@@ -1,0 +1,15 @@
+{
+  "name": "basel-sub60",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HYROX Basel 2027 Trainingsplan-App (PWA)",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/",
+    "dev": "node scripts/serve.js",
+    "pdf2text": "node scripts/pdf-to-text.cjs"
+  },
+  "devDependencies": {
+    "pdfjs-dist": "3.11.174"
+  }
+}

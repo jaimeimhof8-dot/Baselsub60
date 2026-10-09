@@ -16,6 +16,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 :root{
   color-scheme:dark;
@@ -160,6 +162,7 @@ th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;le
 .opt b{display:block}
 .day .meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .btn+.btn{margin-top:8px}
+.grid2 .btn{margin-top:0}
 #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:22px;font-size:14px;font-weight:600;z-index:30;pointer-events:none}
 </style>
 </head>
@@ -182,6 +185,7 @@ th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;le
   <button class="mi" data-v="inj"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/><rect x="3" y="3" width="18" height="18" rx="4"/></svg><span><b>Verletzt / krank</b><span class="sub">Trainings für mehrere Tage anpassen</span></span></button>
   <button class="mi" data-act="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span><b>Backup exportieren</b><span class="sub">Alle Einträge als Text teilen</span></span></button>
   <button class="mi" data-act="import"><svg viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5M5 20h14"/></svg><span><b>Backup importieren</b><span class="sub">Z. B. auf neues Handy übertragen</span></span></button>
+  <div id="acct" style="border-top:1px solid var(--line);margin-top:8px;padding-top:16px"></div>
 </div>
 <div id="toast" hidden></div>
 
@@ -252,11 +256,16 @@ const WAVE = ["moderat","hart","Spitzenreiz","Deload"];
 const NWEEKS = 18;
 
 /* ---------- Speicher ---------- */
-let S;
-const def = ()=>({done:{},val:{},rpe:{},notes:{},sched:{},skip:{},tests:{lauf:{j:["","","",""],m:["","","",""]},station:{},trans:["","","","","",""]}});
-try{ S = JSON.parse(localStorage.getItem("hx")||"null") || def(); }catch(e){ S = def(); }
-for(const [k,v] of Object.entries(def())) if(!S[k]) S[k]=v;
-function save(){ try{localStorage.setItem("hx",JSON.stringify(S));}catch(e){} }
+/* Lokal im Gerät (Schlüssel pro Nutzer), bei Login zusätzlich in Supabase gespiegelt. S._t = Zeit der letzten Änderung. */
+let S, LSK="hx";
+const def = ()=>({done:{},val:{},rpe:{},notes:{},sched:{},skip:{},edit:{},tests:{lauf:{j:["","","",""],m:["","","",""]},station:{},trans:["","","","","",""]}});
+const fill = (o)=>{ for(const [k,v] of Object.entries(def())) if(!o[k]) o[k]=v; return o; };
+const lsGet = (k)=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
+const lsSet = (k,v)=>{ try{ localStorage.setItem(k,v); }catch(e){} };
+function loadLocal(){ try{ S = JSON.parse(lsGet(LSK)||"null") || def(); }catch(e){ S = def(); } fill(S); }
+function saveLocal(){ lsSet(LSK,JSON.stringify(S)); }
+function save(){ S._t=Date.now(); saveLocal(); queuePush(); }
+loadLocal();
 
 /* ---------- Helfer ---------- */
 const $ = (s)=>document.querySelector(s);
@@ -300,11 +309,22 @@ function setE(x,patch){
   if(o.src===x) delete o.src;
   if(Object.keys(o).length) S.sched[x]=o; else delete S.sched[x];
 }
+/* Der Plan ist aus Jaimes Sicht geschrieben ("mit Jimoh"). Für den Partner wird der Name getauscht. */
+let ME="Jaime", PARTNER="Jimoh";
+const per = (s)=>ME==="Jaime" ? s : String(s).replace(/Jimoh/g,PARTNER);
+/* Plan inkl. eigener Übungsanpassung (S.edit hängt an der Einheit, nicht am Datum – wandert beim Verschieben mit) */
+function ownPlan(src){
+  const b=basePlan(src); if(!b) return null;
+  const p=Object.assign({},b,{t:per(b.t),i:b.i.map(per),n:per(b.n||"")});
+  const ed=S.edit[src];
+  if(ed && p.k!=="rest") Object.assign(p,{t:ed.t||p.t,i:ed.i,n:ed.n||"",edited:1});
+  return p;
+}
 function dayPlan(i){
   if(i<0||i>LAST) return null;
   const o=S.sched[i]||{}, src=srcOf(i);
-  let p=basePlan(src); if(!p) return null;
-  p=Object.assign({},p); if(src!==i) p.moved=src;
+  let p=ownPlan(src); if(!p) return null;
+  if(src!==i) p.moved=src;
   if(o.inj){
     const was=p.k==="rest"?"":` Geplant war: ${p.t}.`;
     if(o.inj==="pause"||p.k==="rest") p={t:p.k==="rest"?"Ruhetag":"Verletzt – Pause",k:"rest",i:[],n:"Heute kein Training. Erholen, schlafen, gut essen."+was,inj:o.inj};
@@ -394,7 +414,9 @@ function sessionCard(i){
     <h1 style="margin-top:10px">${esc(p.t)}</h1>`;
   if(p.moved!=null) h+=`<div class="sub" style="margin-top:6px"><span class="badge mv">Verschoben</span> ursprünglich ${shortDay(p.moved)}</div>`;
   if(S.skip[dk]) h+=`<div class="target" style="border-color:rgba(255,138,128,.4);background:rgba(255,138,128,.1)">Als <b style="color:var(--danger)">ausgefallen</b> markiert. Tipp: auf einen freien Tag verschieben.</div>`;
-  const planBtn=`<button class="btn" style="margin-top:14px" data-move="${i}">${p.k==="rest"&&!p.inj?"Training auf diesen Tag holen":"Umplanen / ausgefallen"}</button>`;
+  const moveBtn=`<button class="btn" data-move="${i}">${p.k==="rest"&&!p.inj?"Training auf diesen Tag holen":"Umplanen"}</button>`;
+  const planBtn=p.k==="rest"||p.inj ? `<div style="margin-top:14px">${moveBtn}</div>`
+    : `<div class="grid2" style="margin-top:14px">${moveBtn}<button class="btn" data-edit="${i}">Übungen anpassen</button></div>`;
   if(p.k==="rest"){ return h+`<div class="hint">${esc(p.n)}</div>${planBtn}</div>`; }
   h+=`<div class="prog"><i style="width:${n?done/n*100:0}%"></i></div><div class="sub">${done} von ${n} erledigt</div>`;
   if(p.tp){ const T=teamT();
@@ -423,6 +445,7 @@ function dayBadges(i,p){
   if(p.inj) b.push(`<span class="badge warn">Verletzt</span>`);
   else if(p.back) b.push(`<span class="badge ok">Comeback</span>`);
   if(p.moved!=null) b.push(`<span class="badge mv">Verschoben</span>`);
+  if(p.edited) b.push(`<span class="badge">Angepasst</span>`);
   if(S.skip[key(dateFromIdx(i))]) b.push(`<span class="badge warn">Ausgefallen</span>`);
   return b.join("");
 }
@@ -470,7 +493,7 @@ function vPlan(){
     h+=`<div class="blk ${cur===k?"cur":""}"><div class="tag">${k==="T"?"T":k}</div><div><b>${esc(b.name)}</b><div class="sub">${b.range}</div><ul>`+
       b.d.map((x,j)=>x[1]==="rest"?"":`<li>${DAYS[j]} · <b>${esc(x[0])}</b>${x[2]?" – "+esc(x[2]):""}</li>`).join("")+`</ul></div></div>`; }
   h+=`</div><div class="sub">Jeder Block: moderat → hart → Spitzenreiz → Deload. Konkrete Paces und Gewichte für B–D kommen nach den Testdaten.</div>`;
-  return h;
+  return per(h);
 }
 
 function vTests(){
@@ -547,12 +570,119 @@ function vInj(){
   return h;
 }
 
+let editFrom=null;
+function vEdit(){
+  const i=editFrom, src=srcOf(i), p=ownPlan(src);
+  return `<button class="back" data-back>‹ Zurück</button><h2>Übungen anpassen</h2>
+    <div class="sub" style="margin:6px 0 4px">${DAYSF[((i%7)+7)%7]}, ${fmt(dateFromIdx(i))} · gilt nur für diese Einheit</div>
+    <div class="card k-${p.k}" style="margin-top:12px">
+      <label class="lbl" style="margin-top:0">Titel</label><input type="text" id="ed-t" value="${esc(p.t)}">
+      <label class="lbl">Übungen – eine pro Zeile</label><textarea id="ed-i" rows="8" style="min-height:190px">${esc(p.i.join("\n"))}</textarea>
+      <label class="lbl">Hinweis</label><textarea id="ed-n">${esc(p.n)}</textarea>
+      <button class="btn primary" style="margin-top:16px" data-act="edit-save">Speichern</button>
+      ${S.edit[src]?`<button class="btn" data-act="edit-reset">Original wiederherstellen</button>`:""}
+    </div>
+    <div class="sub">Z. B. Back Squat durch Front Squat ersetzen oder Gewichte an deine Testwerte anpassen. Abgehakte Übungen hängen an der Zeilennummer.</div>`;
+}
+
+/* ---------- Konto & Sync (Supabase) ---------- */
+const CFG = window.HX_CONFIG || {};
+const CLOUD = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
+const sb = CLOUD && window.supabase ? window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey) : null;
+let USER=null, loginStep="email", loginEmail="", loginMsg="", syncState="", pushT=null, dirty=false;
+
+function vLogin(){
+  if(!sb) return `<h2 style="margin-top:20px">Offline</h2><div class="hint">Für die erste Anmeldung braucht die App Internet.</div>`;
+  const msg=loginMsg?`<div class="target" style="border-color:rgba(255,138,128,.4);background:rgba(255,138,128,.1)">${esc(loginMsg)}</div>`:"";
+  if(loginStep==="email") return `<h2 style="margin-top:20px">Anmelden</h2>
+    <div class="sub" style="margin:6px 0 16px">Mit deiner E-Mail. Du bekommst einen Code, kein Passwort nötig.</div>
+    <form class="card" data-form="email"><label class="lbl" style="margin-top:0" for="le">E-Mail</label>
+      <input type="text" id="le" inputmode="email" autocomplete="email" autocapitalize="off" value="${esc(loginEmail)}" placeholder="name@beispiel.ch">
+      ${msg}<button class="btn primary" style="margin-top:16px">Code senden</button></form>`;
+  return `<h2 style="margin-top:20px">Code eingeben</h2>
+    <div class="sub" style="margin:6px 0 16px">Gesendet an ${esc(loginEmail)}. Schau auch im Spam-Ordner.</div>
+    <form class="card" data-form="code"><label class="lbl" style="margin-top:0" for="lc">Code aus der E-Mail</label>
+      <input type="text" id="lc" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" style="font-size:24px;letter-spacing:.2em">
+      ${msg}<button class="btn primary" style="margin-top:16px">Anmelden</button></form>
+    <button class="btn" data-act="otp-back">Andere E-Mail</button>`;
+}
+function setSync(s){ syncState=s; const el=$("#acct-sync"); if(el) el.textContent=syncLabel(); }
+const syncLabel=()=>({ok:"✓ gespeichert in der Cloud",offline:"Offline – wird später gespeichert",busy:"Speichert …"}[syncState]||"");
+function queuePush(){ if(!sb||!USER) return; dirty=true; setSync("busy"); clearTimeout(pushT); pushT=setTimeout(push,1200); }
+async function push(){
+  if(!sb||!USER) return; dirty=false;
+  const {error}=await sb.from("plan_state").upsert({user_id:USER.id,data:S,updated_at:new Date().toISOString()});
+  if(error){ dirty=true; setSync("offline"); } else setSync("ok");
+}
+/* Neuere Version aus der Cloud holen (z. B. vom anderen Gerät). Gibt true zurück, wenn sich S geändert hat. */
+async function pull(){
+  const {data,error}=await sb.from("plan_state").select("data").eq("user_id",USER.id).maybeSingle();
+  if(error){ setSync("offline"); return false; }
+  const rt=data&&data.data&&data.data._t||0, lt=S._t||0;
+  if(data && rt>lt){ S=fill(data.data); saveLocal(); setSync("ok"); return true; }
+  if(!data || lt>rt) await push(); else setSync("ok");
+  return false;
+}
+async function onLogin(user){
+  USER=user; LSK="hx:"+user.id; lsSet("hx:last",user.id);
+  const {data:m,error}=await sb.from("members").select("email,name");
+  if(!error && !m.length){ await sb.auth.signOut(); USER=null; LSK="hx"; loginStep="email"; loginMsg="Diese E-Mail ist für die App nicht freigeschaltet."; view="login"; return render(); }
+  if(!error){ const me=m.find(x=>x.email.toLowerCase()===user.email.toLowerCase())||{name:user.email}; ME=me.name; PARTNER=(m.find(x=>x!==me)||{name:"Partner"}).name; lsSet("hx:names:"+user.id,JSON.stringify([ME,PARTNER])); }
+  else { try{ [ME,PARTNER]=JSON.parse(lsGet("hx:names:"+user.id))||[ME,PARTNER]; }catch(_){} }
+  loadLocal();
+  // Erste Anmeldung auf diesem Gerät: Einträge aus der Zeit ohne Login übernehmen?
+  const old=lsGet("hx");
+  if(!lsGet(LSK) && old && confirm(`Bisherige Einträge auf diesem Gerät in das Konto von ${ME} übernehmen?`)){
+    try{ S=fill(JSON.parse(old)); S._t=Date.now(); saveLocal(); lsSet("hx:übernommen",old); localStorage.removeItem("hx"); }catch(_){}
+  }
+  if(view==="login") view="today";
+  render(); await pull(); render();
+}
+async function boot(){
+  if(!CLOUD) return render();
+  if(!sb){ // Konfiguriert, aber Bibliothek nicht geladen (offline beim allerersten Start)
+    const last=lsGet("hx:last"); if(last){ LSK="hx:"+last; loadLocal(); try{ [ME,PARTNER]=JSON.parse(lsGet("hx:names:"+last))||[ME,PARTNER]; }catch(_){} return render(); }
+    view="login"; return render();
+  }
+  const {data:{session}}=await sb.auth.getSession();
+  if(session) return onLogin(session.user);
+  view="login"; render();
+}
+window.addEventListener("online",()=>{ if(dirty) push(); });
+document.addEventListener("visibilitychange",async()=>{
+  if(!sb||!USER) return;
+  if(document.visibilityState==="hidden"){ if(dirty){ clearTimeout(pushT); push(); } return; }
+  if(dirty) return;
+  const busy=document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName);
+  if(await pull() && !busy) render();
+});
+document.addEventListener("submit",async e=>{
+  const f=e.target.closest("[data-form]"); if(!f) return; e.preventDefault();
+  const btn=f.querySelector("button"); btn.disabled=true; loginMsg="";
+  if(f.dataset.form==="email"){
+    loginEmail=$("#le").value.trim().toLowerCase();
+    if(!/^\S+@\S+\.\S+$/.test(loginEmail)){ loginMsg="Bitte eine gültige E-Mail eingeben."; return render(); }
+    const {error}=await sb.auth.signInWithOtp({email:loginEmail,options:{shouldCreateUser:true}});
+    if(error) loginMsg=/rate|seconds/i.test(error.message)?"Zu viele Versuche. Bitte kurz warten.":error.message; else loginStep="code";
+    render(); const c=$("#lc"); if(c) c.focus();
+  } else {
+    const code=$("#lc").value.replace(/\s/g,"");
+    const {data,error}=await sb.auth.verifyOtp({email:loginEmail,token:code,type:"email"});
+    if(error){ loginMsg="Code falsch oder abgelaufen."; return render(); }
+    loginStep="email"; await onLogin(data.user);
+  }
+});
+
 /* ---------- Render + Events ---------- */
 function render(){
   const left=Math.ceil((RACE-midnight(new Date()))/dayMs);
   $("#cd").textContent=left>0?left:"🏁";
-  $("#main").innerHTML={today:vToday,week:vWeek,plan:vPlan,tests:vTests,move:vMove,inj:vInj}[view]();
+  $("#main").innerHTML={today:vToday,week:vWeek,plan:vPlan,tests:vTests,move:vMove,inj:vInj,edit:vEdit,login:vLogin}[view]();
   document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
+  const out=view==="login";
+  $("#nav").hidden=out; document.querySelector(".top .menu-btn").style.visibility=out?"hidden":"";
+  $("#acct").innerHTML = sb&&USER ? `<div class="sub">Angemeldet als <b style="color:var(--text)">${esc(ME)}</b></div>
+    <div class="sub" id="acct-sync">${syncLabel()}</div><button class="btn" style="margin-top:12px" data-act="logout">Abmelden</button>` : "";
 }
 function go(v){
   if(["today","week","plan"].includes(view)) prevView=view;
@@ -568,11 +698,19 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape") menu(false); });
 function toast(m){ const t=$("#toast"); t.textContent=m; t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,2400); }
 
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-v],[data-wk],[data-open],[data-sel],[data-r],[data-act],[data-back],[data-move],[data-swap],[data-injs],[data-injd],[data-injm]"); if(!t) return;
+  const t=e.target.closest("[data-v],[data-wk],[data-open],[data-sel],[data-r],[data-act],[data-back],[data-move],[data-swap],[data-injs],[data-injd],[data-injm],[data-edit]"); if(!t) return;
   const d=t.dataset;
   if(d.v) return go(d.v);
   if(d.back!==undefined) return go(prevView);
   if(d.move!==undefined){ moveFrom=+d.move; return go("move"); }
+  if(d.edit!==undefined){ editFrom=+d.edit; return go("edit"); }
+  if(d.act==="edit-save"){ const lines=$("#ed-i").value.split("\n").map(s=>s.trim()).filter(Boolean);
+    if(!lines.length) return toast("Mindestens eine Übung eintragen");
+    S.edit[srcOf(editFrom)]={t:$("#ed-t").value.trim(),i:lines,n:$("#ed-n").value.trim()}; save(); toast("Einheit angepasst"); return go(prevView); }
+  if(d.act==="edit-reset"){ delete S.edit[srcOf(editFrom)]; save(); toast("Original wiederhergestellt"); return go(prevView); }
+  if(d.act==="otp-back"){ loginStep="email"; loginMsg=""; return render(); }
+  if(d.act==="logout"){ menu(false); if(!confirm("Abmelden? Deine Daten bleiben in der Cloud gespeichert.")) return;
+    (async()=>{ if(dirty){ clearTimeout(pushT); await push(); } await sb.auth.signOut(); USER=null; LSK="hx"; ME="Jaime"; PARTNER="Jimoh"; S=def(); view="login"; render(); })(); return; }
   if(d.swap!==undefined){
     const i=moveFrom, j=+d.swap, pulled=dayPlan(i).k==="rest", to=pulled?i:j;
     swapDays(i,j); save();
@@ -625,7 +763,7 @@ document.addEventListener("input",e=>{
     const el=document.querySelector(`[${attr}="${id}"]`); if(el){ el.focus(); try{el.setSelectionRange(p,p);}catch(_){} } }
 });
 
-render();
+boot();
 if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>

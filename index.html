@@ -37,10 +37,11 @@ h1{font-size:34px}h2{font-size:22px}h3{font-size:18px}
 
 /* Kopf */
 .top{position:sticky;top:0;z-index:5;background:rgba(15,17,19,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--line);padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));display:flex;align-items:center;gap:12px}
-.brand{font-family:var(--f-head);font-weight:700;font-size:22px;letter-spacing:.06em;text-transform:uppercase;flex:1}
-.brand b{background:var(--accent);color:var(--on-accent);padding:0 7px;margin-left:4px}
-.cd{font-family:var(--f-head);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:right;line-height:1.05}
+  border-bottom:1px solid var(--line);padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.brand{font-family:var(--f-head);font-weight:700;font-size:20px;letter-spacing:.06em;text-transform:uppercase;justify-self:start;white-space:nowrap}
+.brand b{background:var(--accent);color:var(--on-accent);padding:0 6px;margin-left:4px}
+.top .menu-btn{justify-self:end}
+.cd{font-family:var(--f-head);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;line-height:1.05}
 .cd span{display:block;font-size:26px;color:var(--text);letter-spacing:0}
 .menu-btn{width:44px;height:44px;border-radius:11px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center}
 .menu-btn svg{width:20px;height:20px;fill:var(--text)}
@@ -125,10 +126,14 @@ input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);
 .tabs button.on{color:var(--text)}
 .tabs button.on svg{stroke:var(--accent)}
 
-/* Menü-Sheet */
-.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:var(--card);border-radius:20px 20px 0 0;padding:10px 16px calc(20px + env(safe-area-inset-bottom));max-width:620px;margin:0 auto;border-top:1px solid var(--line)}
-.sheet .grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px}
+/* Menü-Schublade (von rechts) */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
+.scrim.open{opacity:1;visibility:visible;transition:opacity .25s}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:21;width:min(330px,86vw);overflow-y:auto;background:var(--card);border-left:1px solid var(--line);
+  padding:calc(14px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));transform:translateX(100%);visibility:hidden;transition:transform .25s ease,visibility 0s .25s}
+.drawer.open{transform:none;visibility:visible;transition:transform .25s ease}
+.drawer-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+@media (prefers-reduced-motion:reduce){.drawer,.scrim{transition:none}}
 .mi{display:flex;gap:14px;align-items:center;width:100%;padding:14px 4px;background:none;border:0;border-top:1px solid var(--line);text-align:left;min-height:60px}
 .mi:first-of-type{border-top:0}
 .mi svg{width:22px;height:22px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
@@ -142,13 +147,26 @@ th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;le
 .res{font-weight:700;color:var(--accent)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--muted);font-weight:600;padding:4px 0 14px;min-height:44px}
+/* Umplanen */
+.badge{font-family:var(--f-head);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.badge.warn{background:rgba(255,138,128,.15);color:var(--danger)}
+.badge.mv{background:rgba(110,164,240,.15);color:var(--lauf)}
+.badge.ok{background:rgba(111,207,134,.15);color:var(--ok)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{min-width:48px;height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-weight:600}
+.chips button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.opt{display:block;width:100%;text-align:left;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);margin-top:8px}
+.opt.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt b{display:block}
+.day .meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.btn+.btn{margin-top:8px}
 #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:22px;font-size:14px;font-weight:600;z-index:30;pointer-events:none}
 </style>
 </head>
 <body>
 <div class="top">
   <div class="brand">Basel<b>Sub-60</b></div>
-  <div class="cd"><span id="cd">–</span>Tage</div>
+  <div class="cd"><span id="cd">–</span>Tage bis Basel</div>
   <button class="menu-btn" data-act="menu" aria-label="Menü"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
 </div>
 <main id="main"></main>
@@ -157,11 +175,13 @@ th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;le
   <button data-v="week"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Woche</button>
   <button data-v="plan"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Plan</button>
 </nav>
-<div class="scrim" id="scrim" data-act="close" hidden></div>
-<div class="sheet" id="sheet" role="dialog" aria-label="Menü" hidden>
-  <div class="grab"></div>
+<div class="scrim" id="scrim" data-act="close"></div>
+<div class="drawer" id="sheet" role="dialog" aria-label="Menü" aria-hidden="true">
+  <div class="drawer-h"><h2>Menü</h2><button class="menu-btn" data-act="close" aria-label="Menü schliessen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg></button></div>
   <button class="mi" data-v="tests"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7"/><path d="M12 13V9M9 3h6"/></svg><span><b>Tests &amp; Benchmarks</b><span class="sub">Pacing-Test, Stationszeiten, Übergaben</span></span></button>
+  <button class="mi" data-v="inj"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/><rect x="3" y="3" width="18" height="18" rx="4"/></svg><span><b>Verletzt / krank</b><span class="sub">Trainings für mehrere Tage anpassen</span></span></button>
   <button class="mi" data-act="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span><b>Backup exportieren</b><span class="sub">Alle Einträge als Text teilen</span></span></button>
+  <button class="mi" data-act="import"><svg viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5M5 20h14"/></svg><span><b>Backup importieren</b><span class="sub">Z. B. auf neues Handy übertragen</span></span></button>
 </div>
 <div id="toast" hidden></div>
 
@@ -233,7 +253,7 @@ const NWEEKS = 18;
 
 /* ---------- Speicher ---------- */
 let S;
-const def = ()=>({done:{},val:{},rpe:{},notes:{},tests:{lauf:{j:["","","",""],m:["","","",""]},station:{},trans:["","","","","",""]}});
+const def = ()=>({done:{},val:{},rpe:{},notes:{},sched:{},skip:{},tests:{lauf:{j:["","","",""],m:["","","",""]},station:{},trans:["","","","","",""]}});
 try{ S = JSON.parse(localStorage.getItem("hx")||"null") || def(); }catch(e){ S = def(); }
 for(const [k,v] of Object.entries(def())) if(!S[k]) S[k]=v;
 function save(){ try{localStorage.setItem("hx",JSON.stringify(S));}catch(e){} }
@@ -257,13 +277,84 @@ function weekInfo(w){
   const bs=BLOCK_STARTS.find(x=>x[0]===b)[1];
   return {block:b,name:BLOCKS[b].name,wave:b==="T"?"Taper":WAVE[Math.min(3,Math.floor((d0-bs)/dayMs/7))]};
 }
-function dayPlan(i){
+/* Originalplan eines Tages (ohne Umplanungen) */
+function basePlan(i){
   const w=Math.floor(i/7), dw=((i%7)+7)%7;
   if(w<0||w>=NWEEKS) return null;
   if(w<4) return WEEKS[w].days[dw];
   const x=BLOCKS[weekInfo(w).block].d[dw];
   return {t:x[0],k:x[1],i:x[1]==="rest"?[]:[x[0]],n:x[2]?x[2]+". Genaue Zahlen folgen nach den Testdaten aus Block A.":"",gen:true};
 }
+
+/* ---------- Umplanen ----------
+   S.sched[tagIndex] = {src: Tag, dessen Einheit hier stattfindet, inj: "pause"|"alt", back: Comeback-Einheit}
+   S.skip[datumKey]  = Einheit ist ausgefallen */
+const LAST = NWEEKS*7-1;
+const HARD = ["kraft","lauf","station","sim"];
+const isHardP = (p)=>!!p && HARD.includes(p.k);
+const srcOf = (x)=>S.sched[x] && S.sched[x].src!=null ? S.sched[x].src : x;
+const shortDay = (i)=>DAYS[((i%7)+7)%7]+" "+fmt(dateFromIdx(i));
+function setE(x,patch){
+  const o=Object.assign({},S.sched[x],patch);
+  for(const k of Object.keys(o)) if(o[k]==null||o[k]===false) delete o[k];
+  if(o.src===x) delete o.src;
+  if(Object.keys(o).length) S.sched[x]=o; else delete S.sched[x];
+}
+function dayPlan(i){
+  if(i<0||i>LAST) return null;
+  const o=S.sched[i]||{}, src=srcOf(i);
+  let p=basePlan(src); if(!p) return null;
+  p=Object.assign({},p); if(src!==i) p.moved=src;
+  if(o.inj){
+    const was=p.k==="rest"?"":` Geplant war: ${p.t}.`;
+    if(o.inj==="pause"||p.k==="rest") p={t:p.k==="rest"?"Ruhetag":"Verletzt – Pause",k:"rest",i:[],n:"Heute kein Training. Erholen, schlafen, gut essen."+was,inj:o.inj};
+    else p={t:"Alternativtraining",k:"bike",i:["Mobility 15′, nur schmerzfreie Bewegungen","Bike 30–40′ Zone 1–2, ganz locker","Core / Oberkörper leicht, verletzte Stelle schonen"],
+      n:"Nur machen, was ohne Schmerzen geht. Bei Schmerz sofort aufhören."+was,inj:o.inj};
+  } else if(o.back && p.k!=="rest"){
+    p.n="Comeback nach Pause: ca. 70 % von Volumen und Gewicht, RPE max. 6."+(p.n?" "+p.n:""); p.back=1;
+  }
+  return p;
+}
+/* Einheiten von Tag i und j tauschen. Abgehakte Übungen und Werte wandern mit der Einheit mit. */
+function swapDays(i,j){
+  const a=srcOf(i), b=srcOf(j);
+  setE(i,{src:b}); setE(j,{src:a});
+  const A=key(dateFromIdx(i))+"|", B=key(dateFromIdx(j))+"|";
+  for(const m of [S.done,S.val]){
+    const ea=[], eb=[];
+    for(const k of Object.keys(m)){ if(k.startsWith(A)) ea.push(k); else if(k.startsWith(B)) eb.push(k); }
+    const va=ea.map(k=>[k.slice(A.length),m[k]]), vb=eb.map(k=>[k.slice(B.length),m[k]]);
+    [...ea,...eb].forEach(k=>delete m[k]);
+    va.forEach(([s,v])=>m[B+s]=v); vb.forEach(([s,v])=>m[A+s]=v);
+  }
+  delete S.skip[key(dateFromIdx(i))]; delete S.skip[key(dateFromIdx(j))];
+}
+function restoreDay(i){
+  const o=S.sched[i]; if(!o) return;
+  if(o.inj||o.back) return setE(i,{inj:null,back:null});
+  for(let x=0;x<=LAST;x++) if(x!==i && srcOf(x)===i) return swapDays(i,x);
+  setE(i,{src:null});
+}
+/* Wäre nach dem Tausch an Tag j hart auf hart? */
+function hardWarn(i,j){
+  const after=(x)=>x===i?dayPlan(j):x===j?dayPlan(i):dayPlan(x);
+  return isHardP(after(j)) && (isHardP(after(j-1))||isHardP(after(j+1)));
+}
+function applyInjury(start,days,mode){
+  const end=Math.min(LAST,start+days-1);
+  for(let x=start;x<=end;x++) setE(x,{inj:mode,back:null});
+  for(let x=end+1;x<=LAST;x++) if(S.sched[x]&&S.sched[x].back) setE(x,{back:null});
+  if(days>=3) markComeback(end+1);
+}
+function markComeback(from){
+  let n=0; for(let x=Math.max(0,from);x<=LAST&&n<3;x++){ const p=dayPlan(x); if(p&&p.k!=="rest"&&!p.inj){ setE(x,{back:1}); n++; } }
+}
+function endInjury(){
+  const t=Math.max(0,TODAY);
+  for(let x=t;x<=LAST;x++) if(S.sched[x]) setE(x,{inj:null,back:null});
+  markComeback(t);
+}
+const injActive=()=>Object.keys(S.sched).some(x=>+x>=TODAY && S.sched[x].inj);
 const mmss=(s)=>{s=Math.round(s);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");};
 function parseT(v){ v=String(v||"").trim().replace(",",".");
   if(!v) return NaN; if(v.includes(":")){const [m,s]=v.split(":");return (+m)*60+(+s);} const n=+v; return isNaN(n)?NaN:n; }
@@ -301,7 +392,10 @@ function sessionCard(i){
   let h=`<div class="card hero k-${p.k}">
     <div class="row between"><span class="kind">${KIND[p.k]}</span><span class="sub">${DAYSF[dw]}, ${fmt(d)}</span></div>
     <h1 style="margin-top:10px">${esc(p.t)}</h1>`;
-  if(p.k==="rest"){ return h+`<div class="hint">${esc(p.n)}</div></div>`; }
+  if(p.moved!=null) h+=`<div class="sub" style="margin-top:6px"><span class="badge mv">Verschoben</span> ursprünglich ${shortDay(p.moved)}</div>`;
+  if(S.skip[dk]) h+=`<div class="target" style="border-color:rgba(255,138,128,.4);background:rgba(255,138,128,.1)">Als <b style="color:var(--danger)">ausgefallen</b> markiert. Tipp: auf einen freien Tag verschieben.</div>`;
+  const planBtn=`<button class="btn" style="margin-top:14px" data-move="${i}">${p.k==="rest"&&!p.inj?"Training auf diesen Tag holen":"Umplanen / ausgefallen"}</button>`;
+  if(p.k==="rest"){ return h+`<div class="hint">${esc(p.n)}</div>${planBtn}</div>`; }
   h+=`<div class="prog"><i style="width:${n?done/n*100:0}%"></i></div><div class="sub">${done} von ${n} erledigt</div>`;
   if(p.tp){ const T=teamT();
     h+= isNaN(T)? `<div class="target">Noch kein Team-Tempo T. Trag zuerst den Pacing-Test ein (Menü → Tests).</div>`
@@ -321,14 +415,22 @@ function sessionCard(i){
   h+=`<label class="lbl">Wie hart war's? (RPE)</label><div class="rpe">${[1,2,3,4,5,6,7,8,9,10].map(r=>`<button data-r="${dk}|${r}" class="${S.rpe[dk]==r?"on":""}">${r}</button>`).join("")}</div>
     <label class="lbl">Notiz</label><textarea data-n="${dk}" placeholder="Gefühl, Schlaf, Fuss, was auffiel …">${esc(S.notes[dk]||S.notes["n|"+dk]||"")}</textarea>`;
   if(p.test) h+=`<button class="btn" style="margin-top:14px" data-v="tests">Testergebnisse eintragen →</button>`;
-  return h+`</div>`;
+  return h+planBtn+`</div>`;
 }
 
+function dayBadges(i,p){
+  const b=[];
+  if(p.inj) b.push(`<span class="badge warn">Verletzt</span>`);
+  else if(p.back) b.push(`<span class="badge ok">Comeback</span>`);
+  if(p.moved!=null) b.push(`<span class="badge mv">Verschoben</span>`);
+  if(S.skip[key(dateFromIdx(i))]) b.push(`<span class="badge warn">Ausgefallen</span>`);
+  return b.join("");
+}
 function dayRow(i){
   const p=dayPlan(i), d=dateFromIdx(i), dw=((i%7)+7)%7, {n,done}=dayStatus(i);
   const st = p.k==="rest" ? "" : (n&&done===n ? `<span class="status done">✓ Erledigt</span>` : done ? `<span class="status">${done}/${n}</span>` : "");
   return `<button class="day k-${p.k} ${i===TODAY?"today":""}" data-open="${i}"><span class="d">${DAYS[dw]}<b>${d.getDate()}</b></span>
-    <span class="t"><b>${esc(p.t)}</b><span class="kind">${KIND[p.k]}</span></span>${st}</button>`;
+    <span class="t"><b>${esc(p.t)}</b><span class="kind">${KIND[p.k]}</span></span><span class="meta">${dayBadges(i,p)}${st}</span></button>`;
 }
 
 /* ---------- Ansichten ---------- */
@@ -393,21 +495,102 @@ function vTests(){
   return h;
 }
 
+let moveFrom=null, prevView="today", injStart=null, injDays=3, injMode="alt";
+
+function vMove(){
+  const i=moveFrom, p=dayPlan(i), dk=key(dateFromIdx(i)), rest=p.k==="rest";
+  const from=Math.max(Math.floor(i/7)*7,TODAY,0), to=Math.min(LAST,Math.max(Math.floor(i/7)*7+13,from+6));
+  let h=`<button class="back" data-back>‹ Zurück</button><h2>Umplanen</h2>
+    <div class="sub" style="margin:6px 0 4px">${DAYSF[((i%7)+7)%7]}, ${fmt(dateFromIdx(i))}</div>
+    <div class="card k-${p.k}" style="padding:14px"><span class="kind">${KIND[p.k]}</span><h3 style="margin-top:4px">${esc(p.t)}</h3></div>`;
+  if(p.inj) return h+`<div class="hint">Dieser Tag ist wegen Verletzung angepasst.</div>
+    <button class="btn" style="margin-top:14px" data-act="restore">Für diesen Tag aufheben</button><button class="btn" data-v="inj">Verletzung verwalten →</button>`;
+  if(!rest){
+    h+=`<div class="cap">Keine Zeit gehabt?</div>
+      <button class="btn ${S.skip[dk]?"":"primary"}" data-act="skip">${S.skip[dk]?"Doch nicht ausgefallen":"Als ausgefallen markieren"}</button>`;
+  }
+  h+=`<div class="cap">${rest?"Diese Einheit hierher holen":"Tauschen mit"}</div>
+    <div class="sub" style="margin:-4px 0 10px">Die Einheiten tauschen den Tag. ${rest?"":"Freie Tage sind am besten."}</div><div class="list">`;
+  for(let j=from;j<=to;j++){
+    if(j===i) continue; const q=dayPlan(j); if(!q||q.inj) continue;
+    if(rest && q.k==="rest") continue;
+    const tags=[];
+    if(!rest && q.k==="rest") tags.push(`<span class="badge ok">frei</span>`);
+    if(hardWarn(i,j)||hardWarn(j,i)) tags.push(`<span class="badge warn">hart auf hart</span>`);
+    h+=`<button class="day k-${q.k}" data-swap="${j}"><span class="d">${DAYS[((j%7)+7)%7]}<b>${dateFromIdx(j).getDate()}</b></span>
+      <span class="t"><b>${esc(q.t)}</b><span class="kind">${KIND[q.k]}</span></span><span class="meta">${tags.join("")}</span></button>`;
+  }
+  h+=`</div><div class="sub">„Hart auf hart“ = zwei harte Einheiten direkt hintereinander. Geht, aber besser vermeiden.</div>`;
+  h+=`<div class="cap">Verletzt oder krank?</div><button class="btn" data-act="inj-from">Ab diesem Tag anpassen →</button>`;
+  if(S.sched[i]) h+=`<div class="cap">Änderung rückgängig</div><button class="btn" data-act="restore">Original wiederherstellen</button>`;
+  return h;
+}
+
+function vInj(){
+  if(injStart==null) injStart=Math.max(0,TODAY);
+  const end=Math.min(LAST,injStart+injDays-1);
+  let h=`<button class="back" data-back>‹ Zurück</button><h2>Verletzt / krank</h2>
+    <div class="sub" style="margin:6px 0 4px">Die betroffenen Tage werden angepasst. Danach folgen 3 Comeback-Einheiten mit reduzierter Last.</div>`;
+  if(injActive()) h+=`<div class="card" style="margin-top:14px"><b>Gerade aktiv</b><div class="sub" style="margin:4px 0 12px">Wieder fit? Ab heute gilt der normale Plan, die nächsten 3 Einheiten sind Comeback.</div>
+    <button class="btn primary" data-act="inj-end">Wieder fit – ab heute normal</button></div>`;
+  h+=`<div class="cap">Ab wann</div><div class="wk"><button data-injs="-1" ${injStart<=0?"disabled":""} aria-label="Einen Tag früher">‹</button>
+      <div><h3>${DAYSF[((injStart%7)+7)%7]}, ${fmt(dateFromIdx(injStart))}</h3></div>
+      <button data-injs="1" ${injStart>=LAST?"disabled":""} aria-label="Einen Tag später">›</button></div>
+    <div class="cap">Wie lange (geschätzt)</div><div class="chips">${[1,2,3,5,7,10,14].map(n=>`<button data-injd="${n}" class="${injDays===n?"on":""}">${n} ${n===1?"Tag":"Tage"}</button>`).join("")}</div>
+    <div class="cap">Was geht noch?</div>
+    <button class="opt ${injMode==="alt"?"on":""}" data-injm="alt"><b>Alternativtraining</b><span class="sub">Locker Bike, Mobility, Core – nur schmerzfrei</span></button>
+    <button class="opt ${injMode==="pause"?"on":""}" data-injm="pause"><b>Komplette Pause</b><span class="sub">Krank, Fieber oder starke Schmerzen</span></button>`;
+  const hit=[]; for(let x=injStart;x<=end;x++){ const p=basePlan(srcOf(x)); if(p&&p.k!=="rest") hit.push(`<li>${shortDay(x)} · <b>${esc(p.t)}</b></li>`); }
+  h+=`<div class="cap">Betroffen bis ${shortDay(end)}</div><div class="card" style="padding:14px">${hit.length?`<ul style="margin:0;padding-left:18px">${hit.join("")}</ul>`:`<span class="sub">Keine Trainings in diesem Zeitraum.</span>`}</div>
+    <button class="btn primary" data-act="inj-apply">Übernehmen</button>
+    <div class="hint">Bei Fieber gilt: kein Training, auch kein lockeres. Bei Schmerzen, die länger als ein paar Tage bleiben, zum Arzt oder Physio.</div>`;
+  return h;
+}
+
 /* ---------- Render + Events ---------- */
 function render(){
   const left=Math.ceil((RACE-midnight(new Date()))/dayMs);
   $("#cd").textContent=left>0?left:"🏁";
-  $("#main").innerHTML={today:vToday,week:vWeek,plan:vPlan,tests:vTests}[view]();
+  $("#main").innerHTML={today:vToday,week:vWeek,plan:vPlan,tests:vTests,move:vMove,inj:vInj}[view]();
   document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
 }
-function go(v){ view=v; if(v==="today") sel=null; menu(false); render(); window.scrollTo(0,0); }
-function menu(open){ $("#sheet").hidden=!open; $("#scrim").hidden=!open; }
+function go(v){
+  if(["today","week","plan"].includes(view)) prevView=view;
+  if(v==="inj" && view!=="move") injStart=null;
+  view=v; if(v==="today") sel=null; menu(false); render(); window.scrollTo(0,0);
+}
+function menu(open){
+  $("#sheet").classList.toggle("open",open); $("#scrim").classList.toggle("open",open);
+  $("#sheet").setAttribute("aria-hidden",String(!open));
+  if(open) $("#sheet").querySelector(".mi").focus({preventScroll:true});
+}
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") menu(false); });
 function toast(m){ const t=$("#toast"); t.textContent=m; t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,2400); }
 
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-v],[data-wk],[data-open],[data-sel],[data-r],[data-act]"); if(!t) return;
+  const t=e.target.closest("[data-v],[data-wk],[data-open],[data-sel],[data-r],[data-act],[data-back],[data-move],[data-swap],[data-injs],[data-injd],[data-injm]"); if(!t) return;
   const d=t.dataset;
   if(d.v) return go(d.v);
+  if(d.back!==undefined) return go(prevView);
+  if(d.move!==undefined){ moveFrom=+d.move; return go("move"); }
+  if(d.swap!==undefined){
+    const i=moveFrom, j=+d.swap, pulled=dayPlan(i).k==="rest", to=pulled?i:j;
+    swapDays(i,j); save();
+    if(prevView==="week"){ wk=Math.floor(to/7); openDay=to; } else sel=to===TODAY?null:to;
+    view=prevView; render(); window.scrollTo(0,0);
+    return toast(`${dayPlan(to).t} → ${shortDay(to)}`); }
+  if(d.injs){ injStart=Math.max(0,Math.min(LAST,injStart+ +d.injs)); return render(); }
+  if(d.injd){ injDays=+d.injd; return render(); }
+  if(d.injm){ injMode=d.injm; return render(); }
+  if(d.act==="skip"){ const k=key(dateFromIdx(moveFrom)); if(S.skip[k]) delete S.skip[k]; else S.skip[k]=1; save();
+    toast(S.skip[k]?"Ausgefallen – wähle unten einen neuen Tag":"Markierung entfernt"); return render(); }
+  if(d.act==="restore"){ restoreDay(moveFrom); save(); toast("Original wiederhergestellt"); return go(prevView); }
+  if(d.act==="inj-from"){ injStart=Math.max(0,moveFrom); return go("inj"); }
+  if(d.act==="inj-apply"){ applyInjury(injStart,injDays,injMode); save(); toast("Plan angepasst. Gute Besserung!"); return go(prevView); }
+  if(d.act==="inj-end"){ endInjury(); save(); toast("Willkommen zurück – 3 Comeback-Einheiten geplant"); return go(prevView); }
+  if(d.act==="import"){ menu(false); const txt=prompt("Backup-Text hier einfügen. Achtung: ersetzt alle Einträge auf diesem Gerät.");
+    if(!txt) return; try{ const o=JSON.parse(txt); if(!o||typeof o!=="object"||!o.done) throw 0;
+      S=Object.assign(def(),o); save(); render(); toast("Backup importiert"); }catch(_){ toast("Das ist kein gültiges Backup"); } return; }
   if(d.wk){ wk=Math.max(0,Math.min(NWEEKS-1,wk+ +d.wk)); openDay=null; return render(); }
   if(d.open!==undefined){ const i=+d.open; openDay=openDay===i?null:i; return render(); }
   if(d.sel!==undefined){ sel=+d.sel===TODAY?null:+d.sel; render(); return window.scrollTo(0,0); }

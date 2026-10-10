@@ -16,8 +16,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<!-- defer: Splash-Screen erscheint sofort, Skripte laufen danach in dieser Reihenfolge -->
+<script src="config.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
 <style>
 :root{
   color-scheme:dark;
@@ -109,6 +110,12 @@ textarea{min-height:76px;resize:vertical;display:block}
 input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px solid var(--accent);outline-offset:1px}
 .lbl{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:var(--s5) 0 var(--s2);letter-spacing:.08em;text-transform:uppercase}
 .lbl:first-child{margin-top:0}
+.pw{position:relative}
+.pw input{padding-right:48px}
+.pw button{position:absolute;right:2px;top:50%;transform:translateY(-50%);width:44px;height:40px;border:0;background:none;color:var(--muted);padding:0;display:flex;align-items:center;justify-content:center}
+.pw svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pw .off{display:none}
+.pw.show .on{display:none}.pw.show .off{display:block}
 .rpe{display:grid;grid-template-columns:repeat(10,1fr);gap:var(--s1)}
 .rpe button{height:44px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-weight:600;font-size:15px;padding:0}
 .rpe button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
@@ -323,6 +330,13 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 .sbox b{color:var(--strava)}
 .sbox .btn{margin-top:var(--s3)}
 
+/* Splash: deckt alles ab, bis feststeht, ob Login oder Trainingsplan gezeigt wird */
+#splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s5);transition:opacity .25s}
+#splash.out{opacity:0;pointer-events:none}
+#splash .brand{font-size:30px}
+#splash .spin{width:28px;height:28px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#splash .spin{animation-duration:2.4s}#splash{transition:none}}
 #toast{position:fixed;left:50%;bottom:calc(var(--tabs-h) + var(--s5) + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px var(--s4);border-radius:22px;font-size:14px;font-weight:600;z-index:30;pointer-events:none;max-width:calc(100vw - 32px);text-align:center}
 
 /* ---------- Responsive ----------
@@ -401,6 +415,7 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 </style>
 </head>
 <body>
+<div id="splash" role="status" aria-label="App wird geladen"><div class="brand">Basel<b>Sub-60</b></div><div class="spin"></div></div>
 <div class="top">
   <div class="brand">Basel<b>Sub-60</b></div>
   <div class="cd"><span id="cd">–</span>Tage bis Basel</div>
@@ -1269,7 +1284,11 @@ function vLogin(){
     <label class="lbl mt-5" for="le">E-Mail</label>
     <input type="email" id="le" inputmode="email" autocomplete="username" autocapitalize="off" value="${esc(loginEmail)}" placeholder="name@beispiel.ch">
     <label class="lbl" for="lp">Passwort</label>
-    <input type="password" id="lp" autocomplete="current-password">`;
+    <div class="pw"><input type="password" id="lp" autocomplete="current-password">
+      <button type="button" data-act="pw-eye" aria-label="Passwort anzeigen" aria-pressed="false" aria-controls="lp">
+        <svg class="on" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg class="off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.1A9.7 9.7 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.6 9.6 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+      </button></div>`;
   if(!CLOUD) h+=`<label class="lbl">Wer bist du?</label><div class="chips">${["Jaime","Jimoh"].map(n=>`<button type="button" data-who="${n}" class="${loginWho===n?"on":""}" aria-pressed="${loginWho===n}">${n}</button>`).join("")}</div>`;
   h+=`${msg}<div class="btns"><button type="submit" class="btn primary">Anmelden</button></div></form>`;
   if(!CLOUD) h+=`<div class="note">Vorschau-Modus: Es wird nichts geprüft, <b>jedes Passwort</b> funktioniert. Die Anmeldung gilt nur auf diesem Gerät und legt fest, aus wessen Sicht der Plan angezeigt wird.</div>
@@ -1342,6 +1361,11 @@ async function boot(){
   if(stCb){ cleanUrl(); loginMsg="Bitte zuerst anmelden, dann Strava verbinden."; }
   if(view!=="shared") view="login"; render();
 }
+/* Splash ausblenden, sobald die erste richtige Ansicht steht (Login, Trainingsplan oder geteilter Link) */
+function hideSplash(){
+  const el=$("#splash"); if(!el||el.classList.contains("out")) return;
+  el.classList.add("out"); setTimeout(()=>el.remove(),300);
+}
 /* Strava im Hintergrund aktualisieren, wenn die letzte Synchronisierung über eine Stunde her ist. */
 function afterBoot(){
   if(stTok() && Date.now()-(S.strava.at||0)>36e5) stravaSync(true);
@@ -1403,6 +1427,7 @@ function render(){
   document.querySelector(".top .menu-btn").style.visibility=bare?"hidden":"";
   document.querySelectorAll("[data-partner]").forEach(x=>x.textContent=PARTNER);
   $("#acct").innerHTML=acctHtml(true);
+  hideSplash();
   const al=$("#acct .acct-link"); if(al){ al.classList.toggle("on",view==="profile"); if(view==="profile") al.setAttribute("aria-current","page"); }
   // Aktive Seite im Burger-Menü markieren (Trainingsplan = Heute/Woche/Plan)
   const mv=["week","plan"].includes(view)?"today":view;
@@ -1437,6 +1462,11 @@ document.addEventListener("click",e=>{
   const d=t.dataset;
   if(d.mu){ soreSel=d.mu; const z=sore.ZONE[d.mu]; if(z) soreView=z.view;
     const t0=soreToday(); const o=S.sore[t0]=S.sore[t0]||{}; if(!o[d.mu]) o[d.mu]=soreAt(t0)[d.mu]||5; soreSave(); return render(); }
+  // Passwort ein-/ausblenden direkt im DOM, damit die Eingabe erhalten bleibt
+  if(d.act==="pw-eye"){ const w=t.parentElement, i=w.querySelector("input"), show=i.type==="password";
+    i.type=show?"text":"password"; w.classList.toggle("show",show);
+    t.setAttribute("aria-pressed",show); t.setAttribute("aria-label",show?"Passwort verbergen":"Passwort anzeigen");
+    i.focus(); const n=i.value.length; try{ i.setSelectionRange(n,n); }catch(_){} return; }
   if(d.act==="sore-view"){ soreView=d.view; return render(); }
   if(d.act==="sore-mirror"){ const m=sore.mirrorZone(soreSel), t0=soreToday(), o=S.sore[t0]=S.sore[t0]||{}; if(m){ o[m]=o[soreSel]||5; soreSave(); toast(`Auch ${sore.LABEL[m]} eingetragen`); } return render(); }
   if(d.v){ if(d.v==="coach" && t.closest("#sheet")) coachTab="chat"; return go(d.v); }
@@ -1570,7 +1600,8 @@ document.addEventListener("input",e=>{
     const el=document.querySelector(`[${attr}="${id}"]`); if(el){ el.focus(); try{el.setSelectionRange(p,p);}catch(_){} } }
 });
 
-boot();
+// Falls der Start scheitert, nicht ewig auf dem Splash hängen bleiben
+boot().catch(e=>{ console.error(e); render(); });
 if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>

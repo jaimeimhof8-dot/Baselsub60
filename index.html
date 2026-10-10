@@ -337,6 +337,9 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 #splash .spin{width:28px;height:28px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){#splash .spin{animation-duration:2.4s}#splash{transition:none}}
+/* Abgehakt, aber kein Wert eingetragen */
+.ex.is-done .ex-v input:placeholder-shown{border-color:var(--warn);box-shadow:inset 3px 0 0 var(--warn)}
+#toast.warn{background:var(--warn);color:var(--on-accent)}
 #toast{position:fixed;left:50%;bottom:calc(var(--tabs-h) + var(--s5) + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px var(--s4);border-radius:22px;font-size:14px;font-weight:600;z-index:30;pointer-events:none;max-width:calc(100vw - 32px);text-align:center}
 
 /* ---------- Responsive ----------
@@ -452,6 +455,7 @@ import { fileToText } from "./src/pdf-import.js";
 import { suggest, readiness, isFixedRest, CHECKIN_FIELDS } from "./src/adapt.js";
 import * as strava from "./src/strava.js";
 import { linkCode, decodeSnapshot } from "./src/share.js";
+import { isFiller, valueHint, missingValues } from "./src/validate.js";
 import { weightList, cleanWeight, defaultWeight } from "./src/weights.js";
 import { colOf, personTests, partnerProfile } from "./src/profile.js";
 import * as sore from "./src/soreness.js";
@@ -581,7 +585,6 @@ function endInjury(){
 }
 const injActive=()=>Object.keys(S.sched).some(x=>+x>=TODAY && S.sched[x].inj);
 
-const isFiller=(t)=>/einlaufen|auslaufen/i.test(t);
 function placeholder(k,t){
   if(k==="kraft") return /plank/i.test(t)?"Zeit, z. B. 50/55/50″":"Gewicht, z. B. 80 kg × 5";
   if(k==="lauf") return "Splits, z. B. 4:12 / 4:10 …";
@@ -639,7 +642,7 @@ function sessionCard(i){
   const p=dayPlan(i), d=dateFromIdx(i), dk=keyI(i), dw=dow(i);
   const {n,done}=dayStatus(i);
   const badges=dayBadges(i,p,true);
-  let h=`<div class="card hero k-${p.k}">
+  let h=`<div class="card hero k-${p.k}" data-day="${i}">
     <div class="session-h"><div class="row between"><span class="kind">${KIND[p.k]}</span><span class="sub">${DAYSF[dw]}, ${fmt(d)}</span></div>
     <h1>${esc(p.t)}</h1>${badges?`<div class="badges">${badges}</div>`:""}</div>`;
   if(p.moved!=null) h+=`<div class="sub mt-2">Ursprünglich ${shortDay(p.moved)}</div>`;
@@ -1382,10 +1385,24 @@ async function boot(){
   if(stCb){ cleanUrl(); loginMsg="Bitte zuerst anmelden, dann Strava verbinden."; }
   if(view!=="shared") view="login"; render();
 }
+/* Rückmeldung beim Abhaken: fehlt ein Wert (Zeit, Watt, Pace, Runden …), wird gewarnt; ist alles abgehakt, bestätigt */
+const exLabel=(t)=>t.length>40?t.slice(0,38).trim()+"…":t;
+function workoutFeedback(i,id,all){
+  const p=dayPlan(i), dk=keyI(i); if(!p) return;
+  const miss=missingValues(p.i,S.done,S.val,dk);
+  if(all){
+    if(!miss.length) return toast(`Workout erledigt – stark! 💪`);
+    return toast(`Workout abgehakt, aber ${miss.length===1?`bei „${exLabel(miss[0].t)}“ fehlt noch ein Wert`:`bei ${miss.length} Übungen fehlen noch Werte`}`,true);
+  }
+  const m=miss.find(x=>dk+"|"+x.j===id);
+  if(m) toast(`Wert fehlt bei „${exLabel(m.t)}“ – bitte ${valueHint(p.k,m.t)} eintragen`,true);
+}
 /* Splash ausblenden, sobald die erste richtige Ansicht steht (Login, Trainingsplan oder geteilter Link) */
+const SPLASH_MIN=1200;
 function hideSplash(){
-  const el=$("#splash"); if(!el||el.classList.contains("out")) return;
-  el.classList.add("out"); setTimeout(()=>el.remove(),300);
+  const el=$("#splash"); if(!el||hideSplash.t) return;
+  // Mindestens 1,2 s ab Seitenaufruf (performance.now() zählt ab Navigation), damit der Start ruhig wirkt
+  hideSplash.t=setTimeout(()=>{ el.classList.add("out"); setTimeout(()=>el.remove(),300); },Math.max(0,SPLASH_MIN-performance.now()));
 }
 /* Strava im Hintergrund aktualisieren, wenn die letzte Synchronisierung über eine Stunde her ist. */
 function afterBoot(){
@@ -1489,7 +1506,8 @@ function menu(open){
 }
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") menu(false);
   if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("mu")){ e.preventDefault(); e.target.dispatchEvent(new MouseEvent("click",{bubbles:true})); } });
-function toast(m){ const t=$("#toast"); t.textContent=m; t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,2600); }
+/* warn: gelb hinterlegt und länger sichtbar */
+function toast(m,warn){ const t=$("#toast"); t.textContent=m; t.classList.toggle("warn",!!warn); t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,warn?4200:2600); }
 const layout=()=>WIDE()?2:MID()?1:0;
 let wasWide=layout();
 addEventListener("resize",()=>{ const w=layout(); if(w!==wasWide){ wasWide=w; if(!document.activeElement||!/INPUT|TEXTAREA/.test(document.activeElement.tagName)) render(); } });
@@ -1550,8 +1568,8 @@ document.addEventListener("click",e=>{
   if(d.injm){ injMode=d.injm; return render(); }
   if(d.act==="skip"){ const k=keyI(moveFrom); if(S.skip[k]) delete S.skip[k]; else S.skip[k]=1; save();
     // Ausfall direkt dem Coach melden: er schlägt die Umplanung im Chat vor, übernommen wird erst nach Bestätigung
-    if(S.skip[k] && coachReady() && !ccBusy){ toast("Ausgefallen – der Coach plant um"); coachTab="chat"; return sendCoach(coach.skipMessage(moveFrom,dayPlan(moveFrom).t)); }
-    toast(S.skip[k]?"Ausgefallen – wähle unten einen neuen Tag":"Markierung entfernt"); return render(); }
+    if(S.skip[k] && coachReady() && !ccBusy){ toast(`Training vom ${shortDay(moveFrom)} als ausgefallen markiert – der Coach plant um`); coachTab="chat"; return sendCoach(coach.skipMessage(moveFrom,dayPlan(moveFrom).t)); }
+    toast(S.skip[k]?`Training vom ${shortDay(moveFrom)} als ausgefallen markiert – wähle unten einen neuen Tag`:"Ausgefallen-Markierung entfernt"); return render(); }
   if(d.act==="restore"){ restoreDay(moveFrom); save(); toast("Original wiederhergestellt"); return render(); }
   if(d.act==="inj-from"){ injStart=Math.max(0,moveFrom); return go("inj"); }
   if(d.act==="inj-apply"){ applyInjury(injStart,injDays,injMode); save(); toast("Plan angepasst. Gute Besserung!"); return go(prevView); }
@@ -1565,7 +1583,7 @@ document.addEventListener("click",e=>{
   if(d.act==="strava-take"){ const i=+d.i, p=dayPlan(i), dk=keyI(i), a=actsOf(i).find(x=>strava.fits(p.k,x.group));
     p.i.forEach((_,j)=>S.done[dk+"|"+j]=1);
     const j=p.i.findIndex(t=>!isFiller(t)); if(a && j>=0 && !S.val[dk+"|"+j]) S.val[dk+"|"+j]=strava.summary(a);
-    save(); toast("Von Strava übernommen"); return render(); }
+    save(); toast("Workout erledigt – von Strava übernommen"); return render(); }
   if(d.act==="st-connect"){ const id=$("#st-id").value.trim(), sec=$("#st-sec").value.trim();
     if(!/^\d+$/.test(id)||!sec) return toast("Client-ID und Secret eintragen");
     lsSet("hx:strava-id",id); lsSet("hx:strava-secret",sec); location.href=strava.authUrl(id,redirectUri()); return; }
@@ -1617,7 +1635,8 @@ document.addEventListener("change",async e=>{
     // Fortschritt ohne Neuaufbau aktualisieren (Fokus in Eingabefeldern bleibt)
     const card=t.closest(".card"); if(card){ const all=card.querySelectorAll("[data-c]"), n=all.length, dn=[...all].filter(x=>x.checked).length;
       const bar=card.querySelector(".prog i"); if(bar) bar.style.width=(dn/n*100)+"%";
-      const s=card.querySelector(".prog+.sub"); if(s) s.textContent=dn+" von "+n+" erledigt"; } }
+      const s=card.querySelector(".prog+.sub"); if(s) s.textContent=dn+" von "+n+" erledigt";
+      if(t.checked && card.dataset.day) workoutFeedback(+card.dataset.day,t.dataset.c,dn===n); } }
 });
 document.addEventListener("input",e=>{
   const t=e.target, d=t.dataset; let redo=false;

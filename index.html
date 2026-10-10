@@ -1261,7 +1261,12 @@ function vShared(){
 /* ---------- Konto & Sync (Supabase oder Vorschau-Login) ---------- */
 const CFG = window.HX_CONFIG || {};
 const CLOUD = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
+/* Rückkehr über den Reset-Link aus der E-Mail: type=recovery bzw. Fehler (z. B. abgelaufen) im Hash */
+const clearHash=()=>history.replaceState(null,"",location.pathname+location.search);
+const RECOVERY=/[#&]type=recovery/.test(location.hash), RECOVERY_ERR=/[#&]error_code=/.test(location.hash);
 const sb = CLOUD && window.supabase ? window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey) : null;
+/* authMode: login | forgot (Reset-Link anfordern) | newpw (neues Passwort nach Reset-Link) */
+let authMode="login", loginOk="";
 let USER=null, loginEmail="", loginMsg="", loginWho="Jaime", syncState="", pushT=null, dirty=false;
 /* OFFLINE: Cloud konfiguriert, aber Supabase nicht geladen – zeigt die lokale Kopie des zuletzt angemeldeten Nutzers */
 let OFFLINE=false;
@@ -1276,21 +1281,32 @@ function resetAuth(msg){
 const mockUser=()=>{ if(CLOUD) return null; try{ return JSON.parse(lsGet("hx:mock")||"null"); }catch(_){ return null; } };
 const setNames=(me)=>{ ME=me; PARTNER=me==="Jimoh"?"Jaime":"Jimoh"; };
 
-function vLogin(){
-  let h=`<div class="login"><p class="tag">HYROX Basel · Doubles Men PRO · 13.02.2027</p>`;
-  if(CLOUD && !sb) return h+`<div class="card"><h3>Offline</h3><p class="sub mt-2">Für die erste Anmeldung braucht die App Internet.</p></div></div>`;
-  const msg=loginMsg?`<div class="target bad">${esc(loginMsg)}</div>`:"";
-  h+=`<form class="card" data-form="login"><h3>Anmelden</h3><p class="sub mt-1">Mit deiner E-Mail und deinem Passwort.</p>
-    <label class="lbl mt-5" for="le">E-Mail</label>
-    <input type="email" id="le" inputmode="email" autocomplete="username" autocapitalize="off" value="${esc(loginEmail)}" placeholder="name@beispiel.ch">
-    <label class="lbl" for="lp">Passwort</label>
-    <div class="pw"><input type="password" id="lp" autocomplete="current-password">
+const EYE=`
       <button type="button" data-act="pw-eye" aria-label="Passwort anzeigen" aria-pressed="false" aria-controls="lp">
         <svg class="on" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
         <svg class="off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.1A9.7 9.7 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.6 9.6 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
       </button></div>`;
+function vLogin(){
+  let h=`<div class="login"><p class="tag">HYROX Basel · Doubles Men PRO · 13.02.2027</p>`;
+  if(CLOUD && !sb) return h+`<div class="card"><h3>Offline</h3><p class="sub mt-2">Für die erste Anmeldung braucht die App Internet.</p></div></div>`;
+  const msg=(loginMsg?`<div class="target bad">${esc(loginMsg)}</div>`:"")+(loginOk?`<div class="target">${esc(loginOk)}</div>`:"");
+  if(authMode==="forgot") return h+`<form class="card" data-form="forgot"><h3>Passwort vergessen</h3><p class="sub mt-1">Gib deine E-Mail ein. Du bekommst einen Link, mit dem du ein neues Passwort setzen kannst.</p>
+    <label class="lbl mt-5" for="le">E-Mail</label>
+    <input type="email" id="le" inputmode="email" autocomplete="username" autocapitalize="off" value="${esc(loginEmail)}" placeholder="name@beispiel.ch">
+    ${msg}<div class="btns"><button type="submit" class="btn primary">Reset-Link senden</button></div></form>
+    <div class="btns"><button class="btn ghost" data-act="auth-mode" data-mode="login">Zurück zur Anmeldung</button></div></div>`;
+  if(authMode==="newpw") return h+`<form class="card" data-form="newpw"><h3>Neues Passwort</h3><p class="sub mt-1">Mindestens 8 Zeichen.</p>
+    <label class="lbl mt-5" for="lp">Neues Passwort</label>
+    <div class="pw"><input type="password" id="lp" autocomplete="new-password" minlength="8">${EYE}
+    ${msg}<div class="btns"><button type="submit" class="btn primary">Passwort speichern</button></div></form></div>`;
+  h+=`<form class="card" data-form="login"><h3>Anmelden</h3><p class="sub mt-1">Mit deiner E-Mail und deinem Passwort.</p>
+    <label class="lbl mt-5" for="le">E-Mail</label>
+    <input type="email" id="le" inputmode="email" autocomplete="username" autocapitalize="off" value="${esc(loginEmail)}" placeholder="name@beispiel.ch">
+    <label class="lbl" for="lp">Passwort</label>
+    <div class="pw"><input type="password" id="lp" autocomplete="current-password">${EYE}`;
   if(!CLOUD) h+=`<label class="lbl">Wer bist du?</label><div class="chips">${["Jaime","Jimoh"].map(n=>`<button type="button" data-who="${n}" class="${loginWho===n?"on":""}" aria-pressed="${loginWho===n}">${n}</button>`).join("")}</div>`;
   h+=`${msg}<div class="btns"><button type="submit" class="btn primary">Anmelden</button></div></form>`;
+  if(CLOUD) h+=`<div class="btns"><button class="btn ghost" data-act="auth-mode" data-mode="forgot">Passwort vergessen?</button></div>`;
   if(!CLOUD) h+=`<div class="note">Vorschau-Modus: Es wird nichts geprüft, <b>jedes Passwort</b> funktioniert. Die Anmeldung gilt nur auf diesem Gerät und legt fest, aus wessen Sicht der Plan angezeigt wird.</div>
     <div class="btns"><button class="btn ghost" data-v="today">Ohne Anmeldung weiter</button></div>`;
   return h+`</div>`;
@@ -1355,8 +1371,13 @@ async function boot(){
   }
   // Session abgelaufen/widerrufen oder in einem anderen Tab abgemeldet → zurück zum Login.
   // Kein await auf Supabase-Aufrufe in diesem Callback (sonst Deadlock in supabase-js).
-  sb.auth.onAuthStateChange((ev)=>{ if(ev==="SIGNED_OUT" && USER) resetAuth("Du wurdest abgemeldet. Bitte erneut anmelden."); });
+  sb.auth.onAuthStateChange((ev)=>{
+    if(ev==="SIGNED_OUT" && USER) resetAuth("Du wurdest abgemeldet. Bitte erneut anmelden.");
+    if(ev==="PASSWORD_RECOVERY" && authMode!=="newpw"){ authMode="newpw"; USER=null; loginMsg=loginOk=""; if(view!=="shared") view="login"; render(); }
+  });
   const {data:{session}}=await sb.auth.getSession();
+  if(session && RECOVERY){ authMode="newpw"; view="login"; return render(); }
+  if(RECOVERY_ERR && !session){ authMode="forgot"; loginMsg="Der Reset-Link ist ungültig oder abgelaufen. Bitte einen neuen anfordern."; clearHash(); }
   if(session){ await onLogin(session.user); if(stCb && USER){ await stravaCallback(); render(); } return afterBoot(); }
   if(stCb){ cleanUrl(); loginMsg="Bitte zuerst anmelden, dann Strava verbinden."; }
   if(view!=="shared") view="login"; render();
@@ -1398,6 +1419,23 @@ document.addEventListener("submit",async e=>{
     }
     const {data,error}=await sb.auth.signInWithPassword({email:loginEmail,password});
     if(error){ loginMsg=loginError(error); render(); return $("#lp").focus(); }
+    await onLogin(data.user); if(USER) afterBoot();
+  }
+  if(f.dataset.form==="forgot"){
+    loginEmail=$("#le").value.trim().toLowerCase(); loginOk="";
+    if(!/^S+@S+.S+$/.test(loginEmail)){ loginMsg="Bitte eine gültige E-Mail eingeben."; render(); return $("#le").focus(); }
+    // Zurück auf diese Seite; die URL muss in Supabase unter Authentication → URL Configuration erlaubt sein
+    const {error}=await sb.auth.resetPasswordForEmail(loginEmail,{redirectTo:location.origin+location.pathname});
+    if(error){ loginMsg=loginError(error); return render(); }
+    loginOk=`Falls ein Konto zu ${loginEmail} existiert, wurde ein Reset-Link gesendet. Bitte Postfach (und Spam-Ordner) prüfen.`;
+    return render();
+  }
+  if(f.dataset.form==="newpw"){
+    const password=$("#lp").value;
+    if(password.length<8){ loginMsg="Das Passwort braucht mindestens 8 Zeichen."; render(); return $("#lp").focus(); }
+    const {data,error}=await sb.auth.updateUser({password});
+    if(error){ loginMsg=error.code==="same_password"?"Bitte ein anderes als das bisherige Passwort wählen.":loginError(error); render(); return $("#lp").focus(); }
+    authMode="login"; clearHash(); toast("Passwort geändert");
     await onLogin(data.user); if(USER) afterBoot();
   }
 });
@@ -1463,6 +1501,7 @@ document.addEventListener("click",e=>{
   if(d.mu){ soreSel=d.mu; const z=sore.ZONE[d.mu]; if(z) soreView=z.view;
     const t0=soreToday(); const o=S.sore[t0]=S.sore[t0]||{}; if(!o[d.mu]) o[d.mu]=soreAt(t0)[d.mu]||5; soreSave(); return render(); }
   // Passwort ein-/ausblenden direkt im DOM, damit die Eingabe erhalten bleibt
+  if(d.act==="auth-mode"){ const el=$("#le"); if(el) loginEmail=el.value.trim(); authMode=d.mode; loginMsg=loginOk=""; render(); const f=$("#le"); if(f) f.focus(); return; }
   if(d.act==="pw-eye"){ const w=t.parentElement, i=w.querySelector("input"), show=i.type==="password";
     i.type=show?"text":"password"; w.classList.toggle("show",show);
     t.setAttribute("aria-pressed",show); t.setAttribute("aria-label",show?"Passwort verbergen":"Passwort anzeigen");

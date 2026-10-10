@@ -5,6 +5,7 @@
 // mit "Woche 1: …", "In Woche 2 …", "Wochen 3 und 4 …" als Abschnittsmarken.
 import { idxFromDayMonth } from "./dates.js";
 import { isHard } from "./util.js";
+import { structureSession, structureKraft, patternSentences } from "./structure.js";
 
 const WD = { montag: 0, dienstag: 1, mittwoch: 2, donnerstag: 3, freitag: 4, samstag: 5, sonntag: 6, wochenende: 5 };
 const NUM = { zwei: 2, drei: 3, vier: 4, "fünf": 5, sechs: 6, sieben: 7, acht: 8, neun: 9, zehn: 10, elf: 11, "zwölf": 12, "fünfzehn": 15, zwanzig: 20, dreissig: 30, "dreißig": 30 };
@@ -150,15 +151,22 @@ export function makeDay(wd, rawTitle, body, extra = {}) {
   const kind = kindOf(rawTitle, body, wd);
   const day = { t: titleFor(kind, rawTitle, body), k: kind, i: [], n: "" };
   if (kind === "rest") {
-    day.i = /Check-in|Rückblick/.test(body) ? sentences(digits(body)) : [];
-    day.n = day.i.length ? "" : (sentences(body)[0] || "Echte Erholung.");
-  } else if (kind === "kraft" && parseExercises(body)) {
-    const ex = parseExercises(body);
+    // Check-in-Tag: eine abhakbare Zeile, die Erklärung als Hinweis
+    const ci = /Check-in|Rückblick/.test(body);
+    day.i = ci ? [/Rückblick/.test(body) ? "Ampelsystem-Check-in + Rückblick" : "Ampelsystem-Check-in"] : [];
+    day.n = ci ? sentences(digits(body)).join(" ") : (sentences(body)[0] || "Echte Erholung.");
+  } else if (kind === "kraft" && (parseExercises(body) || structureKraft(body, extra.common || "", extra.prev, extra.block))) {
+    const ex = parseExercises(body) || structureKraft(body, extra.common || "", extra.prev, extra.block);
     day.i = ex.items; day.n = ex.note;
   } else {
-    day.i = sentences(digits(body)).slice(0, 8);
-    if (!day.i.length) day.i = [day.t];
+    // Lauf, Rad, Stationen, Doubles: Zeilen mit Zahlen abhakbar, Erklärungen als Hinweis.
+    // Im Block-Absatz ist der Wochentext die Aufgabe selbst – dort zählt auch der erste Satz ohne Zahl.
+    const st = structureSession(body, { tasks: !!extra.block });
+    day.i = st.items.length ? st.items : [day.t]; day.n = st.note;
+    // Intervalle wie in Block A mit Ein- und Auslaufen
+    if (extra.block && kind === "lauf" && day.i.some((x) => /\d×\d/.test(x)) && !/Einlaufen/.test(body)) day.i = ["15′ Einlaufen", ...day.i, "10′ Auslaufen"];
   }
+  delete extra.common; delete extra.prev; delete extra.block;
   day.key = isHard(day);
   day.joint = /gemeinsam|mit Jimoh|ihr\b|Doubles/i.test((rawTitle || "") + " " + body) || ["sim", "race"].includes(kind);
   day.src = "pdf";
@@ -187,6 +195,24 @@ export function splitByWeeks(body, nWeeks = 4) {
   return { weeks: result.map((seg) => (seg || common).trim()), common };
 }
 
+/**
+ * "…bei gleichbleibendem Volumen": Kraftübungen ohne Sätze×Wdh übernehmen sie von derselben
+ * Übung eine Woche vorher.
+ */
+function inheritVolume(days) {
+  const vol = /\s(\d+×\d+″?)/;
+  for (const k of Object.keys(days).map(Number).sort((a, b) => a - b)) {
+    const d = days[k], prev = days[k - 7];
+    if (d.k !== "kraft" || d.blk || !prev || prev.k !== "kraft") continue;
+    d.i = d.i.map((line) => {
+      if (vol.test(line)) return line;
+      const name = EXERCISES.find(([n]) => line.startsWith(n));
+      const old = name && prev.i.find((x) => x.startsWith(name[0]) && vol.test(x));
+      return old ? line.replace(name[0], name[0] + " " + old.match(vol)[1]) : line;
+    });
+  }
+}
+
 /** Haupteinstieg: Text -> {days, meta}. */
 export function parsePlanText(text) {
   const days = {};
@@ -196,14 +222,22 @@ export function parsePlanText(text) {
 
   const flushBlock = () => {
     if (!ctx || ctx.type !== "block" || !blockDays.length) { blockDays.length = 0; return; }
+    inheritVolume(days); // Vorblock vervollständigen, damit "gleiches Wellenmuster" Sätze×Wdh findet
     const hasSunday = blockDays.some((d) => d.wd === 6);
     for (const d of blockDays) {
-      const { weeks, common } = splitByWeeks(d.body, ctx.weeks);
+      // Sätze über mehrere Wochen ("…in Woche 1 und 2, Spitze in Woche 3…") gelten für alle Wochen
+      const { pattern, body } = patternSentences(d.body);
+      const { weeks, common } = splitByWeeks(body, ctx.weeks);
+      const shared = [common, pattern].filter(Boolean).join(" ");
       for (let w = 0; w < ctx.weeks; w++) {
         const idx = ctx.start + w * 7 + d.wd;
-        const day = makeDay(d.wd, d.title, weeks[w] || d.body);
+        // "im gleichen Wellenmuster": dieselbe Übung aus der gleichen Woche des Vorblocks
+        const prev = (name) => { for (let x = idx - 28; x >= 0; x -= 28) { const p = days[x]; const hit = p && p.k === "kraft" && p.i.find((l) => l.startsWith(name)); if (hit) return hit; } return null; };
+        const own = weeks[w] && weeks[w] !== common ? weeks[w] : "";
+        const day = makeDay(d.wd, d.title, own || body, { common: own ? shared : pattern, prev, block: d.body });
+        day.blk = 1; // Block-Absatz: kein Volumen aus der Vorwoche erben (Zirkel und Taper haben bewusst keins)
         // Gemeinsamer Einleitungssatz eines Wochen-Absatzes ("Über die vier Wochen …") als Hinweis.
-        if (common && weeks[w] !== common) day.n = [common, day.n].filter(Boolean).join(" ");
+        if (shared && own && day.k !== "kraft") day.n = [common, day.n].filter(Boolean).join(" ");
         days[idx] = day;
       }
       if (d.weekend && !hasSunday) {
@@ -258,6 +292,8 @@ export function parsePlanText(text) {
     // sonst: Einleitungstext – ignorieren
   }
   flushBlock();
+  inheritVolume(days);
+  for (const d of Object.values(days)) delete d.blk;
   if (!Object.keys(days).length) meta.warnings.push("Keine Trainingstage erkannt. Erwartet werden Überschriften wie „Block A – … (12.10. – 08.11.2026)“ und Absätze wie „Montag – Kraft 1. …“.");
   return { days, meta };
 }

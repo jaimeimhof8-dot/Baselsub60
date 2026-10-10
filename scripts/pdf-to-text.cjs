@@ -1,4 +1,4 @@
-// Extrahiert den Text eines PDFs zeilenweise – gleiche Logik wie im Browser (src/pdf.js).
+// Extrahiert den Text eines PDFs zeilenweise – gleiche Logik wie im Browser (src/pdf-import.js).
 // Aufruf: node scripts/pdf-to-text.cjs <datei.pdf> [ausgabe.txt]
 const fs = require("fs");
 const pdfjs = require("pdfjs-dist/legacy/build/pdf.js");

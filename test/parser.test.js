@@ -24,6 +24,10 @@ test("gemeinsame Angaben (beziehungsweise) werden korrekt verteilt", () => {
   assert.equal(days[7].i[3], "Shoulder Press 3×8 RPE 7");
 });
 
+test("gleichbleibendes Volumen wird aus der Vorwoche übernommen", () => {
+  assert.equal(days[7].i[4], "Pull-ups 3×6 RPE 7–8");
+});
+
 test("Tagesarten und Flags", () => {
   assert.equal(days[1].k, "lauf"); assert.ok(days[1].joint); assert.ok(days[1].key);
   assert.equal(days[2].k, "bike"); assert.ok(!days[2].key);
@@ -32,10 +36,27 @@ test("Tagesarten und Flags", () => {
 });
 
 test("Block-Absätze werden auf die 4 Wochen verteilt", () => {
-  assert.match(days[29].i[0], /Woche 1/);
-  assert.match(days[36].i[0], /Woche 2/);
+  assert.deepEqual(days[29].i, ["15′ Einlaufen", "4×8′ @82–85% max HF, 2′ Pause", "10′ Auslaufen"]);
+  assert.deepEqual(days[36].i, ["15′ Einlaufen", "4×10′ @85%, 90″ Pause", "10′ Auslaufen"]);
   assert.equal(days[89].k, "bike");   // Block D, Sa Woche 1
   assert.equal(days[103].k, "sim");   // Block D, Sa Woche 3
+});
+
+test("Block B: Kraft als Übungsliste mit Topsatz und Wellenmuster der Zusatzübungen", () => {
+  assert.deepEqual(days[28].i, [
+    "Back Squat 4×5 @80% RPE 7–8", "Back Squat 1×3 @85%, Topsatz", "Bulgarian Split Squat 3×8 je Seite RPE 7",
+    "Bench Press 3×6 RPE 7", "Shoulder Press 3×8 RPE 7", "Pull-ups 3×6 RPE 7", "Plank 3×50″"]);
+  assert.equal(days[35].i[0], "Back Squat 4×4 @82%");          // Woche 2: Hauptübung ohne Namen im Wochentext
+  assert.equal(days[35].i[5], "Pull-ups 3×6 RPE 7–8");          // Volumen aus Block A Woche 2
+  assert.deepEqual(days[49].i.slice(0, 2), ["Back Squat 3×5 @65% RPE 5–6", "Bulgarian Split Squat 2×8 RPE 5–6"]); // Deload, kein Topsatz
+});
+
+test("Block C–Taper: Zirkel, Grundübungen und kurze Zeilen statt Fliesstext", () => {
+  assert.equal(days[56].i[0], "Back Squat RPE 7, Zirkel, 2 Durchgänge");
+  assert.deepEqual(days[112].i[0], "Back Squat 2 Sätze RPE 5–6");
+  assert.deepEqual(days[31].i, ["4 Runden im Stationswechsel mit leichtem Zeitdruck", "Compromised Running 2×10′ Zone 3"]);
+  assert.deepEqual(days[30].i, ["45–60′ Rad @65–70% max HF"]);
+  for (let i = 28; i < 124; i++) for (const line of days[i] ? days[i].i : []) assert.ok(line.length <= 130, `Tag ${i}: ${line}`);
 });
 
 test("splitByWeeks mit Bereichen", () => {

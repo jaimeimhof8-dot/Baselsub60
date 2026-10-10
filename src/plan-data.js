@@ -1,6 +1,7 @@
 // Eingebauter Plan (Stand 18.09.2026) – wird verwendet, bis ein PDF hochgeladen wird.
 import { NWEEKS } from "./dates.js";
 import { isHard } from "./util.js";
+import { LATER_DAYS } from "./plan-later.js";
 
 const R = (n) => ({ t: "Ruhetag", k: "rest", i: [], n: n || "Echte Erholung. Kein Bike, kein Zirkel." });
 const KRAFT = (items, n) => ({ t: "Kraft 1", k: "kraft", i: items, n });
@@ -85,6 +86,8 @@ export function buildBuiltinPlan() {
     for (let d = 0; d < 7; d++) {
       const idx = w * 7 + d;
       if (w < 4) { days[idx] = withFlags(WEEKS_A[w].days[d]); continue; }
+      // Ab Woche 5: Übungszeilen aus dem Coach-PDF (generiert), sonst nur das Blockmuster
+      if (LATER_DAYS[idx]) { days[idx] = withFlags(LATER_DAYS[idx]); continue; }
       const x = BLOCKS[blockOfWeek(w)].d[d];
       days[idx] = withFlags({ t: x[0], k: x[1], i: x[1] === "rest" ? [] : [x[0]], n: x[2] ? x[2] + ". Genaue Zahlen folgen nach den Testdaten aus Block A." : "" });
     }

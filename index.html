@@ -22,108 +22,172 @@
 :root{
   color-scheme:dark;
   --bg:#0f1113;--card:#181b1e;--surface2:#222629;--text:#ecebe5;--muted:#8d9096;--line:#2b2f33;
-  --accent:#ffd21f;--on-accent:#16181a;--ok:#6fcf86;--danger:#ff8a80;
-  --kraft:#f0834a;--lauf:#6ea4f0;--bike:#5fcf80;--station:#b996ef;--sim:#ff7b6b;--rest:#6d7176;
+  --accent:#ffd21f;--on-accent:#16181a;--ok:#6fcf86;--warn:#ffc04d;--danger:#ff8a80;--strava:#fc6a2c;
+  --kraft:#f0834a;--lauf:#6ea4f0;--bike:#5fcf80;--station:#b996ef;--sim:#ff7b6b;--rest:#6d7176;--race:#ffd21f;
   --f-head:'Barlow Condensed','Arial Narrow',Impact,sans-serif;--f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  /* Abstände: ein 4-px-Raster für alles */
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--s8:32px;
+  --r-s:10px;--r-m:12px;--r-l:16px;
+  --tabs-h:62px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg)}
 body{color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%;
-  overflow-x:hidden;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  overflow-x:hidden;padding-bottom:calc(var(--tabs-h) + var(--s4) + env(safe-area-inset-bottom))}
+body.bare{padding-bottom:env(safe-area-inset-bottom)}
 button,textarea,input{font:inherit;color:inherit}
 button{cursor:pointer}
+button:disabled{cursor:default}
 h1,h2,h3{margin:0;font-family:var(--f-head);font-weight:700;text-transform:uppercase;letter-spacing:.03em;line-height:1.05}
-h1{font-size:34px}h2{font-size:22px}h3{font-size:18px}
+h1{font-size:34px}h2{font-size:24px}h3{font-size:19px}
+p{margin:0}
 .sub{color:var(--muted);font-size:14px}
-.cap{font-family:var(--f-head);font-weight:600;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:26px 0 10px}
+.cap{font-family:var(--f-head);font-weight:600;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:var(--s6) 0 var(--s3)}
+.cap:first-child{margin-top:0}
+.mt-1{margin-top:var(--s1)}.mt-2{margin-top:var(--s2)}.mt-3{margin-top:var(--s3)}.mt-4{margin-top:var(--s4)}.mt-5{margin-top:var(--s5)}
+.center{text-align:center}
+.stack{display:flex;flex-direction:column;gap:var(--s3)}
+[hidden]{display:none!important}
 
 /* Kopf */
 .top{position:sticky;top:0;z-index:5;background:rgba(15,17,19,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--line);padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top));display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+  border-bottom:1px solid var(--line);padding:var(--s3) var(--s4);padding-top:calc(var(--s3) + env(safe-area-inset-top));
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:var(--s3)}
 .brand{font-family:var(--f-head);font-weight:700;font-size:20px;letter-spacing:.06em;text-transform:uppercase;justify-self:start;white-space:nowrap}
-.brand b{background:var(--accent);color:var(--on-accent);padding:0 6px;margin-left:4px}
+.brand b{background:var(--accent);color:var(--on-accent);padding:0 6px;margin-left:var(--s1)}
 .top .menu-btn{justify-self:end}
 .cd{font-family:var(--f-head);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;line-height:1.05}
 .cd span{display:block;font-size:26px;color:var(--text);letter-spacing:0}
-.menu-btn{width:44px;height:44px;border-radius:11px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center}
+.menu-btn{width:44px;height:44px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--card);display:grid;place-items:center;padding:0}
 .menu-btn svg{width:20px;height:20px;fill:var(--text)}
-main{padding:16px;max-width:620px;margin:0 auto}
+main{padding:var(--s4);max-width:640px;margin:0 auto}
+.sim-date{background:rgba(255,192,77,.12);color:var(--warn);font-size:13px;text-align:center;padding:var(--s2) var(--s4)}
+
+/* Ansichts-Kopf */
+.vh{margin-bottom:var(--s5)}
+.vh .sub{margin-top:var(--s2)}
+.back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--muted);font-weight:600;padding:0;min-height:44px;margin-bottom:var(--s2)}
 
 /* Karten */
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s5);margin-bottom:var(--s4)}
+.card.tight{padding:var(--s4)}
 .card.hero{border-top:5px solid var(--kc,var(--accent))}
-.row{display:flex;align-items:center;gap:8px}.between{justify-content:space-between}
-.k-kraft{--kc:var(--kraft)}.k-lauf{--kc:var(--lauf)}.k-bike{--kc:var(--bike)}.k-station{--kc:var(--station)}.k-sim{--kc:var(--sim)}.k-rest{--kc:var(--rest)}
+.card > :last-child{margin-bottom:0}
+.row{display:flex;align-items:center;gap:var(--s2)}.between{justify-content:space-between}.wrap{flex-wrap:wrap}
+.k-kraft{--kc:var(--kraft)}.k-lauf{--kc:var(--lauf)}.k-bike{--kc:var(--bike)}.k-station{--kc:var(--station)}.k-sim{--kc:var(--sim)}.k-rest{--kc:var(--rest)}.k-race{--kc:var(--race)}
 .kind{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--kc,var(--muted))}
 .dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--kc,var(--rest))}
-.status{font-family:var(--f-head);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.status{font-family:var(--f-head);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;white-space:nowrap}
 .status.done{color:var(--ok)}
-.prog{height:5px;background:var(--surface2);border-radius:4px;overflow:hidden;margin:14px 0 4px}
+.prog{height:6px;background:var(--surface2);border-radius:4px;overflow:hidden;margin:var(--s4) 0 var(--s2)}
 .prog i{display:block;height:100%;background:var(--kc,var(--accent));transition:width .25s}
+.session-h h1{margin-top:var(--s3)}
+.session-h .badges{margin-top:var(--s3)}
 
 /* Übungen */
-.ex{border-top:1px solid var(--line);padding:12px 0}
-.ex:first-child{border-top:0;padding-top:4px}
-.ex-h{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
-.ex-h input{width:24px;height:24px;margin:1px 0 0;flex:none;accent-color:var(--ok)}
+.exs{margin-top:var(--s4)}
+.ex{border-top:1px solid var(--line);padding:var(--s3) 0}
+.ex:first-child{border-top:0;padding-top:0}
+.ex-h{display:flex;gap:var(--s3);align-items:flex-start;cursor:pointer}
+.ex-h input{width:24px;height:24px;margin:0;flex:none;accent-color:var(--ok)}
 .ex-h span{flex:1;font-size:15.5px}
 .ex.is-done .ex-h span{color:var(--muted);text-decoration:line-through}
-.ex-v{display:flex;gap:8px;align-items:center;margin:8px 0 0 36px}
-.ex-v input{flex:1}
+.ex-v{display:flex;gap:var(--s2);align-items:center;margin:var(--s2) 0 0 36px}
+.ex-v input{flex:1;min-width:0}
 .last{font-size:12px;color:var(--muted);white-space:nowrap}
-.hint{background:var(--surface2);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:14px;color:var(--muted)}
-.target{background:rgba(255,210,31,.12);border:1px solid rgba(255,210,31,.35);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:14px}
+.hint{background:var(--surface2);border-radius:var(--r-s);padding:var(--s3);font-size:14px;margin-top:var(--s4);color:var(--muted)}
+.hint:first-child{margin-top:0}
+.target{background:rgba(255,210,31,.12);border:1px solid rgba(255,210,31,.35);border-radius:var(--r-s);padding:var(--s3);font-size:14px;margin-top:var(--s4)}
 .target b{color:var(--accent)}
+.target.bad{border-color:rgba(255,138,128,.4);background:rgba(255,138,128,.1)}
+.target.bad b{color:var(--danger)}
 
 /* Eingaben */
-input[type=text],input[type=number],textarea{width:100%;font-size:16px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);min-height:42px}
+input[type=text],input[type=number],input[type=password],input[type=email],textarea{width:100%;font-size:16px;padding:9px 12px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--bg);min-height:44px}
 input::placeholder,textarea::placeholder{color:#5b5f65}
-textarea{min-height:70px;resize:vertical}
-input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.lbl{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:16px 0 8px;letter-spacing:.08em;text-transform:uppercase}
-.rpe{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
-.rpe button{height:42px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-weight:600;font-size:15px;padding:0}
+textarea{min-height:76px;resize:vertical;display:block}
+input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+.lbl{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:var(--s5) 0 var(--s2);letter-spacing:.08em;text-transform:uppercase}
+.lbl:first-child{margin-top:0}
+.rpe{display:grid;grid-template-columns:repeat(10,1fr);gap:var(--s1)}
+.rpe button{height:44px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-weight:600;font-size:15px;padding:0}
 .rpe button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 
 /* Buttons */
-.btn{min-height:48px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-weight:600;font-size:15px;width:100%}
+.btn{min-height:48px;padding:0 var(--s4);border-radius:var(--r-m);border:1px solid var(--line);background:var(--card);font-weight:600;font-size:15px;width:100%;
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);text-decoration:none;color:var(--text)}
 .btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
-.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent}
+.btn.strava{background:var(--strava);border-color:var(--strava);color:#fff}
+.btn.sm{min-height:40px;font-size:14px;width:auto;padding:0 var(--s3)}
+.btn:active:not(:disabled){transform:scale(.98)}
+.btn:disabled{opacity:.5}
+.btns{display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s4)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
+.file{position:relative;overflow:hidden}
+.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
 
 /* Wochenleiste + Tagesliste */
 .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.strip button{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 0 10px;display:flex;flex-direction:column;align-items:center;gap:5px}
+.strip button{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s2) 0 10px;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
 .strip .dn{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em}
 .strip .dd{font-family:var(--f-head);font-weight:700;font-size:20px;line-height:1}
 .strip button.today{border-color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent)}
+.strip button.sel{border-color:var(--text)}
 .strip .dot.done{background:var(--ok)}
-.list{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 16px;margin-bottom:14px}
-.day{display:flex;gap:12px;align-items:center;padding:14px 0;border-top:1px solid var(--line);cursor:pointer;min-height:60px;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left}
-.day:first-child{border-top:0}
+.strip .dot.off{opacity:.35}
+.list{background:var(--card);border:1px solid var(--line);border-radius:var(--r-l);padding:0 var(--s4);margin-bottom:var(--s4)}
+.day{display:flex;gap:var(--s3);align-items:center;padding:var(--s3) 0;border-top:1px solid var(--line);cursor:pointer;min-height:64px;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;position:relative}
+.list > .day:first-child{border-top:0}
+.day::before{content:"";position:absolute;left:calc(-1 * var(--s4));top:var(--s3);bottom:var(--s3);width:3px;border-radius:0 3px 3px 0;background:var(--kc);opacity:.9}
+.day.k-rest::before{opacity:.25}
 .day .d{width:38px;flex:none;font-family:var(--f-head);font-weight:600;font-size:12px;letter-spacing:.06em;color:var(--muted);line-height:1.05;text-transform:uppercase}
 .day .d b{display:block;font-size:22px;color:var(--text);letter-spacing:0}
 .day .t{flex:1;min-width:0}
-.day .t b{display:block;font-weight:600}
+.day .t b{display:block;font-weight:600;overflow-wrap:anywhere}
 .day.today .d b{color:var(--accent)}
-.day-body{padding:0 0 14px}
+.day.open{background:linear-gradient(90deg,rgba(255,255,255,.03),transparent)}
+.day .meta{display:flex;flex-direction:column;align-items:flex-end;gap:var(--s1);flex:none;max-width:45%}
+.day-body{padding:0 0 var(--s4)}
 .day-body .card{margin:0;background:var(--bg)}
-.wk{display:flex;gap:10px;align-items:center;margin:0 0 16px}
-.wk button{width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:22px;flex:none}
+.wk{display:flex;gap:var(--s3);align-items:center}
+.wk button{width:46px;height:46px;border-radius:var(--r-m);border:1px solid var(--line);background:var(--card);font-size:22px;flex:none;padding:0}
 .wk button:disabled{opacity:.3}
-.wk div{flex:1;text-align:center}
+.wk div{flex:1;text-align:center;min-width:0}
+.wk .sub{margin-top:var(--s1)}
+.wsum{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s2);margin:var(--s4) 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s3);text-align:center}
+.stat b{display:block;font-family:var(--f-head);font-size:24px;line-height:1.05}
+.stat span{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.chiprow{display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:center;margin-top:var(--s3)}
 
 /* Plan */
-.blk{display:flex;gap:14px;padding:16px 0;border-top:1px solid var(--line)}
-.blk:first-child{border-top:0}
-.blk .tag{font-family:var(--f-head);font-weight:700;font-size:26px;width:34px;line-height:1;color:var(--accent)}
-.blk.cur .tag{background:var(--accent);color:var(--on-accent);border-radius:6px;text-align:center;padding:4px 0;height:fit-content}
-.blk ul{margin:8px 0 0;padding:0;list-style:none;font-size:14px;color:var(--muted)}
-.blk li{padding:2px 0}
-.blk li b{color:var(--text);font-weight:500}
+/* Plan: Blöcke als Akkordeon → Wochen → Tage (Tag aufklappbar für die Übungen) */
+.blk{display:flex;gap:var(--s4);align-items:center;width:100%;padding:var(--s4) 0;background:none;border:0;border-top:1px solid var(--line);text-align:left;cursor:pointer;min-height:64px}
+.list > .blk:first-child{border-top:0}
+.blk .tag{font-family:var(--f-head);font-weight:700;font-size:26px;width:34px;flex:none;line-height:1;color:var(--accent);text-align:center}
+.blk.cur .tag{background:var(--accent);color:var(--on-accent);border-radius:6px;padding:var(--s1) 0}
+.blk .t{flex:1;min-width:0}
+.blk .t b{display:block;font-weight:600;overflow-wrap:anywhere}
+.blk .t .sub{display:block;margin-top:2px}
+.blk .chev{font-size:24px;color:var(--muted);flex:none;transition:transform .2s}
+.blk[aria-expanded="true"] .chev{transform:rotate(90deg)}
+@media (prefers-reduced-motion:reduce){.blk .chev{transition:none}}
+.blk-body{padding:0 0 var(--s3)}
+.pw-h{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s3);padding:var(--s4) 0 var(--s2);border-top:1px solid var(--line)}
+.pw-h h3{font-size:17px}
+.pw-h.cur h3{color:var(--accent)}
+.pw-h .sub{text-align:right;font-size:13px}
+.day.sm{min-height:48px;padding:var(--s2) 0;border-top-color:rgba(255,255,255,.04)}
+.day.sm .d b{font-size:18px}
+.pday-body{padding:0 0 var(--s3) 50px;font-size:14px}
+.pday-body ul{margin:0;padding-left:var(--s4)}
+.pday-body li{padding:2px 0}
+.pday-body .hint{margin-top:var(--s2)}
 
 /* Tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:grid;grid-template-columns:repeat(3,1fr);background:rgba(24,27,30,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-.tabs button{background:none;border:0;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.03em}
+.tabs button{background:none;border:0;min-height:var(--tabs-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.03em}
 .tabs svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tabs button.on{color:var(--text)}
 .tabs button.on svg{stroke:var(--accent)}
@@ -131,47 +195,218 @@ input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);
 /* Menü-Schublade (von rechts) */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
 .scrim.open{opacity:1;visibility:visible;transition:opacity .25s}
-.drawer{position:fixed;top:0;right:0;bottom:0;z-index:21;width:min(330px,86vw);overflow-y:auto;background:var(--card);border-left:1px solid var(--line);
-  padding:calc(14px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));transform:translateX(100%);visibility:hidden;transition:transform .25s ease,visibility 0s .25s}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:21;width:min(340px,88vw);overflow-y:auto;background:var(--card);border-left:1px solid var(--line);
+  padding:calc(var(--s3) + env(safe-area-inset-top)) var(--s4) calc(var(--s5) + env(safe-area-inset-bottom));transform:translateX(100%);visibility:hidden;transition:transform .25s ease,visibility 0s .25s}
 .drawer.open{transform:none;visibility:visible;transition:transform .25s ease}
-.drawer-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-@media (prefers-reduced-motion:reduce){.drawer,.scrim{transition:none}}
-.mi{display:flex;gap:14px;align-items:center;width:100%;padding:14px 4px;background:none;border:0;border-top:1px solid var(--line);text-align:left;min-height:60px}
-.mi:first-of-type{border-top:0}
+.drawer-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--s2)}
+.drawer .cap{margin:var(--s5) 0 var(--s1)}
+@media (prefers-reduced-motion:reduce){.drawer,.scrim,.prog i{transition:none}}
+.mi{display:flex;gap:var(--s4);align-items:center;width:100%;padding:var(--s3) var(--s1);background:none;border:0;border-top:1px solid var(--line);text-align:left;min-height:60px}
+.cap + .mi{border-top:0}
 .mi svg{width:22px;height:22px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .mi b{display:block;font-weight:600}
-[hidden]{display:none!important}
+.mi .sub{display:block}
+.mi.on b{color:var(--accent)}
+
+/* Coach-Chat */
+.chat{display:flex;flex-direction:column;gap:var(--s3);margin-bottom:var(--s4)}
+.msg{max-width:88%;padding:var(--s3) var(--s4);border-radius:var(--r-m);font-size:15px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.user{align-self:flex-end;background:var(--accent);color:var(--on-accent);border-bottom-right-radius:4px}
+.msg.assistant{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg.err{align-self:center;background:none;color:var(--danger);font-size:13px;padding:0}
+.prop{margin-top:var(--s3);border-top:1px solid var(--line);padding-top:var(--s3);white-space:normal}
+.prop li{margin:var(--s1) 0}
+.prop li.bad{color:var(--muted);text-decoration:line-through}
+.prop ul{margin:0;padding-left:18px}
+.chat-in textarea{min-height:88px}
+
+/* Onboarding */
+.onb{max-width:460px;margin:var(--s6) auto 0}
+.onb .av{width:56px;height:56px;font-size:26px;background:var(--strava);color:#fff;margin-bottom:var(--s4)}
+.onb ul{margin:var(--s3) 0 0;padding-left:18px;color:var(--muted)}
+.onb li{margin:var(--s1) 0}
+
+/* Konto */
+.acct{display:flex;gap:var(--s3);align-items:center}
+.av{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-family:var(--f-head);font-weight:700;font-size:20px;flex:none}
+.av.alt{background:var(--lauf)}
+.av.off{background:var(--surface2);color:var(--muted)}
+.login{max-width:420px;margin:var(--s8) auto 0}
+.login .tag{color:var(--muted);text-align:center;margin:0 0 var(--s5)}
+.note{border:1px dashed var(--line);border-radius:var(--r-m);padding:var(--s3);font-size:13px;color:var(--muted);margin-top:var(--s4)}
 
 /* Tests */
 table{width:100%;border-collapse:collapse;font-size:14px}
-td,th{padding:5px 3px;text-align:left;vertical-align:middle}
+td,th{padding:var(--s1) 3px;text-align:left;vertical-align:middle}
 th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+td.l{font-size:13px;color:var(--muted)}
 .res{font-weight:700;color:var(--accent)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--muted);font-weight:600;padding:4px 0 14px;min-height:44px}
-/* Umplanen */
+
+/* Badges, Chips, Optionen */
+.badges{display:flex;flex-wrap:wrap;gap:var(--s1);justify-content:flex-end}
+.session-h .badges{justify-content:flex-start}
 .badge{font-family:var(--f-head);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:var(--surface2);color:var(--muted);white-space:nowrap}
 .badge.warn{background:rgba(255,138,128,.15);color:var(--danger)}
 .badge.mv{background:rgba(110,164,240,.15);color:var(--lauf)}
 .badge.ok{background:rgba(111,207,134,.15);color:var(--ok)}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chips button{min-width:48px;height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-weight:600}
+.badge.easy{background:rgba(255,192,77,.15);color:var(--warn)}
+.badge.strava{background:rgba(252,106,44,.15);color:var(--strava)}
+.chips{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.chips button{min-width:48px;height:44px;padding:0 14px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--bg);font-weight:600}
 .chips button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
-.opt{display:block;width:100%;text-align:left;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);margin-top:8px}
+.cc-tabs{margin-bottom:var(--s4);display:grid;grid-template-columns:repeat(2,1fr)}
+@media (min-width:600px){ .cc-tabs{grid-template-columns:repeat(4,1fr)} }
+.bodies{display:flex;justify-content:center}
+.sore-views{margin-bottom:var(--s3)} .sore-views button{flex:1}
+.body .side-l{font-size:11px;fill:var(--muted);font-family:var(--f-head);letter-spacing:.06em;text-transform:uppercase}
+.zone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+.zone-grid button{min-height:40px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--bg);font-size:13px;font-weight:600;text-align:left;padding:6px 10px;box-shadow:inset 4px 0 0 var(--zc)}
+.zone-grid button.on{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--zc),0 0 0 1px var(--accent)}
+.body{margin:0;text-align:center}
+.body svg{width:100%;max-width:340px;max-height:560px}
+.body{width:100%;max-width:340px}
+.body figcaption{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.body .sil{fill:var(--bg);stroke:var(--line);stroke-width:1}
+.mu{cursor:pointer;stroke:var(--bg);stroke-width:1;transition:fill .15s}
+.mu:hover{stroke:var(--text)}
+.mu.sel{stroke:var(--accent);stroke-width:2.2}
+.mu:focus-visible{outline:none;stroke:var(--accent);stroke-width:2.2}
+.legend{display:flex;flex-wrap:wrap;gap:var(--s3);justify-content:center;margin-top:var(--s2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.sore-ctl{border-top:1px solid var(--line);margin-top:var(--s4);padding-top:var(--s4)}
+.sore-ctl input[type=range]{width:100%;accent-color:var(--accent);margin-top:var(--s3);height:28px}
+.impact{list-style:none;margin:0;padding:0}
+.impact li{padding:var(--s2) 0;border-top:1px solid var(--line)}
+.impact li:first-child{border-top:0}
+.acct-link{width:100%;background:none;border:0;padding:var(--s2);margin:0 calc(-1 * var(--s2));width:calc(100% + 2 * var(--s2));border-radius:var(--r-m);text-align:left;cursor:pointer}
+.acct-link:hover,.acct-link.on{background:var(--surface2)}
+.acct-link .chev{margin-left:auto;font-size:24px;color:var(--muted)}
+input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:not-allowed}
+.cc-tabs button{flex:1}
+.ex-v input.pre{color:var(--muted);font-style:italic}
+.wt{width:100%}
+.wt td{padding:3px 0}
+.wt td:last-child{width:28px;padding-left:var(--s2)}
+.wt input{width:100%}
+.opt{display:block;width:100%;text-align:left;padding:var(--s4);border-radius:var(--r-m);border:1px solid var(--line);background:var(--bg)}
+.opt + .opt{margin-top:var(--s2)}
 .opt.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .opt b{display:block}
-.day .meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.btn+.btn{margin-top:8px}
-.grid2 .btn{margin-top:0}
-#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:22px;font-size:14px;font-weight:600;z-index:30;pointer-events:none}
+
+/* Check-in (Ampel) */
+.ci-row{display:grid;grid-template-columns:96px 1fr;gap:var(--s3);align-items:center;padding:var(--s2) 0}
+.ci-row > span{font-size:14px;font-weight:500}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s1)}
+.seg button{height:40px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-size:13px;font-weight:600;color:var(--muted);padding:0 var(--s1)}
+.seg button.on.v-g{background:rgba(111,207,134,.18);border-color:var(--ok);color:var(--ok)}
+.seg button.on.v-y{background:rgba(255,192,77,.18);border-color:var(--warn);color:var(--warn)}
+.seg button.on.v-r{background:rgba(255,138,128,.18);border-color:var(--danger);color:var(--danger)}
+.amp{font-family:var(--f-head);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:6px}
+.amp::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.amp-green{color:var(--ok);background:rgba(111,207,134,.12)}.amp-yellow{color:var(--warn);background:rgba(255,192,77,.12)}.amp-red{color:var(--danger);background:rgba(255,138,128,.12)}
+
+/* Vorschläge */
+.sug{border-top:1px solid var(--line);padding:var(--s4) 0}
+.row + .sug{border-top:0;padding-top:var(--s3)}
+.sug:last-child{padding-bottom:0}
+.sug b{display:block}
+.sug .sub{margin-top:var(--s1)}
+.sug .grid2{margin-top:var(--s3)}
+
+/* Strava */
+.act{display:flex;gap:var(--s3);padding:var(--s3) 0;border-top:1px solid var(--line);align-items:flex-start}
+.act:first-child{border-top:0}
+.act .d{width:38px;flex:none;font-family:var(--f-head);font-weight:600;font-size:12px;color:var(--muted);text-transform:uppercase;line-height:1.05}
+.act .d b{display:block;font-size:20px;color:var(--text)}
+.act > div:last-child{flex:1;min-width:0}
+.sbox{border:1px solid rgba(252,106,44,.35);background:rgba(252,106,44,.08);border-radius:var(--r-s);padding:var(--s3);margin-top:var(--s4);font-size:14px}
+.sbox b{color:var(--strava)}
+.sbox .btn{margin-top:var(--s3)}
+
+#toast{position:fixed;left:50%;bottom:calc(var(--tabs-h) + var(--s5) + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px var(--s4);border-radius:22px;font-size:14px;font-weight:600;z-index:30;pointer-events:none;max-width:calc(100vw - 32px);text-align:center}
+
+/* ---------- Responsive ----------
+   < 480     Handy: eine Spalte, RPE in zwei Reihen
+   600–899   Tablet hoch: lesbare Spalte, Tab-Leiste als Pille
+   ≥ 900     Tablet quer / Desktop: zwei Spalten, Navigation oben in der Kopfzeile
+   Höhe<500  Handy quer: kompakte Kopf- und Tab-Leiste */
+@media (max-width:479px){
+  .rpe{grid-template-columns:repeat(5,1fr);gap:6px}
+}
+@media (max-width:370px){
+  h1{font-size:28px}
+  main{padding:var(--s3)}
+  .card{padding:var(--s4)}
+  .ci-row{grid-template-columns:82px 1fr;gap:var(--s2)}
+  .seg button{font-size:12px}
+  .strip{gap:var(--s1)}
+  .strip .dd{font-size:18px}
+  .ex-v{margin-left:0}
+  .wsum .stat b{font-size:20px}
+  .brand{font-size:18px}
+}
+@media (min-width:600px){
+  main{max-width:720px;padding:var(--s6)}
+  .tabs{left:50%;right:auto;bottom:calc(var(--s4) + env(safe-area-inset-bottom));transform:translateX(-50%);width:400px;
+    border:1px solid var(--line);border-radius:var(--r-l);padding-bottom:0;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+  body{padding-bottom:calc(var(--tabs-h) + var(--s8) + env(safe-area-inset-bottom))}
+  #toast{bottom:calc(var(--tabs-h) + var(--s8) + env(safe-area-inset-bottom))}
+  /* Heute: Wochenleiste hochkant links, Einheit rechts daneben */
+  .cols.today{display:grid;grid-template-columns:64px minmax(0,1fr);gap:var(--s4);align-items:start}
+  .rail{position:sticky;top:84px}
+  .rail .cap{font-size:12px;text-align:center;margin:0 0 var(--s2)}
+  .strip.v{grid-template-columns:1fr;gap:6px}
+  .strip.v button{padding:var(--s2) 0;gap:3px}
+  .strip.v .dd{font-size:18px}
+  .strip.v button.today{box-shadow:inset 3px 0 0 var(--accent)}
+}
+@media (min-width:900px){
+  /* Kopfzeile bündig mit dem Inhalt, Navigation als Segment in der Mitte */
+  .top{--pad:max(var(--s8),calc((100vw - 1080px) / 2 + var(--s8)));padding-left:var(--pad);padding-right:var(--pad);
+    grid-template-columns:auto 1fr auto auto;min-height:72px}
+  .cd{grid-column:3;display:flex;align-items:baseline;gap:var(--s2);text-align:left}
+  .cd span{display:inline;font-size:24px}
+  .tabs{position:fixed;top:calc(14px + env(safe-area-inset-top));bottom:auto;left:50%;transform:translateX(-50%);width:auto;
+    display:flex;gap:var(--s1);padding:var(--s1);background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);box-shadow:none;z-index:6}
+  .tabs button{min-height:36px;flex-direction:row;gap:var(--s2);padding:0 var(--s4);border-radius:9px;font-size:14px}
+  .tabs svg{width:18px;height:18px}
+  .tabs button.on{background:var(--surface2)}
+  body{padding-bottom:var(--s8)}
+  #toast{bottom:var(--s6)}
+  main{max-width:1080px;padding:var(--s6) var(--s8)}
+  .cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:var(--s6);align-items:start}
+  .cols.week{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}
+  .cols.today{grid-template-columns:72px minmax(0,1.3fr) minmax(300px,1fr)}
+  .cols.today.two{grid-template-columns:72px minmax(0,1fr)}
+  .rail{top:96px}
+  /* Seitenspalte bleibt stehen, scrollt aber selbst, wenn sie höher als der Bildschirm ist */
+  .cols:not(.week) > .side{position:sticky;top:96px;max-height:calc(100vh - 112px);overflow-y:auto;scrollbar-width:thin}
+  .narrow{max-width:680px;margin:0 auto}
+}
+@media (min-width:1400px){
+  main{max-width:1200px}
+  .top{--pad:max(var(--s8),calc((100vw - 1200px) / 2 + var(--s8)))}
+}
+@media (max-height:500px) and (orientation:landscape) and (max-width:899px){
+  :root{--tabs-h:48px}
+  .top{padding-top:calc(var(--s1) + env(safe-area-inset-top));padding-bottom:var(--s1);padding-left:max(var(--s4),env(safe-area-inset-left));padding-right:max(var(--s4),env(safe-area-inset-right))}
+  .cd{display:flex;gap:var(--s2);align-items:baseline}
+  .cd span{display:inline;font-size:20px}
+  .menu-btn{width:40px;height:40px}
+  .tabs button{flex-direction:row;gap:var(--s2);font-size:13px}
+  .tabs svg{width:18px;height:18px}
+  .sim-date{padding:2px var(--s4)}
+  main{padding-left:max(var(--s6),env(safe-area-inset-left));padding-right:max(var(--s6),env(safe-area-inset-right))}
+}
 </style>
 </head>
 <body>
 <div class="top">
   <div class="brand">Basel<b>Sub-60</b></div>
   <div class="cd"><span id="cd">–</span>Tage bis Basel</div>
-  <button class="menu-btn" data-act="menu" aria-label="Menü"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+  <button class="menu-btn" data-act="menu" aria-label="Menü öffnen" aria-controls="sheet"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg></button>
 </div>
+<div class="sim-date" id="simdate" hidden></div>
 <main id="main"></main>
 <nav class="tabs" id="nav">
   <button data-v="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>Heute</button>
@@ -181,128 +416,82 @@ th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;le
 <div class="scrim" id="scrim" data-act="close"></div>
 <div class="drawer" id="sheet" role="dialog" aria-label="Menü" aria-hidden="true">
   <div class="drawer-h"><h2>Menü</h2><button class="menu-btn" data-act="close" aria-label="Menü schliessen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg></button></div>
-  <button class="mi" data-v="tests"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7"/><path d="M12 13V9M9 3h6"/></svg><span><b>Tests &amp; Benchmarks</b><span class="sub">Pacing-Test, Stationszeiten, Übergaben</span></span></button>
-  <button class="mi" data-v="inj"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/><rect x="3" y="3" width="18" height="18" rx="4"/></svg><span><b>Verletzt / krank</b><span class="sub">Trainings für mehrere Tage anpassen</span></span></button>
-  <button class="mi" data-act="export"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span><b>Backup exportieren</b><span class="sub">Alle Einträge als Text teilen</span></span></button>
-  <button class="mi" data-act="import"><svg viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5M5 20h14"/></svg><span><b>Backup importieren</b><span class="sub">Z. B. auf neues Handy übertragen</span></span></button>
-  <div id="acct" style="border-top:1px solid var(--line);margin-top:8px;padding-top:16px"></div>
+  <div class="cap">App</div>
+  <button class="mi" data-v="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg><span><b>Trainingsplan</b><span class="sub">Heute, Woche und Gesamtplan</span></span></button>
+  <button class="mi" data-v="coach"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><span><b>Coach &amp; Verletzt / krank</b><span class="sub">Chatten oder Trainings für mehrere Tage anpassen</span></span></button>
+  <button class="mi" data-v="backup"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span><b>Backup</b><span class="sub">Daten als Datei sichern oder einspielen</span></span></button>
+  <div class="cap">Training</div>
+  <button class="mi" data-v="strava"><svg viewBox="0 0 24 24"><path d="M10 3l-6 12h4l2-4 2 4h4zM14 15l2 4 2-4"/></svg><span><b>Strava</b><span class="sub">Läufe und Fahrten mit dem Plan abgleichen</span></span></button>
+  <button class="mi" data-v="import"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 18v-6M9 15l3-3 3 3"/></svg><span><b>Plan importieren</b><span class="sub">Neues PDF vom Coach einlesen</span></span></button>
+  <div class="cap">Konto</div>
+  <div id="acct"></div>
 </div>
-<div id="toast" hidden></div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
 
-<script>
-"use strict";
-/* ---------- Daten ---------- */
-const START = new Date(2026,9,12);            // Mo 12.10.2026
-const RACE  = new Date(2027,1,13);
-const DAYS  = ["Mo","Di","Mi","Do","Fr","Sa","So"];
-const DAYSF = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
-const MONTHS= ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
-const KIND  = {kraft:"Kraft",lauf:"Lauf",bike:"Rad",station:"Stationen",rest:"Ruhe",sim:"Doubles"};
+<script type="module">
+import { START, RACE, NWEEKS, DAYS, DAYSF, midnight, idxFromDate, dateFromIdx, fmt } from "./src/dates.js";
+import { KIND_LABEL as KIND, esc, mmss, parseT, avg, exName } from "./src/util.js";
+import { activePlan, weekInfo as planWeekInfo, mergeImport, changesByWeek, undoImport, blockOverview, LAST } from "./src/plan-store.js";
+import { parsePlanText } from "./src/parser.js";
+import { fileToText } from "./src/pdf-import.js";
+import { suggest, readiness, isFixedRest, CHECKIN_FIELDS } from "./src/adapt.js";
+import * as strava from "./src/strava.js";
+import { linkCode, decodeSnapshot } from "./src/share.js";
+import { weightList, cleanWeight, defaultWeight } from "./src/weights.js";
+import { colOf, personTests, partnerProfile } from "./src/profile.js";
+import * as sore from "./src/soreness.js";
+import { makeBackup, backupFileName, readBackup } from "./src/backup.js";
+import * as coach from "./src/coach.js";
 
-const R = (n)=>({t:"Ruhetag",k:"rest",i:[],n:n||"Echte Erholung. Kein Bike, kein Zirkel."});
-const KRAFT = (items,n)=>({t:"Kraft 1",k:"kraft",i:items,n});
-
-const WEEKS = [
- { name:"Standortbestimmung", days:[
-  KRAFT(["Back Squat 3×5 @75% RPE 7","Bulgarian Split Squat 3×8 je Seite RPE 7","Bench Press 3×6 RPE 7","Shoulder Press 3×8 RPE 7","Pull-ups 3×6 RPE 7","Plank 3×50″"],"Arbeitsgewicht, kein Testsatz. Kein Zone-2-Zusatz danach."),
-  {t:"Lauf-Pacing-Test mit Jimoh",k:"lauf",i:["15′ Einlaufen + Mobility","4×1km zusammen, RPE 8–9 (kein Sprint), 2′ Trabpause","Abstand zwischen euch notieren (5–15 Sek. Toleranz)","10′ Auslaufen"],n:"Splits auch unter Menü → Tests eintragen, daraus entsteht dein Team-Tempo T.",test:1},
-  {t:"Zone 2 Bike",k:"bike",i:["Bike 45–60′ bei 65–70% max HF"]},
-  {t:"Stationen-Benchmark mit Jimoh",k:"station",i:["SkiErg 1000m","Sled Push","Sled Pull","Burpee Broad Jumps 80m","RowErg 1000m","Farmers Carry","Sandbag Lunges","100 Wall Balls"],n:"3–5′ Pause zwischen den Stationen, im Wechsel: einer testet, einer stoppt. Ein Test, kein Erschöpfungs-Circuit.",test:1},
-  R("Fix Ruhetag."),
-  {t:"Lange Fahrt Zone 2",k:"bike",i:["75–90′ Zone 2 Bike, locker"]},
-  R("Nach zwei Testtagen hat der Körper das verdient.")]},
- { name:"Aufbau auf Testbasis", days:[
-  KRAFT(["Back Squat 3×5 @75–80% RPE 7","Bulgarian Split Squat 3×8 je Seite RPE 7","Bench Press 3×6 RPE 7","Shoulder Press 3×8 RPE 7","Pull-ups 3×6 RPE 7–8","Plank 3×50″"]),
-  {t:"Intervall mit Jimoh",k:"lauf",i:["15′ Einlaufen","4×1km @ T + 10–15 sec/km, 2′ Trabpause","10′ Auslaufen"],n:"Ziel: Streuung ≤10 sec/km UND enger Abstand zueinander.",tp:[10,15]},
-  {t:"Zone 2 Bike",k:"bike",i:["Bike 45–60′ bei 65–70% max HF"]},
-  {t:"Kraft 2 + Compromised Running",k:"station",i:["3 Runden im Wechsel: 400m Ski, 400m Row, 10 Sled Push moderat, 15 Wall Balls","Compromised Running 1×8′ Zone 3 (75–80% max HF), zusammen"]},
-  R("Fix Ruhetag."),
-  {t:"Lange Fahrt Zone 2",k:"bike",i:["75–90′ Zone 2 Bike"]},
-  R()]},
- { name:"Hart + Transition Drilling", days:[
-  KRAFT(["Back Squat 3×3 @85% + Back-off RPE 7–8","Bulgarian Split Squat 4×8 je Seite RPE 8","Bench Press 4×5 RPE 8","Shoulder Press 4×6 RPE 7–8","Pull-ups 4×6 RPE 8","Plank 3×60″"]),
-  {t:"Intervall mit Jimoh",k:"lauf",i:["15′ Einlaufen + Mobility","4×6′ @ 85% max HF, 2′ Trabpause, im Team-Tempo","10′ Auslaufen"]},
-  {t:"Zone 2 Bike",k:"bike",i:["Bike 45–60′"]},
-  {t:"Kraft 2 + Compromised Running",k:"station",i:["4 Runden im Wechsel: 300m Ski, 15m Sled Push moderat, 15 Wall Balls, 20m Sled Pull","Compromised Running 2×10′ Zone 3, 2′ Pause, zusammen"]},
-  R("Fix Ruhetag."),
-  {t:"Doubles Transition Drilling",k:"sim",i:["4–6 komplette Stationswechsel am Stück","Übergabezeiten messen (Ziel < 8 Sek.)"],n:"Fokus nur auf die Übergabe, nicht auf die Stationsleistung. Wenn möglich beide mit Pulsuhr."},
-  R()]},
- { name:"Deload", days:[
-  KRAFT(["Back Squat 3×5 @65% RPE 5–6","Bulgarian Split Squat 2×8 je Seite RPE 5–6","Bench Press 2×8 RPE 5–6","Shoulder Press 2×8 RPE 5–6","Pull-ups 3×6 RPE 6","Plank 2×45″"],"Leicht."),
-  {t:"Intervall kurz",k:"lauf",i:["15′ Einlaufen","3×4′ @ 90% max HF, 3′ Trabpause","10′ Auslaufen"]},
-  {t:"Zone 2 Bike ganz locker",k:"bike",i:["Bike 45′, ganz locker"]},
-  {t:"Kraft 2 – Technik only",k:"station",i:["Stationen ohne Zeitdruck, niedriges Volumen"],n:"Kein Compromised Running diese Woche."},
-  R("Fix Ruhetag."),
-  {t:"Lange Fahrt Zone 2",k:"bike",i:["75–90′ Zone 2 Bike, ruhig"]},
-  R("Kurzer Rückblick: Testwerte vs. Woche 3, was nimmst du in Block B mit?")]}
-];
-
-const BLOCKS = {
- B:{name:"Build I – Renn-Spezifität",range:"09.11. – 06.12.",d:[
-  ["Kraft 1","kraft","Ein Schwerset pro Woche, 6–8 Wdh"],["Schwellenintervalle","lauf","3–5×8–12′ Zone 4"],["Zone 2 Bike","bike","60–90′"],
-  ["Stationen unter Zeitdruck + Compromised Running","station","AMRAP intensiver, mit Jimoh"],["Ruhetag","rest",""],["Doubles Transition Drilling","sim","Übergabe < 8 Sek., eine lange Fahrt dazu"],["Ruhetag","rest",""]]},
- C:{name:"Build II – Stationskraft & Sims",range:"07.12. – 03.01.",d:[
-  ["Kraft 1 Zirkel","kraft","Zirkelformate, kürzere Pausen"],["Kurze schnelle Reps","lauf","Zone 4/5"],["Zone 2 Bike","bike","60–90′"],
-  ["Stationen schwer","station","Sled Race Weight+, unter Ermüdung"],["Ruhetag","rest",""],["Doubles-Simulation","sim","#1–2 bei 70–85% Intensität"],["Ruhetag","rest",""]]},
- D:{name:"Peak – Renn-Bricks",range:"04.01. – 31.01.",d:[
-  ["Kraft 1 explosiv","kraft","Komplex, wenig Volumen"],["Brick: Lauf + Station + Lauf","lauf","Renn-nah"],["Zone 2 Bike","bike","60–90′"],
-  ["Renn-Szenario-Bricks","station","mit Jimoh"],["Ruhetag","rest",""],["Doubles-Simulation","sim","#3–4 bei 85–95% Intensität"],["Ruhetag","rest",""]]},
- T:{name:"Taper",range:"01.02. – 13.02.",d:[
-  ["Kraft 1 minimal","kraft","Technik / Mobilität"],["Kurz und scharf","lauf","Wenig Volumen, Renn-Pace-Reize"],["Zone 2 reduziert","bike","30–45′"],
-  ["Nur Technik","station","Kein Erschöpfungsreiz"],["Ruhetag","rest",""],["Finale Sim 90–100%","sim","Anfang Taper-Woche, dann runter"],["Ruhetag","rest",""]]}
-};
-const BLOCK_STARTS = [["B",new Date(2026,10,9)],["C",new Date(2026,11,7)],["D",new Date(2027,0,4)],["T",new Date(2027,1,1)]];
-const WAVE = ["moderat","hart","Spitzenreiz","Deload"];
-const NWEEKS = 18;
+/* ---------- Zeit ---------- */
+// ?heute=2026-10-20 simuliert ein anderes Datum (zum Testen von Umplanen/Strava vor Planstart).
+const QS = new URLSearchParams(location.search);
+const SIM = /^\d{4}-\d{2}-\d{2}$/.test(QS.get("heute")||"") ? QS.get("heute") : null;
+const isoToDate = (s)=>{ const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
+const NOW = SIM ? isoToDate(SIM) : new Date();
+const dayMs = 864e5;
+const TODAY = idxFromDate(NOW);
+const CURW  = Math.max(0,Math.min(NWEEKS-1,Math.floor(TODAY/7)));
+const key = (d)=>d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+const keyI = (i)=>key(dateFromIdx(i));
+const dow = (i)=>((i%7)+7)%7;
+const shortDay = (i)=>DAYS[dow(i)]+" "+fmt(dateFromIdx(i));
+const idxOfIso = (s)=>idxFromDate(isoToDate(s));
+const STRAVA_MIN = new Date(+START-7*dayMs).toISOString().slice(0,10);
 
 /* ---------- Speicher ---------- */
 /* Lokal im Gerät (Schlüssel pro Nutzer), bei Login zusätzlich in Supabase gespiegelt. S._t = Zeit der letzten Änderung. */
 let S, LSK="hx";
-const def = ()=>({done:{},val:{},rpe:{},notes:{},sched:{},skip:{},edit:{},tests:{lauf:{j:["","","",""],m:["","","",""]},station:{},trans:["","","","","",""]}});
-const fill = (o)=>{ for(const [k,v] of Object.entries(def())) if(!o[k]) o[k]=v; return o; };
+/* onb: einmalige Hinweise (onb.strava = Strava-Onboarding erledigt), chat: Verlauf des Coach-Chats,
+   weights: Standard-Arbeitsgewichte aus dem Profil ({übungsname: "kg"}),
+   sore: Muskelkater-Meldungen ({tagIndex: {muskel: 1–10}}) */
+const def = ()=>({done:{},val:{},rpe:{},notes:{},sched:{},skip:{},edit:{},checkin:{},dismiss:{},plan:null,strava:{acts:{},at:0},onb:{},chat:[],weights:{},sore:{},
+  tests:{lauf:{j:["","","",""],m:["","","",""]},station:{},trans:["","","","","",""]}});
+const fill = (o)=>{ for(const [k,v] of Object.entries(def())) if(o[k]==null) o[k]=v; if(!o.strava||!o.strava.acts) o.strava={acts:{},at:0}; return o; };
 const lsGet = (k)=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
-const lsSet = (k,v)=>{ try{ localStorage.setItem(k,v); }catch(e){} };
+const lsSet = (k,v)=>{ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } };
+const lsDel = (k)=>{ try{ localStorage.removeItem(k); }catch(e){} };
 function loadLocal(){ try{ S = JSON.parse(lsGet(LSK)||"null") || def(); }catch(e){ S = def(); } fill(S); }
-function saveLocal(){ lsSet(LSK,JSON.stringify(S)); }
+function saveLocal(){ if(!lsSet(LSK,JSON.stringify(S))) toast("Speicher voll – bitte Backup exportieren"); }
 function save(){ S._t=Date.now(); saveLocal(); queuePush(); }
 loadLocal();
 
 /* ---------- Helfer ---------- */
 const $ = (s)=>document.querySelector(s);
-const esc = (s)=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const dayMs = 864e5;
-const midnight = (d)=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
-const fmt = (d)=>d.getDate()+". "+MONTHS[d.getMonth()];
-const key = (d)=>d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
-const idxFromDate=(d)=>Math.round((midnight(d)-START)/dayMs);
-const dateFromIdx=(i)=>new Date(2026,9,12+i);
-const TODAY = idxFromDate(new Date());
-const CURW  = Math.max(0,Math.min(NWEEKS-1,Math.floor(TODAY/7)));
-
-function weekInfo(w){
-  const d0=dateFromIdx(w*7);
-  if(w<4) return {block:"A",name:WEEKS[w].name,wave:w===0?"Test":WAVE[w]};
-  let b="B"; for(const [k,s] of BLOCK_STARTS) if(d0>=s) b=k;
-  const bs=BLOCK_STARTS.find(x=>x[0]===b)[1];
-  return {block:b,name:BLOCKS[b].name,wave:b==="T"?"Taper":WAVE[Math.min(3,Math.floor((d0-bs)/dayMs/7))]};
-}
-/* Originalplan eines Tages (ohne Umplanungen) */
-function basePlan(i){
-  const w=Math.floor(i/7), dw=((i%7)+7)%7;
-  if(w<0||w>=NWEEKS) return null;
-  if(w<4) return WEEKS[w].days[dw];
-  const x=BLOCKS[weekInfo(w).block].d[dw];
-  return {t:x[0],k:x[1],i:x[1]==="rest"?[]:[x[0]],n:x[2]?x[2]+". Genaue Zahlen folgen nach den Testdaten aus Block A.":"",gen:true};
-}
-
-/* ---------- Umplanen ----------
-   S.sched[tagIndex] = {src: Tag, dessen Einheit hier stattfindet, inj: "pause"|"alt", back: Comeback-Einheit}
-   S.skip[datumKey]  = Einheit ist ausgefallen */
-const LAST = NWEEKS*7-1;
 const HARD = ["kraft","lauf","station","sim"];
 const isHardP = (p)=>!!p && HARD.includes(p.k);
+
+/* ---------- Plan ---------- */
+const PLAN = ()=>activePlan(S.plan);
+const weekInfo = (w)=>planWeekInfo(PLAN(),w);
+const blockLabel = (b)=>b==="T"?"Taper":"Block "+b;
+/* Originalplan eines Tages (ohne Umplanungen) */
+function basePlan(i){ return i<0||i>LAST ? null : PLAN().days[i]||null; }
+
+/* ---------- Umplanen ----------
+   S.sched[tagIndex] = {src: Tag, dessen Einheit hier stattfindet, inj: "pause"|"alt", back: Comeback, easy: entlastet}
+   S.skip[datumKey]  = Einheit ist ausgefallen */
 const srcOf = (x)=>S.sched[x] && S.sched[x].src!=null ? S.sched[x].src : x;
-const shortDay = (i)=>DAYS[((i%7)+7)%7]+" "+fmt(dateFromIdx(i));
 function setE(x,patch){
   const o=Object.assign({},S.sched[x],patch);
   for(const k of Object.keys(o)) if(o[k]==null||o[k]===false) delete o[k];
@@ -315,9 +504,9 @@ const per = (s)=>ME==="Jaime" ? s : String(s).replace(/Jimoh/g,PARTNER);
 /* Plan inkl. eigener Übungsanpassung (S.edit hängt an der Einheit, nicht am Datum – wandert beim Verschieben mit) */
 function ownPlan(src){
   const b=basePlan(src); if(!b) return null;
-  const p=Object.assign({},b,{t:per(b.t),i:b.i.map(per),n:per(b.n||"")});
+  const p=Object.assign({},b,{t:per(b.t),i:(b.i||[]).map(per),n:per(b.n||"")});
   const ed=S.edit[src];
-  if(ed && p.k!=="rest") Object.assign(p,{t:ed.t||p.t,i:ed.i,n:ed.n||"",edited:1});
+  if(ed && p.k!=="rest") Object.assign(p,{t:ed.t||p.t,k:ed.k||p.k,i:ed.i,n:ed.n||"",edited:1});
   return p;
 }
 function dayPlan(i){
@@ -330,8 +519,9 @@ function dayPlan(i){
     if(o.inj==="pause"||p.k==="rest") p={t:p.k==="rest"?"Ruhetag":"Verletzt – Pause",k:"rest",i:[],n:"Heute kein Training. Erholen, schlafen, gut essen."+was,inj:o.inj};
     else p={t:"Alternativtraining",k:"bike",i:["Mobility 15′, nur schmerzfreie Bewegungen","Bike 30–40′ Zone 1–2, ganz locker","Core / Oberkörper leicht, verletzte Stelle schonen"],
       n:"Nur machen, was ohne Schmerzen geht. Bei Schmerz sofort aufhören."+was,inj:o.inj};
-  } else if(o.back && p.k!=="rest"){
-    p.n="Comeback nach Pause: ca. 70 % von Volumen und Gewicht, RPE max. 6."+(p.n?" "+p.n:""); p.back=1;
+  } else if(p.k!=="rest" && (o.back||o.easy)){
+    const pre=o.back?"Comeback nach Pause: ca. 70 % von Volumen und Gewicht, RPE max. 6.":"Entlastet: ca. 75 % Volumen, RPE max. 6.";
+    p.n=pre+(p.n?" "+p.n:""); if(o.back) p.back=1; else p.easy=1;
   }
   return p;
 }
@@ -339,7 +529,7 @@ function dayPlan(i){
 function swapDays(i,j){
   const a=srcOf(i), b=srcOf(j);
   setE(i,{src:b}); setE(j,{src:a});
-  const A=key(dateFromIdx(i))+"|", B=key(dateFromIdx(j))+"|";
+  const A=keyI(i)+"|", B=keyI(j)+"|";
   for(const m of [S.done,S.val]){
     const ea=[], eb=[];
     for(const k of Object.keys(m)){ if(k.startsWith(A)) ea.push(k); else if(k.startsWith(B)) eb.push(k); }
@@ -347,11 +537,11 @@ function swapDays(i,j){
     [...ea,...eb].forEach(k=>delete m[k]);
     va.forEach(([s,v])=>m[B+s]=v); vb.forEach(([s,v])=>m[A+s]=v);
   }
-  delete S.skip[key(dateFromIdx(i))]; delete S.skip[key(dateFromIdx(j))];
+  delete S.skip[keyI(i)]; delete S.skip[keyI(j)];
 }
 function restoreDay(i){
   const o=S.sched[i]; if(!o) return;
-  if(o.inj||o.back) return setE(i,{inj:null,back:null});
+  if(o.inj||o.back||o.easy) return setE(i,{inj:null,back:null,easy:null});
   for(let x=0;x<=LAST;x++) if(x!==i && srcOf(x)===i) return swapDays(i,x);
   setE(i,{src:null});
 }
@@ -362,12 +552,12 @@ function hardWarn(i,j){
 }
 function applyInjury(start,days,mode){
   const end=Math.min(LAST,start+days-1);
-  for(let x=start;x<=end;x++) setE(x,{inj:mode,back:null});
+  for(let x=start;x<=end;x++) setE(x,{inj:mode,back:null,easy:null});
   for(let x=end+1;x<=LAST;x++) if(S.sched[x]&&S.sched[x].back) setE(x,{back:null});
   if(days>=3) markComeback(end+1);
 }
 function markComeback(from){
-  let n=0; for(let x=Math.max(0,from);x<=LAST&&n<3;x++){ const p=dayPlan(x); if(p&&p.k!=="rest"&&!p.inj){ setE(x,{back:1}); n++; } }
+  let n=0; for(let x=Math.max(0,from);x<=LAST&&n<3;x++){ const p=dayPlan(x); if(p&&p.k!=="rest"&&!p.inj){ setE(x,{back:1,easy:null}); n++; } }
 }
 function endInjury(){
   const t=Math.max(0,TODAY);
@@ -375,14 +565,7 @@ function endInjury(){
   markComeback(t);
 }
 const injActive=()=>Object.keys(S.sched).some(x=>+x>=TODAY && S.sched[x].inj);
-const mmss=(s)=>{s=Math.round(s);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");};
-function parseT(v){ v=String(v||"").trim().replace(",",".");
-  if(!v) return NaN; if(v.includes(":")){const [m,s]=v.split(":");return (+m)*60+(+s);} const n=+v; return isNaN(n)?NaN:n; }
-const avg=(a)=>{const v=a.map(parseT).filter(x=>!isNaN(x));return v.length?v.reduce((x,y)=>x+y,0)/v.length:NaN;};
-const teamT=()=>avg([...S.tests.lauf.j,...S.tests.lauf.m]);
 
-/* Übungsname ohne Satz-/Wdh-Angaben, um den letzten Eintrag zu finden */
-const exName=(t)=>t.split(/\s\d|\s@/)[0].trim().toLowerCase();
 const isFiller=(t)=>/einlaufen|auslaufen/i.test(t);
 function placeholder(k,t){
   if(k==="kraft") return /plank/i.test(t)?"Zeit, z. B. 50/55/50″":"Gewicht, z. B. 80 kg × 5";
@@ -394,219 +577,720 @@ function lastValue(i,t){
   const n=exName(t);
   for(let j=i-1;j>=0;j--){
     const p=dayPlan(j); if(!p) continue;
-    const dk=key(dateFromIdx(j));
+    const dk=keyI(j);
     for(let x=0;x<p.i.length;x++) if(exName(p.i[x])===n && S.val[dk+"|"+x]) return S.val[dk+"|"+x];
   }
   return "";
 }
 function dayStatus(i){
-  const p=dayPlan(i), dk=key(dateFromIdx(i));
+  const p=dayPlan(i), dk=keyI(i);
   if(!p||!p.i.length) return {n:0,done:0};
   return {n:p.i.length,done:p.i.filter((_,j)=>S.done[dk+"|"+j]).length};
 }
 
+/* ---------- Strava-Abgleich (pro Render einmal berechnet) ---------- */
+let RC=null;
+function rc(){
+  if(!RC) RC=strava.reconcile(Object.values(S.strava.acts),{plan:dayPlan,idxOf:idxOfIso,last:LAST,
+    done:(x)=>{ const s=dayStatus(x); return s.n>0&&s.done>0; }});
+  return RC;
+}
+const actsOf=(i)=>{ const e=rc().byDay[i]; return e ? e.acts.map(id=>S.strava.acts[id]).filter(Boolean) : []; };
+
+/* ---------- Vorschläge (Rescheduler) ---------- */
+let SUGS=[];
+function suggestions(){
+  return suggest({today:TODAY,last:LAST,plan:dayPlan,status:dayStatus,
+    skipped:(i)=>!!S.skip[keyI(i)], rpe:(i)=>S.rpe[keyI(i)]??undefined, checkin:(i)=>S.checkin[keyI(i)],
+    strava:(i)=>rc().byDay[i], moved:rc().moved.map(m=>({...m,toLabel:shortDay(m.to)})), dismissed:S.dismiss, sore:soreAt});
+}
+function applySug(s){
+  if(s.type==="swap") swapDays(s.day,s.to);
+  else if(s.type==="easy") setE(s.day,{easy:1});
+  else if(s.type==="alt") setE(s.day,{inj:"alt"});
+  S.dismiss[s.id]=1;
+}
+
 /* ---------- Bausteine ---------- */
+function stravaBox(i,p,n,done){
+  const acts=actsOf(i); if(!acts.length) return "";
+  const e=rc().byDay[i];
+  let h=`<div class="sbox"><b>Strava</b> · ${e.match?"passt zur Einheit":"andere Sportart als geplant"}`;
+  for(const a of acts) h+=`<div class="mt-1">${esc(a.name)} – ${esc(strava.summary(a))}</div>`;
+  if(e.match && n && done<n) h+=`<button class="btn sm" data-act="strava-take" data-i="${i}">Als erledigt übernehmen</button>`;
+  return h+`</div>`;
+}
 function sessionCard(i){
-  const p=dayPlan(i), d=dateFromIdx(i), dk=key(d), dw=((i%7)+7)%7;
+  const p=dayPlan(i), d=dateFromIdx(i), dk=keyI(i), dw=dow(i);
   const {n,done}=dayStatus(i);
+  const badges=dayBadges(i,p,true);
   let h=`<div class="card hero k-${p.k}">
-    <div class="row between"><span class="kind">${KIND[p.k]}</span><span class="sub">${DAYSF[dw]}, ${fmt(d)}</span></div>
-    <h1 style="margin-top:10px">${esc(p.t)}</h1>`;
-  if(p.moved!=null) h+=`<div class="sub" style="margin-top:6px"><span class="badge mv">Verschoben</span> ursprünglich ${shortDay(p.moved)}</div>`;
-  if(S.skip[dk]) h+=`<div class="target" style="border-color:rgba(255,138,128,.4);background:rgba(255,138,128,.1)">Als <b style="color:var(--danger)">ausgefallen</b> markiert. Tipp: auf einen freien Tag verschieben.</div>`;
-  const moveBtn=`<button class="btn" data-move="${i}">${p.k==="rest"&&!p.inj?"Training auf diesen Tag holen":"Umplanen"}</button>`;
-  const planBtn=p.k==="rest"||p.inj ? `<div style="margin-top:14px">${moveBtn}</div>`
-    : `<div class="grid2" style="margin-top:14px">${moveBtn}<button class="btn" data-edit="${i}">Übungen anpassen</button></div>`;
-  if(p.k==="rest"){ return h+`<div class="hint">${esc(p.n)}</div>${planBtn}</div>`; }
+    <div class="session-h"><div class="row between"><span class="kind">${KIND[p.k]}</span><span class="sub">${DAYSF[dw]}, ${fmt(d)}</span></div>
+    <h1>${esc(p.t)}</h1>${badges?`<div class="badges">${badges}</div>`:""}</div>`;
+  if(p.moved!=null) h+=`<div class="sub mt-2">Ursprünglich ${shortDay(p.moved)}</div>`;
+  if(S.skip[dk]) h+=`<div class="target bad">Als <b>ausgefallen</b> markiert. Tipp: auf einen freien Tag verschieben.</div>`;
+  // Umplanen und Übungen anpassen liegen zentral im Coach (Reiter „Umplanen“), nicht mehr an jedem Tag
+  if(p.k==="rest") return h+`<div class="hint">${esc(p.n||"Echte Erholung.")}</div>${stravaBox(i,p,0,0)}</div>`;
+  const hit=sore.impact(p,soreAt(i));
+  if(hit.level>=4) h+=`<div class="target ${hit.level>=7?"bad":""}">Muskelkater: ${sore.summarize(hit.muscles.filter(m=>m.level>=4)).map(x=>esc(x).replace(/(\d+\/10)$/,"<b>$1</b>")).join(", ")}.${hit.names.length?` Bei ${hit.names.slice(0,3).map(esc).join(", ")} Last reduzieren.`:""}</div>`;
   h+=`<div class="prog"><i style="width:${n?done/n*100:0}%"></i></div><div class="sub">${done} von ${n} erledigt</div>`;
   if(p.tp){ const T=teamT();
-    h+= isNaN(T)? `<div class="target">Noch kein Team-Tempo T. Trag zuerst den Pacing-Test ein (Menü → Tests).</div>`
+    h+= isNaN(T)? `<div class="target">Noch kein Team-Tempo T. Trag zuerst den Pacing-Test ein (Menü → Profil).</div>`
       : `<div class="target">Team-Tempo T = ${mmss(T)}/km · Ziel heute <b>${mmss(T+p.tp[0])}–${mmss(T+p.tp[1])}/km</b></div>`; }
-  h+=`<div style="margin-top:14px">`;
+  h+=stravaBox(i,p,n,done)+`<div class="exs">`;
   p.i.forEach((t,j)=>{
     const id=dk+"|"+j, on=!!S.done[id];
     h+=`<div class="ex ${on?"is-done":""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on?"checked":""}><span>${esc(t)}</span></label>`;
     if(!isFiller(t)){
-      const last=lastValue(i,t);
-      h+=`<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id]||"")}" placeholder="${placeholder(p.k,t)}" enterkeyhint="next">${last?`<span class="last">zuletzt: ${esc(last)}</span>`:""}</div>`;
+      const last=lastValue(i,t), pre=!S.val[id]&&p.k==="kraft"&&!/Topsatz/.test(t)?defaultWeight(t,S.weights):"";
+      h+=`<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id]||pre)}"${pre?` class="pre" title="Standardgewicht aus dem Profil"`:""} placeholder="${placeholder(p.k,t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}">${last?`<span class="last">zuletzt: ${esc(last)}</span>`:""}</div>`;
     }
     h+=`</div>`;
   });
   h+=`</div>`;
   if(p.n) h+=`<div class="hint">${esc(p.n)}</div>`;
-  h+=`<label class="lbl">Wie hart war's? (RPE)</label><div class="rpe">${[1,2,3,4,5,6,7,8,9,10].map(r=>`<button data-r="${dk}|${r}" class="${S.rpe[dk]==r?"on":""}">${r}</button>`).join("")}</div>
-    <label class="lbl">Notiz</label><textarea data-n="${dk}" placeholder="Gefühl, Schlaf, Fuss, was auffiel …">${esc(S.notes[dk]||S.notes["n|"+dk]||"")}</textarea>`;
-  if(p.test) h+=`<button class="btn" style="margin-top:14px" data-v="tests">Testergebnisse eintragen →</button>`;
-  return h+planBtn+`</div>`;
+  h+=`<label class="lbl">Wie hart war's? (RPE)</label><div class="rpe">${[1,2,3,4,5,6,7,8,9,10].map(r=>`<button data-r="${dk}|${r}" class="${S.rpe[dk]==r?"on":""}" aria-pressed="${S.rpe[dk]==r}">${r}</button>`).join("")}</div>
+    <label class="lbl" for="n-${i}">Notiz</label><textarea id="n-${i}" data-n="${dk}" placeholder="Gefühl, Schlaf, Fuss, was auffiel …">${esc(S.notes[dk]||S.notes["n|"+dk]||"")}</textarea>`;
+  if(p.test) h+=`<div class="btns"><button class="btn" data-v="tests">Testergebnisse eintragen →</button></div>`;
+  return h+`</div>`;
 }
 
-function dayBadges(i,p){
+function dayBadges(i,p,full){
   const b=[];
   if(p.inj) b.push(`<span class="badge warn">Verletzt</span>`);
   else if(p.back) b.push(`<span class="badge ok">Comeback</span>`);
+  else if(p.easy) b.push(`<span class="badge easy">Entlastet</span>`);
   if(p.moved!=null) b.push(`<span class="badge mv">Verschoben</span>`);
   if(p.edited) b.push(`<span class="badge">Angepasst</span>`);
-  if(S.skip[key(dateFromIdx(i))]) b.push(`<span class="badge warn">Ausgefallen</span>`);
+  if(S.skip[keyI(i)]) b.push(`<span class="badge warn">Ausgefallen</span>`);
+  const e=rc().byDay[i]; if(e && (e.match||full)) b.push(`<span class="badge strava">Strava</span>`);
   return b.join("");
 }
 function dayRow(i){
-  const p=dayPlan(i), d=dateFromIdx(i), dw=((i%7)+7)%7, {n,done}=dayStatus(i);
+  const p=dayPlan(i), d=dateFromIdx(i), dw=dow(i), {n,done}=dayStatus(i);
   const st = p.k==="rest" ? "" : (n&&done===n ? `<span class="status done">✓ Erledigt</span>` : done ? `<span class="status">${done}/${n}</span>` : "");
-  return `<button class="day k-${p.k} ${i===TODAY?"today":""}" data-open="${i}"><span class="d">${DAYS[dw]}<b>${d.getDate()}</b></span>
-    <span class="t"><b>${esc(p.t)}</b><span class="kind">${KIND[p.k]}</span></span><span class="meta">${dayBadges(i,p)}${st}</span></button>`;
+  const badges=dayBadges(i,p);
+  return `<button class="day k-${p.k} ${i===TODAY?"today":""} ${openDay===i?"open":""}" data-open="${i}" aria-expanded="${openDay===i}"><span class="d">${DAYS[dw]}<b>${d.getDate()}</b></span>
+    <span class="t"><b>${esc(p.t)}</b><span class="kind">${KIND[p.k]}</span></span><span class="meta">${badges?`<span class="badges">${badges}</span>`:""}${st}</span></button>`;
+}
+
+const READY_TXT={green:"Alles im grünen Bereich – Plan wie vorgesehen.",yellow:"Leicht angeschlagen. Harte Einheiten heute eher entlasten.",red:"Heute keine harte Belastung. Siehe Vorschläge."};
+const CI_LABELS={sleep:["gut","mittel","schlecht"],sore:["kaum","spürbar","stark"],energy:["hoch","mittel","tief"],pain:["keine","leicht","stark"]};
+let ciOpen=false;
+function checkinCard(i){
+  const k=keyI(i), c=S.checkin[k]||{}, r=readiness(c);
+  const amp=r?`<span class="amp amp-${r}">${{green:"Grün",yellow:"Gelb",red:"Rot"}[r]}</span>`:`<span class="sub">ca. 20 Sekunden</span>`;
+  let h=`<div class="card tight"><div class="row between"><h3>Check-in heute</h3>${amp}</div>`;
+  if(r && !ciOpen) return h+`<p class="sub mt-2">${READY_TXT[r]}</p><button class="btn ghost sm mt-3" data-act="ci-edit">Check-in ändern</button></div>`;
+  h+=`<div class="mt-2">`;
+  for(const [f,label] of CHECKIN_FIELDS){
+    h+=`<div class="ci-row"><span>${label}</span><div class="seg" role="group" aria-label="${label}">${["g","y","r"].map((v,j)=>`<button class="v-${v} ${c[f]===v?"on":""}" data-ci="${k}|${f}|${v}" aria-pressed="${c[f]===v}">${CI_LABELS[f][j]}</button>`).join("")}</div></div>`;
+  }
+  h+=`</div>`;
+  if(r) h+=`<p class="sub mt-2">${READY_TXT[r]}</p><button class="btn ghost sm mt-3" data-act="ci-done">Fertig</button>`;
+  return h+`</div>`;
+}
+function sugCard(){
+  if(!SUGS.length) return "";
+  let h=`<div class="card tight"><div class="row between"><h3>Plan-Vorschläge</h3><span class="badge">${SUGS.length}</span></div>`;
+  for(const s of SUGS){
+    const act = s.type==="info" ? `<button class="btn sm" data-sug-no="${esc(s.id)}">Verstanden</button><span></span>`
+      : `<button class="btn primary sm" data-sug="${esc(s.id)}">${s.type==="swap"?"Verschieben":s.type==="easy"?"Entlasten":"Übernehmen"}</button><button class="btn sm" data-sug-no="${esc(s.id)}">Ignorieren</button>`;
+    const where = s.to!=null ? `<div class="sub">${shortDay(s.day)} → ${shortDay(s.to)}</div>` : `<div class="sub">${shortDay(s.day)}</div>`;
+    h+=`<div class="sug"><b>${esc(s.title)}</b>${where}<div class="sub">${esc(s.why)}</div><div class="grid2">${act}</div></div>`;
+  }
+  return h+`</div>`;
 }
 
 /* ---------- Ansichten ---------- */
 let view="today", wk=CURW, openDay=null, sel=null;
+const WIDE=()=>matchMedia("(min-width:900px)").matches; // = CSS-Breakpoint für zwei Spalten
+const MID=()=>matchMedia("(min-width:600px)").matches;  // = CSS-Breakpoint für die Wochenleiste links
+const vhead=(title,sub,back)=>`${back?`<button class="back" data-back>‹ Zurück</button>`:""}<div class="vh"><h2>${title}</h2>${sub?`<div class="sub">${sub}</div>`:""}</div>`;
 
 function vToday(){
-  let i=sel!=null?sel:Math.max(0,TODAY), h="";
+  const i=sel!=null?sel:Math.max(0,Math.min(LAST,TODAY));
   const info=weekInfo(Math.floor(i/7));
-  if(TODAY<0 && sel==null) h+=`<div class="hint" style="margin:0 0 14px">Start in ${-TODAY} Tagen (Mo 12.10.). Hier siehst du schon Tag 1.</div>`;
-  h+=`<div class="sub" style="margin-bottom:10px">Woche ${Math.floor(i/7)+1} · Block ${info.block==="T"?"Taper":info.block} · ${esc(info.wave)}</div>`;
-  if(dayPlan(i)) h+=sessionCard(i);
-  // Wochenleiste
-  const w0=Math.floor(i/7)*7;
-  h+=`<div class="cap">Diese Woche</div><div class="strip">`;
-  for(let d=0;d<7;d++){ const j=w0+d, p=dayPlan(j); if(!p) continue; const {n,done}=dayStatus(j);
-    h+=`<button class="k-${p.k} ${j===TODAY?"today":""}" data-sel="${j}" style="${j===i?"border-color:var(--text)":""}"><span class="dn">${DAYS[d]}</span><span class="dd">${dateFromIdx(j).getDate()}</span><span class="dot ${n&&done===n?"done":""}" style="${p.k==="rest"?"opacity:.35":""}"></span></button>`; }
-  h+=`</div>`;
+  let intro="", daily="", strip="";
+  if(TODAY<0 && sel==null) intro+=`<div class="hint" style="margin:0 0 var(--s4)">Start in ${-TODAY} ${TODAY===-1?"Tag":"Tagen"} (Mo 12.10.). Hier siehst du schon Tag 1.</div>`;
+  if(TODAY>LAST && sel==null) intro+=`<div class="hint" style="margin:0 0 var(--s4)">Der Plan ist abgeschlossen. Stark gemacht! 🏁</div>`;
+  // Tägliche Eingabe (Check-in) und Vorschläge: auf dem Handy über der Einheit, auf dem Desktop daneben
+  if(i===TODAY && TODAY>=0 && TODAY<=LAST) daily+=checkinCard(i);
+  daily+=sugCard();
+  const w0=Math.floor(i/7)*7, rail=MID();
+  // Handy: Leiste quer unter der Einheit. Ab Tablet: hochkant als Seitenleiste links.
+  strip+=`<div class="cap">${rail?"Woche":"Diese Woche"}</div><div class="strip${rail?" v":""}">`;
+  for(let d=0;d<7;d++){ const j=w0+d, p=dayPlan(j); if(!p) continue; const {n,done}=dayStatus(j), e=rc().byDay[j];
+    const ok=(n&&done===n)||(e&&e.match);
+    strip+=`<button class="k-${p.k} ${j===TODAY?"today":""} ${j===i?"sel":""}" data-sel="${j}" aria-label="${DAYSF[d]} ${fmt(dateFromIdx(j))}: ${esc(p.t)}"><span class="dn">${DAYS[d]}</span><span class="dd">${dateFromIdx(j).getDate()}</span><span class="dot ${ok?"done":""} ${p.k==="rest"?"off":""}"></span></button>`; }
+  strip+=`</div>`;
+  const session=`<div class="sub" style="margin-bottom:var(--s3)">Woche ${Math.floor(i/7)+1} · ${blockLabel(info.block)} · ${esc(info.wave)}</div>`+(dayPlan(i)?sessionCard(i):"");
+  if(!rail) return intro+daily+session+strip;
+  const nav=`<nav class="rail" aria-label="Diese Woche">${strip}</nav>`;
+  // Tablet: Check-in/Vorschläge über der Einheit. Desktop: in einer dritten Spalte rechts.
+  if(!WIDE()) return `${intro}<div class="cols today">${nav}<div>${daily}${session}</div></div>`;
+  return `${intro}<div class="cols today${daily?"":" two"}">${nav}<div>${session}</div>${daily?`<div class="side">${daily}</div>`:""}</div>`;
+}
+
+function weekSummary(w){
+  let plan=0, ok=0, rp=[];
+  for(let d=0;d<7;d++){ const i=w*7+d, p=dayPlan(i); if(!p||p.k==="rest") continue; plan++;
+    const {n,done}=dayStatus(i), e=rc().byDay[i]; if((n&&done===n)||(e&&e.match)) ok++;
+    const r=S.rpe[keyI(i)]; if(r!=null) rp.push(+r); }
+  const ar=rp.length?(rp.reduce((a,b)=>a+b,0)/rp.length).toFixed(1):"–";
+  return `<div class="wsum"><div class="stat"><b>${ok}/${plan}</b><span>Einheiten</span></div><div class="stat"><b>${ar}</b><span>Ø RPE</span></div><div class="stat"><b>${Object.values(S.strava.acts).filter(a=>{const x=idxOfIso(a.date);return x>=w*7&&x<w*7+7;}).length}</b><span>Strava</span></div></div>`;
+}
+function vWeek(){
+  const info=weekInfo(wk), wide=WIDE();
+  let h=`<div class="wk"><button data-wk="-1" aria-label="Vorherige Woche" ${wk===0?"disabled":""}>‹</button>
+    <div><h2>Woche ${wk+1}</h2><div class="sub">${fmt(dateFromIdx(wk*7))} – ${fmt(dateFromIdx(wk*7+6))}</div></div>
+    <button data-wk="1" aria-label="Nächste Woche" ${wk===NWEEKS-1?"disabled":""}>›</button></div>
+    <div class="chiprow"><span class="badge">${blockLabel(info.block)}</span><span class="badge">${esc(info.wave)}</span><span class="badge">${esc(per(info.name))}</span></div>`;
+  h+=weekSummary(wk);
+  let list=`<div class="list">`;
+  for(let d=0;d<7;d++){ const i=wk*7+d; list+=dayRow(i); if(openDay===i && !wide) list+=`<div class="day-body">${sessionCard(i)}</div>`; }
+  list+=`</div>`;
+  if(!wide) return h+list;
+  const det=openDay!=null&&Math.floor(openDay/7)===wk ? openDay : (TODAY>=wk*7&&TODAY<wk*7+7 ? TODAY : wk*7);
+  return h+`<div class="cols week"><div>${list}</div><div class="side">${sessionCard(det)}</div></div>`;
+}
+
+/* Plan-Übersicht: ein Block offen (planBlk), darin alle Wochen Mo–So; ein Tag aufklappbar (planDay) */
+let planBlk=null, planDay=null;
+function planDayRow(i){
+  const p=dayPlan(i); if(!p) return "";
+  const d=dateFromIdx(i), {n,done}=dayStatus(i), e=rc().byDay[i], on=planDay===i;
+  const st = p.k==="rest" ? "" : ((n&&done===n)||(e&&e.match) ? `<span class="status done">✓</span>` : done ? `<span class="status">${done}/${n}</span>` : "");
+  const badges=dayBadges(i,p);
+  let h=`<button class="day sm k-${p.k} ${i===TODAY?"today":""} ${on?"open":""}" data-pd="${i}" aria-expanded="${on}"><span class="d">${DAYS[dow(i)]}<b>${d.getDate()}</b></span>
+    <span class="t"><b>${esc(p.t)}</b><span class="kind">${KIND[p.k]}</span></span><span class="meta">${badges?`<span class="badges">${badges}</span>`:""}${st}</span></button>`;
+  if(on) h+=`<div class="pday-body">${p.i.length?`<ul>${p.i.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:""}${p.n?`<div class="hint">${esc(p.n)}</div>`:""}
+      <button class="btn ghost sm mt-2" data-pgo="${i}">Tag öffnen →</button></div>`;
+  return h;
+}
+function vPlan(){
+  const P=PLAN(), cur=weekInfo(CURW).block, blocks=blockOverview(P);
+  let h=vhead("Der Weg nach Basel",per("Doubles Men PRO mit Jimoh · Sa 13.02.2027 · Ziel Sub-60"));
+  h+=`<div class="cols"><div><div class="list">`;
+  blocks.forEach((b,j)=>{
+    // Letzter Block läuft bis zum Planende, damit kein Tag fehlt
+    const s=Math.max(0,b.start), end=j===blocks.length-1?LAST:Math.min(b.end,LAST), on=planBlk===b.id;
+    let plan=0, ok=0;
+    for(let i=s;i<=end;i++){ const p=dayPlan(i); if(!p||p.k==="rest") continue; plan++;
+      const {n,done}=dayStatus(i), e=rc().byDay[i]; if((n&&done===n)||(e&&e.match)) ok++; }
+    const nw=Math.floor(end/7)-Math.floor(s/7)+1;
+    h+=`<button class="blk ${cur===b.id?"cur":""}" data-pb="${esc(b.id)}" aria-expanded="${on}"><span class="tag">${esc(b.id)}</span>
+      <span class="t"><b>${esc(per(b.name))}</b><span class="sub">${fmt(dateFromIdx(s))} – ${fmt(dateFromIdx(end))} · ${nw} ${nw===1?"Woche":"Wochen"} · ${ok}/${plan} erledigt</span></span><span class="chev" aria-hidden="true">›</span></button>`;
+    if(!on) return;
+    h+=`<div class="blk-body">`;
+    for(let w=Math.floor(s/7); w<=Math.floor(end/7); w++){
+      const info=weekInfo(w), a=Math.max(s,w*7), z=Math.min(end,w*7+6);
+      const nm=per(info.name)!==per(b.name)?` · ${esc(per(info.name))}`:"";
+      h+=`<div class="pw-h ${w===CURW&&TODAY>=0?"cur":""}"><h3>Woche ${w+1}</h3><span class="sub">${fmt(dateFromIdx(a))} – ${fmt(dateFromIdx(z))} · ${esc(info.wave)}${nm}</span></div>`;
+      for(let i=a;i<=z;i++) h+=planDayRow(i);
+    }
+    h+=`</div>`;
+  });
+  h+=`</div></div><div class="side"><div class="card tight"><div class="cap">Quelle</div><b>${esc(P.name||"Plan")}</b>`;
+  h+=P.importedAt?`<div class="sub mt-1">Importiert am ${new Date(P.importedAt).toLocaleDateString("de-CH")}</div>`:`<div class="sub mt-1">Jeder Block: moderat → hart → Spitzenreiz → Deload.</div>`;
+  h+=`<div class="btns"><button class="btn" data-v="import">Neuen Plan importieren →</button></div></div></div></div>`;
   return h;
 }
 
-function vWeek(){
-  const info=weekInfo(wk);
-  let h=`<div class="wk"><button data-wk="-1" aria-label="Vorherige Woche" ${wk===0?"disabled":""}>‹</button>
-    <div><h2>Woche ${wk+1}</h2><div class="sub">${fmt(dateFromIdx(wk*7))} – ${fmt(dateFromIdx(wk*7+6))} · ${esc(info.wave)}</div></div>
-    <button data-wk="1" aria-label="Nächste Woche" ${wk===NWEEKS-1?"disabled":""}>›</button></div>
-    <div class="sub" style="margin:-6px 0 12px;text-align:center">Block ${info.block==="T"?"Taper":info.block} · ${esc(info.name)}</div><div class="list">`;
-  for(let d=0;d<7;d++){ const i=wk*7+d; h+=dayRow(i); if(openDay===i) h+=`<div class="day-body">${sessionCard(i)}</div>`; }
-  return h+`</div>`;
+/* ---------- Profil: Konto, Arbeitsgewichte, Tests & Benchmarks ----------
+   Jeder bearbeitet nur seine eigenen Werte (eigene Zeile in plan_state, RLS: user_id = auth.uid()).
+   Die Werte des Partners kommen nur lesend über partner_profile() und sind gesperrt. */
+let PP=null, ppState="", profWho="me"; // PP: Profil des Partners (null = keins), ppState: ""|"busy"|"ok"|"err"
+async function loadPartner(){
+  if(!sb||!USER||ppState==="busy") return;
+  ppState="busy"; const uid=USER.id;
+  const {data,error}=await sb.rpc("partner_profile");
+  if(!USER||USER.id!==uid) return; // inzwischen abgemeldet
+  if(error){ ppState="err"; } else { PP=partnerProfile((data||[])[0]); ppState="ok"; }
+  if(view==="profile"||view==="today") render();
 }
+const myCol=()=>colOf(ME);
+const myTests=()=>personTests(S.tests,myCol());
+/* Partnerwerte: aus seinem Konto. Ohne Cloud (Vorschau) die alten Einträge der Partnerspalte auf diesem Gerät – ebenfalls nur lesen. */
+const partnerTests=()=>PP?PP.tests:personTests(S.tests,colOf(PARTNER));
+const teamT=()=>avg([...myTests().lauf,...partnerTests().lauf]);
 
-function vPlan(){
-  const cur=weekInfo(CURW).block;
-  let h=`<h2>Der Weg nach Basel</h2><div class="sub" style="margin:6px 0 16px">Doubles Men PRO mit Jimoh · Sa 13.02.2027 · Ziel Sub-60</div><div class="list">`;
-  h+=`<div class="blk ${cur==="A"?"cur":""}"><div class="tag">A</div><div><b>Standortbestimmung</b><div class="sub">12.10. – 08.11.</div>
-    <ul><li>Pacing-Test + Stationen-Benchmark in Woche 1</li><li>Intervalle auf Testbasis, Transition Drilling</li><li>Woche 4 Deload</li></ul></div></div>`;
-  for(const k of ["B","C","D","T"]){ const b=BLOCKS[k];
-    h+=`<div class="blk ${cur===k?"cur":""}"><div class="tag">${k==="T"?"T":k}</div><div><b>${esc(b.name)}</b><div class="sub">${b.range}</div><ul>`+
-      b.d.map((x,j)=>x[1]==="rest"?"":`<li>${DAYS[j]} · <b>${esc(x[0])}</b>${x[2]?" – "+esc(x[2]):""}</li>`).join("")+`</ul></div></div>`; }
-  h+=`</div><div class="sub">Jeder Block: moderat → hart → Spitzenreiz → Deload. Konkrete Paces und Gewichte für B–D kommen nach den Testdaten.</div>`;
-  return per(h);
+/* Eingabefeld: bearbeitbar nur mit attr (eigener Wert), sonst gesperrt und ohne data-Attribut (der Input-Handler ignoriert es) */
+const pin=(attr,val,label,ph)=>attr
+  ? `<input type="text" inputmode="decimal" ${attr} value="${esc(val||"")}" placeholder="${ph||""}" aria-label="${esc(label)}">`
+  : `<input type="text" class="ro" value="${esc(val||"")}" placeholder="–" readonly tabindex="-1" aria-readonly="true" aria-label="${esc(label)} (nur lesen)">`;
+
+function vProfile(){
+  const own=profWho==="me", who=own?ME:PARTNER;
+  const tab=(id,label)=>`<button role="tab" data-act="prof-who" data-who-p="${id}" class="${profWho===id?"on":""}" aria-selected="${profWho===id}">${esc(label)}</button>`;
+  let h=`<div class="narrow">${vhead("Profil","",true)}<div class="chips cc-tabs" role="tablist">${tab("me",ME+" (ich)")}${tab("partner",PARTNER)}</div>`;
+  if(own) h+=`<div class="card">${acctHtml(false)}</div>`;
+  else {
+    const src=PP?(PP.at?`Stand ${new Date(PP.at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}`:"")
+      : sb&&USER ? (ppState==="busy"?"Wird geladen …":ppState==="err"?"Konnte nicht geladen werden.":`${esc(PARTNER)} hat noch keine Werte gespeichert.`)
+      : "Vorschau ohne Cloud: zeigt nur ältere Einträge auf diesem Gerät.";
+    h+=`<div class="card"><div class="acct"><span class="av alt">${esc(PARTNER[0])}</span><div><b>${esc(PARTNER)}</b><div class="sub">Nur lesen · ${src}</div></div></div></div>`;
+  }
+  const W=own?S.weights:(PP?PP.weights:{});
+  h+=`<div class="cap">Standard-Arbeitsgewichte</div><div class="card">${own?`<p class="sub" style="margin-top:0">Wird bei Krafteinheiten automatisch ins Eingabefeld übernommen und beim Abhaken gespeichert. Im Training jederzeit überschreibbar. Leer = kein Vorschlag.</p>`:`<p class="sub" style="margin-top:0">Gewichte von ${esc(who)}. Ändern kann sie nur ${esc(who)} selbst.</p>`}
+    <table class="wt">${weightList(Object.values(PLAN().days)).map(e=>`<tr><td class="l"><label for="w-${esc(e.key)}">${esc(e.label)}</label></td><td>${pin(own?`id="w-${esc(e.key)}" data-w="${esc(e.key)}"`:"",W[e.key],e.label+" kg","–")}</td><td class="l">kg</td></tr>`).join("")}</table></div>`;
+  return h+`<div id="tests">${testsHtml(own)}</div></div>`;
 }
-
-function vTests(){
-  const L=S.tests.lauf, st=S.tests.station, tr=S.tests.trans, T=teamT(), aj=avg(L.j), am=avg(L.m);
-  let h=`<button class="back" data-v="today">‹ Zurück</button><h2>Tests &amp; Benchmarks</h2>
+function testsHtml(own){
+  // Spalten immer: ich | Partner. Bearbeitbar ist nur die eigene Spalte in der eigenen Ansicht.
+  const A=myTests(), B=partnerTests(), mc=myCol(), T=teamT(), aa=avg(A.lauf), ab=avg(B.lauf);
+  let h=`<div class="vh" style="margin-top:var(--s8)"><h2>Tests &amp; Benchmarks</h2></div>
   <div class="cap">Pacing-Test 4×1 km</div><div class="card">
-    <table><tr><th></th><th>Jaime</th><th>Jimoh</th></tr>
-    ${[0,1,2,3].map(r=>`<tr><td class="sub">Rep ${r+1}</td><td><input type="text" inputmode="decimal" placeholder="4:20" data-l="j|${r}" value="${esc(L.j[r])}"></td><td><input type="text" inputmode="decimal" placeholder="4:25" data-l="m|${r}" value="${esc(L.m[r])}"></td></tr>`).join("")}
+    <table><tr><th></th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th></tr>
+    ${A.lauf.map((v,r)=>`<tr><td class="l" style="white-space:nowrap">Rep ${r+1}</td><td>${pin(own?`data-l="${mc}|${r}"`:"",v,`${ME} Rep ${r+1}`,"4:20")}</td><td>${pin("",B.lauf[r],`${PARTNER} Rep ${r+1}`)}</td></tr>`).join("")}
     </table>
-    <div style="margin-top:12px">Ø Jaime <span class="res">${isNaN(aj)?"–":mmss(aj)}</span> · Ø Jimoh <span class="res">${isNaN(am)?"–":mmss(am)}</span>${!isNaN(aj)&&!isNaN(am)?` · Abstand <span class="res">${Math.abs(Math.round(aj-am))} s</span>`:""}</div>
-    <div style="margin-top:4px">Team-Tempo T <span class="res">${isNaN(T)?"–":mmss(T)+"/km"}</span></div>
+    <p class="mt-3">Ø ${esc(ME)} <span class="res">${isNaN(aa)?"–":mmss(aa)}</span> · Ø ${esc(PARTNER)} <span class="res">${isNaN(ab)?"–":mmss(ab)}</span>${!isNaN(aa)&&!isNaN(ab)?` · Abstand <span class="res">${Math.abs(Math.round(aa-ab))} s</span>`:""}</p>
+    <p class="mt-1">Team-Tempo T <span class="res">${isNaN(T)?"–":mmss(T)+"/km"}</span></p>
     <div class="hint">Sub-60 braucht im Rennen ca. 3:58/km. Abstand zwischen euch: 5–15 s.</div></div>`;
   const ST=["SkiErg 1000m","Sled Push","Sled Pull","Burpee BJ 80m","RowErg 1000m","Farmers Carry","Sandbag Lunges","Wall Balls 100"];
-  h+=`<div class="cap">Stationen-Benchmark</div><div class="card"><table><tr><th>Station</th><th>Jaime</th><th>Jimoh</th><th></th></tr>
-    ${ST.map((s,r)=>{ const a=parseT((st[r]||{}).j), b=parseT((st[r]||{}).m); let rec="";
-      if(!isNaN(a)&&!isNaN(b)){const df=Math.abs(a-b); rec=df<15?"50/50":(a<b?"Jaime":"Jimoh")+" +";}
-      return `<tr><td style="font-size:13px">${s}</td><td><input type="text" inputmode="decimal" data-s="${r}|j" value="${esc((st[r]||{}).j||"")}"></td><td><input type="text" inputmode="decimal" data-s="${r}|m" value="${esc((st[r]||{}).m||"")}"></td><td class="res" style="font-size:12px">${rec}</td></tr>`;}).join("")}
+  h+=`<div class="cap">Stationen-Benchmark</div><div class="card"><table><tr><th>Station</th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th><th></th></tr>
+    ${ST.map((s,r)=>{ const a=parseT(A.station[r]), b=parseT(B.station[r]); let rec="";
+      if(!isNaN(a)&&!isNaN(b)){const df=Math.abs(a-b); rec=df<15?"50/50":esc(a<b?ME:PARTNER)+" +";}
+      return `<tr><td class="l">${s}</td><td>${pin(own?`data-s="${r}|${mc}"`:"",A.station[r],`${s} ${ME}`)}</td><td>${pin("",B.station[r],`${s} ${PARTNER}`)}</td><td class="res" style="font-size:12px">${rec}</td></tr>`;}).join("")}
     </table><div class="hint">Mehr als 15–20 s Unterschied: der Schnellere übernimmt mehr. Sonst 50/50.</div></div>`;
-  const ta=avg(tr);
-  h+=`<div class="cap">Übergaben (Ziel &lt; 8 s)</div><div class="card"><div class="grid2">${tr.map((v,r)=>`<input type="text" inputmode="decimal" placeholder="Wechsel ${r+1}" data-t="${r}" value="${esc(v)}">`).join("")}</div>
-    <div style="margin-top:12px">Ø <span class="res">${isNaN(ta)?"–":ta.toFixed(1)+" s"}</span> ${!isNaN(ta)?(ta<8?"· Ziel erreicht":"· noch "+(ta-8).toFixed(1)+" s drüber"):""}</div></div>`;
+  const tr=own?A.trans:B.trans, ta=avg(tr);
+  h+=`<div class="cap">Übergaben (Ziel &lt; 8 s)${own?"":" · von "+esc(PARTNER)}</div><div class="card"><div class="grid2">${tr.map((v,r)=>pin(own?`data-t="${r}"`:"",v,`Wechsel ${r+1}`,`Wechsel ${r+1}`)).join("")}</div>
+    <p class="mt-3">Ø <span class="res">${isNaN(ta)?"–":ta.toFixed(1)+" s"}</span> ${!isNaN(ta)?(ta<8?"· Ziel erreicht":"· noch "+(ta-8).toFixed(1)+" s drüber"):""}</p></div>`;
   return h;
 }
 
 let moveFrom=null, prevView="today", injStart=null, injDays=3, injMode="alt";
 
-function vMove(){
-  const i=moveFrom, p=dayPlan(i), dk=key(dateFromIdx(i)), rest=p.k==="rest";
+/* Reiter „Umplanen“ im Coach: Tag wählen, dann tauschen, ausfallen lassen, Übungen anpassen */
+function moveHtml(){
+  if(moveFrom==null) moveFrom=Math.max(0,Math.min(LAST,sel!=null?sel:TODAY));
+  const i=moveFrom, p=dayPlan(i), dk=keyI(i), rest=p.k==="rest";
   const from=Math.max(Math.floor(i/7)*7,TODAY,0), to=Math.min(LAST,Math.max(Math.floor(i/7)*7+13,from+6));
-  let h=`<button class="back" data-back>‹ Zurück</button><h2>Umplanen</h2>
-    <div class="sub" style="margin:6px 0 4px">${DAYSF[((i%7)+7)%7]}, ${fmt(dateFromIdx(i))}</div>
-    <div class="card k-${p.k}" style="padding:14px"><span class="kind">${KIND[p.k]}</span><h3 style="margin-top:4px">${esc(p.t)}</h3></div>`;
+  let h=`<div class="cap" style="margin-top:0">Welcher Tag?</div><div class="wk"><button data-act="mv-day" data-d="-1" ${i<=0?"disabled":""} aria-label="Einen Tag früher">‹</button>
+      <div><h3>${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))}</h3>${i===TODAY?`<div class="sub">heute</div>`:`<button class="btn ghost sm" data-act="mv-today" style="min-height:28px;margin-top:2px">zu heute</button>`}</div>
+      <button data-act="mv-day" data-d="1" ${i>=LAST?"disabled":""} aria-label="Einen Tag später">›</button></div>
+    <div class="card tight k-${p.k}"><span class="kind">${KIND[p.k]}</span><h3 class="mt-1">${esc(p.t)}</h3>${dayBadges(i,p)?`<div class="badges mt-2">${dayBadges(i,p)}</div>`:""}</div>`;
+  if(p.race) return h+`<div class="cap">Renntag</div><button class="btn" data-edit="${i}">Übungen anpassen →</button>`;
+  if(i<TODAY) h+=`<div class="hint">Dieser Tag liegt in der Vergangenheit. Tauschen geht nur mit Tagen ab heute.</div>`;
   if(p.inj) return h+`<div class="hint">Dieser Tag ist wegen Verletzung angepasst.</div>
-    <button class="btn" style="margin-top:14px" data-act="restore">Für diesen Tag aufheben</button><button class="btn" data-v="inj">Verletzung verwalten →</button>`;
+    <div class="btns"><button class="btn" data-act="restore">Für diesen Tag aufheben</button><button class="btn" data-act="cc-tab" data-tab="inj">Verletzung verwalten →</button></div>`;
   if(!rest){
+    h+=`<div class="cap">Übungen ändern</div>
+      <button class="btn" data-edit="${i}">Übungen anpassen →</button>`;
     h+=`<div class="cap">Keine Zeit gehabt?</div>
       <button class="btn ${S.skip[dk]?"":"primary"}" data-act="skip">${S.skip[dk]?"Doch nicht ausgefallen":"Als ausgefallen markieren"}</button>`;
   }
   h+=`<div class="cap">${rest?"Diese Einheit hierher holen":"Tauschen mit"}</div>
-    <div class="sub" style="margin:-4px 0 10px">Die Einheiten tauschen den Tag. ${rest?"":"Freie Tage sind am besten."}</div><div class="list">`;
+    <p class="sub" style="margin:calc(-1 * var(--s1)) 0 var(--s3)">Die Einheiten tauschen den Tag. ${rest?"":"Freie Tage sind am besten."}</p><div class="list">`;
+  let any=false;
   for(let j=from;j<=to;j++){
-    if(j===i) continue; const q=dayPlan(j); if(!q||q.inj) continue;
+    if(j===i) continue; const q=dayPlan(j); if(!q||q.inj||q.race) continue;
     if(rest && q.k==="rest") continue;
     const tags=[];
-    if(!rest && q.k==="rest") tags.push(`<span class="badge ok">frei</span>`);
+    if(!rest && q.k==="rest") tags.push(isFixedRest(q,j)?`<span class="badge">fixer Ruhetag</span>`:`<span class="badge ok">frei</span>`);
     if(hardWarn(i,j)||hardWarn(j,i)) tags.push(`<span class="badge warn">hart auf hart</span>`);
-    h+=`<button class="day k-${q.k}" data-swap="${j}"><span class="d">${DAYS[((j%7)+7)%7]}<b>${dateFromIdx(j).getDate()}</b></span>
-      <span class="t"><b>${esc(q.t)}</b><span class="kind">${KIND[q.k]}</span></span><span class="meta">${tags.join("")}</span></button>`;
+    any=true;
+    h+=`<button class="day k-${q.k}" data-swap="${j}"><span class="d">${DAYS[dow(j)]}<b>${dateFromIdx(j).getDate()}</b></span>
+      <span class="t"><b>${esc(q.t)}</b><span class="kind">${KIND[q.k]}</span></span><span class="meta"><span class="badges">${tags.join("")}</span></span></button>`;
   }
-  h+=`</div><div class="sub">„Hart auf hart“ = zwei harte Einheiten direkt hintereinander. Geht, aber besser vermeiden.</div>`;
+  if(!any) h+=`<p class="sub" style="padding:var(--s4) 0">Keine passenden Tage in Reichweite.</p>`;
+  h+=`</div><p class="sub">„Hart auf hart“ = zwei harte Einheiten direkt hintereinander. Geht, aber besser vermeiden.</p>`;
   h+=`<div class="cap">Verletzt oder krank?</div><button class="btn" data-act="inj-from">Ab diesem Tag anpassen →</button>`;
   if(S.sched[i]) h+=`<div class="cap">Änderung rückgängig</div><button class="btn" data-act="restore">Original wiederherstellen</button>`;
   return h;
 }
 
-function vInj(){
+/* Reiter „Muskelkater“: feine Zonen (z. B. Brust oben/mitte/unten, links/rechts) auf der Körperkarte,
+   Feinauswahl pro Muskelgruppe, Stärke-Regler und Einfluss auf die nächsten Einheiten */
+let soreSel=null, soreView="front";
+const soreToday=()=>Math.max(0,Math.min(LAST,TODAY));
+const soreAt=(i)=>sore.effective(S.sore,i);
+const SORE_COL={l:"#f5d90a",m:"#f5a524",s:"#e5484d"};
+const soreFill=(v)=>!v?"var(--surface2)":v>=7?SORE_COL.s:v>=4?SORE_COL.m:SORE_COL.l;
+/* Zone-Attribute: Farbe nach Stärke; Werte von gestern (nicht heute gemeldet) halb transparent */
+const zoneAttr=(z,levels,own)=>{ const v=levels[z.id]||0;
+  return `class="mu${soreSel===z.id?" sel":""}" data-mu="${z.id}" fill="${soreFill(v)}" fill-opacity="${v&&!own[z.id]?.45:.92}" tabindex="0" role="button" aria-label="${esc(z.label)}${v?`, ${v} von 10`:""}"`; };
+function bodySvg(view,levels,own){
+  const shapes=sore.ZONES.filter(z=>z.view===view).map(z=>{ const [tag,geo]=sore.shapeTag(z);
+    return `<${tag} ${geo} ${zoneAttr(z,levels,own)}><title>${esc(z.label)}</title></${tag}>`; }).join("");
+  // Seitenbeschriftung: vorne ist die rechte Körperseite links im Bild
+  const [lft,rgt]=view==="front"?["rechts","links"]:["links","rechts"];
+  return `<figure class="body"><svg viewBox="0 0 200 420" aria-label="Körper ${view==="front"?"vorne":"hinten"}"><g class="sil">${sore.SILHOUETTE}</g>${shapes}
+    <text x="8" y="414" class="side-l">${lft}</text><text x="192" y="414" text-anchor="end" class="side-l">${rgt}</text></svg></figure>`;
+}
+function soreHtml(){
+  const t=soreToday(), own=S.sore[t]||{}, lv=soreAt(t);
+  const vbtn=(v,l)=>`<button data-act="sore-view" data-view="${v}" class="${soreView===v?"on":""}" aria-pressed="${soreView===v}">${l}</button>`;
+  let h=`<p class="sub" style="margin:0 0 var(--s4)">Tippe genau die Stelle an, die schmerzt – z. B. Brust oben links – und stell die Stärke ein. Die App entlastet oder verschiebt harte Einheiten, die genau diese Zonen belasten, und füllt den Check-in „Muskelkater“ aus.</p>
+    <div class="card"><div class="chips sore-views">${vbtn("front","Vorne")}${vbtn("back","Hinten")}</div>
+    <div class="bodies">${bodySvg(soreView,lv,own)}</div>
+    <div class="legend sub"><span><i style="background:${SORE_COL.l}"></i>leicht (1–3)</span><span><i style="background:${SORE_COL.m}"></i>mittel (4–6)</span><span><i style="background:${SORE_COL.s}"></i>stark (7–10)</span><span><i style="background:${SORE_COL.m};opacity:.45"></i>von gestern</span></div>`;
+  if(soreSel&&sore.ZONE[soreSel]){
+    const z=sore.ZONE[soreSel], v=own[soreSel]||lv[soreSel]||5, mz=sore.mirrorZone(soreSel);
+    // Feinauswahl: alle Zonen derselben Muskelgruppe, nach Teil und Seite
+    const parts=sore.zonesOf(z.group);
+    h+=`<div class="sore-ctl"><div class="cap" style="margin-top:0">${esc(sore.GROUPS[z.group])} – genaue Stelle</div>
+      <div class="zone-grid">${parts.map(q=>{ const qv=lv[q.id]||0; return `<button data-mu="${q.id}" class="${q.id===soreSel?"on":""}" style="--zc:${qv?soreFill(qv):"transparent"}">${esc(q.label.replace(sore.GROUPS[z.group],"").trim()||"ganz")}${qv?` <b>${qv}</b>`:""}</button>`; }).join("")}</div>
+      <div class="row between mt-4"><b>${esc(z.label)}</b><span class="res" id="sore-v">${v}/10 · ${sore.strength(v)}</span></div>
+      <input type="range" id="sore-r" min="${sore.MIN}" max="${sore.MAX}" step="1" value="${v}" aria-label="Stärke Muskelkater ${esc(z.label)}">
+      <div class="row between sub"><span>leicht</span><span>mittel</span><span>stark</span></div>
+      <div class="grid2 mt-3">${mz?`<button class="btn sm" data-act="sore-mirror">Auch ${sore.ZONE[mz].side==="l"?"links":"rechts"}</button>`:`<span></span>`}<button class="btn ghost sm" data-act="sore-del">Entfernen</button></div>
+      <div class="btns"><button class="btn sm" data-act="sore-done">Fertig</button></div></div>`;
+  } else h+=`<p class="sub mt-3" style="margin-bottom:0">Noch keine Stelle gewählt.</p>`;
+  h+=`</div>`;
+  const list=Object.entries(own).filter(([id])=>sore.LABEL[id]).sort((a,b)=>b[1]-a[1]);
+  if(list.length) h+=`<div class="cap">Heute gemeldet</div><div class="chips">${list.map(([id,v])=>`<button data-mu="${id}" class="${soreSel===id?"on":""}" style="border-left:4px solid ${soreFill(v)}">${esc(sore.LABEL[id])} ${v}</button>`).join("")}</div>
+    <div class="btns"><button class="btn ghost sm" data-act="sore-clear">Alles zurücksetzen</button></div>`;
+  // Einfluss auf die nächsten Einheiten
+  const rows=[];
+  for(let x=t;x<=Math.min(LAST,t+2);x++){ const p=dayPlan(x); if(!p||p.k==="rest") continue; const hit=sore.impact(p,soreAt(x));
+    rows.push(`<li><b>${shortDay(x)} · ${esc(p.t)}</b><div class="sub">${hit.level>=5?`Betroffen: ${esc(sore.summarize(hit.muscles.filter(m=>m.level>=4),4).join(", "))}${hit.names.length?` · ${esc(hit.names.slice(0,3).join(", "))}`:""} – ${hit.level>=8?"verschieben":"entlasten"} empfohlen`:hit.level?`Leicht betroffen (${hit.level}/10) – normal trainieren`:"Nicht betroffen"}</div></li>`); }
+  if(rows.length) h+=`<div class="cap">Einfluss auf das Training</div><div class="card tight"><ul class="impact">${rows.join("")}</ul>
+    ${Object.keys(lv).length?`<div class="btns"><button class="btn" data-v="today">Vorschläge auf „Heute“ ansehen →</button></div>`:""}</div>`;
+  return h;
+}
+/* Muskelkater speichern und den Check-in „Muskelkater“ daraus ableiten */
+function soreSave(){
+  const t=soreToday(), k=keyI(t); if(S.sore[t]&&!Object.keys(S.sore[t]).length) delete S.sore[t];
+  const lvl=sore.checkinLevel(soreAt(t)), c=S.checkin[k]=S.checkin[k]||{};
+  if(lvl) c.sore=lvl; else if(c.sore&&!S.sore[t]) delete c.sore;
+  // Alte Meldungen (älter als 3 Tage) aufräumen
+  for(const x of Object.keys(S.sore)) if(+x<t-3) delete S.sore[x];
+  save();
+}
+
+function injHtml(){
   if(injStart==null) injStart=Math.max(0,TODAY);
   const end=Math.min(LAST,injStart+injDays-1);
-  let h=`<button class="back" data-back>‹ Zurück</button><h2>Verletzt / krank</h2>
-    <div class="sub" style="margin:6px 0 4px">Die betroffenen Tage werden angepasst. Danach folgen 3 Comeback-Einheiten mit reduzierter Last.</div>`;
-  if(injActive()) h+=`<div class="card" style="margin-top:14px"><b>Gerade aktiv</b><div class="sub" style="margin:4px 0 12px">Wieder fit? Ab heute gilt der normale Plan, die nächsten 3 Einheiten sind Comeback.</div>
-    <button class="btn primary" data-act="inj-end">Wieder fit – ab heute normal</button></div>`;
+  let h=`<p class="sub" style="margin:0 0 var(--s4)">Die betroffenen Tage werden angepasst. Danach folgen 3 Comeback-Einheiten mit reduzierter Last.</p>`;
+  if(injActive()) h+=`<div class="card"><b>Gerade aktiv</b><p class="sub mt-1">Wieder fit? Ab heute gilt der normale Plan, die nächsten 3 Einheiten sind Comeback.</p>
+    <div class="btns"><button class="btn primary" data-act="inj-end">Wieder fit – ab heute normal</button></div></div>`;
   h+=`<div class="cap">Ab wann</div><div class="wk"><button data-injs="-1" ${injStart<=0?"disabled":""} aria-label="Einen Tag früher">‹</button>
-      <div><h3>${DAYSF[((injStart%7)+7)%7]}, ${fmt(dateFromIdx(injStart))}</h3></div>
+      <div><h3>${DAYSF[dow(injStart)]}, ${fmt(dateFromIdx(injStart))}</h3></div>
       <button data-injs="1" ${injStart>=LAST?"disabled":""} aria-label="Einen Tag später">›</button></div>
-    <div class="cap">Wie lange (geschätzt)</div><div class="chips">${[1,2,3,5,7,10,14].map(n=>`<button data-injd="${n}" class="${injDays===n?"on":""}">${n} ${n===1?"Tag":"Tage"}</button>`).join("")}</div>
+    <div class="cap">Wie lange (geschätzt)</div><div class="chips">${[1,2,3,5,7,10,14].map(n=>`<button data-injd="${n}" class="${injDays===n?"on":""}" aria-pressed="${injDays===n}">${n} ${n===1?"Tag":"Tage"}</button>`).join("")}</div>
     <div class="cap">Was geht noch?</div>
-    <button class="opt ${injMode==="alt"?"on":""}" data-injm="alt"><b>Alternativtraining</b><span class="sub">Locker Bike, Mobility, Core – nur schmerzfrei</span></button>
-    <button class="opt ${injMode==="pause"?"on":""}" data-injm="pause"><b>Komplette Pause</b><span class="sub">Krank, Fieber oder starke Schmerzen</span></button>`;
-  const hit=[]; for(let x=injStart;x<=end;x++){ const p=basePlan(srcOf(x)); if(p&&p.k!=="rest") hit.push(`<li>${shortDay(x)} · <b>${esc(p.t)}</b></li>`); }
-  h+=`<div class="cap">Betroffen bis ${shortDay(end)}</div><div class="card" style="padding:14px">${hit.length?`<ul style="margin:0;padding-left:18px">${hit.join("")}</ul>`:`<span class="sub">Keine Trainings in diesem Zeitraum.</span>`}</div>
+    <button class="opt ${injMode==="alt"?"on":""}" data-injm="alt" aria-pressed="${injMode==="alt"}"><b>Alternativtraining</b><span class="sub">Locker Bike, Mobility, Core – nur schmerzfrei</span></button>
+    <button class="opt ${injMode==="pause"?"on":""}" data-injm="pause" aria-pressed="${injMode==="pause"}"><b>Komplette Pause</b><span class="sub">Krank, Fieber oder starke Schmerzen</span></button>`;
+  const hit=[]; for(let x=injStart;x<=end;x++){ const p=basePlan(srcOf(x)); if(p&&p.k!=="rest") hit.push(`<li>${shortDay(x)} · <b>${esc(per(p.t))}</b></li>`); }
+  h+=`<div class="cap">Betroffen bis ${shortDay(end)}</div><div class="card tight">${hit.length?`<ul style="margin:0;padding-left:18px">${hit.join("")}</ul>`:`<span class="sub">Keine Trainings in diesem Zeitraum.</span>`}</div>
     <button class="btn primary" data-act="inj-apply">Übernehmen</button>
     <div class="hint">Bei Fieber gilt: kein Training, auch kein lockeres. Bei Schmerzen, die länger als ein paar Tage bleiben, zum Arzt oder Physio.</div>`;
   return h;
 }
 
-let editFrom=null;
+let editFrom=null, editBack=null; // editBack: zurück in den Coach statt zur Tagesansicht
 function vEdit(){
   const i=editFrom, src=srcOf(i), p=ownPlan(src);
-  return `<button class="back" data-back>‹ Zurück</button><h2>Übungen anpassen</h2>
-    <div class="sub" style="margin:6px 0 4px">${DAYSF[((i%7)+7)%7]}, ${fmt(dateFromIdx(i))} · gilt nur für diese Einheit</div>
-    <div class="card k-${p.k}" style="margin-top:12px">
-      <label class="lbl" style="margin-top:0">Titel</label><input type="text" id="ed-t" value="${esc(p.t)}">
-      <label class="lbl">Übungen – eine pro Zeile</label><textarea id="ed-i" rows="8" style="min-height:190px">${esc(p.i.join("\n"))}</textarea>
-      <label class="lbl">Hinweis</label><textarea id="ed-n">${esc(p.n)}</textarea>
-      <button class="btn primary" style="margin-top:16px" data-act="edit-save">Speichern</button>
-      ${S.edit[src]?`<button class="btn" data-act="edit-reset">Original wiederherstellen</button>`:""}
+  return `<div class="narrow">${vhead("Übungen anpassen",`${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))} · gilt nur für diese Einheit`,true)}
+    <div class="card k-${p.k}">
+      <label class="lbl" for="ed-t">Titel</label><input type="text" id="ed-t" value="${esc(p.t)}">
+      <label class="lbl" for="ed-i">Übungen – eine pro Zeile</label><textarea id="ed-i" rows="8" style="min-height:190px">${esc(p.i.join("\n"))}</textarea>
+      <label class="lbl" for="ed-n">Hinweis</label><textarea id="ed-n">${esc(p.n)}</textarea>
+      <div class="btns"><button class="btn primary" data-act="edit-save">Speichern</button>
+      ${S.edit[src]?`<button class="btn" data-act="edit-reset">Original wiederherstellen</button>`:""}</div>
     </div>
-    <div class="sub">Z. B. Back Squat durch Front Squat ersetzen oder Gewichte an deine Testwerte anpassen. Abgehakte Übungen hängen an der Zeilennummer.</div>`;
+    <p class="sub">Z. B. Back Squat durch Front Squat ersetzen oder Gewichte an deine Testwerte anpassen. Abgehakte Übungen hängen an der Zeilennummer.</p></div>`;
 }
 
-/* ---------- Konto & Sync (Supabase) ---------- */
+/* ---------- PDF-Import ---------- */
+let imp={step:"pick"};
+function vImport(){
+  const P=PLAN();
+  let h=`<div class="narrow">${vhead("Plan importieren","Neues PDF vom Coach hochladen. Die App liest Blöcke, Wochen und Tage aus und zeigt vor dem Übernehmen, was sich ändert.",true)}`;
+  if(imp.step==="busy") return h+`<div class="card center"><b>Lese ${esc(imp.name)} …</b><p class="sub mt-1">Das dauert ein paar Sekunden.</p></div></div>`;
+  if(imp.step==="preview"){
+    const fromIdx = imp.all ? 0 : Math.max(0,TODAY);
+    const {changed}=mergeImport(P,imp.parsed,{from:fromIdx});
+    const weeks=changesByWeek(changed), m=imp.parsed.meta;
+    const edits=changed.filter(x=>S.edit[x]).length;
+    h+=`<div class="card"><div class="row between"><b>${esc(imp.name)}</b><span class="badge ok">erkannt</span></div>
+      <p class="sub mt-1">${Object.keys(imp.parsed.days).length} Tage · ${m.blocks.length} Blöcke · ${m.weeks.length} ausformulierte Wochen${m.race!=null?" · Renntag "+fmt(dateFromIdx(m.race)):""}</p>
+      <div class="cap">Was übernommen wird</div>
+      <button class="opt ${imp.all?"":"on"}" data-imp-all="0" aria-pressed="${!imp.all}"><b>Ab heute</b><span class="sub">Vergangene Tage und ihre Einträge bleiben unverändert</span></button>
+      <button class="opt ${imp.all?"on":""}" data-imp-all="1" aria-pressed="${!!imp.all}"><b>Ganzer Plan</b><span class="sub">Auch vergangene Tage ersetzen</span></button>
+      <div class="cap">Änderungen</div>`;
+    h+= changed.length ? `<p><b>${changed.length}</b> ${changed.length===1?"Tag ändert":"Tage ändern"} sich:</p><ul class="sub" style="margin:var(--s2) 0 0;padding-left:18px">${weeks.map(x=>`<li>Woche ${x.w+1} (${fmt(dateFromIdx(x.w*7))}): ${x.n} ${x.n===1?"Tag":"Tage"}</li>`).join("")}</ul>`
+      : `<p class="sub">Keine Änderungen gegenüber dem aktuellen Plan.</p>`;
+    if(edits) h+=`<div class="hint">${edits} von dir angepasste ${edits===1?"Einheit bleibt":"Einheiten bleiben"} wie angepasst. Über „Übungen anpassen → Original wiederherstellen“ siehst du die neue Version.</div>`;
+    if(m.warnings.length) h+=`<div class="target bad">${m.warnings.map(esc).join("<br>")}</div>`;
+    h+=`<div class="btns"><button class="btn primary" data-act="imp-apply" ${changed.length?"":"disabled"}>Übernehmen</button><button class="btn" data-act="imp-cancel">Abbrechen</button></div></div></div>`;
+    return h;
+  }
+  if(imp.step==="error") h+=`<div class="target bad" style="margin:0 0 var(--s4)">${esc(imp.err)}</div>`;
+  h+=`<div class="card"><div class="cap">Aktueller Plan</div><b>${esc(P.name||"Plan")}</b>${P.importedAt?`<p class="sub mt-1">Importiert am ${new Date(P.importedAt).toLocaleString("de-CH",{dateStyle:"medium",timeStyle:"short"})}</p>`:""}
+    <div class="btns"><label class="btn primary file">PDF auswählen<input type="file" accept="application/pdf,.pdf,.txt,.md,text/plain" data-file="plan"></label>`;
+  if(S.plan) h+=`<button class="btn" data-act="imp-undo">${S.plan.prev?"Vorherigen Plan wiederherstellen":"Eingebauten Plan wiederherstellen"}</button>`;
+  h+=`</div></div><div class="note">Erwartet wird der Aufbau des Coach-PDFs: „Block A – Name (12.10. – 08.11.2026)“, „Woche 1 – …“ und Absätze wie „Montag – Kraft 1. …“. Textdateien (.txt, .md) im gleichen Aufbau gehen auch. Abgehakte Übungen, Werte und Umplanungen bleiben erhalten.</div></div>`;
+  return h;
+}
+async function importFile(file){
+  imp={step:"busy",name:file.name}; render();
+  try{
+    const text=await fileToText(file);
+    const parsed=parsePlanText(text);
+    if(!Object.keys(parsed.days).length) throw new Error(parsed.meta.warnings[0]||"Keine Trainingstage erkannt.");
+    imp={step:"preview",name:file.name,parsed,all:false};
+  }catch(e){ imp={step:"error",err:e.message||"Datei konnte nicht gelesen werden."}; }
+  render();
+}
+
+/* ---------- Strava ---------- */
+/* Token pro Nutzer (ohne Login: "hx:strava"), damit auf einem geteilten Gerät niemand die Aktivitäten des anderen lädt */
+const stKey=()=>LSK+":strava";
+const stTok=()=>{ try{ return JSON.parse(lsGet(stKey())||"null"); }catch(_){ return null; } };
+const stCfg=()=>({clientId:CFG.stravaClientId||lsGet("hx:strava-id")||"",secret:lsGet("hx:strava-secret")||""});
+let stBusy=false, stMsg="";
+const redirectUri=()=>location.origin+location.pathname;
+function mergeActs(acts){ let n=0; for(const a of acts) if(a.date>=STRAVA_MIN){ if(!S.strava.acts[a.id]) n++; S.strava.acts[a.id]=a; } return n; }
+async function stravaSync(silent){
+  let tok=stTok(); if(!tok||stBusy) return;
+  stBusy=true; stMsg=""; if(!silent) render();
+  try{
+    tok=await strava.ensureToken(fetch.bind(window),tok,stCfg()); lsSet(stKey(),JSON.stringify(tok));
+    const since=Math.max(+START-7*dayMs, S.strava.at ? S.strava.at-3*dayMs : 0);
+    const acts=await strava.fetchActivities(fetch.bind(window),tok.access,Math.floor(since/1000));
+    const n=mergeActs(acts); S.strava.at=Date.now(); save();
+    stMsg=n?`${n} neue ${n===1?"Aktivität":"Aktivitäten"} geladen.`:"Alles aktuell.";
+    if(!silent) toast(stMsg);
+  }catch(e){ stMsg=e.message; if(!silent) toast(e.message); }
+  stBusy=false; render();
+}
+const cleanUrl=()=>history.replaceState(null,"",location.pathname+(SIM?"?heute="+SIM:"")+location.hash);
+async function stravaCallback(){
+  const code=QS.get("code"), err=QS.get("error");
+  cleanUrl();
+  view="strava";
+  if(err||!code){ stMsg="Verbindung abgebrochen."; return; }
+  try{
+    const tok=await strava.exchangeCode(fetch.bind(window),{...stCfg(),code});
+    lsSet(stKey(),JSON.stringify(tok)); stMsg="Verbunden. Lade Aktivitäten …";
+    S.onb.strava=Date.now(); save(); // Onboarding dauerhaft erledigt
+    stravaSync(true);
+  }catch(e){ stMsg=e.message+". Client-ID und Secret prüfen."; }
+}
+function stConnectForm(){
+  const cfg=stCfg();
+  return `<b>Mit Strava verbinden</b><p class="sub mt-1">Einmalig eine eigene Strava-API-App anlegen (strava.com/settings/api, Callback-Domain: <b>${esc(location.hostname||"localhost")}</b>) und hier Client-ID und Secret eintragen. Beides bleibt nur auf diesem Gerät.</p>
+    ${stMsg?`<div class="target bad">${esc(stMsg)}</div>`:""}
+    <label class="lbl" for="st-id">Client-ID</label><input type="text" id="st-id" inputmode="numeric" value="${esc(cfg.clientId)}" autocomplete="off">
+    <label class="lbl" for="st-sec">Client Secret</label><input type="password" id="st-sec" value="${esc(cfg.secret)}" autocomplete="off">
+    <div class="btns"><button class="btn strava" data-act="st-connect">Mit Strava verbinden</button></div>`;
+}
+/* Einmal-Ansicht nach dem ersten Start/Login: nur solange weder verbunden noch übersprungen und keine Aktivitäten da sind */
+const needsOnb=()=>!(S.onb&&S.onb.strava) && !stTok() && !Object.keys(S.strava.acts).length;
+function vOnb(){
+  return `<div class="onb"><div class="card"><span class="av">S</span><h2>Strava verbinden</h2>
+    <p class="sub mt-2">Verbinde dein Strava-Konto, dann gleicht die App deine Läufe und Fahrten automatisch mit dem Plan ab:</p>
+    <ul><li>Passende Aktivitäten als erledigt übernehmen</li><li>Einheit an einem anderen Tag gemacht? Die App schlägt vor, den Plan nachzuziehen</li><li>Die Verbindung gilt nur für dein Konto</li></ul></div>
+    <div class="card">${stConnectForm()}</div>
+    <div class="btns"><button class="btn ghost" data-act="onb-skip">Später – ohne Strava weiter</button></div>
+    <p class="sub mt-3" style="text-align:center">Jederzeit nachholbar unter Menü → Strava.</p></div>`;
+}
+function vStrava(){
+  const tok=stTok();
+  let h=`<div class="narrow">${vhead("Strava","Läufe und Fahrten werden den geplanten Einheiten zugeordnet. Passt eine Aktivität zu einem anderen Tag, schlägt die App vor, den Plan nachzuziehen.",true)}`;
+  h+=`<div class="card">`;
+  if(tok){
+    h+=`<div class="row between"><div class="acct"><span class="av" style="background:var(--strava);color:#fff">S</span><div><b>Verbunden${tok.athlete?" als "+esc(tok.athlete):""}</b><div class="sub">${S.strava.at?"Zuletzt synchronisiert "+new Date(S.strava.at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}):"Noch nicht synchronisiert"}</div></div></div></div>
+      ${stMsg?`<p class="sub mt-3">${esc(stMsg)}</p>`:""}
+      <div class="grid2 mt-4"><button class="btn strava" data-act="st-sync" ${stBusy?"disabled":""}>${stBusy?"Lädt …":"Jetzt synchronisieren"}</button><button class="btn" data-act="st-off">Trennen</button></div>`;
+  } else h+=stConnectForm();
+  h+=`</div><div class="card tight"><b>Ohne Verbindung: Datei importieren</b><p class="sub mt-1">Strava → Einstellungen → Mein Konto → „Account-Daten herunterladen“. Aus dem ZIP die Datei <b>activities.csv</b> wählen.</p>
+    <div class="btns"><label class="btn file">activities.csv auswählen<input type="file" accept=".csv,.json,text/csv,application/json" data-file="strava"></label></div></div>`;
+  const acts=Object.values(S.strava.acts).sort((a,b)=>a.date<b.date?1:-1).slice(0,30);
+  const movedTo=new Map(rc().moved.map(m=>[m.act.id,m.from]));
+  h+=`<div class="cap">Aktivitäten (${Object.keys(S.strava.acts).length})</div>`;
+  if(!acts.length) return h+`<p class="sub">Noch keine Aktivitäten.</p></div>`;
+  h+=`<div class="list">`;
+  for(const a of acts){
+    const i=idxOfIso(a.date), d=isoToDate(a.date), e=rc().byDay[i], p=dayPlan(i);
+    let st=`<span class="sub">ausserhalb des Plans</span>`;
+    if(p) st = e&&e.match&&strava.fits(p.k,a.group) ? `<span class="badge ok">passt</span> <span class="sub">${esc(p.t)}</span>`
+      : movedTo.has(a.id) ? `<span class="badge mv">passt zu ${shortDay(movedTo.get(a.id))}</span>` : `<span class="sub">Plan: ${esc(p.t)}</span>`;
+    h+=`<div class="act"><div class="d">${DAYS[(d.getDay()+6)%7]}<b>${d.getDate()}</b></div><div><b>${esc(a.name||strava.SPORT_LABEL[a.group])}</b><div class="sub">${esc(strava.summary(a))}</div><div class="mt-1">${st}</div></div></div>`;
+  }
+  h+=`</div>`;
+  if(Object.keys(S.strava.acts).length) h+=`<button class="btn ghost" data-act="st-clear">Aktivitäten aus der App löschen</button>`;
+  return h+`</div>`;
+}
+
+/* ---------- Backup ---------- */
+let bkp=null; // eingelesenes Backup, wartet auf Bestätigung: {name, data, meta, summary}
+function vBackup(){
+  const cloud=sb&&USER;
+  let h=`<div class="narrow">${vhead("Backup","Alle Einträge als Datei sichern, z. B. vor einem Handywechsel.",true)}`;
+  h+=`<div class="card"><b>Backup exportieren</b><p class="sub mt-1">Lädt Haken, Werte, Notizen, Check-ins, Umplanungen, Tests und Strava-Aktivitäten als <b>.json</b>-Datei herunter. Zugangsdaten (Login, Strava-Token) sind nicht enthalten.</p>
+    <div class="grid2 mt-4"><button class="btn primary" data-act="bk-export">Export Backup</button><button class="btn" data-act="bk-share">Als Text teilen</button></div></div>`;
+  if(bkp){
+    const s=bkp.summary, m=bkp.meta;
+    h+=`<div class="card"><b>Backup einspielen?</b><p class="sub mt-1">${esc(bkp.name)}${m.exportedAt?` · erstellt ${new Date(m.exportedAt).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"})}`:""}${m.user?` · von ${esc(m.user)}`:""}</p>
+      <ul class="sub mt-2"><li>${s.done} abgehakte Übungen, ${s.notes} Notizen, ${s.rpe} RPE-Werte</li><li>${s.checkins} Check-ins, ${s.changes} Umplanungen/Anpassungen</li><li>${s.strava} Strava-Aktivitäten${s.plan?", importierter Plan":""}</li></ul>
+      ${m.user&&m.user!==ME?`<div class="target bad">Dieses Backup stammt von ${esc(m.user)}, du bist als ${esc(ME)} angemeldet.</div>`:""}
+      <div class="target bad">Ersetzt alle aktuellen Einträge${cloud?" – auf diesem Gerät und in der Cloud":" auf diesem Gerät"}. Tipp: vorher ein Backup exportieren.</div>
+      <div class="grid2 mt-4"><button class="btn primary" data-act="bk-apply">Ersetzen</button><button class="btn" data-act="bk-cancel">Abbrechen</button></div></div>`;
+  } else {
+    h+=`<div class="card"><b>Backup importieren</b><p class="sub mt-1">Eine zuvor exportierte <b>.json</b>-Datei wählen. Vor dem Überschreiben siehst du, was drin ist.</p>
+      <div class="btns"><label class="btn file">Import Backup<input type="file" accept=".json,application/json,text/plain" data-file="backup"></label></div></div>`;
+  }
+  return h+`</div>`;
+}
+function exportBackup(){
+  const blob=new Blob([JSON.stringify(makeBackup(S,{user:ME}),null,1)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=backupFileName();
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast("Backup heruntergeladen");
+}
+
+/* ---------- Coach-Chat ----------
+   Plan-Kontext + Nachricht → Edge Function "coach" (Claude) → Antwort + Vorschläge.
+   Vorschläge werden geprüft und erst nach Tipp auf "Übernehmen" angewendet. */
+let ccBusy=false, ccErr="", ccDraft="", coachTab="chat"; // coachTab: "chat" | "move" | "sore" | "inj"
+const coachReady=()=>!!(sb&&USER);
+function coachCtx(){
+  return coach.planContext({today:TODAY,last:LAST,plan:dayPlan,status:dayStatus,
+    rpe:(i)=>S.rpe[keyI(i)], skipped:(i)=>!!S.skip[keyI(i)], checkin:S.checkin[keyI(Math.max(0,TODAY))], me:ME, partner:PARTNER,
+    soreness:Object.fromEntries(Object.entries(soreAt(soreToday())).map(([z,v])=>[sore.LABEL[z]||z,v]))});
+}
+const coachCheck=(actions)=>coach.validateActions(actions,{today:TODAY,last:LAST,idxOf:idxOfIso,plan:dayPlan});
+function vCoach(){
+  const tab=(id,label)=>`<button role="tab" data-act="cc-tab" data-tab="${id}" class="${coachTab===id?"on":""}" aria-selected="${coachTab===id}">${label}</button>`;
+  let h=`<div class="narrow">${vhead("Coach","",true)}<div class="chips cc-tabs" role="tablist">${tab("chat","Chat")}${tab("move","Umplanen")}${tab("sore","Muskelkater")}${tab("inj","Verletzt / krank")}</div>`;
+  if(coachTab==="inj") return h+injHtml()+`</div>`;
+  if(coachTab==="move") return h+moveHtml()+`</div>`;
+  if(coachTab==="sore") return h+soreHtml()+`</div>`;
+  h+=`<p class="sub" style="margin:0 0 var(--s4)">Beschreib, was nicht passt – z. B. „Knie zwickt seit gestern“ oder „Mittwoch habe ich keine Zeit“. Der Coach schlägt Änderungen vor, du entscheidest.</p>`;
+  if(!coachReady()) h+=`<div class="note">Der Coach läuft über die Supabase-Funktion <b>coach</b> und braucht den Cloud-Login (siehe SETUP.md). Bis dahin wird die Anfrage nur vorbereitet – mit „Anfrage kopieren“ siehst du, was gesendet würde.</div>`;
+  h+=`<div class="chat" id="chat">`;
+  if(!S.chat.length) h+=`<div class="msg assistant">Hoi ${esc(ME)}! Was ist los? Ich sehe deinen Plan der nächsten drei Wochen und die letzten Einträge.</div>`;
+  S.chat.forEach((m,k)=>{
+    h+=`<div class="msg ${m.role}">${esc(m.text)}`;
+    if(m.actions&&m.actions.length){
+      // Offene Vorschläge gegen den aktuellen Plan prüfen; erledigte so zeigen, wie sie damals waren
+      const open=m.state==="open", {valid,invalid}=open?coachCheck(m.actions):{valid:[],invalid:[]};
+      const reason=(a)=>a.reason?`<div class="sub">${esc(a.reason)}</div>`:"";
+      h+=`<div class="prop"><b>Vorschläge</b><ul>`;
+      if(open){
+        for(const a of valid) h+=`<li>${esc(propText(a))}${reason(a)}</li>`;
+        for(const x of invalid) h+=`<li class="bad">${esc(coach.actionLabel(x.action||{}))} <span class="sub">(${esc(x.why)})</span></li>`;
+      } else for(const a of m.actions) h+=`<li>${esc(coach.actionLabel(a))}${reason(a)}</li>`;
+      h+=`</ul>`;
+      if(open && valid.length) h+=`<div class="grid2 mt-3"><button class="btn primary sm" data-act="cc-apply" data-k="${k}">Übernehmen</button><button class="btn sm" data-act="cc-dismiss" data-k="${k}">Verwerfen</button></div>`;
+      else h+=`<div class="sub mt-2">${m.state==="applied"?"✓ Übernommen":m.state==="dismissed"?"Verworfen":"Nichts anwendbar"}</div>`;
+      h+=`</div>`;
+    }
+    h+=`</div>`;
+  });
+  if(ccBusy) h+=`<div class="msg assistant">Coach denkt nach …</div>`;
+  if(ccErr) h+=`<div class="msg err">${esc(ccErr)}</div>`;
+  h+=`</div><form class="card chat-in" data-form="coach"><label class="lbl" for="cc-in" style="margin-top:0">Deine Nachricht</label>
+    <textarea id="cc-in" maxlength="${coach.MAX_MSG}" placeholder="Was soll angepasst werden?" ${ccBusy?"disabled":""}>${esc(ccDraft)}</textarea>
+    <div class="grid2 mt-3"><button type="submit" class="btn primary" ${ccBusy?"disabled":""}>${coachReady()?"Senden":"Vorbereiten"}</button>
+    ${coachReady()?(S.chat.length?`<button type="button" class="btn ghost" data-act="cc-clear">Verlauf löschen</button>`:"<span></span>"):`<button type="button" class="btn" data-act="cc-copy">Anfrage kopieren</button>`}</div></form>`;
+  return h+`</div>`;
+}
+function propText(a){
+  const d=(i)=>`${shortDay(i)} (${dayPlan(i).t})`;
+  if(a.type==="swap") return `${d(a.i)} ↔ ${d(a.j)} tauschen`;
+  if(a.type==="easy") return `${d(a.i)} entlasten`;
+  if(a.type==="skip") return `${d(a.i)} fällt aus`;
+  return `${shortDay(a.i)}: ${a.title}${a.kind!==dayPlan(a.i).k?` (neu: ${KIND[a.kind]})`:""} – ${a.items.length} Übungen`;
+}
+function applyCoach(valid){
+  for(const a of valid){
+    if(a.type==="swap") swapDays(a.i,a.j);
+    else if(a.type==="easy") setE(a.i,{easy:1});
+    else if(a.type==="skip") S.skip[keyI(a.i)]=1;
+    else if(a.type==="edit") S.edit[srcOf(a.i)]={t:a.title,i:a.items,n:a.note||"",k:a.kind};
+  }
+}
+async function sendCoach(text){
+  let req; try{ req=coach.buildCoachRequest({context:coachCtx(),chat:S.chat,message:text}); }catch(e){ ccErr=e.message; return render(); }
+  if(!coachReady()){ ccDraft=text; return copyCoach(req); }
+  S.chat.push({role:"user",text:req.message,at:Date.now()}); ccDraft=""; ccErr=""; ccBusy=true; save(); render(); scrollChat();
+  try{
+    const {data,error}=await sb.functions.invoke("coach",{body:req});
+    if(error){
+      // HTTP-Fehler: Status + Fehlercode aus der Antwort; Netzwerkfehler: Status 0
+      const res=error.context&&typeof error.context.json==="function"?error.context:null; let code="";
+      if(res){ try{ code=(await res.clone().json()).error||""; }catch(_){} }
+      throw new Error(coach.coachErrorText(res?res.status:(navigator.onLine===false?0:-1),code)); }
+    const r=coach.parseCoachResponse(data);
+    S.chat.push({role:"assistant",text:r.reply,actions:r.actions,state:r.actions.length?"open":"none",at:Date.now()});
+    S.chat=S.chat.slice(-40); save();
+  }catch(e){ ccErr=e.message||coach.coachErrorText(-1,""); if(S.chat.length&&S.chat[S.chat.length-1].role==="user") S.chat.pop(); ccDraft=req.message; save(); }
+  ccBusy=false; if(view==="coach"&&coachTab==="chat"){ render(); scrollChat(); }
+}
+function copyCoach(req){
+  const txt=JSON.stringify(req,null,1);
+  if(navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>toast("Anfrage kopiert"),()=>prompt("Anfrage:",txt)); else prompt("Anfrage:",txt);
+}
+const scrollChat=()=>{ const f=document.querySelector("[data-form=coach]"); if(f) f.scrollIntoView({block:"end"}); };
+
+/* ---------- Geteilte Woche (Lese-Link, nur Anzeige) ---------- */
+let SHARED=null;
+function vShared(){
+  const s=SHARED;
+  let h=`<div class="narrow"><div class="target" style="margin:0 0 var(--s5)">Geteilte Woche${s.by?" von <b>"+esc(s.by)+"</b>":""} · nur lesen</div>
+    ${vhead(`Woche ${s.w+1}`,`${fmt(dateFromIdx(s.w*7))} – ${fmt(dateFromIdx(s.w*7+6))}${s.title?" · "+esc(s.title):""}`)}`;
+  s.days.forEach((d,j)=>{
+    const i=s.w*7+j;
+    h+=`<div class="card tight hero k-${esc(d.k)}"><div class="row between"><span class="kind">${KIND[d.k]||""}</span><span class="sub">${DAYSF[j]}, ${fmt(dateFromIdx(i))}</span></div>
+      <h3 class="mt-2">${esc(d.t)}${d.done?` <span class="badge ok">erledigt</span>`:""}</h3>
+      ${d.i.length?`<ul class="sub" style="margin:var(--s2) 0 0;padding-left:18px">${d.i.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
+      ${d.n?`<div class="hint">${esc(d.n)}</div>`:""}</div>`;
+  });
+  return h+`<button class="btn" data-act="shared-close">Zur eigenen App</button></div>`;
+}
+
+/* ---------- Konto & Sync (Supabase oder Vorschau-Login) ---------- */
 const CFG = window.HX_CONFIG || {};
 const CLOUD = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
 const sb = CLOUD && window.supabase ? window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey) : null;
-let USER=null, loginStep="email", loginEmail="", loginMsg="", syncState="", pushT=null, dirty=false;
+let USER=null, loginEmail="", loginMsg="", loginWho="Jaime", syncState="", pushT=null, dirty=false;
+/* OFFLINE: Cloud konfiguriert, aber Supabase nicht geladen – zeigt die lokale Kopie des zuletzt angemeldeten Nutzers */
+let OFFLINE=false;
+/* Ohne gültige Session gibt es im Cloud-Modus nur Login und geteilte Lese-Links */
+const authed=()=>!CLOUD||!!USER||OFFLINE;
+/* Zurück zum Login. Die lokale Kopie (hx:<id>) bleibt, damit ungespeicherte Änderungen beim nächsten Login hochgeladen werden. */
+function resetAuth(msg){
+  clearTimeout(pushT); dirty=false; USER=null; LSK="hx"; setNames("Jaime"); S=def(); PP=null; ppState=""; profWho="me";
+  loginMsg=msg||""; if(view!=="shared") view="login"; render();
+}
+/* Ohne Supabase-Konfiguration: Vorschau-Login nur auf diesem Gerät (kein Server, keine E-Mail). */
+const mockUser=()=>{ if(CLOUD) return null; try{ return JSON.parse(lsGet("hx:mock")||"null"); }catch(_){ return null; } };
+const setNames=(me)=>{ ME=me; PARTNER=me==="Jimoh"?"Jaime":"Jimoh"; };
 
 function vLogin(){
-  if(!sb) return `<h2 style="margin-top:20px">Offline</h2><div class="hint">Für die erste Anmeldung braucht die App Internet.</div>`;
-  const msg=loginMsg?`<div class="target" style="border-color:rgba(255,138,128,.4);background:rgba(255,138,128,.1)">${esc(loginMsg)}</div>`:"";
-  if(loginStep==="email") return `<h2 style="margin-top:20px">Anmelden</h2>
-    <div class="sub" style="margin:6px 0 16px">Mit deiner E-Mail. Du bekommst einen Code, kein Passwort nötig.</div>
-    <form class="card" data-form="email"><label class="lbl" style="margin-top:0" for="le">E-Mail</label>
-      <input type="text" id="le" inputmode="email" autocomplete="email" autocapitalize="off" value="${esc(loginEmail)}" placeholder="name@beispiel.ch">
-      ${msg}<button class="btn primary" style="margin-top:16px">Code senden</button></form>`;
-  return `<h2 style="margin-top:20px">Code eingeben</h2>
-    <div class="sub" style="margin:6px 0 16px">Gesendet an ${esc(loginEmail)}. Schau auch im Spam-Ordner.</div>
-    <form class="card" data-form="code"><label class="lbl" style="margin-top:0" for="lc">Code aus der E-Mail</label>
-      <input type="text" id="lc" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" style="font-size:24px;letter-spacing:.2em">
-      ${msg}<button class="btn primary" style="margin-top:16px">Anmelden</button></form>
-    <button class="btn" data-act="otp-back">Andere E-Mail</button>`;
+  let h=`<div class="login"><p class="tag">HYROX Basel · Doubles Men PRO · 13.02.2027</p>`;
+  if(CLOUD && !sb) return h+`<div class="card"><h3>Offline</h3><p class="sub mt-2">Für die erste Anmeldung braucht die App Internet.</p></div></div>`;
+  const msg=loginMsg?`<div class="target bad">${esc(loginMsg)}</div>`:"";
+  h+=`<form class="card" data-form="login"><h3>Anmelden</h3><p class="sub mt-1">Mit deiner E-Mail und deinem Passwort.</p>
+    <label class="lbl mt-5" for="le">E-Mail</label>
+    <input type="email" id="le" inputmode="email" autocomplete="username" autocapitalize="off" value="${esc(loginEmail)}" placeholder="name@beispiel.ch">
+    <label class="lbl" for="lp">Passwort</label>
+    <input type="password" id="lp" autocomplete="current-password">`;
+  if(!CLOUD) h+=`<label class="lbl">Wer bist du?</label><div class="chips">${["Jaime","Jimoh"].map(n=>`<button type="button" data-who="${n}" class="${loginWho===n?"on":""}" aria-pressed="${loginWho===n}">${n}</button>`).join("")}</div>`;
+  h+=`${msg}<div class="btns"><button type="submit" class="btn primary">Anmelden</button></div></form>`;
+  if(!CLOUD) h+=`<div class="note">Vorschau-Modus: Es wird nichts geprüft, <b>jedes Passwort</b> funktioniert. Die Anmeldung gilt nur auf diesem Gerät und legt fest, aus wessen Sicht der Plan angezeigt wird.</div>
+    <div class="btns"><button class="btn ghost" data-v="today">Ohne Anmeldung weiter</button></div>`;
+  return h+`</div>`;
 }
-function setSync(s){ syncState=s; const el=$("#acct-sync"); if(el) el.textContent=syncLabel(); }
+/* link: im Menü ist der Namensbereich ein Button zum Profil */
+function acctHtml(link){
+  const box=(av,name,sub)=>link
+    ? `<button class="acct acct-link" data-v="profile" aria-label="Profil von ${esc(name)} öffnen">${av}<div><b>${esc(name)}</b>${sub}</div><span class="chev" aria-hidden="true">›</span></button>`
+    : `<div class="acct">${av}<div><b>${esc(name)}</b>${sub}</div></div>`;
+  if(sb&&USER) return box(`<span class="av">${esc(ME[0])}</span>`,ME,`<div class="sub acct-sync">${syncLabel()}</div>`)+`
+    <div class="btns"><button class="btn" data-act="logout">Abmelden</button></div>`;
+  if(CLOUD) return "";
+  const m=mockUser();
+  if(m) return box(`<span class="av">${esc(m.name[0])}</span>`,m.name,`<div class="sub">Vorschau-Login · nur dieses Gerät</div>`)+`
+    <div class="btns"><button class="btn" data-act="logout">Abmelden</button></div>`;
+  return box(`<span class="av off">?</span>`,"Nicht angemeldet",`<div class="sub">Einträge bleiben auf diesem Gerät</div>`)+`
+    <div class="btns"><button class="btn" data-v="login">Anmelden</button></div>`;
+}
+function setSync(s){ syncState=s; document.querySelectorAll(".acct-sync").forEach(el=>el.textContent=syncLabel()); }
 const syncLabel=()=>({ok:"✓ gespeichert in der Cloud",offline:"Offline – wird später gespeichert",busy:"Speichert …"}[syncState]||"");
 function queuePush(){ if(!sb||!USER) return; dirty=true; setSync("busy"); clearTimeout(pushT); pushT=setTimeout(push,1200); }
 async function push(){
@@ -625,30 +1309,49 @@ async function pull(){
 }
 async function onLogin(user){
   USER=user; LSK="hx:"+user.id; lsSet("hx:last",user.id);
-  const {data:m,error}=await sb.from("members").select("email,name");
-  if(!error && !m.length){ await sb.auth.signOut(); USER=null; LSK="hx"; loginStep="email"; loginMsg="Diese E-Mail ist für die App nicht freigeschaltet."; view="login"; return render(); }
-  if(!error){ const me=m.find(x=>x.email.toLowerCase()===user.email.toLowerCase())||{name:user.email}; ME=me.name; PARTNER=(m.find(x=>x!==me)||{name:"Partner"}).name; lsSet("hx:names:"+user.id,JSON.stringify([ME,PARTNER])); }
+  // team() liefert nur Namen (keine E-Mails) und ist leer, wenn der Nutzer nicht freigeschaltet ist
+  const {data:m,error}=await sb.rpc("team");
+  if(!error && !m.length){ resetAuth("Diese E-Mail ist für die App nicht freigeschaltet."); await sb.auth.signOut(); return; }
+  if(!error){ const me=m.find(x=>x.is_me)||{name:user.email}; ME=me.name; PARTNER=(m.find(x=>!x.is_me)||{name:"Partner"}).name; lsSet("hx:names:"+user.id,JSON.stringify([ME,PARTNER])); }
   else { try{ [ME,PARTNER]=JSON.parse(lsGet("hx:names:"+user.id))||[ME,PARTNER]; }catch(_){} }
   loadLocal();
   // Erste Anmeldung auf diesem Gerät: Einträge aus der Zeit ohne Login übernehmen?
   const old=lsGet("hx");
   if(!lsGet(LSK) && old && confirm(`Bisherige Einträge auf diesem Gerät in das Konto von ${ME} übernehmen?`)){
-    try{ S=fill(JSON.parse(old)); S._t=Date.now(); saveLocal(); lsSet("hx:übernommen",old); localStorage.removeItem("hx"); }catch(_){}
+    try{ S=fill(JSON.parse(old)); S._t=Date.now(); saveLocal(); lsSet("hx:übernommen",old); lsDel("hx"); }catch(_){}
   }
   if(view==="login") view="today";
-  render(); await pull(); render();
+  render(); await pull(); render(); loadPartner();
 }
 async function boot(){
-  if(!CLOUD) return render();
-  if(!sb){ // Konfiguriert, aber Bibliothek nicht geladen (offline beim allerersten Start)
-    const last=lsGet("hx:last"); if(last){ LSK="hx:"+last; loadLocal(); try{ [ME,PARTNER]=JSON.parse(lsGet("hx:names:"+last))||[ME,PARTNER]; }catch(_){} return render(); }
-    view="login"; return render();
+  const code=linkCode(location.hash);
+  if(code){ SHARED=decodeSnapshot(code); if(SHARED) view="shared"; else toast("Der geteilte Link ist ungültig"); }
+  const m=mockUser(); if(m) setNames(m.name);
+  // Strava-Rückkehr erst verarbeiten, wenn feststeht, wem die Daten gehören (LSK)
+  const stCb=QS.get("state")===strava.STATE;
+  if(!CLOUD){ if(stCb) await stravaCallback(); render(); return afterBoot(); }
+  if(!sb){ // Konfiguriert, aber Bibliothek nicht geladen (offline)
+    const last=lsGet("hx:last"); if(last){ OFFLINE=true; LSK="hx:"+last; loadLocal(); try{ [ME,PARTNER]=JSON.parse(lsGet("hx:names:"+last))||[ME,PARTNER]; }catch(_){} if(stCb) cleanUrl(); render(); return afterBoot(); }
+    if(view!=="shared") view="login"; return render();
   }
+  // Session abgelaufen/widerrufen oder in einem anderen Tab abgemeldet → zurück zum Login.
+  // Kein await auf Supabase-Aufrufe in diesem Callback (sonst Deadlock in supabase-js).
+  sb.auth.onAuthStateChange((ev)=>{ if(ev==="SIGNED_OUT" && USER) resetAuth("Du wurdest abgemeldet. Bitte erneut anmelden."); });
   const {data:{session}}=await sb.auth.getSession();
-  if(session) return onLogin(session.user);
-  view="login"; render();
+  if(session){ await onLogin(session.user); if(stCb && USER){ await stravaCallback(); render(); } return afterBoot(); }
+  if(stCb){ cleanUrl(); loginMsg="Bitte zuerst anmelden, dann Strava verbinden."; }
+  if(view!=="shared") view="login"; render();
+}
+/* Strava im Hintergrund aktualisieren, wenn die letzte Synchronisierung über eine Stunde her ist. */
+function afterBoot(){
+  if(stTok() && Date.now()-(S.strava.at||0)>36e5) stravaSync(true);
+  // Erster Start / erstes Login ohne Strava: einmalig das Onboarding zeigen
+  if(authed() && view==="today" && needsOnb()){ view="onb"; render(); }
 }
 window.addEventListener("online",()=>{ if(dirty) push(); });
+/* Geteilter Link, während die App schon offen ist (nur der Hash ändert sich) */
+window.addEventListener("hashchange",()=>{ const c=linkCode(location.hash); if(!c) return; const s=decodeSnapshot(c);
+  if(!s) return toast("Der geteilte Link ist ungültig"); SHARED=s; menu(false); view="shared"; render(); window.scrollTo(0,0); });
 document.addEventListener("visibilitychange",async()=>{
   if(!sb||!USER) return;
   if(document.visibilityState==="hidden"){ if(dirty){ clearTimeout(pushT); push(); } return; }
@@ -658,35 +1361,62 @@ document.addEventListener("visibilitychange",async()=>{
 });
 document.addEventListener("submit",async e=>{
   const f=e.target.closest("[data-form]"); if(!f) return; e.preventDefault();
-  const btn=f.querySelector("button"); btn.disabled=true; loginMsg="";
-  if(f.dataset.form==="email"){
+  if(f.dataset.form==="coach"){ if(!ccBusy) sendCoach($("#cc-in").value); return; }
+  const btn=f.querySelector("button[type=submit]"); btn.disabled=true; loginMsg="";
+  if(f.dataset.form==="login"){
     loginEmail=$("#le").value.trim().toLowerCase();
+    const password=$("#lp").value;
     if(!/^\S+@\S+\.\S+$/.test(loginEmail)){ loginMsg="Bitte eine gültige E-Mail eingeben."; return render(); }
-    const {error}=await sb.auth.signInWithOtp({email:loginEmail,options:{shouldCreateUser:true}});
-    if(error) loginMsg=/rate|seconds/i.test(error.message)?"Zu viele Versuche. Bitte kurz warten.":error.message; else loginStep="code";
-    render(); const c=$("#lc"); if(c) c.focus();
-  } else {
-    const code=$("#lc").value.replace(/\s/g,"");
-    const {data,error}=await sb.auth.verifyOtp({email:loginEmail,token:code,type:"email"});
-    if(error){ loginMsg="Code falsch oder abgelaufen."; return render(); }
-    loginStep="email"; await onLogin(data.user);
+    if(!password){ loginMsg="Bitte das Passwort eingeben."; render(); return $("#lp").focus(); }
+    if(!CLOUD){
+      lsSet("hx:mock",JSON.stringify({name:loginWho,email:loginEmail})); setNames(loginWho);
+      view="today"; render(); afterBoot(); return toast(`Angemeldet als ${loginWho} (Vorschau)`);
+    }
+    const {data,error}=await sb.auth.signInWithPassword({email:loginEmail,password});
+    if(error){ loginMsg=loginError(error); render(); return $("#lp").focus(); }
+    await onLogin(data.user); if(USER) afterBoot();
   }
 });
+/* Supabase-Fehler beim Login in verständliche Meldungen übersetzen */
+function loginError(e){
+  if(e.code==="invalid_credentials"||/invalid login credentials/i.test(e.message)) return "E-Mail oder Passwort falsch.";
+  if(e.code==="email_not_confirmed") return "Diese E-Mail ist noch nicht bestätigt (Supabase → Authentication → Users).";
+  if(e.status===429||/rate|seconds/i.test(e.message)) return "Zu viele Versuche. Bitte kurz warten.";
+  if(e.name==="AuthRetryableFetchError"||e.status===0) return "Keine Verbindung. Bitte Internet prüfen.";
+  return e.message;
+}
 
 /* ---------- Render + Events ---------- */
+const VIEWS={today:vToday,week:vWeek,plan:vPlan,profile:vProfile,edit:vEdit,login:vLogin,import:vImport,strava:vStrava,shared:vShared,
+  backup:vBackup,coach:vCoach,onb:vOnb};
 function render(){
-  const left=Math.ceil((RACE-midnight(new Date()))/dayMs);
+  RC=null;
+  if(!authed() && view!=="shared") view="login";
+  const left=Math.ceil((RACE-midnight(NOW))/dayMs);
   $("#cd").textContent=left>0?left:"🏁";
-  $("#main").innerHTML={today:vToday,week:vWeek,plan:vPlan,tests:vTests,move:vMove,inj:vInj,edit:vEdit,login:vLogin}[view]();
-  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===view));
-  const out=view==="login";
-  $("#nav").hidden=out; document.querySelector(".top .menu-btn").style.visibility=out?"hidden":"";
-  $("#acct").innerHTML = sb&&USER ? `<div class="sub">Angemeldet als <b style="color:var(--text)">${esc(ME)}</b></div>
-    <div class="sub" id="acct-sync">${syncLabel()}</div><button class="btn" style="margin-top:12px" data-act="logout">Abmelden</button>` : "";
+  const sd=$("#simdate"); sd.hidden=!SIM; if(SIM) sd.textContent=`Testmodus: Datum simuliert auf ${fmt(NOW)} ${NOW.getFullYear()}`;
+  SUGS = view==="today" ? suggestions() : [];
+  $("#main").innerHTML=VIEWS[view]();
+  document.querySelectorAll("#nav button").forEach(b=>{ const on=b.dataset.v===view; b.classList.toggle("on",on); if(on) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
+  const bare=view==="login"||view==="shared"||view==="onb";
+  $("#nav").hidden=bare; document.body.classList.toggle("bare",bare);
+  document.querySelector(".top .menu-btn").style.visibility=bare?"hidden":"";
+  document.querySelectorAll("[data-partner]").forEach(x=>x.textContent=PARTNER);
+  $("#acct").innerHTML=acctHtml(true);
+  const al=$("#acct .acct-link"); if(al){ al.classList.toggle("on",view==="profile"); if(view==="profile") al.setAttribute("aria-current","page"); }
+  // Aktive Seite im Burger-Menü markieren (Trainingsplan = Heute/Woche/Plan)
+  const mv=["week","plan"].includes(view)?"today":view;
+  document.querySelectorAll("#sheet .mi[data-v]").forEach(b=>{ const on=b.dataset.v===mv; b.classList.toggle("on",on); if(on) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
 }
 function go(v){
   if(["today","week","plan"].includes(view)) prevView=view;
   if(v==="inj" && view!=="move") injStart=null;
+  // Verletzt/krank ist ein Tab im Coach, Tests & Benchmarks stehen im Profil
+  if(v==="inj"){ coachTab="inj"; v="coach"; }
+  if(v==="move"){ coachTab="move"; v="coach"; }
+  if(v==="tests"){ profWho="me"; view="profile"; menu(false); render(); loadPartner(); return $("#tests").scrollIntoView(); }
+  if(v==="profile"){ profWho="me"; loadPartner(); }
+  if(v==="import" && imp.step!=="preview") imp={step:"pick"};
   view=v; if(v==="today") sel=null; menu(false); render(); window.scrollTo(0,0);
 }
 function menu(open){
@@ -694,55 +1424,126 @@ function menu(open){
   $("#sheet").setAttribute("aria-hidden",String(!open));
   if(open) $("#sheet").querySelector(".mi").focus({preventScroll:true});
 }
-document.addEventListener("keydown",e=>{ if(e.key==="Escape") menu(false); });
-function toast(m){ const t=$("#toast"); t.textContent=m; t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,2400); }
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") menu(false);
+  if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("mu")){ e.preventDefault(); e.target.dispatchEvent(new MouseEvent("click",{bubbles:true})); } });
+function toast(m){ const t=$("#toast"); t.textContent=m; t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,2600); }
+const layout=()=>WIDE()?2:MID()?1:0;
+let wasWide=layout();
+addEventListener("resize",()=>{ const w=layout(); if(w!==wasWide){ wasWide=w; if(!document.activeElement||!/INPUT|TEXTAREA/.test(document.activeElement.tagName)) render(); } });
 
+const CLICK="[data-mu],[data-v],[data-wk],[data-open],[data-sel],[data-r],[data-act],[data-back],[data-move],[data-swap],[data-injs],[data-injd],[data-injm],[data-edit],[data-ci],[data-sug],[data-sug-no],[data-who],[data-imp-all],[data-pb],[data-pd],[data-pgo]";
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-v],[data-wk],[data-open],[data-sel],[data-r],[data-act],[data-back],[data-move],[data-swap],[data-injs],[data-injd],[data-injm],[data-edit]"); if(!t) return;
+  const t=e.target.closest(CLICK); if(!t) return;
   const d=t.dataset;
-  if(d.v) return go(d.v);
-  if(d.back!==undefined) return go(prevView);
+  if(d.mu){ soreSel=d.mu; const z=sore.ZONE[d.mu]; if(z) soreView=z.view;
+    const t0=soreToday(); const o=S.sore[t0]=S.sore[t0]||{}; if(!o[d.mu]) o[d.mu]=soreAt(t0)[d.mu]||5; soreSave(); return render(); }
+  if(d.act==="sore-view"){ soreView=d.view; return render(); }
+  if(d.act==="sore-mirror"){ const m=sore.mirrorZone(soreSel), t0=soreToday(), o=S.sore[t0]=S.sore[t0]||{}; if(m){ o[m]=o[soreSel]||5; soreSave(); toast(`Auch ${sore.LABEL[m]} eingetragen`); } return render(); }
+  if(d.v){ if(d.v==="coach" && t.closest("#sheet")) coachTab="chat"; return go(d.v); }
+  if(d.back!==undefined) return go(view==="edit"&&editBack?editBack:prevView);
   if(d.move!==undefined){ moveFrom=+d.move; return go("move"); }
-  if(d.edit!==undefined){ editFrom=+d.edit; return go("edit"); }
+  if(d.edit!==undefined){ editFrom=+d.edit; editBack=view==="coach"?"coach":null; return go("edit"); }
+  if(d.act==="mv-day"){ moveFrom=Math.max(0,Math.min(LAST,moveFrom+ +d.d)); return render(); }
+  if(d.act==="mv-today"){ moveFrom=Math.max(0,Math.min(LAST,TODAY)); return render(); }
+  if(d.act==="sore-done"){ soreSel=null; return render(); }
+  if(d.act==="sore-del"){ const o=S.sore[soreToday()]; if(o) delete o[soreSel]; soreSel=null; soreSave(); return render(); }
+  if(d.act==="sore-clear"){ delete S.sore[soreToday()]; soreSel=null; soreSave(); toast("Muskelkater zurückgesetzt"); return render(); }
+  if(d.ci){ const [k,f,v]=d.ci.split("|"); const c=S.checkin[k]=S.checkin[k]||{}; if(c[f]===v) delete c[f]; else c[f]=v;
+    ciOpen=true; save(); return render(); }
+  if(d.act==="ci-edit"){ ciOpen=true; return render(); }
+  if(d.act==="ci-done"){ ciOpen=false; return render(); }
+  if(d.sug){ const s=SUGS.find(x=>x.id===d.sug); if(!s) return; applySug(s); save(); toast(s.type==="swap"?`${dayPlan(s.to).t} → ${shortDay(s.to)}`:"Plan angepasst"); return render(); }
+  if(d.sugNo){ S.dismiss[d.sugNo]=1; save(); return render(); }
   if(d.act==="edit-save"){ const lines=$("#ed-i").value.split("\n").map(s=>s.trim()).filter(Boolean);
     if(!lines.length) return toast("Mindestens eine Übung eintragen");
-    S.edit[srcOf(editFrom)]={t:$("#ed-t").value.trim(),i:lines,n:$("#ed-n").value.trim()}; save(); toast("Einheit angepasst"); return go(prevView); }
-  if(d.act==="edit-reset"){ delete S.edit[srcOf(editFrom)]; save(); toast("Original wiederhergestellt"); return go(prevView); }
-  if(d.act==="otp-back"){ loginStep="email"; loginMsg=""; return render(); }
-  if(d.act==="logout"){ menu(false); if(!confirm("Abmelden? Deine Daten bleiben in der Cloud gespeichert.")) return;
-    (async()=>{ if(dirty){ clearTimeout(pushT); await push(); } await sb.auth.signOut(); USER=null; LSK="hx"; ME="Jaime"; PARTNER="Jimoh"; S=def(); view="login"; render(); })(); return; }
+    const src=srcOf(editFrom), k=S.edit[src]&&S.edit[src].k; // vom Coach gesetzte Disziplin behalten
+    S.edit[src]={t:$("#ed-t").value.trim(),i:lines,n:$("#ed-n").value.trim(),...(k?{k}:{})}; save(); toast("Einheit angepasst"); return go(editBack||prevView); }
+  if(d.act==="edit-reset"){ delete S.edit[srcOf(editFrom)]; save(); toast("Original wiederhergestellt"); return go(editBack||prevView); }
+  if(d.who){ const el=$("#le"); if(el) loginEmail=el.value.trim(); loginWho=d.who; return render(); }
+  if(d.act==="logout"){ menu(false);
+    if(!sb){ lsDel("hx:mock"); setNames("Jaime"); toast("Abgemeldet"); return render(); }
+    if(!confirm("Abmelden? Deine Daten bleiben in der Cloud gespeichert und werden von diesem Gerät entfernt.")) return;
+    (async()=>{
+      if(dirty){ clearTimeout(pushT); await push(); }
+      // Lokale Kopie nur löschen, wenn alles in der Cloud ist – sonst gingen Offline-Änderungen verloren
+      const uid=USER.id, keep=dirty;
+      if(!keep){ lsDel("hx:"+uid); lsDel("hx:"+uid+":strava"); lsDel("hx:names:"+uid); }
+      lsDel("hx:last");
+      resetAuth(keep?"Nicht alles war gespeichert. Die Einträge bleiben auf diesem Gerät und werden beim nächsten Login hochgeladen.":"");
+      await sb.auth.signOut();
+    })(); return; }
   if(d.swap!==undefined){
     const i=moveFrom, j=+d.swap, pulled=dayPlan(i).k==="rest", to=pulled?i:j;
-    swapDays(i,j); save();
-    if(prevView==="week"){ wk=Math.floor(to/7); openDay=to; } else sel=to===TODAY?null:to;
-    view=prevView; render(); window.scrollTo(0,0);
+    swapDays(i,j); save(); moveFrom=to; render();
     return toast(`${dayPlan(to).t} → ${shortDay(to)}`); }
   if(d.injs){ injStart=Math.max(0,Math.min(LAST,injStart+ +d.injs)); return render(); }
   if(d.injd){ injDays=+d.injd; return render(); }
   if(d.injm){ injMode=d.injm; return render(); }
-  if(d.act==="skip"){ const k=key(dateFromIdx(moveFrom)); if(S.skip[k]) delete S.skip[k]; else S.skip[k]=1; save();
+  if(d.act==="skip"){ const k=keyI(moveFrom); if(S.skip[k]) delete S.skip[k]; else S.skip[k]=1; save();
+    // Ausfall direkt dem Coach melden: er schlägt die Umplanung im Chat vor, übernommen wird erst nach Bestätigung
+    if(S.skip[k] && coachReady() && !ccBusy){ toast("Ausgefallen – der Coach plant um"); coachTab="chat"; return sendCoach(coach.skipMessage(moveFrom,dayPlan(moveFrom).t)); }
     toast(S.skip[k]?"Ausgefallen – wähle unten einen neuen Tag":"Markierung entfernt"); return render(); }
-  if(d.act==="restore"){ restoreDay(moveFrom); save(); toast("Original wiederhergestellt"); return go(prevView); }
+  if(d.act==="restore"){ restoreDay(moveFrom); save(); toast("Original wiederhergestellt"); return render(); }
   if(d.act==="inj-from"){ injStart=Math.max(0,moveFrom); return go("inj"); }
   if(d.act==="inj-apply"){ applyInjury(injStart,injDays,injMode); save(); toast("Plan angepasst. Gute Besserung!"); return go(prevView); }
   if(d.act==="inj-end"){ endInjury(); save(); toast("Willkommen zurück – 3 Comeback-Einheiten geplant"); return go(prevView); }
-  if(d.act==="import"){ menu(false); const txt=prompt("Backup-Text hier einfügen. Achtung: ersetzt alle Einträge auf diesem Gerät.");
-    if(!txt) return; try{ const o=JSON.parse(txt); if(!o||typeof o!=="object"||!o.done) throw 0;
-      S=Object.assign(def(),o); save(); render(); toast("Backup importiert"); }catch(_){ toast("Das ist kein gültiges Backup"); } return; }
+  if(d.impAll!==undefined){ imp.all=d.impAll==="1"; return render(); }
+  if(d.act==="imp-apply"){ const {plan,changed}=mergeImport(PLAN(),imp.parsed,{from:imp.all?0:Math.max(0,TODAY),name:imp.name});
+    S.plan=plan; imp={step:"pick"}; wk=CURW; openDay=null; save(); toast(`Plan übernommen – ${changed.length} Tage aktualisiert`); return go("week"); }
+  if(d.act==="imp-cancel"){ imp={step:"pick"}; return render(); }
+  if(d.act==="imp-undo"){ if(!confirm(S.plan.prev?"Vorherigen Plan wiederherstellen?":"Importierten Plan verwerfen und den eingebauten Plan verwenden?")) return;
+    S.plan=undoImport(S.plan); save(); toast("Plan wiederhergestellt"); return render(); }
+  if(d.act==="strava-take"){ const i=+d.i, p=dayPlan(i), dk=keyI(i), a=actsOf(i).find(x=>strava.fits(p.k,x.group));
+    p.i.forEach((_,j)=>S.done[dk+"|"+j]=1);
+    const j=p.i.findIndex(t=>!isFiller(t)); if(a && j>=0 && !S.val[dk+"|"+j]) S.val[dk+"|"+j]=strava.summary(a);
+    save(); toast("Von Strava übernommen"); return render(); }
+  if(d.act==="st-connect"){ const id=$("#st-id").value.trim(), sec=$("#st-sec").value.trim();
+    if(!/^\d+$/.test(id)||!sec) return toast("Client-ID und Secret eintragen");
+    lsSet("hx:strava-id",id); lsSet("hx:strava-secret",sec); location.href=strava.authUrl(id,redirectUri()); return; }
+  if(d.act==="st-sync") return stravaSync(false);
+  if(d.act==="st-off"){ if(!confirm("Strava trennen? Bereits geladene Aktivitäten bleiben.")) return; lsDel(stKey()); stMsg=""; return render(); }
+  if(d.act==="st-clear"){ if(!confirm("Alle Strava-Aktivitäten aus der App löschen?")) return; S.strava={acts:{},at:0}; save(); return render(); }
+  if(d.act==="shared-close"){ SHARED=null; history.replaceState(null,"",location.pathname+location.search); return go("today"); }
   if(d.wk){ wk=Math.max(0,Math.min(NWEEKS-1,wk+ +d.wk)); openDay=null; return render(); }
-  if(d.open!==undefined){ const i=+d.open; openDay=openDay===i?null:i; return render(); }
+  if(d.pb){ planBlk=planBlk===d.pb?null:d.pb; planDay=null; render(); const el=document.querySelector(`[data-pb="${CSS.escape(d.pb)}"]`); return el&&el.scrollIntoView({block:"nearest"}); }
+  if(d.pd!==undefined){ const i=+d.pd; planDay=planDay===i?null:i; return render(); }
+  if(d.pgo!==undefined){ const i=+d.pgo; wk=Math.floor(i/7); openDay=i; return go("week"); }
+  if(d.open!==undefined){ const i=+d.open; openDay=openDay===i&&!WIDE()?null:i; return render(); }
   if(d.sel!==undefined){ sel=+d.sel===TODAY?null:+d.sel; render(); return window.scrollTo(0,0); }
-  if(d.r){ const [k,r]=d.r.split("|"); S.rpe[k]=S.rpe[k]==r?undefined:+r; save(); return render(); }
+  if(d.r){ const [k,r]=d.r.split("|"); if(S.rpe[k]==r) delete S.rpe[k]; else S.rpe[k]=+r; save(); return render(); }
   if(d.act==="menu") return menu(true);
   if(d.act==="close") return menu(false);
-  if(d.act==="export"){ menu(false); const txt=JSON.stringify(S);
+  if(d.act==="bk-export") return exportBackup();
+  if(d.act==="bk-share"){ const txt=JSON.stringify(makeBackup(S,{user:ME}));
     if(navigator.share) navigator.share({title:"Basel Sub-60 Backup",text:txt}).catch(()=>{});
     else if(navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>toast("Backup kopiert"));
-    else prompt("Backup:",txt); }
+    else prompt("Backup:",txt); return; }
+  if(d.act==="bk-cancel"){ bkp=null; return render(); }
+  if(d.act==="bk-apply"){ if(!bkp||!confirm("Wirklich alle aktuellen Einträge durch das Backup ersetzen?")) return;
+    S=fill(Object.assign(def(),bkp.data)); bkp=null; save(); toast("Backup eingespielt"); return render(); }
+  if(d.act==="onb-skip"){ S.onb.strava=Date.now(); save(); return go("today"); }
+  if(d.act==="cc-apply"){ const m=S.chat[+d.k]; if(!m||m.state!=="open") return;
+    const {valid}=coachCheck(m.actions); if(!valid.length) return toast("Keine Vorschläge mehr anwendbar");
+    applyCoach(valid); m.state="applied"; save(); toast(`Plan angepasst (${valid.length} ${valid.length===1?"Änderung":"Änderungen"})`); return render(); }
+  if(d.act==="cc-dismiss"){ const m=S.chat[+d.k]; if(m){ m.state="dismissed"; save(); } return render(); }
+  if(d.act==="prof-who"){ profWho=d.whoP; if(profWho==="partner") loadPartner(); return render(); }
+  if(d.act==="cc-tab"){ coachTab=d.tab; return render(); }
+  if(d.act==="cc-clear"){ if(!confirm("Chatverlauf löschen? Der Plan bleibt unverändert.")) return; S.chat=[]; ccErr=""; save(); return render(); }
+  if(d.act==="cc-copy"){ try{ copyCoach(coach.buildCoachRequest({context:coachCtx(),chat:S.chat,message:$("#cc-in").value})); }catch(e){ toast(e.message); } return; }
 });
-document.addEventListener("change",e=>{
+document.addEventListener("change",async e=>{
   const t=e.target;
-  if(t.dataset.c){ if(t.checked) S.done[t.dataset.c]=1; else delete S.done[t.dataset.c]; save();
+  if(t.id==="sore-r"){ soreSave(); return render(); }
+  if(t.dataset.file){ const f=t.files&&t.files[0]; t.value=""; if(!f) return;
+    if(t.dataset.file==="plan") return importFile(f);
+    if(t.dataset.file==="backup"){ try{ bkp={name:f.name,...readBackup(await f.text())}; }catch(err){ toast(err.message); } return render(); }
+    try{ const n=mergeActs(strava.parseActivities(await f.text())); save(); toast(n?`${n} neue Aktivitäten importiert`:"Keine neuen Aktivitäten seit Planstart"); }
+    catch(err){ toast(err.code==="csv_format"?"Das ist keine Strava-activities.csv":"Datei konnte nicht gelesen werden"); }
+    return render(); }
+  if(t.dataset.c){ if(t.checked) S.done[t.dataset.c]=1; else delete S.done[t.dataset.c];
+    // Vorbelegtes Standardgewicht beim Abhaken als Wert übernehmen
+    const pv=document.querySelector(`[data-v2="${t.dataset.c}"].pre`); if(t.checked && pv && !S.val[t.dataset.c]){ S.val[t.dataset.c]=pv.value; pv.classList.remove("pre"); }
+    save();
     const ex=t.closest(".ex"); if(ex) ex.classList.toggle("is-done",t.checked);
     // Fortschritt ohne Neuaufbau aktualisieren (Fokus in Eingabefeldern bleibt)
     const card=t.closest(".card"); if(card){ const all=card.querySelectorAll("[data-c]"), n=all.length, dn=[...all].filter(x=>x.checked).length;
@@ -751,10 +1552,16 @@ document.addEventListener("change",e=>{
 });
 document.addEventListener("input",e=>{
   const t=e.target, d=t.dataset; let redo=false;
+  if(t.id==="sore-r"&&soreSel){ const v=+t.value, t0=soreToday(); (S.sore[t0]=S.sore[t0]||{})[soreSel]=v;
+    const l=$("#sore-v"); if(l) l.textContent=`${v}/10 · ${sore.strength(v)}`;
+    document.querySelectorAll(`.mu[data-mu="${soreSel}"]`).forEach(el=>{ el.setAttribute("fill",soreFill(v)); el.setAttribute("fill-opacity",".9"); }); return; }
+  if(t.id==="cc-in"){ ccDraft=t.value; return; }
   if(d.n!==undefined){ S.notes[d.n]=t.value; }
-  else if(d.v2){ S.val[d.v2]=t.value; }
-  else if(d.l){ const [w,r]=d.l.split("|"); S.tests.lauf[w][+r]=t.value; redo=true; }
-  else if(d.s){ const [r,w]=d.s.split("|"); S.tests.station[r]=S.tests.station[r]||{}; S.tests.station[r][w]=t.value; redo=true; }
+  else if(d.v2){ S.val[d.v2]=t.value; t.classList.remove("pre"); }
+  else if(t.readOnly || ((d.w||d.l||d.s||d.t) && (view!=="profile"||profWho!=="me"))) return;
+  else if(d.w){ const v=cleanWeight(t.value); if(v) S.weights[d.w]=v; else delete S.weights[d.w]; }
+  else if(d.l){ const [w,r]=d.l.split("|"); if(w!==myCol()) return; S.tests.lauf[w][+r]=t.value; redo=true; }
+  else if(d.s){ const [r,w]=d.s.split("|"); if(w!==myCol()) return; S.tests.station[r]=S.tests.station[r]||{}; S.tests.station[r][w]=t.value; redo=true; }
   else if(d.t){ S.tests.trans[+d.t]=t.value; redo=true; }
   else return;
   save();

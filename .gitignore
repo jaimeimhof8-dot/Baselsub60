@@ -1,1 +1,24 @@
+# Abhängigkeiten
 node_modules/
+
+# Secrets: API-Keys gehören in Supabase Secrets (supabase secrets set …), nie ins Repo
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Supabase CLI: lokaler Projekt-Link und Cache
+supabase/.temp/
+supabase/.branches/
+
+# Logs und Systemdateien
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/

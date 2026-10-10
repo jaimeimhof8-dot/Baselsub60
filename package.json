@@ -5,7 +5,7 @@
   "description": "HYROX Basel 2027 Trainingsplan-App (PWA)",
   "type": "module",
   "scripts": {
-    "test": "node --test test/",
+    "test": "node --test",
     "dev": "node scripts/serve.js",
     "pdf2text": "node scripts/pdf-to-text.cjs"
   },

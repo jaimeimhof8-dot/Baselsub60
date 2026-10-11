@@ -486,6 +486,7 @@ import { parsePlanText } from "./src/parser.js";
 import { fileToText } from "./src/pdf-import.js";
 import { suggest, readiness, isFixedRest, CHECKIN_FIELDS } from "./src/adapt.js";
 import * as strava from "./src/strava.js";
+import { callServer, syncErrorText, completeOAuth } from "./src/strava-auth.js";
 import { linkCode, decodeSnapshot } from "./src/share.js";
 import { isFiller, valueHint, missingValues } from "./src/validate.js";
 import { weightList, cleanWeight, defaultWeight, parseKg, nextWeight, targetRpe } from "./src/weights.js";
@@ -1137,30 +1138,13 @@ const stCfg=()=>({clientId:CFG.stravaClientId||lsGet("hx:strava-id")||"",secret:
 /* Mit Cloud-Login läuft der Token-Tausch über die Edge Function „strava“: Client-Secret und Client-ID liegen nur auf dem Server.
    Nur im Vorschau-Modus ohne Cloud gibt es die lokale Eingabe von Client-ID und Secret (zum Ausprobieren auf einem Gerät). */
 const stServer=()=>!!(sb&&USER);
-async function stInvoke(body){
-  if(navigator.onLine===false) throw new TypeError("offline");
-  const {data,error}=await sb.functions.invoke("strava",{body});
-  if(!error&&data&&!data.error) return data;
-  const res=error&&error.context&&typeof error.context.json==="function"?error.context:null; let code=data&&data.error||"";
-  if(res&&!code){ try{ code=(await res.clone().json()).error||""; }catch(_){} }
-  const status=res?res.status:0;
-  const msg=status===404?"Strava ist auf dem Server noch nicht eingerichtet (Edge Function „strava“, siehe SETUP.md)."
-    :code==="no_secret"?"Auf dem Server fehlen STRAVA_CLIENT_ID und STRAVA_CLIENT_SECRET (siehe SETUP.md)."
-    :code==="forbidden"?"Bitte neu anmelden, dann nochmals verbinden."
-    :code==="strava"?"Strava hat die Anmeldung abgelehnt (Code abgelaufen, Zugriff widerrufen oder falsche Callback-Domain). Bitte neu verbinden."
-    :"Strava-Server nicht erreichbar. Später nochmals versuchen.";
-  throw Object.assign(new Error(msg),{code:code||"server",status});
-}
+const stInvoke=(body)=>callServer((b)=>sb.functions.invoke("strava",{body:b}),body,{online:navigator.onLine!==false});
 const stRefreshOpt=()=>stServer()?{refresh:(t)=>stInvoke({action:"refresh",refresh:t.refresh})}:{};
 let stBusy=false, stMsg="";
 const redirectUri=()=>location.origin+location.pathname;
 function mergeActs(acts){ let n=0; for(const a of acts) if(a.date>=STRAVA_MIN){ if(!S.strava.acts[a.id]) n++; S.strava.acts[a.id]=a; } return n; }
 /* Strava-Fehler in klare Handlungsanweisungen übersetzen */
-function stravaErr(e){
-  if(navigator.onLine===false||e instanceof TypeError) return "Keine Verbindung zu Strava. Die Aktivitäten werden geladen, sobald du wieder online bist.";
-  if(e.code==="auth"||e.code==="strava"||(e.code==="token"&&(e.status===400||e.status===401))) return "Strava-Zugriff abgelaufen oder widerrufen. Bitte „Trennen“ und neu verbinden.";
-  return e.message||"Strava nicht erreichbar. Später nochmals versuchen.";
-}
+const stravaErr=(e)=>syncErrorText(e,{online:navigator.onLine!==false});
 async function stravaSync(silent){
   let tok=stTok(); if(!tok||stBusy) return;
   if(silent&&navigator.onLine===false) return;
@@ -1181,13 +1165,10 @@ async function stravaCallback(){
   const code=QS.get("code"), err=QS.get("error");
   cleanUrl();
   view="strava";
-  if(err||!code){ stMsg=err==="access_denied"?"Du hast den Zugriff in Strava abgelehnt. Zum Verbinden in Strava auf „Autorisieren“ tippen.":"Verbindung abgebrochen. Bitte nochmals versuchen."; return; }
-  try{
-    const tok=stServer()?await stInvoke({action:"exchange",code}):await strava.exchangeCode(fetch.bind(window),{...stCfg(),code});
-    lsSet(stKey(),JSON.stringify(tok)); stMsg="Verbunden. Lade Aktivitäten …";
-    S.onb.strava=Date.now(); save(); // Onboarding dauerhaft erledigt
-    stravaSync(true);
-  }catch(e){ stMsg=e instanceof TypeError||navigator.onLine===false?stravaErr(e):stServer()?e.message:`${e.message}. Client-ID, Secret und die Callback-Domain (${location.hostname||"localhost"}) in strava.com/settings/api prüfen.`; }
+  const r=await completeOAuth({code,err,server:stServer(),invoke:(b)=>sb.functions.invoke("strava",{body:b}),online:navigator.onLine!==false,
+    fetchFn:fetch.bind(window),cfg:stCfg(),host:location.hostname||"localhost",store:(tok)=>lsSet(stKey(),JSON.stringify(tok))});
+  stMsg=r.msg;
+  if(r.ok){ S.onb.strava=Date.now(); save(); stravaSync(true); } // Onboarding dauerhaft erledigt
 }
 function stConnectForm(){
   if(stServer()) return `<b>Mit Strava verbinden</b><p class="sub mt-1">Du wirst zu Strava weitergeleitet und erlaubst dort den Lesezugriff auf deine Aktivitäten. Die Zugangsdaten der Strava-App liegen sicher auf dem Server, nicht auf diesem Gerät.</p>

@@ -6,8 +6,7 @@ import { builtinPlan } from "../src/plan-store.js";
 test("Gewichtsliste: Kraftübungen aus dem Plan, ohne Plank und Platzhalter", () => {
   const list = weightList(Object.values(builtinPlan().days));
   const labels = list.map((e) => e.label);
-  for (const l of ["Back Squat", "Push Press", "Bulgarian Split Squat", "Shoulder Press", "Pull-ups"]) assert.ok(labels.includes(l), l);
-  assert.ok(!labels.includes("Bench Press"));
+  for (const l of ["Back Squat", "Bench Press", "Bulgarian Split Squat", "Shoulder Press", "Pull-ups"]) assert.ok(labels.includes(l), l);
   assert.ok(!labels.some((l) => /plank|^kraft/i.test(l)));
   assert.equal(new Set(list.map((e) => e.key)).size, list.length);
 });

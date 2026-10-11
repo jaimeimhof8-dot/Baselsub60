@@ -501,7 +501,6 @@ import { colOf, personTests, partnerProfile } from "./src/profile.js";
 import * as sore from "./src/soreness.js";
 import { makeBackup, backupFileName, readBackup } from "./src/backup.js";
 import * as coach from "./src/coach.js";
-import { noChestDay } from "./src/exercises.js";
 import { canSolo, soloize } from "./src/solo.js";
 import { EXTRA_TYPES, makeExtra, addExtra, removeExtra, extraLabel, extraMinutes, cleanExtras, loadDay } from "./src/extras.js";
 
@@ -570,7 +569,7 @@ function ownPlan(src){
   const p=Object.assign({},b,{t:per(b.t),i:(b.i||[]).map(per),n:per(b.n||"")});
   const ed=S.edit[src];
   if(ed && p.k!=="rest") Object.assign(p,{t:ed.t||p.t,k:ed.k||p.k,i:ed.i,n:ed.n||"",edited:1});
-  return noChestDay(p);
+  return p;
 }
 function dayPlan(i){
   if(i<0||i>LAST) return null;

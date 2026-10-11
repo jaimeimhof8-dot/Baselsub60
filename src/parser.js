@@ -6,7 +6,6 @@
 import { idxFromDayMonth } from "./dates.js";
 import { isHard } from "./util.js";
 import { structureSession, structureKraft, patternSentences } from "./structure.js";
-import { noChest, noChestDay } from "./exercises.js";
 
 const WD = { montag: 0, dienstag: 1, mittwoch: 2, donnerstag: 3, freitag: 4, samstag: 5, sonntag: 6, wochenende: 5 };
 const NUM = { zwei: 2, drei: 3, vier: 4, "fünf": 5, sechs: 6, sieben: 7, acht: 8, neun: 9, zehn: 10, elf: 11, "zwölf": 12, "fünfzehn": 15, zwanzig: 20, dreissig: 30, "dreißig": 30 };
@@ -172,8 +171,7 @@ export function makeDay(wd, rawTitle, body, extra = {}) {
   day.key = isHard(day);
   day.joint = /gemeinsam|mit Jimoh|ihr\b|Doubles/i.test((rawTitle || "") + " " + body) || ["sim", "race"].includes(kind);
   day.src = "pdf";
-  // Kein Brusttraining: Bankdrücken & Co. werden zu Push Press
-  return Object.assign(noChestDay(day), extra);
+  return Object.assign(day, extra);
 }
 
 /** Absatz eines Blocks nach Wochenmarken ("Woche 1:", "Wochen 3 und 4") in Woche 1–4 aufteilen. */
@@ -235,7 +233,7 @@ export function parsePlanText(text) {
       for (let w = 0; w < ctx.weeks; w++) {
         const idx = ctx.start + w * 7 + d.wd;
         // "im gleichen Wellenmuster": dieselbe Übung aus der gleichen Woche des Vorblocks
-        const prev = (name) => { for (let x = idx - 28; x >= 0; x -= 28) { const p = days[x]; const hit = p && p.k === "kraft" && p.i.find((l) => l.startsWith(noChest(name))); if (hit) return hit; } return null; };
+        const prev = (name) => { for (let x = idx - 28; x >= 0; x -= 28) { const p = days[x]; const hit = p && p.k === "kraft" && p.i.find((l) => l.startsWith(name)); if (hit) return hit; } return null; };
         const own = weeks[w] && weeks[w] !== common ? weeks[w] : "";
         const day = makeDay(d.wd, d.title, own || body, { common: own ? shared : pattern, prev, block: d.body });
         day.blk = 1; // Block-Absatz: kein Volumen aus der Vorwoche erben (Zirkel und Taper haben bewusst keins)

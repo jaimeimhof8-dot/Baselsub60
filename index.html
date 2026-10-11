@@ -263,25 +263,25 @@ td.l{font-size:13px;color:var(--muted)}
 .chips button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .cc-tabs{margin-bottom:var(--s4);display:grid;grid-template-columns:repeat(2,1fr)}
 @media (min-width:600px){ .cc-tabs{grid-template-columns:repeat(4,1fr)} }
-.bodies{display:flex;justify-content:center}
-.sore-views{margin-bottom:var(--s3)} .sore-views button{flex:1}
-.body .side-l{font-size:11px;fill:var(--muted);font-family:var(--f-head);letter-spacing:.06em;text-transform:uppercase}
-.zone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
-.zone-grid button{min-height:40px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--bg);font-size:13px;font-weight:600;text-align:left;padding:6px 10px;box-shadow:inset 4px 0 0 var(--zc)}
-.zone-grid button.on{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--zc),0 0 0 1px var(--accent)}
-.body{margin:0;text-align:center}
-.body svg{width:100%;max-width:340px;max-height:560px}
-.body{width:100%;max-width:340px}
-.body figcaption{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
-.body .sil{fill:var(--bg);stroke:var(--line);stroke-width:1}
-.mu{cursor:pointer;stroke:var(--bg);stroke-width:1;transition:fill .15s}
-.mu:hover{stroke:var(--text)}
-.mu.sel{stroke:var(--accent);stroke-width:2.2}
-.mu:focus-visible{outline:none;stroke:var(--accent);stroke-width:2.2}
-.legend{display:flex;flex-wrap:wrap;gap:var(--s3);justify-content:center;margin-top:var(--s2)}
+.sore-acc{background:var(--card);border:1px solid var(--line);border-radius:var(--r-l);margin-bottom:var(--s3);overflow:hidden}
+.sore-acc summary{list-style:none;display:flex;align-items:center;gap:var(--s3);padding:var(--s4) var(--s5);min-height:56px;cursor:pointer}
+.sore-acc summary::-webkit-details-marker{display:none}
+.sore-acc summary h3{flex:1}
+.sore-acc summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin:-4px 4px 0;transition:transform .15s}
+.sore-acc[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.sore-acc[open] summary{border-bottom:1px solid var(--line)}
+.sore-acc summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.sore-it{padding:var(--s3) var(--s5) var(--s2);border-top:1px solid var(--line)}
+.sore-it:first-of-type{border-top:0}
+.sore-it .row{align-items:baseline}
+.sore-it label{font-weight:600;font-size:15px;flex:1}
+.sore-it .val{font-family:var(--f-head);font-weight:700;font-size:20px;color:var(--sc,var(--muted));white-space:nowrap}
+.sore-it .val small{font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--muted);margin-left:4px}
+.sore-it input[type=range]{width:100%;accent-color:var(--sc,var(--muted));height:32px;margin:var(--s1) 0 0;display:block}
+.sore-it .was{font-size:12px;color:var(--muted)}
+.sore-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:0 2px}
+.legend{display:flex;flex-wrap:wrap;gap:var(--s3);margin:0 0 var(--s4)}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
-.sore-ctl{border-top:1px solid var(--line);margin-top:var(--s4);padding-top:var(--s4)}
-.sore-ctl input[type=range]{width:100%;accent-color:var(--accent);margin-top:var(--s3);height:28px}
 .impact{list-style:none;margin:0;padding:0}
 .impact li{padding:var(--s2) 0;border-top:1px solid var(--line)}
 .impact li:first-child{border-top:0}
@@ -918,47 +918,32 @@ function moveHtml(){
   return h;
 }
 
-/* Reiter „Muskelkater“: feine Zonen (z. B. Brust oben/mitte/unten, links/rechts) auf der Körperkarte,
-   Feinauswahl pro Muskelgruppe, Stärke-Regler und Einfluss auf die nächsten Einheiten */
-let soreSel=null, soreView="front";
+/* Reiter „Muskelkater“: Muskeln und Gelenke als aufklappbare Liste (Beine, Gelenke & Sehnen, Oberkörper, Rumpf),
+   je Eintrag ein Regler 0–10, darunter der Einfluss auf die nächsten Einheiten */
+const soreOpen=new Set(["legs"]);
 const soreToday=()=>Math.max(0,Math.min(LAST,TODAY));
 const soreAt=(i)=>sore.effective(S.sore,i);
 const SORE_COL={l:"#f5d90a",m:"#f5a524",s:"#e5484d"};
-const soreFill=(v)=>!v?"var(--surface2)":v>=7?SORE_COL.s:v>=4?SORE_COL.m:SORE_COL.l;
-/* Zone-Attribute: Farbe nach Stärke; Werte von gestern (nicht heute gemeldet) halb transparent */
-const zoneAttr=(z,levels,own)=>{ const v=levels[z.id]||0;
-  return `class="mu${soreSel===z.id?" sel":""}" data-mu="${z.id}" fill="${soreFill(v)}" fill-opacity="${v&&!own[z.id]?.45:.92}" tabindex="0" role="button" aria-label="${esc(z.label)}${v?`, ${v} von 10`:""}"`; };
-function bodySvg(view,levels,own){
-  const shapes=sore.ZONES.filter(z=>z.view===view).map(z=>{ const [tag,geo]=sore.shapeTag(z);
-    return `<${tag} ${geo} ${zoneAttr(z,levels,own)}><title>${esc(z.label)}</title></${tag}>`; }).join("");
-  // Seitenbeschriftung: vorne ist die rechte Körperseite links im Bild
-  const [lft,rgt]=view==="front"?["rechts","links"]:["links","rechts"];
-  return `<figure class="body"><svg viewBox="0 0 200 420" aria-label="Körper ${view==="front"?"vorne":"hinten"}"><g class="sil">${sore.SILHOUETTE}</g>${shapes}
-    <text x="8" y="414" class="side-l">${lft}</text><text x="192" y="414" text-anchor="end" class="side-l">${rgt}</text></svg></figure>`;
+const soreFill=(v)=>!v?"var(--muted)":v>=7?SORE_COL.s:v>=4?SORE_COL.m:SORE_COL.l;
+const soreVal=(v)=>`${v}<small>${sore.strength(v)}</small>`;
+/* Heute gemeldete Werte je Zone (ältere Meldungen der Körperkarte umgedeutet) */
+const soreOwn=(t)=>{ const o={}; for(const [id,v] of Object.entries(S.sore[t]||{})) for(const z of sore.expand(id)) o[z]=Math.max(o[z]||0,+v||0); return o; };
+function soreItem(z,own,lv){
+  const v=own[z.id]||0, carry=lv[z.id]>v?lv[z.id]:0;
+  return `<div class="sore-it" style="--sc:${soreFill(v)}"><div class="row between"><label for="sz-${z.id}">${esc(z.label)}</label><span class="val" id="szv-${z.id}">${soreVal(v)}</span></div>
+    <input type="range" id="sz-${z.id}" data-sz="${z.id}" min="0" max="${sore.MAX}" step="1" value="${v}" aria-valuetext="${v} von 10, ${sore.strength(v)}">
+    ${carry?`<div class="was">Von den letzten Tagen noch ${carry}/10</div>`:""}</div>`;
 }
 function soreHtml(){
-  const t=soreToday(), own=S.sore[t]||{}, lv=soreAt(t);
-  const vbtn=(v,l)=>`<button data-act="sore-view" data-view="${v}" class="${soreView===v?"on":""}" aria-pressed="${soreView===v}">${l}</button>`;
-  let h=`<p class="sub" style="margin:0 0 var(--s4)">Tippe genau die Stelle an, die schmerzt – z. B. Brust oben links – und stell die Stärke ein. Die App entlastet oder verschiebt harte Einheiten, die genau diese Zonen belasten, und füllt den Check-in „Muskelkater“ aus.</p>
-    <div class="card"><div class="chips sore-views">${vbtn("front","Vorne")}${vbtn("back","Hinten")}</div>
-    <div class="bodies">${bodySvg(soreView,lv,own)}</div>
-    <div class="legend sub"><span><i style="background:${SORE_COL.l}"></i>leicht (1–3)</span><span><i style="background:${SORE_COL.m}"></i>mittel (4–6)</span><span><i style="background:${SORE_COL.s}"></i>stark (7–10)</span><span><i style="background:${SORE_COL.m};opacity:.45"></i>von gestern</span></div>`;
-  if(soreSel&&sore.ZONE[soreSel]){
-    const z=sore.ZONE[soreSel], v=own[soreSel]||lv[soreSel]||5, mz=sore.mirrorZone(soreSel);
-    // Feinauswahl: alle Zonen derselben Muskelgruppe, nach Teil und Seite
-    const parts=sore.zonesOf(z.group);
-    h+=`<div class="sore-ctl"><div class="cap" style="margin-top:0">${esc(sore.GROUPS[z.group])} – genaue Stelle</div>
-      <div class="zone-grid">${parts.map(q=>{ const qv=lv[q.id]||0; return `<button data-mu="${q.id}" class="${q.id===soreSel?"on":""}" style="--zc:${qv?soreFill(qv):"transparent"}">${esc(q.label.replace(sore.GROUPS[z.group],"").trim()||"ganz")}${qv?` <b>${qv}</b>`:""}</button>`; }).join("")}</div>
-      <div class="row between mt-4"><b>${esc(z.label)}</b><span class="res" id="sore-v">${v}/10 · ${sore.strength(v)}</span></div>
-      <input type="range" id="sore-r" min="${sore.MIN}" max="${sore.MAX}" step="1" value="${v}" aria-label="Stärke Muskelkater ${esc(z.label)}">
-      <div class="row between sub"><span>leicht</span><span>mittel</span><span>stark</span></div>
-      <div class="grid2 mt-3">${mz?`<button class="btn sm" data-act="sore-mirror">Auch ${sore.ZONE[mz].side==="l"?"links":"rechts"}</button>`:`<span></span>`}<button class="btn ghost sm" data-act="sore-del">Entfernen</button></div>
-      <div class="btns"><button class="btn sm" data-act="sore-done">Fertig</button></div></div>`;
-  } else h+=`<p class="sub mt-3" style="margin-bottom:0">Noch keine Stelle gewählt.</p>`;
-  h+=`</div>`;
-  const list=Object.entries(own).filter(([id])=>sore.LABEL[id]).sort((a,b)=>b[1]-a[1]);
-  if(list.length) h+=`<div class="cap">Heute gemeldet</div><div class="chips">${list.map(([id,v])=>`<button data-mu="${id}" class="${soreSel===id?"on":""}" style="border-left:4px solid ${soreFill(v)}">${esc(sore.LABEL[id])} ${v}</button>`).join("")}</div>
-    <div class="btns"><button class="btn ghost sm" data-act="sore-clear">Alles zurücksetzen</button></div>`;
+  const t=soreToday(), own=soreOwn(t), lv=soreAt(t), top=sore.sectionLevels(lv);
+  let h=`<p class="sub" style="margin:0 0 var(--s4)">Stell für jede Stelle ein, wie stark sie heute zwickt (0 = nichts, 10 = sehr stark). Die App entlastet oder verschiebt harte Einheiten, die genau diese Stellen belasten, und füllt den Check-in „Muskelkater“ aus.</p>
+    <div class="legend sub"><span><i style="background:${SORE_COL.l}"></i>leicht (1–3)</span><span><i style="background:${SORE_COL.m}"></i>mittel (4–6)</span><span><i style="background:${SORE_COL.s}"></i>stark (7–10)</span></div>`;
+  for(const [sec,title] of sore.SECTIONS){
+    const zs=sore.zonesOf(sec), n=zs.filter(z=>lv[z.id]).length, m=top[sec]||0;
+    h+=`<details class="sore-acc" data-sec="${sec}"${soreOpen.has(sec)?" open":""}><summary><h3>${esc(title)}</h3>${n?`<span class="badge" style="color:${soreFill(m)}">${n} · max ${m}</span>`:`<span class="badge">${zs.length}</span>`}</summary>
+      ${zs.map(z=>soreItem(z,own,lv)).join("")}<div class="sore-scale" style="padding:0 var(--s5) var(--s3)"><span>0 nichts</span><span>5</span><span>10 stark</span></div></details>`;
+  }
+  if(S.sore[t]&&Object.keys(S.sore[t]).length) h+=`<div class="btns"><button class="btn ghost sm" data-act="sore-clear">Heute alles zurücksetzen</button></div>`;
   // Einfluss auf die nächsten Einheiten
   const rows=[];
   for(let x=t;x<=Math.min(LAST,t+2);x++){ const p=dayPlan(x); if(!p||p.k==="rest") continue; const hit=sore.impact(p,soreAt(x));
@@ -969,7 +954,7 @@ function soreHtml(){
 }
 /* Muskelkater speichern und den Check-in „Muskelkater“ daraus ableiten */
 function soreSave(){
-  const t=soreToday(), k=keyI(t); if(S.sore[t]&&!Object.keys(S.sore[t]).length) delete S.sore[t];
+  const t=soreToday(), k=keyI(t); if(S.sore[t]){ const o=soreOwn(t); for(const z in o) if(!o[z]) delete o[z]; if(Object.keys(o).length) S.sore[t]=o; else delete S.sore[t]; }
   const lvl=sore.checkinLevel(soreAt(t)), c=S.checkin[k]=S.checkin[k]||{};
   if(lvl) c.sore=lvl; else if(c.sore&&!S.sore[t]) delete c.sore;
   // Alte Meldungen (älter als 3 Tage) aufräumen
@@ -1512,29 +1497,23 @@ const layout=()=>WIDE()?2:MID()?1:0;
 let wasWide=layout();
 addEventListener("resize",()=>{ const w=layout(); if(w!==wasWide){ wasWide=w; if(!document.activeElement||!/INPUT|TEXTAREA/.test(document.activeElement.tagName)) render(); } });
 
-const CLICK="[data-mu],[data-v],[data-wk],[data-open],[data-sel],[data-r],[data-act],[data-back],[data-move],[data-swap],[data-injs],[data-injd],[data-injm],[data-edit],[data-ci],[data-sug],[data-sug-no],[data-who],[data-imp-all],[data-pb],[data-pd],[data-pgo]";
+const CLICK="[data-v],[data-wk],[data-open],[data-sel],[data-r],[data-act],[data-back],[data-move],[data-swap],[data-injs],[data-injd],[data-injm],[data-edit],[data-ci],[data-sug],[data-sug-no],[data-who],[data-imp-all],[data-pb],[data-pd],[data-pgo]";
 document.addEventListener("click",e=>{
   const t=e.target.closest(CLICK); if(!t) return;
   const d=t.dataset;
-  if(d.mu){ soreSel=d.mu; const z=sore.ZONE[d.mu]; if(z) soreView=z.view;
-    const t0=soreToday(); const o=S.sore[t0]=S.sore[t0]||{}; if(!o[d.mu]) o[d.mu]=soreAt(t0)[d.mu]||5; soreSave(); return render(); }
   // Passwort ein-/ausblenden direkt im DOM, damit die Eingabe erhalten bleibt
   if(d.act==="auth-mode"){ const el=$("#le"); if(el) loginEmail=el.value.trim(); authMode=d.mode; loginMsg=loginOk=""; render(); const f=$("#le"); if(f) f.focus(); return; }
   if(d.act==="pw-eye"){ const w=t.parentElement, i=w.querySelector("input"), show=i.type==="password";
     i.type=show?"text":"password"; w.classList.toggle("show",show);
     t.setAttribute("aria-pressed",show); t.setAttribute("aria-label",show?"Passwort verbergen":"Passwort anzeigen");
     i.focus(); const n=i.value.length; try{ i.setSelectionRange(n,n); }catch(_){} return; }
-  if(d.act==="sore-view"){ soreView=d.view; return render(); }
-  if(d.act==="sore-mirror"){ const m=sore.mirrorZone(soreSel), t0=soreToday(), o=S.sore[t0]=S.sore[t0]||{}; if(m){ o[m]=o[soreSel]||5; soreSave(); toast(`Auch ${sore.LABEL[m]} eingetragen`); } return render(); }
   if(d.v){ if(d.v==="coach" && t.closest("#sheet")) coachTab="chat"; return go(d.v); }
   if(d.back!==undefined) return go(view==="edit"&&editBack?editBack:prevView);
   if(d.move!==undefined){ moveFrom=+d.move; return go("move"); }
   if(d.edit!==undefined){ editFrom=+d.edit; editBack=view==="coach"?"coach":null; return go("edit"); }
   if(d.act==="mv-day"){ moveFrom=Math.max(0,Math.min(LAST,moveFrom+ +d.d)); return render(); }
   if(d.act==="mv-today"){ moveFrom=Math.max(0,Math.min(LAST,TODAY)); return render(); }
-  if(d.act==="sore-done"){ soreSel=null; return render(); }
-  if(d.act==="sore-del"){ const o=S.sore[soreToday()]; if(o) delete o[soreSel]; soreSel=null; soreSave(); return render(); }
-  if(d.act==="sore-clear"){ delete S.sore[soreToday()]; soreSel=null; soreSave(); toast("Muskelkater zurückgesetzt"); return render(); }
+  if(d.act==="sore-clear"){ delete S.sore[soreToday()]; soreSave(); toast("Muskelkater zurückgesetzt"); return render(); }
   if(d.ci){ const [k,f,v]=d.ci.split("|"); const c=S.checkin[k]=S.checkin[k]||{}; if(c[f]===v) delete c[f]; else c[f]=v;
     ciOpen=true; save(); return render(); }
   if(d.act==="ci-edit"){ ciOpen=true; return render(); }
@@ -1618,9 +1597,10 @@ document.addEventListener("click",e=>{
   if(d.act==="cc-clear"){ if(!confirm("Chatverlauf löschen? Der Plan bleibt unverändert.")) return; S.chat=[]; ccErr=""; save(); return render(); }
   if(d.act==="cc-copy"){ try{ copyCoach(coach.buildCoachRequest({context:coachCtx(),chat:S.chat,message:$("#cc-in").value})); }catch(e){ toast(e.message); } return; }
 });
+document.addEventListener("toggle",e=>{ const sec=e.target.dataset&&e.target.dataset.sec; if(sec){ if(e.target.open) soreOpen.add(sec); else soreOpen.delete(sec); } },true);
 document.addEventListener("change",async e=>{
   const t=e.target;
-  if(t.id==="sore-r"){ soreSave(); return render(); }
+  if(t.dataset.sz){ soreSave(); return render(); }
   if(t.dataset.file){ const f=t.files&&t.files[0]; t.value=""; if(!f) return;
     if(t.dataset.file==="plan") return importFile(f);
     if(t.dataset.file==="backup"){ try{ bkp={name:f.name,...readBackup(await f.text())}; }catch(err){ toast(err.message); } return render(); }
@@ -1640,9 +1620,10 @@ document.addEventListener("change",async e=>{
 });
 document.addEventListener("input",e=>{
   const t=e.target, d=t.dataset; let redo=false;
-  if(t.id==="sore-r"&&soreSel){ const v=+t.value, t0=soreToday(); (S.sore[t0]=S.sore[t0]||{})[soreSel]=v;
-    const l=$("#sore-v"); if(l) l.textContent=`${v}/10 · ${sore.strength(v)}`;
-    document.querySelectorAll(`.mu[data-mu="${soreSel}"]`).forEach(el=>{ el.setAttribute("fill",soreFill(v)); el.setAttribute("fill-opacity",".9"); }); return; }
+  if(d.sz){ const v=+t.value, t0=soreToday(); S.sore[t0]=soreOwn(t0); S.sore[t0][d.sz]=v;
+    // Anzeige ohne Neuaufbau aktualisieren, damit der Regler beim Ziehen nicht springt
+    const it=t.closest(".sore-it"); if(it) it.style.setProperty("--sc",soreFill(v));
+    const l=$("#szv-"+d.sz); if(l) l.innerHTML=soreVal(v); t.setAttribute("aria-valuetext",`${v} von 10, ${sore.strength(v)}`); return; }
   if(t.id==="cc-in"){ ccDraft=t.value; return; }
   if(d.n!==undefined){ S.notes[d.n]=t.value; }
   else if(d.v2){ S.val[d.v2]=t.value; t.classList.remove("pre"); }

@@ -94,3 +94,9 @@ test("Fehlertexte des Coach", () => {
   assert.match(coachErrorText(500, "no_key"), /API-Key/);
   assert.match(coachErrorText(0, ""), /Verbindung/);
 });
+
+test("Akkordeon: Bereiche mit Meldungen offen, sonst nur Beine", async () => {
+  const { openSections } = await import("../src/soreness.js");
+  assert.deepEqual(openSections({}), ["legs"]);
+  assert.deepEqual(openSections({ abs: 3, achilles: 6 }), ["joints", "core"]);
+});

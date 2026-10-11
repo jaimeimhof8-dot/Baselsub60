@@ -1,4 +1,4 @@
-const C = "hyrox-v22";
+const C = "hyrox-v24";
 const SRC = ["dates", "util", "plan-data", "plan-store", "parser", "pdftext", "pdf-import", "adapt", "strava", "share", "backup", "coach", "weights", "profile", "structure", "plan-later", "soreness", "validate"].map(f => "./src/" + f + ".js");
 const FILES = ["./", "./index.html", "./config.js", "./manifest.json", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png", ...SRC];
 self.addEventListener("install", e => { e.waitUntil(caches.open(C).then(c => c.addAll(FILES))); self.skipWaiting(); });
@@ -7,5 +7,5 @@ self.addEventListener("fetch", e => {
   // Datenbank-, Login- und Strava-Anfragen nie cachen, nur App-Dateien, Schriften und Bibliotheken
   const host = new URL(e.request.url).hostname;
   if (e.request.method !== "GET" || host.endsWith("supabase.co") || host.endsWith("strava.com")) return;
-  e.respondWith(fetch(e.request).then(r => { const cp = r.clone(); caches.open(C).then(c => c.put(e.request, cp)); return r; }).catch(() => caches.match(e.request)));
+  e.respondWith(fetch(e.request).then(r => { if (r.ok || r.type === "opaque") { const cp = r.clone(); caches.open(C).then(c => c.put(e.request, cp)); } return r; }).catch(() => caches.match(e.request)));
 });

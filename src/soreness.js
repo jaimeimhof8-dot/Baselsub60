@@ -69,6 +69,12 @@ export function sectionLevels(levels) {
   return out;
 }
 
+/** Bereiche, die aufgeklappt starten: alle mit Meldungen, sonst nur der erste (Beine). */
+export function openSections(levels) {
+  const s = Object.keys(sectionLevels(levels));
+  return s.length ? SECTIONS.map(([id]) => id).filter((id) => s.includes(id)) : [SECTIONS[0][0]];
+}
+
 /** Ampel für den Check-in ("Muskelkater"): ab 7 rot, ab 4 gelb, sonst grün. null = nichts gemeldet. */
 export function checkinLevel(levels) {
   const vals = Object.values(levels || {}); if (!vals.length) return null;
@@ -119,7 +125,6 @@ export function loadOf(day) {
   for (const t of day.i || []) exercisePatterns(t).forEach((z) => out.add(z));
   return [...out];
 }
-export const loadedZones = loadOf;
 
 /**
  * Wie stark trifft der Muskelkater eine Einheit?

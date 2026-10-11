@@ -96,6 +96,8 @@ main{padding:var(--s4);max-width:640px;margin:0 auto}
 .ex-v{display:flex;gap:var(--s2);align-items:center;margin:var(--s2) 0 0 36px}
 .ex-v input{flex:1;min-width:0}
 .last{font-size:12px;color:var(--muted);white-space:nowrap}
+button.last{background:none;border:1px dashed var(--line);border-radius:var(--r-s);min-height:44px;padding:0 10px;flex:none;max-width:50%;overflow:hidden;text-overflow:ellipsis}
+button.last:active{border-color:var(--accent);color:var(--text)}
 .hint{background:var(--surface2);border-radius:var(--r-s);padding:var(--s3);font-size:14px;margin-top:var(--s4);color:var(--muted)}
 .hint:first-child{margin-top:0}
 .target{background:rgba(255,210,31,.12);border:1px solid rgba(255,210,31,.35);border-radius:var(--r-s);padding:var(--s3);font-size:14px;margin-top:var(--s4)}
@@ -126,7 +128,7 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 .btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .btn.ghost{background:transparent}
 .btn.strava{background:var(--strava);border-color:var(--strava);color:#fff}
-.btn.sm{min-height:40px;font-size:14px;width:auto;padding:0 var(--s3)}
+.btn.sm{min-height:44px;font-size:14px;width:auto;padding:0 var(--s3)}
 .btn:active:not(:disabled){transform:scale(.98)}
 .btn:disabled{opacity:.5}
 .btns{display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s4)}
@@ -277,7 +279,14 @@ td.l{font-size:13px;color:var(--muted)}
 .sore-it label{font-weight:600;font-size:15px;flex:1}
 .sore-it .val{font-family:var(--f-head);font-weight:700;font-size:20px;color:var(--sc,var(--muted));white-space:nowrap}
 .sore-it .val small{font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--muted);margin-left:4px}
-.sore-it input[type=range]{width:100%;accent-color:var(--sc,var(--muted));height:32px;margin:var(--s1) 0 0;display:block}
+.sore-it input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:44px;margin:0;display:block;background:transparent;touch-action:pan-y;cursor:pointer}
+.sore-it input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:var(--surface2)}
+.sore-it input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:var(--surface2)}
+.sore-it input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-11px;border-radius:50%;background:var(--sc,var(--muted));border:3px solid var(--card);box-shadow:0 0 0 1px var(--line)}
+.sore-it input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--sc,var(--muted));border:3px solid var(--card);box-shadow:0 0 0 1px var(--line)}
+.sore-it input[type=range]:focus{outline:none}
+.sore-it input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 2px var(--accent)}
+.sore-it input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 2px var(--accent)}
 .sore-it .was{font-size:12px;color:var(--muted)}
 .sore-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:0 2px}
 .legend{display:flex;flex-wrap:wrap;gap:var(--s3);margin:0 0 var(--s4)}
@@ -304,7 +313,7 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 .ci-row{display:grid;grid-template-columns:96px 1fr;gap:var(--s3);align-items:center;padding:var(--s2) 0}
 .ci-row > span{font-size:14px;font-weight:500}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s1)}
-.seg button{height:40px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-size:13px;font-weight:600;color:var(--muted);padding:0 var(--s1)}
+.seg button{height:44px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-size:13px;font-weight:600;color:var(--muted);padding:0 var(--s1)}
 .seg button.on.v-g{background:rgba(111,207,134,.18);border-color:var(--ok);color:var(--ok)}
 .seg button.on.v-y{background:rgba(255,192,77,.18);border-color:var(--warn);color:var(--warn)}
 .seg button.on.v-r{background:rgba(255,138,128,.18);border-color:var(--danger);color:var(--danger)}
@@ -651,7 +660,7 @@ function sessionCard(i){
   if(p.k==="rest") return h+`<div class="hint">${esc(p.n||"Echte Erholung.")}</div>${stravaBox(i,p,0,0)}</div>`;
   const hit=sore.impact(p,soreAt(i));
   if(hit.level>=4) h+=`<div class="target ${hit.level>=7?"bad":""}">Muskelkater: ${sore.summarize(hit.muscles.filter(m=>m.level>=4)).map(x=>esc(x).replace(/(\d+\/10)$/,"<b>$1</b>")).join(", ")}.${hit.names.length?` Bei ${hit.names.slice(0,3).map(esc).join(", ")} Last reduzieren.`:""}</div>`;
-  h+=`<div class="prog"><i style="width:${n?done/n*100:0}%"></i></div><div class="sub">${done} von ${n} erledigt</div>`;
+  h+=`<div class="prog"><i style="width:${n?done/n*100:0}%"></i></div><div class="row between"><span class="sub">${done} von ${n} erledigt</span>${done<n?`<button class="btn sm" data-act="all-done" data-i="${i}">✓ Alles erledigt</button>`:""}</div>`;
   if(p.tp){ const T=teamT();
     h+= isNaN(T)? `<div class="target">Noch kein Team-Tempo T. Trag zuerst den Pacing-Test ein (Menü → Profil).</div>`
       : `<div class="target">Team-Tempo T = ${mmss(T)}/km · Ziel heute <b>${mmss(T+p.tp[0])}–${mmss(T+p.tp[1])}/km</b></div>`; }
@@ -661,14 +670,16 @@ function sessionCard(i){
     h+=`<div class="ex ${on?"is-done":""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on?"checked":""}><span>${esc(t)}</span></label>`;
     if(!isFiller(t)){
       const last=lastValue(i,t), pre=!S.val[id]&&p.k==="kraft"&&!/Topsatz/.test(t)?defaultWeight(t,S.weights):"";
-      h+=`<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id]||pre)}"${pre?` class="pre" title="Standardgewicht aus dem Profil"`:""} placeholder="${placeholder(p.k,t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}">${last?`<span class="last">zuletzt: ${esc(last)}</span>`:""}</div>`;
+      h+=`<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id]||pre)}"${pre?` class="pre" title="Standardgewicht aus dem Profil"`:""} placeholder="${placeholder(p.k,t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}">${last?`<button type="button" class="last" data-last="${id}" data-lv="${esc(last)}" aria-label="Letzten Wert ${esc(last)} übernehmen">zuletzt: ${esc(last)} ↵</button>`:""}</div>`;
     }
     h+=`</div>`;
   });
   h+=`</div>`;
   if(p.n) h+=`<div class="hint">${esc(p.n)}</div>`;
-  h+=`<label class="lbl">Wie hart war's? (RPE)</label><div class="rpe">${[1,2,3,4,5,6,7,8,9,10].map(r=>`<button data-r="${dk}|${r}" class="${S.rpe[dk]==r?"on":""}" aria-pressed="${S.rpe[dk]==r}">${r}</button>`).join("")}</div>
+  h+=`<label class="lbl">Wie hart war's? (RPE)${S.rpe[dk]?` · <span style="color:var(--text)">${S.rpe[dk]} = ${RPE_TXT[S.rpe[dk]]||""}</span>`:""}</label><div class="rpe">${[1,2,3,4,5,6,7,8,9,10].map(r=>`<button data-r="${dk}|${r}" class="${S.rpe[dk]==r?"on":""}" aria-pressed="${S.rpe[dk]==r}">${r}</button>`).join("")}</div>
     <label class="lbl" for="n-${i}">Notiz</label><textarea id="n-${i}" data-n="${dk}" placeholder="Gefühl, Schlaf, Fuss, was auffiel …">${esc(S.notes[dk]||S.notes["n|"+dk]||"")}</textarea>`;
+  const sl=sore.effective(S.sore,i), sn=Object.keys(sl).length;
+  h+=`<button class="btn mt-3" data-act="sore-open">${sn?`Muskelkater: ${sn} ${sn===1?"Stelle":"Stellen"}, max ${Math.max(...Object.values(sl))}/10 – ändern`:"Muskelkater / Gelenke eintragen"} →</button>`;
   if(p.test) h+=`<div class="btns"><button class="btn" data-v="tests">Testergebnisse eintragen →</button></div>`;
   return h+`</div>`;
 }
@@ -692,6 +703,8 @@ function dayRow(i){
     <span class="t"><b>${esc(p.t)}</b><span class="kind">${KIND[p.k]}</span></span><span class="meta">${badges?`<span class="badges">${badges}</span>`:""}${st}</span></button>`;
 }
 
+/* RPE nach Borg CR10 */
+const RPE_TXT=["","sehr leicht","leicht","locker","moderat","etwas hart","hart","sehr hart","sehr hart+","fast maximal","maximal"];
 const READY_TXT={green:"Alles im grünen Bereich – Plan wie vorgesehen.",yellow:"Leicht angeschlagen. Harte Einheiten heute eher entlasten.",red:"Heute keine harte Belastung. Siehe Vorschläge."};
 const CI_LABELS={sleep:["gut","mittel","schlecht"],sore:["kaum","spürbar","stark"],energy:["hoch","mittel","tief"],pain:["keine","leicht","stark"]};
 let ciOpen=false;
@@ -701,10 +714,12 @@ function checkinCard(i){
   let h=`<div class="card tight"><div class="row between"><h3>Check-in heute</h3>${amp}</div>`;
   if(r && !ciOpen) return h+`<p class="sub mt-2">${READY_TXT[r]}</p><button class="btn ghost sm mt-3" data-act="ci-edit">Check-in ändern</button></div>`;
   h+=`<div class="mt-2">`;
+  // Ein Tipp für einen unauffälligen Tag – unterscheidet „alles gut“ von „vergessen“
+  if(r!=="green") h+=`<button class="btn primary sm" style="width:100%;margin-bottom:var(--s2)" data-act="ci-ok" data-k="${k}">✓ Keine Beschwerden</button>`;
   for(const [f,label] of CHECKIN_FIELDS){
     h+=`<div class="ci-row"><span>${label}</span><div class="seg" role="group" aria-label="${label}">${["g","y","r"].map((v,j)=>`<button class="v-${v} ${c[f]===v?"on":""}" data-ci="${k}|${f}|${v}" aria-pressed="${c[f]===v}">${CI_LABELS[f][j]}</button>`).join("")}</div></div>`;
   }
-  h+=`</div>`;
+  h+=`</div><button class="btn ghost sm mt-2" data-act="sore-open">Muskelkater genau eintragen →</button>`;
   if(r) h+=`<p class="sub mt-2">${READY_TXT[r]}</p><button class="btn ghost sm mt-3" data-act="ci-done">Fertig</button>`;
   return h+`</div>`;
 }
@@ -885,7 +900,7 @@ function moveHtml(){
   const i=moveFrom, p=dayPlan(i), dk=keyI(i), rest=p.k==="rest";
   const from=Math.max(Math.floor(i/7)*7,TODAY,0), to=Math.min(LAST,Math.max(Math.floor(i/7)*7+13,from+6));
   let h=`<div class="cap" style="margin-top:0">Welcher Tag?</div><div class="wk"><button data-act="mv-day" data-d="-1" ${i<=0?"disabled":""} aria-label="Einen Tag früher">‹</button>
-      <div><h3>${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))}</h3>${i===TODAY?`<div class="sub">heute</div>`:`<button class="btn ghost sm" data-act="mv-today" style="min-height:28px;margin-top:2px">zu heute</button>`}</div>
+      <div><h3>${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))}</h3>${i===TODAY?`<div class="sub">heute</div>`:`<button class="btn ghost sm" data-act="mv-today" style="margin-top:2px">zu heute</button>`}</div>
       <button data-act="mv-day" data-d="1" ${i>=LAST?"disabled":""} aria-label="Einen Tag später">›</button></div>
     <div class="card tight k-${p.k}"><span class="kind">${KIND[p.k]}</span><h3 class="mt-1">${esc(p.t)}</h3>${dayBadges(i,p)?`<div class="badges mt-2">${dayBadges(i,p)}</div>`:""}</div>`;
   if(p.race) return h+`<div class="cap">Renntag</div><button class="btn" data-edit="${i}">Übungen anpassen →</button>`;
@@ -921,6 +936,8 @@ function moveHtml(){
 /* Reiter „Muskelkater“: Muskeln und Gelenke als aufklappbare Liste (Beine, Gelenke & Sehnen, Oberkörper, Rumpf),
    je Eintrag ein Regler 0–10, darunter der Einfluss auf die nächsten Einheiten */
 const soreOpen=new Set(["legs"]);
+/* Beim Öffnen des Reiters: Bereiche mit Meldungen aufklappen, unauffällige zu */
+const soreInitOpen=()=>{ soreOpen.clear(); sore.openSections(soreAt(soreToday())).forEach(s=>soreOpen.add(s)); };
 const soreToday=()=>Math.max(0,Math.min(LAST,TODAY));
 const soreAt=(i)=>sore.effective(S.sore,i);
 const SORE_COL={l:"#f5d90a",m:"#f5a524",s:"#e5484d"};
@@ -1460,7 +1477,9 @@ function render(){
   $("#cd").textContent=left>0?left:"🏁";
   const sd=$("#simdate"); sd.hidden=!SIM; if(SIM) sd.textContent=`Testmodus: Datum simuliert auf ${fmt(NOW)} ${NOW.getFullYear()}`;
   SUGS = view==="today" ? suggestions() : [];
+  const fid=document.activeElement&&$("#main").contains(document.activeElement)?document.activeElement.id:"";
   $("#main").innerHTML=VIEWS[view]();
+  if(fid){ const el=document.getElementById(fid); if(el) el.focus({preventScroll:true}); }
   document.querySelectorAll("#nav button").forEach(b=>{ const on=b.dataset.v===view; b.classList.toggle("on",on); if(on) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
   const bare=view==="login"||view==="shared"||view==="onb";
   $("#nav").hidden=bare; document.body.classList.toggle("bare",bare);
@@ -1489,15 +1508,14 @@ function menu(open){
   $("#sheet").setAttribute("aria-hidden",String(!open));
   if(open) $("#sheet").querySelector(".mi").focus({preventScroll:true});
 }
-document.addEventListener("keydown",e=>{ if(e.key==="Escape") menu(false);
-  if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("mu")){ e.preventDefault(); e.target.dispatchEvent(new MouseEvent("click",{bubbles:true})); } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") menu(false); });
 /* warn: gelb hinterlegt und länger sichtbar */
 function toast(m,warn){ const t=$("#toast"); t.textContent=m; t.classList.toggle("warn",!!warn); t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,warn?4200:2600); }
 const layout=()=>WIDE()?2:MID()?1:0;
 let wasWide=layout();
 addEventListener("resize",()=>{ const w=layout(); if(w!==wasWide){ wasWide=w; if(!document.activeElement||!/INPUT|TEXTAREA/.test(document.activeElement.tagName)) render(); } });
 
-const CLICK="[data-v],[data-wk],[data-open],[data-sel],[data-r],[data-act],[data-back],[data-move],[data-swap],[data-injs],[data-injd],[data-injm],[data-edit],[data-ci],[data-sug],[data-sug-no],[data-who],[data-imp-all],[data-pb],[data-pd],[data-pgo]";
+const CLICK="[data-v],[data-last],[data-wk],[data-open],[data-sel],[data-r],[data-act],[data-back],[data-move],[data-swap],[data-injs],[data-injd],[data-injm],[data-edit],[data-ci],[data-sug],[data-sug-no],[data-who],[data-imp-all],[data-pb],[data-pd],[data-pgo]";
 document.addEventListener("click",e=>{
   const t=e.target.closest(CLICK); if(!t) return;
   const d=t.dataset;
@@ -1513,6 +1531,18 @@ document.addEventListener("click",e=>{
   if(d.edit!==undefined){ editFrom=+d.edit; editBack=view==="coach"?"coach":null; return go("edit"); }
   if(d.act==="mv-day"){ moveFrom=Math.max(0,Math.min(LAST,moveFrom+ +d.d)); return render(); }
   if(d.act==="mv-today"){ moveFrom=Math.max(0,Math.min(LAST,TODAY)); return render(); }
+  if(d.act==="sore-open"){ coachTab="sore"; soreInitOpen(); return go("coach"); }
+  if(d.act==="ci-ok"){ const c=S.checkin[d.k]=S.checkin[d.k]||{};
+    // Gemeldeter Muskelkater bleibt massgebend, der Rest wird grün
+    const sl=sore.checkinLevel(soreAt(soreToday())); for(const [f] of CHECKIN_FIELDS) c[f]=f==="sore"&&sl?sl:"g";
+    ciOpen=false; save(); toast(sl&&sl!=="g"?"Check-in gespeichert – Muskelkater aus deinen Meldungen":"Check-in: keine Beschwerden"); return render(); }
+  if(d.act==="all-done"){ const i=+d.i, p=dayPlan(i), dk=keyI(i); if(!p) return;
+    p.i.forEach((_,j)=>{ const id=dk+"|"+j; S.done[id]=1;
+      // Vorbelegtes Standardgewicht wie beim einzelnen Abhaken übernehmen
+      const pv=document.querySelector(`[data-v2="${id}"].pre`); if(pv&&!S.val[id]) S.val[id]=pv.value; });
+    save(); render(); return workoutFeedback(i,null,true); }
+  if(d.last){ const el=document.querySelector(`[data-v2="${d.last}"]`); S.val[d.last]=d.lv; save();
+    if(el){ el.value=d.lv; el.classList.remove("pre"); el.focus(); } return toast(`Übernommen: ${d.lv}`); }
   if(d.act==="sore-clear"){ delete S.sore[soreToday()]; soreSave(); toast("Muskelkater zurückgesetzt"); return render(); }
   if(d.ci){ const [k,f,v]=d.ci.split("|"); const c=S.checkin[k]=S.checkin[k]||{}; if(c[f]===v) delete c[f]; else c[f]=v;
     ciOpen=true; save(); return render(); }
@@ -1576,7 +1606,9 @@ document.addEventListener("click",e=>{
   if(d.pgo!==undefined){ const i=+d.pgo; wk=Math.floor(i/7); openDay=i; return go("week"); }
   if(d.open!==undefined){ const i=+d.open; openDay=openDay===i&&!WIDE()?null:i; return render(); }
   if(d.sel!==undefined){ sel=+d.sel===TODAY?null:+d.sel; render(); return window.scrollTo(0,0); }
-  if(d.r){ const [k,r]=d.r.split("|"); if(S.rpe[k]==r) delete S.rpe[k]; else S.rpe[k]=+r; save(); return render(); }
+  if(d.r){ const [k,r]=d.r.split("|"), set=S.rpe[k]!=r; if(set) S.rpe[k]=+r; else delete S.rpe[k]; save(); render();
+    // Nach der RPE-Wahl direkt weiter zur Notiz
+    const n=set&&document.querySelector(`[data-n="${k}"]`); if(n){ n.focus({preventScroll:true}); n.scrollIntoView({block:"center",behavior:"smooth"}); } return; }
   if(d.act==="menu") return menu(true);
   if(d.act==="close") return menu(false);
   if(d.act==="bk-export") return exportBackup();
@@ -1593,7 +1625,7 @@ document.addEventListener("click",e=>{
     applyCoach(valid); m.state="applied"; save(); toast(`Plan angepasst (${valid.length} ${valid.length===1?"Änderung":"Änderungen"})`); return render(); }
   if(d.act==="cc-dismiss"){ const m=S.chat[+d.k]; if(m){ m.state="dismissed"; save(); } return render(); }
   if(d.act==="prof-who"){ profWho=d.whoP; if(profWho==="partner") loadPartner(); return render(); }
-  if(d.act==="cc-tab"){ coachTab=d.tab; return render(); }
+  if(d.act==="cc-tab"){ if(d.tab==="sore"&&coachTab!=="sore") soreInitOpen(); coachTab=d.tab; return render(); }
   if(d.act==="cc-clear"){ if(!confirm("Chatverlauf löschen? Der Plan bleibt unverändert.")) return; S.chat=[]; ccErr=""; save(); return render(); }
   if(d.act==="cc-copy"){ try{ copyCoach(coach.buildCoachRequest({context:coachCtx(),chat:S.chat,message:$("#cc-in").value})); }catch(e){ toast(e.message); } return; }
 });

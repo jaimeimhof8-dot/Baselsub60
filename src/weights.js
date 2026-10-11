@@ -38,3 +38,35 @@ export function defaultWeight(text, weights) {
   const w = weights && weights[exName(text)];
   return w ? `${w} kg` : "";
 }
+
+/** Gewicht aus einem Eintrag lesen: "82,5 kg × 5" → 82.5, "80/85/85" → 85 (schwerster Satz), sonst NaN. */
+export function parseKg(v) {
+  const s = String(v || "").replace(",", ".");
+  const kg = s.match(/(\d{1,3}(?:\.\d+)?)\s*kg/i);
+  if (kg) return +kg[1];
+  if (/\d:\d/.test(s)) return NaN; // Zeit oder Pace, kein Gewicht
+  const nums = (s.match(/\d{1,3}(?:\.\d+)?/g) || []).map(Number).filter((n) => n >= 10 && n <= 400);
+  return nums.length ? Math.max(...nums) : NaN;
+}
+/**
+ * Gewicht fürs nächste Mal aus dem letzten Wert und der RPE jener Einheit:
+ * RPE ≤ 7 → +2.5 kg, RPE ≥ 9 → −2.5 kg, sonst gleich. Deload-Zeilen (RPE 5–6 im Text) → −10 %.
+ * Gibt "" zurück, wenn kein Gewicht erkennbar ist.
+ */
+export function nextWeight(last, lastRpe, text = "") {
+  const kg = parseKg(last); if (isNaN(kg)) return "";
+  let n = kg;
+  if (/RPE\s*5/i.test(text)) n = kg * 0.9;
+  else if (lastRpe != null && lastRpe <= 7) n = kg + 2.5;
+  else if (lastRpe >= 9) n = kg - 2.5;
+  return `${Math.round(n / 2.5) * 2.5} kg`;
+}
+/** Ziel-RPE aus dem Plantext: ["… RPE 7", "… RPE 7–8"] → [7, 8]; ohne Angabe null. */
+export function targetRpe(items) {
+  let lo = null, hi = null;
+  for (const t of items || []) {
+    const m = String(t).match(/RPE\s*(\d+)(?:\s*[–-]\s*(\d+))?/i); if (!m) continue;
+    lo = Math.min(lo ?? 10, +m[1]); hi = Math.max(hi ?? 0, +(m[2] || m[1]));
+  }
+  return lo == null ? null : [lo, hi];
+}

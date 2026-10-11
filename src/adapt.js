@@ -13,7 +13,7 @@
 //   dismissed   -> {id: 1}
 //   sore(i)     -> {muskel: 1–10}     wirksamer Muskelkater (optional, aus dem Muskelkater-Melder)
 // }
-import { impact, summarize } from "./soreness.js";
+import { impact, summarize, overloadRisk, overloadText } from "./soreness.js";
 // Vorschlag = {id, type: "swap"|"easy"|"alt", day, to?, title, why}
 
 export const CHECKIN_FIELDS = [
@@ -98,6 +98,29 @@ export function suggest(ctx) {
       eased.add(T);
       add({ id: `easy:${T}`, type: "easy", day: T, title: `${today.t} entlasten`,
         why: "Check-in gelb. Einheit machen, aber mit ca. 75 % Volumen und RPE max. 6." });
+    }
+  }
+
+  // 1a) Überlastung: Stelle seit 3+ Tagen über 6/10 oder Sehne zu oft hintereinander stossartig belastet
+  //     -> bei anhaltendem Muskelkater verschieben (wenn ein freier Tag da ist), sonst entlasten.
+  //     Vergangene Tage zählen nur, wenn trainiert wurde; kommende so, wie sie geplant sind.
+  const happened = (d) => (d < 0 ? null : d < T ? (isDone(ctx, d) ? ctx.plan(d) : null) : ctx.plan(d));
+  for (const x of [T, T + 1]) {
+    if (!ctx.sore || x > ctx.last || eased.has(x) || taken.has(x)) continue;
+    const p = ctx.plan(x);
+    if (!isHard(p) || p.easy || p.back || isDone(ctx, x)) continue;
+    const risk = overloadRisk(p, x, T, ctx.sore, happened);
+    if (!risk.length) continue;
+    const top = risk.slice(0, 2).map(overloadText).join("; ");
+    const slot = risk[0].kind === "sore" ? findSlot(ctx, x, x + 1, x + 3, taken) : null;
+    if (slot != null) {
+      taken.add(slot);
+      add({ id: `over:${x}`, type: "swap", day: x, to: slot, title: `Überlastung: ${p.t} verschieben`,
+        why: `${top}. Die Stelle braucht Ruhe – Einheit auf einen freien Tag legen. Bei anhaltendem Schmerz ärztlich abklären.` });
+    } else {
+      eased.add(x);
+      add({ id: `over:${x}`, type: "easy", day: x, title: `Überlastung: ${p.t} entlasten`,
+        why: `${top}. Sprünge, Lunges und Tempoläufe reduzieren oder durch Rad/Rudern ersetzen, ca. 75 % Volumen.` });
     }
   }
 

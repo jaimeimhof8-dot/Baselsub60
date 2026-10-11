@@ -141,3 +141,54 @@ export function impact(day, levels) {
 }
 /** Betroffene Zonen kurz zusammenfassen: "Quadrizeps 7/10". */
 export const summarize = (muscles, n = 3) => [...muscles].sort((a, b) => b.level - a.level).slice(0, n).map((m) => `${m.label} ${m.level}/10`);
+
+/* ---------- Überlastung: anhaltender Muskelkater und wiederholte Sehnenbelastung ---------- */
+export const HIGH = 7; // "über 6/10"
+/**
+ * Wie viele Tage in Folge (bis einschliesslich Tag x) lag eine Stelle über 6/10?
+ * soreAt(d) → wirksamer Muskelkater an Tag d ({zone: 1–10}).
+ * @returns {Record<string, number>} {zone: tage} – nur Stellen, die an Tag x über 6 liegen
+ */
+export function soreStreaks(soreAt, x, min = HIGH) {
+  const out = {};
+  for (const z of Object.keys(soreAt(x) || {})) {
+    let n = 0; while (n < 14 && ((soreAt(x - n) || {})[z] || 0) >= min) n++;
+    if (n) out[z] = n;
+  }
+  return out;
+}
+
+export const TENDONS = ["knee", "achilles", "shins", "plantar"];
+// Stossartige Belastung (Laufen, Sprünge, Lunges, Squats, Sled Push, Wall Balls) – Rad und Rudern zählen nicht
+const IMPACT = /box ?jump|kastensprung|burpee|lunge|ausfallschritt|sled push|wall ?ball|squat|kniebeuge|thruster/i;
+/** Sehnen/Gelenke, die eine Einheit stossartig belastet. */
+export function tendonLoad(day) {
+  if (!day || day.k === "rest" || day.inj || day.k === "bike") return [];
+  const out = new Set(["lauf", "sim", "race"].includes(day.k) ? RUN : []);
+  for (const t of day.i || []) if (IMPACT.test(t) || /lauf|run|\d+\s?km/i.test(t)) exercisePatterns(t).forEach((z) => out.add(z));
+  return TENDONS.filter((z) => out.has(z));
+}
+
+/**
+ * Überlastungsrisiko einer Einheit an Tag x.
+ * - "sore": eine Stelle, die die Einheit belastet, liegt seit 3+ Tagen (bis heute) über 6/10
+ * - "load": eine Sehne wäre am 3. Tag in Folge bzw. zum 5. Mal in 7 Tagen stossartig belastet
+ * soreAt(d) → wirksamer Muskelkater, planAt(d) → Einheit, die an Tag d stattfand/stattfindet (null = keine)
+ * @returns {{id,label,kind:"sore"|"load",days,level}[]} stärkstes Risiko zuerst
+ */
+export function overloadRisk(day, x, today, soreAt, planAt) {
+  if (!day || day.k === "rest" || day.inj) return [];
+  const out = [], load = new Set(loadOf(day)), streaks = soreStreaks(soreAt, today);
+  for (const [z, n] of Object.entries(streaks))
+    if (n >= 3 && load.has(z)) out.push({ id: z, label: LABEL[z], kind: "sore", days: n, level: soreAt(today)[z] });
+  for (const z of tendonLoad(day)) {
+    if (out.some((o) => o.id === z)) continue;
+    let streak = 0; while (streak < 7 && tendonLoad(planAt(x - 1 - streak)).includes(z)) streak++;
+    let week = 0; for (let d = x - 7; d < x; d++) if (tendonLoad(planAt(d)).includes(z)) week++;
+    if (streak >= 2 || week >= 5) out.push({ id: z, label: LABEL[z], kind: "load", days: streak >= 2 ? streak + 1 : week, week: streak < 2 });
+  }
+  return out.sort((a, b) => (a.kind === b.kind ? b.days - a.days : a.kind === "sore" ? -1 : 1));
+}
+/** Kurztext für eine Überlastung, z. B. "Patellasehne / Knie seit 3 Tagen über 6/10". */
+export const overloadText = (o) => o.kind === "sore" ? `${o.label} seit ${o.days} Tagen über 6/10 (aktuell ${o.level}/10)`
+  : o.week ? `${o.label} ${o.days}× in 7 Tagen stossartig belastet` : `${o.label} am ${o.days}. Tag in Folge belastet`;

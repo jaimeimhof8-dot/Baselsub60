@@ -136,7 +136,9 @@ export function impact(day, levels) {
     .map(([id, level]) => ({ id, label: LABEL[id] || id, level })).sort((a, b) => b.level - a.level);
   const sore = muscles.filter((m) => m.level >= 4).map((m) => m.id);
   const exercises = (day && day.i || []).filter((t) => exercisePatterns(t).some((z) => sore.includes(z)));
-  const names = [...new Set(exercises.map((t) => t.split(/\s\d|\s@|,/)[0].trim()))];
+  // Name ohne Satz-/RPE-Angaben; Zeilen, die mit einer Zahl beginnen („4×1km zusammen, …“), bis zum ersten Komma
+  const nameOf = (t) => { const n = t.split(/\s\d|\s@|,|\sRPE\b/i)[0].trim(); return n.length >= 3 && !/^\d/.test(n) ? n : t.split(",")[0].trim(); };
+  const names = [...new Set(exercises.map(nameOf))];
   return { level: muscles.length ? muscles[0].level : 0, muscles, exercises, names };
 }
 /** Betroffene Zonen kurz zusammenfassen: "Quadrizeps 7/10". */

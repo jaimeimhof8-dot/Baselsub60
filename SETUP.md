@@ -32,15 +32,25 @@ Bei der ersten Anmeldung fragt die App, ob die bisherigen Einträge auf dem Hand
 - **Fremde Anmeldungen:** Ist „Allow new users to sign up“ ausgeschaltet (Schritt 3), kann niemand sonst ein Konto anlegen. Auch mit Konto sähe ein Fremder nichts, solange seine E-Mail nicht in `schema.sql` steht.
 - **Passwort vergessen:** Im Dashboard unter **Authentication → Users** beim Konto ein neues Passwort setzen.
 
-# Strava verbinden (optional, ca. 5 Minuten)
+# Strava verbinden (optional, ca. 10 Minuten)
+
+Der Token-Tausch läuft über die Supabase Edge Function `strava`. Client-ID und Client-Secret liegen nur auf dem Server, nie im Browser. Im Browser bleiben nur das Access- und das Refresh-Token; ohne Secret kann damit niemand neue Tokens holen.
 
 1. Auf https://www.strava.com/settings/api eine API-App anlegen. **Authorization Callback Domain** = Domain, auf der die App läuft (z. B. `deinname.github.io`, lokal `localhost`).
-2. In der App: Menü → **Strava** → Client-ID und Client Secret eintragen → **Mit Strava verbinden**.
-3. Optional die Client-ID in `config.js` (`stravaClientId`) eintragen, dann muss sie nicht auf jedem Gerät eingetippt werden. Das Secret gehört **nicht** in `config.js`.
+2. Supabase CLI verbinden (falls noch nicht, siehe Coach-Chat unten): `npx supabase login` und `npx supabase link --project-ref <Projekt-ID>` (im Ordner `app/`).
+3. Secrets setzen und Funktion deployen:
+   ```
+   npx supabase secrets set STRAVA_CLIENT_ID=12345 STRAVA_CLIENT_SECRET=dein-secret
+   npx supabase functions deploy strava --no-verify-jwt
+   ```
+   `--no-verify-jwt` ist nötig wie beim Coach: Die Funktion prüft selbst, ob der Aufrufer ein freigeschaltetes Mitglied ist (`is_member()`).
+4. In der App: Menü → **Strava** → **Mit Strava verbinden**. Es gibt kein Secret-Feld mehr.
+
+Wer Strava schon vorher verbunden hatte: Die Verbindung bleibt bestehen, das alte Secret wird beim nächsten Login vom Gerät gelöscht. Damit das Token weiter erneuert werden kann, muss `STRAVA_CLIENT_ID` dieselbe Strava-API-App sein wie bisher.
+
+Ohne Cloud (Vorschau-Modus) gibt es zum Ausprobieren weiterhin die Eingabe von Client-ID und Secret direkt in der App. Das Secret liegt dann im Browser-Speicher dieses Geräts.
 
 Ohne API-App geht es auch per Datei: Strava → Einstellungen → Mein Konto → Account-Daten herunterladen → aus dem ZIP `activities.csv` in der App importieren.
-
-Hinweis: Das Secret liegt im Browser-Speicher des Geräts. Für zwei Leute ist das vertretbar; sauberer wäre eine Supabase Edge Function für den Token-Tausch (siehe OVERNIGHT_SUMMARY.md, „Bekannte Grenzen“).
 
 # Coach-Chat einrichten (optional, ca. 10 Minuten)
 

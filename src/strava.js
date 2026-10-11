@@ -174,10 +174,14 @@ async function tokenCall(fetchFn, body) {
 export const exchangeCode = (fetchFn, { clientId, secret, code }) =>
   tokenCall(fetchFn, { client_id: clientId, client_secret: secret, code, grant_type: "authorization_code" });
 
-/** Gültigen Token sicherstellen (Refresh 5 Min. vor Ablauf). Gibt das (evtl. neue) Token-Objekt zurück. */
-export async function ensureToken(fetchFn, tok, { clientId, secret, now = Date.now() }) {
+/**
+ * Gültigen Token sicherstellen (Refresh 5 Min. vor Ablauf). Gibt das (evtl. neue) Token-Objekt zurück.
+ * refresh(tok) – optional: Refresh über den Server (Edge Function), dann braucht es hier kein Secret.
+ */
+export async function ensureToken(fetchFn, tok, { clientId, secret, now = Date.now(), refresh }) {
   if (tok.expires * 1000 - 300000 > now) return tok;
-  const n = await tokenCall(fetchFn, { client_id: clientId, client_secret: secret, refresh_token: tok.refresh, grant_type: "refresh_token" });
+  const n = refresh ? await refresh(tok)
+    : await tokenCall(fetchFn, { client_id: clientId, client_secret: secret, refresh_token: tok.refresh, grant_type: "refresh_token" });
   return { ...tok, ...n, athlete: n.athlete || tok.athlete };
 }
 

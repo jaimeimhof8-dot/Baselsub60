@@ -7,7 +7,7 @@ export const BASE_EXERCISES = ["Back Squat", "Front Squat", "Bulgarian Split Squ
 const NO_WEIGHT = /plank|einlaufen|auslaufen|^kraft\b/i;
 
 /** Anzeigename einer Übung: Text vor Satz-/Wdh-Angaben ("Back Squat 3×5 @75%" → "Back Squat"). */
-const label = (t) => String(t).split(/\s\d|\s@|\s–|,/)[0].trim();
+const label = (t) => String(t).split(/\s\d|\s@|\s–|,|\sRPE\b/i)[0].trim();
 
 /**
  * Liste für das Profil: feste Übungen + weitere Kraftübungen aus dem aktiven Plan (z. B. nach PDF-Import).

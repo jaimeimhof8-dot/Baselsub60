@@ -7,7 +7,7 @@ export const clone = (o) => JSON.parse(JSON.stringify(o));
 export const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 /** Übungsname ohne Satz-/Wdh-Angaben – um Einträge über Planänderungen hinweg wiederzufinden. */
-export const exName = (t) => String(t).split(/\s\d|\s@|\s–|,/)[0].trim().toLowerCase().replace(/s$/, "");
+export const exName = (t) => String(t).split(/\s\d|\s@|\s–|,|\sRPE\b/i)[0].trim().toLowerCase().replace(/s$/, "");
 
 export const isTraining = (d) => !!d && d.k !== "rest";
 export const isHard = (d) => !!d && HARD_KINDS.includes(d.k);

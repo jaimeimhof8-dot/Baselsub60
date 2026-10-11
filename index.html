@@ -173,6 +173,13 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 .wk div{flex:1;text-align:center;min-width:0}
 .wk .sub{margin-top:var(--s1)}
 .wsum{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s2);margin:var(--s4) 0}
+.xsum{margin:calc(-1 * var(--s2)) 0 var(--s4)}
+.extras .lbl{margin-top:var(--s5)}
+.xrow{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);padding:var(--s2) 0;border-top:1px solid var(--line)}
+.xrow span{flex:1;font-size:15px}
+.xrow .btn{flex:none;width:44px;padding:0}
+.xform{border-top:1px solid var(--line);padding-top:var(--s3)}
+.solo-t[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s3);text-align:center}
 .stat b{display:block;font-family:var(--f-head);font-size:24px;line-height:1.05}
 .stat span{font-size:12px;color:var(--muted);letter-spacing:.04em}
@@ -494,6 +501,9 @@ import { colOf, personTests, partnerProfile } from "./src/profile.js";
 import * as sore from "./src/soreness.js";
 import { makeBackup, backupFileName, readBackup } from "./src/backup.js";
 import * as coach from "./src/coach.js";
+import { noChestDay } from "./src/exercises.js";
+import { canSolo, soloize } from "./src/solo.js";
+import { EXTRA_TYPES, makeExtra, addExtra, removeExtra, extraLabel, extraMinutes, cleanExtras, loadDay } from "./src/extras.js";
 
 /* ---------- Zeit ---------- */
 // ?heute=2026-10-20 simuliert ein anderes Datum (zum Testen von Umplanen/Strava vor Planstart).
@@ -516,8 +526,9 @@ const STRAVA_MIN = new Date(+START-7*dayMs).toISOString().slice(0,10);
 let S, LSK="hx";
 /* onb: einmalige Hinweise (onb.strava = Strava-Onboarding erledigt), chat: Verlauf des Coach-Chats,
    weights: Standard-Arbeitsgewichte aus dem Profil ({übungsname: "kg"}),
-   sore: Muskelkater-Meldungen ({tagIndex: {muskel: 1–10}}) */
-const def = ()=>({done:{},val:{},rpe:{},notes:{},sched:{},skip:{},edit:{},checkin:{},dismiss:{},plan:null,strava:{acts:{},at:0},onb:{},chat:[],weights:{},sore:{},
+   sore: Muskelkater-Meldungen ({tagIndex: {muskel: 1–10}}),
+   extra: Zusatz-Einheiten neben dem Plan ({datum: [{id,type,min,note}]}), solo: Partner-Einheit allein ({datum: 1}) */
+const def = ()=>({done:{},val:{},rpe:{},notes:{},sched:{},skip:{},edit:{},checkin:{},dismiss:{},plan:null,strava:{acts:{},at:0},onb:{},chat:[],weights:{},sore:{},extra:{},solo:{},
   tests:{lauf:{j:["","","",""],m:["","","",""]},station:{},trans:["","","","","",""]}});
 const fill = (o)=>{ for(const [k,v] of Object.entries(def())) if(o[k]==null) o[k]=v; if(!o.strava||!o.strava.acts) o.strava={acts:{},at:0}; return o; };
 const lsGet = (k)=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
@@ -559,7 +570,7 @@ function ownPlan(src){
   const p=Object.assign({},b,{t:per(b.t),i:(b.i||[]).map(per),n:per(b.n||"")});
   const ed=S.edit[src];
   if(ed && p.k!=="rest") Object.assign(p,{t:ed.t||p.t,k:ed.k||p.k,i:ed.i,n:ed.n||"",edited:1});
-  return p;
+  return noChestDay(p);
 }
 function dayPlan(i){
   if(i<0||i>LAST) return null;
@@ -575,6 +586,7 @@ function dayPlan(i){
     const pre=o.back?"Comeback nach Pause: ca. 70 % von Volumen und Gewicht, RPE max. 6.":"Entlastet: ca. 75 % Volumen, RPE max. 6.";
     p.n=pre+(p.n?" "+p.n:""); if(o.back) p.back=1; else p.easy=1;
   }
+  if(!o.inj && S.solo[keyI(i)] && canSolo(p)) p=soloize(p,PARTNER);
   return p;
 }
 /* Einheiten von Tag i und j tauschen. Abgehakte Übungen und Werte wandern mit der Einheit mit. */
@@ -652,8 +664,10 @@ const actsOf=(i)=>{ const e=rc().byDay[i]; return e ? e.acts.map(id=>S.strava.ac
 /* Hat an Tag d ein Training stattgefunden? (abgehakt, RPE oder passende Strava-Aktivität) */
 const trained=(d)=>{ if(d<0||d>LAST) return false; const e=rc().byDay[d]; return dayStatus(d).done>0||S.rpe[keyI(d)]!=null||!!(e&&e.match); };
 function overloadAt(i){
-  const p=dayPlan(i); if(!p||i<TODAY||i>TODAY+1) return [];
-  return sore.overloadRisk(p,i,soreToday(),soreAt,(d)=>d<0?null:d<TODAY?(trained(d)?dayPlan(d):null):dayPlan(d));
+  const p=loadDay(dayPlan(i),S.extra[keyI(i)]); if(!p||i<TODAY||i>TODAY+1) return [];
+  // Zusätzliche Läufe (Zusatz-Einheiten) belasten Sehnen wie ein geplanter Lauf
+  const at=(d)=>d<0?null:loadDay(d<TODAY?(trained(d)?dayPlan(d):null):dayPlan(d),S.extra[keyI(d)]);
+  return sore.overloadRisk(p,i,soreToday(),soreAt,at);
 }
 
 /* ---------- Vorschläge (Rescheduler) ---------- */
@@ -705,7 +719,8 @@ function sessionCard(i){
   if(p.moved!=null) h+=`<div class="sub mt-2">Ursprünglich ${shortDay(p.moved)}</div>`;
   if(S.skip[dk]) h+=`<div class="target bad">Als <b>ausgefallen</b> markiert. Tipp: auf einen freien Tag verschieben.</div>`;
   // Umplanen und Übungen anpassen liegen zentral im Coach (Reiter „Umplanen“), nicht mehr an jedem Tag
-  if(p.k==="rest") return h+`<div class="hint">${esc(p.n||"Echte Erholung.")}</div>${stravaBox(i,p,0,0)}</div>`;
+  if(p.k==="rest") return h+`<div class="hint">${esc(p.n||"Echte Erholung.")}</div>${stravaBox(i,p,0,0)}${extrasBox(i)}</div>`;
+  if(canSolo(p)) h+=`<button class="btn sm solo-t mt-3" data-act="solo" data-i="${i}" aria-pressed="${!!p.solo}">${p.solo?`👥 Wieder mit ${esc(PARTNER)}`:`👤 Solo – ${esc(PARTNER)} fällt aus`}</button>`;
   const hit=sore.impact(p,soreAt(i));
   if(hit.level>=4) h+=`<div class="target ${hit.level>=7?"bad":""}">Muskelkater: ${sore.summarize(hit.muscles.filter(m=>m.level>=4)).map(x=>esc(x).replace(/(\d+\/10)$/,"<b>$1</b>")).join(", ")}.${hit.names.length?` Betroffen: ${hit.names.slice(0,3).map(x=>`„${esc(x)}“`).join(", ")} – dort Last reduzieren.`:""}</div>`;
   const ol=overloadAt(i);
@@ -736,7 +751,19 @@ function sessionCard(i){
   const sl=sore.effective(S.sore,i), sn=Object.keys(sl).length;
   h+=`<button class="btn mt-3" data-act="sore-open">${sn?`Muskelkater: ${sn} ${sn===1?"Stelle":"Stellen"}, max ${Math.max(...Object.values(sl))}/10 – ändern`:"Muskelkater eintragen"} →</button>`;
   if(p.test) h+=`<div class="btns"><button class="btn" data-v="tests">Testergebnisse eintragen →</button></div>`;
-  return h+`</div>`;
+  return h+extrasBox(i)+`</div>`;
+}
+
+/* Zusatz-Einheiten (Zone 2, Mobility, Core …) neben dem Plan – ändern weder Plan noch Fortschritt */
+let xOpen=null;
+function extrasBox(i){
+  const list=cleanExtras(S.extra[keyI(i)]);
+  let h=`<div class="extras"><div class="lbl">Zusatz-Einheiten${list.length>1?` · ${extraMinutes(list)}′`:""}</div>`;
+  for(const e of list) h+=`<div class="xrow"><span>${esc(extraLabel(e))}</span><button class="btn sm" data-act="x-del" data-i="${i}" data-x="${esc(e.id)}" aria-label="${esc(extraLabel(e))} entfernen">✕</button></div>`;
+  if(xOpen!==i) return h+`<button class="btn sm" data-act="x-open" data-i="${i}">＋ Zusatz-Einheit</button></div>`;
+  return h+`<div class="xform"><div class="chips" role="group" aria-label="Art der Einheit">${Object.entries(EXTRA_TYPES).map(([k,t],j)=>`<button type="button" data-act="x-type" data-xt="${k}" class="${j?"":"on"}" aria-pressed="${!j}">${t.label}</button>`).join("")}</div>
+    <div class="grid2 mt-3"><input type="number" inputmode="numeric" min="1" max="600" id="x-min" placeholder="Minuten" aria-label="Dauer in Minuten"><input type="text" id="x-note" maxlength="80" placeholder="Notiz (optional)" aria-label="Notiz"></div>
+    <div class="grid2 mt-3"><button class="btn primary sm" data-act="x-add" data-i="${i}">Speichern</button><button class="btn sm" data-act="x-cancel">Abbrechen</button></div></div></div>`;
 }
 
 function dayBadges(i,p,full){
@@ -747,6 +774,8 @@ function dayBadges(i,p,full){
   if(p.moved!=null) b.push(`<span class="badge mv">Verschoben</span>`);
   if(p.edited) b.push(`<span class="badge">Angepasst</span>`);
   if(S.skip[keyI(i)]) b.push(`<span class="badge warn">Ausgefallen</span>`);
+  if(p.solo) b.push(`<span class="badge">Solo</span>`);
+  if(cleanExtras(S.extra[keyI(i)]).length) b.push(`<span class="badge ok">＋Zusatz</span>`);
   const e=rc().byDay[i]; if(e && (e.match||full)) b.push(`<span class="badge strava">Strava</span>`);
   return b.join("");
 }
@@ -830,7 +859,9 @@ function weekSummary(w){
     const {n,done}=dayStatus(i), e=rc().byDay[i]; if((n&&done===n)||(e&&e.match)) ok++;
     const r=S.rpe[keyI(i)]; if(r!=null) rp.push(+r); }
   const ar=rp.length?(rp.reduce((a,b)=>a+b,0)/rp.length).toFixed(1):"–";
-  return `<div class="wsum"><div class="stat"><b>${ok}/${plan}</b><span>Einheiten</span></div><div class="stat"><b>${ar}</b><span>Ø RPE</span></div><div class="stat"><b>${Object.values(S.strava.acts).filter(a=>{const x=idxOfIso(a.date);return x>=w*7&&x<w*7+7;}).length}</b><span>Strava</span></div></div>`;
+  const xs=[]; for(let d=0;d<7;d++) xs.push(...cleanExtras(S.extra[keyI(w*7+d)]));
+  const xLine=xs.length?`<div class="sub xsum">＋ ${xs.length} Zusatz-${xs.length===1?"Einheit":"Einheiten"}${extraMinutes(xs)?` · ${extraMinutes(xs)}′`:""}</div>`:"";
+  return `<div class="wsum"><div class="stat"><b>${ok}/${plan}</b><span>Einheiten</span></div><div class="stat"><b>${ar}</b><span>Ø RPE</span></div><div class="stat"><b>${Object.values(S.strava.acts).filter(a=>{const x=idxOfIso(a.date);return x>=w*7&&x<w*7+7;}).length}</b><span>Strava</span></div></div>${xLine}`;
 }
 function vWeek(){
   const info=weekInfo(wk), wide=WIDE();
@@ -1625,6 +1656,16 @@ document.addEventListener("click",e=>{
   if(d.act==="mv-today"){ moveFrom=Math.max(0,Math.min(LAST,TODAY)); return render(); }
   if(d.act==="ol-easy"){ setE(+d.i,{easy:1}); save(); toast("Einheit entlastet: ca. 75 % Volumen, RPE max. 6"); return render(); }
   if(d.act==="strava-no"){ S.dismiss["stv:"+d.i]=1; save(); return render(); }
+  if(d.act==="solo"){ const dk=keyI(+d.i); if(S.solo[dk]) delete S.solo[dk]; else S.solo[dk]=1; save();
+    toast(S.solo[dk]?"Solo: Einheit für allein angepasst":`Wieder mit ${PARTNER}`); return render(); }
+  if(d.act==="x-open"){ xOpen=+d.i; render(); const m=$("#x-min"); if(m) m.focus(); return; }
+  if(d.act==="x-cancel"){ xOpen=null; return render(); }
+  if(d.act==="x-type"){ t.parentNode.querySelectorAll("button").forEach(b=>{ b.classList.toggle("on",b===t); b.setAttribute("aria-pressed",b===t); }); return; }
+  if(d.act==="x-add"){ const i=+d.i, f=t.closest(".xform"), on=f.querySelector("[data-xt].on");
+    const e=makeExtra({type:on&&on.dataset.xt,min:f.querySelector("#x-min").value,note:f.querySelector("#x-note").value});
+    if(!e) return toast("Dauer bitte in Minuten (1–600) oder leer lassen");
+    const dk=keyI(i); S.extra[dk]=addExtra(cleanExtras(S.extra[dk]),e); xOpen=null; save(); toast("Gespeichert: "+extraLabel(e)); return render(); }
+  if(d.act==="x-del"){ const dk=keyI(+d.i), l=removeExtra(S.extra[dk],d.x); if(l.length) S.extra[dk]=l; else delete S.extra[dk]; save(); return render(); }
   if(d.act==="sore-open"){ coachTab="sore"; soreInitOpen(); return go("coach"); }
   if(d.act==="ci-ok"){ const c=S.checkin[d.k]=S.checkin[d.k]||{};
     // Gemeldeter Muskelkater bleibt massgebend, der Rest wird grün

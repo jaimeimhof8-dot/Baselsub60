@@ -93,6 +93,7 @@ const EX = [
   [/incline|schrägbank/i, ["chest", "shoulders", "arms"]],
   [/push-?up|liegestütz|dip/i, ["chest", "arms", "shoulders"]],
   [/shoulder press|overhead|schulterdr/i, ["shoulders", "arms", "upback"]],
+  [/push press/i, ["shoulders", "arms", "upback", "quads", "glutes", "abs"]],
   [/pull-?up|klimmzug|lat/i, ["upback", "arms", "forearms", "shoulders"]],
   [/row\b|rudern|rowerg/i, ["upback", "arms", "forearms", "lowback", "hams", "quads"]],
   [/plank|core|sit-?up|crunch/i, ["abs", "obliques"]],

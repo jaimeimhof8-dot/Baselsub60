@@ -1,9 +1,10 @@
 // Standard-Arbeitsgewichte (Profil). Reine Funktionen, ohne DOM.
 // Gespeicherte Form (S.weights): {übungsname (exName): "80"} – Wert in kg, als Text wie eingegeben.
 import { exName } from "./util.js";
+import { hasChest } from "./exercises.js";
 
 /** Übungen, die immer im Profil stehen. Gilt nur für Krafteinheiten (Stationen werden auf Zeit gemessen). */
-export const BASE_EXERCISES = ["Back Squat", "Front Squat", "Bulgarian Split Squat", "Deadlift", "Bench Press", "Shoulder Press", "Pull-ups"];
+export const BASE_EXERCISES = ["Back Squat", "Front Squat", "Bulgarian Split Squat", "Deadlift", "Push Press", "Shoulder Press", "Pull-ups"];
 // Ohne Gewicht: Halteübungen, Lauf-Zeilen, Sprünge und Zirkel (EMOM)
 const NO_WEIGHT = /plank|einlaufen|auslaufen|^kraft\b|box ?jumps?|^emom\b/i;
 
@@ -22,7 +23,7 @@ export function weightList(days) {
     if (!d || d.k !== "kraft") continue;
     for (const t of d.i || []) {
       const l = label(t), k = exName(t);
-      if (l && !NO_WEIGHT.test(l) && !out.has(k)) out.set(k, l);
+      if (l && !NO_WEIGHT.test(l) && !hasChest(l) && !out.has(k)) out.set(k, l);
     }
   }
   return [...out].map(([key, l]) => ({ key, label: l }));

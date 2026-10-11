@@ -15,12 +15,12 @@ test("erkennt alle Blöcke, Wochen und den Renntag", () => {
 
 test("Kraft 1 Woche 1 wird in Übungszeilen zerlegt", () => {
   assert.deepEqual(days[0].i, [
-    "Back Squat 3×5 @75% RPE 7", "Bulgarian Split Squat 3×8 je Seite RPE 7", "Bench Press 3×6 RPE 7",
+    "Back Squat 3×5 @75% RPE 7", "Bulgarian Split Squat 3×8 je Seite RPE 7", "Push Press 3×6 RPE 7",
     "Shoulder Press 3×8 RPE 7", "Pull-ups 3×6 RPE 7", "Plank 3×50″"]);
 });
 
 test("gemeinsame Angaben (beziehungsweise) werden korrekt verteilt", () => {
-  assert.equal(days[7].i[2], "Bench Press 3×6 RPE 7");
+  assert.equal(days[7].i[2], "Push Press 3×6 RPE 7");
   assert.equal(days[7].i[3], "Shoulder Press 3×8 RPE 7");
 });
 
@@ -45,7 +45,7 @@ test("Block-Absätze werden auf die 4 Wochen verteilt", () => {
 test("Block B: Kraft als Übungsliste mit Topsatz und Wellenmuster der Zusatzübungen", () => {
   assert.deepEqual(days[28].i, [
     "Back Squat 4×5 @80% RPE 7–8", "Back Squat 1×3 @85%, Topsatz", "Bulgarian Split Squat 3×8 je Seite RPE 7",
-    "Bench Press 3×6 RPE 7", "Shoulder Press 3×8 RPE 7", "Pull-ups 3×6 RPE 7", "Plank 3×50″"]);
+    "Push Press 3×6 RPE 7", "Shoulder Press 3×8 RPE 7", "Pull-ups 3×6 RPE 7", "Plank 3×50″"]);
   assert.equal(days[35].i[0], "Back Squat 4×4 @82%");          // Woche 2: Hauptübung ohne Namen im Wochentext
   assert.equal(days[35].i[5], "Pull-ups 3×6 RPE 7–8");          // Volumen aus Block A Woche 2
   assert.deepEqual(days[49].i.slice(0, 2), ["Back Squat 3×5 @65% RPE 5–6", "Bulgarian Split Squat 2×8 RPE 5–6"]); // Deload, kein Topsatz

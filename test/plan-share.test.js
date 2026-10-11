@@ -67,3 +67,11 @@ test("Teilen: Snapshot, Text, Link hin und zurück", () => {
   const evil = decodeSnapshot(encodeSnapshot({ v: 1, w: 1, days: [{ t: 5, i: "x" }, null] }));
   assert.deepEqual(evil.days, [{ t: "", k: "", n: "", i: [] }, { t: "", k: "", n: "", i: [] }]);
 });
+
+test("Benannte Deload-Woche verschiebt die Wellen im Block", async () => {
+  const { weekInfo } = await import("../src/plan-store.js");
+  const blocks = [{ id: "A", name: "A", start: 0, end: 27 }, { id: "B", name: "B", start: 28, end: 55 }];
+  const plan = { blocks, weeks: [{ n: 7, name: "Feiertage und Deload", start: 42 }, { n: 8, name: "Laktat 3", start: 49 }] };
+  assert.deepEqual([4, 5, 6, 7].map((w) => weekInfo(plan, w).wave), ["moderat", "hart", "Deload", "Spitzenreiz"]);
+  assert.equal(weekInfo({ blocks, weeks: [] }, 7).wave, "Deload");
+});

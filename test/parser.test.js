@@ -74,3 +74,11 @@ test("leerer Text liefert Warnung statt Absturz", () => {
   assert.equal(Object.keys(r.days).length, 0);
   assert.equal(r.meta.warnings.length, 1);
 });
+
+test("Kraft in Kurzschreibweise: jede Übung wird eine Zeile, auch unbekannte", () => {
+  const r = parsePlanText("Woche 1 – Aufbau (12.10. – 18.10.)\nMontag – Kraft 1. Back Squat 4×5 RPE 7. Romanian Deadlift 3×8 RPE 7. Heavy Sled Push 6×12,5 m @ 120 % Rennlast. Plank 3×50″. Kein Muskelversagen.");
+  const d = r.days[0];
+  assert.equal(d.k, "kraft");
+  assert.deepEqual(d.i, ["Back Squat 4×5 RPE 7", "Romanian Deadlift 3×8 RPE 7", "Heavy Sled Push 6×12,5 m @ 120 % Rennlast", "Plank 3×50″"]);
+  assert.equal(d.n, "Kein Muskelversagen.");
+});

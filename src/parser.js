@@ -155,11 +155,12 @@ export function makeDay(wd, rawTitle, body, extra = {}) {
     const ci = /Check-in|Rückblick/.test(body);
     day.i = ci ? [/Rückblick/.test(body) ? "Ampelsystem-Check-in + Rückblick" : "Ampelsystem-Check-in"] : [];
     day.n = ci ? sentences(digits(body)).join(" ") : (sentences(body)[0] || "Echte Erholung.");
-  } else if (kind === "kraft" && (parseExercises(body) || structureKraft(body, extra.common || "", extra.prev, extra.block))) {
+  } else if (kind === "kraft" && !/\d×\d/.test(body) && (parseExercises(body) || structureKraft(body, extra.common || "", extra.prev, extra.block))) {
     const ex = parseExercises(body) || structureKraft(body, extra.common || "", extra.prev, extra.block);
     day.i = ex.items; day.n = ex.note;
   } else {
-    // Lauf, Rad, Stationen, Doubles: Zeilen mit Zahlen abhakbar, Erklärungen als Hinweis.
+    // Lauf, Rad, Stationen, Doubles und Kraft in Kurzschreibweise ("Back Squat 4×5 RPE 7."):
+    // Zeilen mit Zahlen abhakbar, Erklärungen als Hinweis.
     // Im Block-Absatz ist der Wochentext die Aufgabe selbst – dort zählt auch der erste Satz ohne Zahl.
     const st = structureSession(body, { tasks: !!extra.block });
     day.i = st.items.length ? st.items : [day.t]; day.n = st.note;

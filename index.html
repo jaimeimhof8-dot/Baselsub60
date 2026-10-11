@@ -489,7 +489,7 @@ import * as strava from "./src/strava.js";
 import { callServer, syncErrorText, completeOAuth } from "./src/strava-auth.js";
 import { linkCode, decodeSnapshot } from "./src/share.js";
 import { isFiller, valueHint, missingValues } from "./src/validate.js";
-import { weightList, cleanWeight, defaultWeight, parseKg, nextWeight, targetRpe } from "./src/weights.js";
+import { weightList, cleanWeight, defaultWeight, parseKg, nextWeight, targetRpe, isLift } from "./src/weights.js";
 import { colOf, personTests, partnerProfile } from "./src/profile.js";
 import * as sore from "./src/soreness.js";
 import { makeBackup, backupFileName, readBackup } from "./src/backup.js";
@@ -719,11 +719,11 @@ function sessionCard(i){
     const id=dk+"|"+j, on=!!S.done[id];
     h+=`<div class="ex ${on?"is-done":""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on?"checked":""}><span>${esc(t)}</span></label>`;
     if(!isFiller(t)){
-      const le=lastEntry(i,t), last=le?le.v:"", pre=!S.val[id]&&p.k==="kraft"&&!/Topsatz/.test(t)?defaultWeight(t,S.weights):"";
-      // Progression nur bei Kraft und nur, wenn sie vom letzten Wert abweicht
-      const nx=p.k==="kraft"&&le?nextWeight(le.v,le.rpe,t):"", up=nx&&parseKg(nx)!==parseKg(last)?nx:"";
+      const lift=isLift(p.k,t), le=lastEntry(i,t), last=le?le.v:"", pre=!S.val[id]&&lift&&!/Topsatz/.test(t)?defaultWeight(t,S.weights):"";
+      // Progression nur bei Kraftübungen und nur, wenn sie vom letzten Wert abweicht
+      const nx=lift&&le?nextWeight(le.v,le.rpe,t):"", up=nx&&parseKg(nx)!==parseKg(last)?nx:"";
       const why=le&&le.rpe!=null?`letzte RPE ${le.rpe}`:"";
-      h+=`<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id]||pre)}"${pre?` class="pre" title="Standardgewicht aus dem Profil"`:""} placeholder="${placeholder(p.k,t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
+      h+=`<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id]||pre)}"${pre?` class="pre" title="Standardgewicht aus dem Profil"`:""} placeholder="${placeholder(lift?"kraft":p.k,t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
       if(last) h+=`<div class="quick"><button type="button" class="last" data-last="${id}" data-lv="${esc(last)}" aria-label="Letzten Wert ${esc(last)} übernehmen">zuletzt: ${esc(last)} ↵</button>${up?`<button type="button" class="last up" data-last="${id}" data-lv="${esc(up)}" aria-label="Vorschlag ${esc(up)} übernehmen${why?", "+why:""}">${parseKg(up)>parseKg(last)?"↗":"↘"} ${esc(up)}${why?` <small>(${why})</small>`:""}</button>`:""}</div>`;
     }
     h+=`</div>`;

@@ -4,7 +4,8 @@ import { exName } from "./util.js";
 
 /** Übungen, die immer im Profil stehen. Gilt nur für Krafteinheiten (Stationen werden auf Zeit gemessen). */
 export const BASE_EXERCISES = ["Back Squat", "Front Squat", "Bulgarian Split Squat", "Deadlift", "Bench Press", "Shoulder Press", "Pull-ups"];
-const NO_WEIGHT = /plank|einlaufen|auslaufen|^kraft\b/i;
+// Ohne Gewicht: Halteübungen, Lauf-Zeilen, Sprünge und Zirkel (EMOM)
+const NO_WEIGHT = /plank|einlaufen|auslaufen|^kraft\b|box ?jumps?|^emom\b/i;
 
 /** Anzeigename einer Übung: Text vor Satz-/Wdh-Angaben ("Back Squat 3×5 @75%" → "Back Squat"). */
 const label = (t) => String(t).split(/\s\d|\s@|\s–|,|\sRPE\b/i)[0].trim();
@@ -25,6 +26,13 @@ export function weightList(days) {
     }
   }
   return [...out].map(([key, l]) => ({ key, label: l }));
+}
+
+/** Zeile mit Gewicht? Auf Krafttagen jede Übung, sonst nur die festen Übungen (z. B. Back Squat vor dem Compromised Running). */
+export function isLift(kind, text) {
+  if (kind === "kraft") return true;
+  const n = exName(text);
+  return BASE_EXERCISES.some((l) => exName(l) === n);
 }
 
 /** Gewicht normalisieren: "80", "80kg", "80,5 kg" → "80" / "80.5"; leer oder ungültig → "". */

@@ -43,3 +43,10 @@ test("Nicht trainierte Vortage und Rad zählen nicht als Sehnenbelastung", () =>
   assert.ok(!suggest(ctx([kraft, bike, station], [0, 1])).some((s) => s.id.startsWith("over")));
   assert.deepEqual(overloadRisk(rest, 2, 2, () => ({}), () => null), []);
 });
+
+test("„Runden“ zählt nicht als Laufen, „Run 1–4“ und „Compromised Running“ schon", async () => {
+  const { tendonLoad } = await import("../src/soreness.js");
+  assert.deepEqual(tendonLoad({ k: "kraft", i: ["EMOM 16′ (4 Runden): 15 kcal SkiErg / 15 kcal RowErg", "Pull-ups 3×5"] }), []);
+  assert.ok(tendonLoad({ k: "station", i: ["Compromised Running 1×8′ Zone 3"] }).includes("achilles"));
+  assert.ok(tendonLoad({ k: "station", i: ["Run 1–4 mit SkiErg"] }).includes("knee"));
+});

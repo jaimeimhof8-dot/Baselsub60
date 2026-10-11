@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { weightList, cleanWeight, defaultWeight } from "../src/weights.js";
+import { weightList, cleanWeight, defaultWeight, isLift } from "../src/weights.js";
 import { builtinPlan } from "../src/plan-store.js";
 
 test("Gewichtsliste: Kraftübungen aus dem Plan, ohne Plank und Platzhalter", () => {
@@ -17,6 +17,12 @@ test("Gewichtsliste nimmt neue Übungen aus importiertem Plan auf", () => {
   assert.ok(!list.some((e) => e.label === "Sled Push"));
 });
 
+test("Gewichtsliste ohne Sprünge und EMOM", () => {
+  const list = weightList([{ k: "kraft", i: ["Box Jumps 3×3, im Wechsel mit den Kniebeugen", "EMOM 20′ (5 Runden): 15 Wall Balls", "Romanian Deadlift 3×8 RPE 7"] }]);
+  assert.ok(list.some((e) => e.label === "Romanian Deadlift"));
+  assert.ok(!list.some((e) => /Box Jumps|EMOM/.test(e.label)));
+});
+
 test("Gewicht normalisieren", () => {
   assert.equal(cleanWeight("80"), "80");
   assert.equal(cleanWeight(" 82,5 kg"), "82.5");
@@ -30,4 +36,12 @@ test("Vorschlag passt zur Übung trotz Satz-/Wdh-Angaben", () => {
   assert.equal(defaultWeight("Pull-ups 3×6 RPE 7", w), "10 kg");
   assert.equal(defaultWeight("Bench Press 3×6", w), "");
   assert.equal(defaultWeight("Back Squat", undefined), "");
+});
+
+test("Gewicht auch für feste Kraftübungen an Stationstagen", () => {
+  assert.ok(isLift("kraft", "Wadenheben einbeinig 3×15"));
+  assert.ok(isLift("station", "Back Squat 4×5 RPE 7"));
+  assert.ok(isLift("station", "Bulgarian Split Squat 3×8 je Seite RPE 7"));
+  assert.ok(!isLift("station", "Sled Push 50 m"));
+  assert.ok(!isLift("lauf", "4×1 km @ R"));
 });

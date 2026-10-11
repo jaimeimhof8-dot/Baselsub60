@@ -115,7 +115,8 @@ const KIND = {
 export function exercisePatterns(text) {
   const out = new Set();
   for (const [re, zs] of EX) if (re.test(text)) zs.forEach((z) => out.add(z));
-  if (/lauf|run|\d+\s?km|\bkm\b/i.test(text) && !/einlaufen|auslaufen/i.test(text)) RUN.forEach((z) => out.add(z));
+  // "run" nur als Wort ("Run 1–4", "Compromised Running"), nicht in "Runden"
+  if (/lauf|\brun(?:ning)?\b|\d+\s?km|\bkm\b/i.test(text) && !/einlaufen|auslaufen/i.test(text)) RUN.forEach((z) => out.add(z));
   return [...out];
 }
 /** Belastete Zonen einer Einheit: Art der Einheit + alle Übungen. */
@@ -167,7 +168,7 @@ const IMPACT = /box ?jump|kastensprung|burpee|lunge|ausfallschritt|sled push|wal
 export function tendonLoad(day) {
   if (!day || day.k === "rest" || day.inj || day.k === "bike") return [];
   const out = new Set(["lauf", "sim", "race"].includes(day.k) ? RUN : []);
-  for (const t of day.i || []) if (IMPACT.test(t) || /lauf|run|\d+\s?km/i.test(t)) exercisePatterns(t).forEach((z) => out.add(z));
+  for (const t of day.i || []) if (IMPACT.test(t) || /lauf|\brun(?:ning)?\b|\d+\s?km/i.test(t)) exercisePatterns(t).forEach((z) => out.add(z));
   return TENDONS.filter((z) => out.has(z));
 }
 

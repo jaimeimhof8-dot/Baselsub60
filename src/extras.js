@@ -1,6 +1,7 @@
 // Zusatz-Einheiten: spontane Einheiten neben dem Plan (Zone 2, Mobility, Core …), pro Tag als Liste.
 // Gespeicherte Form (S.extra): {"2026-10-14": [{id, type, min, note}]} – der Plan selbst bleibt unverändert.
 // Reine Funktionen, ohne DOM.
+import { overloadRisk, overloadText } from "./soreness.js";
 
 /** Arten. run = belastet Sehnen und Gelenke wie ein Lauf (zählt für die Überlastungs-Warnung). */
 export const EXTRA_TYPES = {
@@ -57,4 +58,29 @@ export function loadDay(day, list) {
   if (!runs.length) return day || null;
   if (!day || ["rest", "bike"].includes(day.k) || day.inj) return { t: "Zusatz-Einheit", k: "lauf", i: runs };
   return { ...day, i: [...(day.i || []), ...runs] };
+}
+
+/**
+ * Überlastungsrisiko mit Zusatz-Einheiten – und ob es erst durch sie entsteht (oder schlimmer wird).
+ * planAt(d) = Einheit, die an Tag d stattfand/stattfindet (null = keine), extraAt(d) = Zusatz-Liste.
+ * @returns {{risk, byExtra: boolean, runs: {d:number,label:string}[]}} runs = Zusatz-Läufe der letzten 7 Tage bis x
+ */
+export function overloadWithExtras({ day, x, today, soreAt, planAt, extraAt }) {
+  const at = (d) => loadDay(planAt(d), extraAt(d));
+  const base = day ? overloadRisk(day, x, today, soreAt, planAt) : [];
+  const risk = overloadRisk(loadDay(day, extraAt(x)), x, today, soreAt, at);
+  const sig = (list) => list.map(overloadText).join("|");
+  const byExtra = risk.length > 0 && sig(risk) !== sig(base);
+  const runs = [];
+  if (byExtra) for (let d = x - 7; d <= x; d++) for (const e of cleanExtras(extraAt(d))) if (EXTRA_TYPES[e.type].run) runs.push({ d, label: extraLabel(e) });
+  return { risk, byExtra, runs };
+}
+
+/** Zusatz-Einheit als Tag für die Muskel-Zuordnung (Muskelkater-Melder). Mobility belastet nichts. */
+export function extraAsDay(e) {
+  if (!e || !EXTRA_TYPES[e.type]) return null;
+  if (e.type === "z2run") return { t: extraLabel(e), k: "lauf", i: ["Zone 2 Lauf"] };
+  if (e.type === "z2bike") return { t: extraLabel(e), k: "bike", i: ["Rad Zone 2"] };
+  if (e.type === "core") return { t: extraLabel(e), k: "kraft", i: ["Core"] };
+  return null;
 }

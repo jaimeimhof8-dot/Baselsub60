@@ -2,6 +2,7 @@
 // Claude auf) und prüft die zurückgegebenen Änderungsvorschläge, bevor die App sie anwenden darf.
 // Reine Funktionen – der Plan wird über Callbacks gelesen, damit alles in Node testbar bleibt.
 import { dateFromIdx, DAYSF, dow } from "./dates.js";
+import { cleanExtras, extraLabel } from "./extras.js";
 
 export const COACH_PAST = 7;      // Tage Rückblick (erledigt, RPE, ausgefallen)
 export const COACH_AHEAD = 21;    // Tage Vorschau, die der Coach ändern darf
@@ -15,7 +16,7 @@ export const isoFromIdx = (i) => { const d = dateFromIdx(i); return d.getFullYea
 
 /**
  * Kompakte Sicht auf den Plan für das LLM.
- * ctx: {today, last, plan(i), status(i)->{n,done}, rpe(i), skipped(i), checkin, me, partner}
+ * ctx: {today, last, plan(i), status(i)->{n,done}, rpe(i), skipped(i), checkin, me, partner, extra(i)?}
  */
 export function planContext(ctx) {
   const today = Math.max(0, Math.min(ctx.last, ctx.today));
@@ -31,7 +32,11 @@ export function planContext(ctx) {
     if (p.inj) flags.push("verletzt");
     if (p.edited) flags.push("angepasst");
     if (p.race) flags.push("rennen");
+    if (p.solo) flags.push("solo ohne Partner");
     if (flags.length) d.flags = flags;
+    // Zusatz-Einheiten neben dem Plan (z. B. "Zone 2 Lauf · 30′") – zählen für die Belastung
+    const x = ctx.extra ? cleanExtras(ctx.extra(i)) : [];
+    if (x.length) d.extra = x.map(extraLabel);
     return d;
   };
   const recent = [];

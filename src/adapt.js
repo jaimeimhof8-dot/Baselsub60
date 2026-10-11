@@ -12,9 +12,11 @@
 //   moved       -> [{from, to, act}]  Strava-Aktivität passt zu einer Einheit an einem anderen Tag
 //   dismissed   -> {id: 1}
 //   sore(i)     -> {muskel: 1–10}     wirksamer Muskelkater (optional, aus dem Muskelkater-Melder)
+//   extra(i)    -> [{id,type,min}]    Zusatz-Einheiten (optional) – zusätzliche Läufe zählen für die Überlastung
 // }
-import { impact, summarize, overloadRisk, overloadText } from "./soreness.js";
-// Vorschlag = {id, type: "swap"|"easy"|"alt", day, to?, title, why}
+import { impact, summarize, overloadText } from "./soreness.js";
+import { overloadWithExtras } from "./extras.js";
+// Vorschlag = {id, type: "swap"|"easy"|"alt", day, to?, title, why, extra?: true (durch Zusatz-Einheiten ausgelöst)}
 
 export const CHECKIN_FIELDS = [
   ["sleep", "Schlaf"], ["sore", "Muskelkater"], ["energy", "Energie"], ["pain", "Schmerzen"]
@@ -105,21 +107,23 @@ export function suggest(ctx) {
   //     -> bei anhaltendem Muskelkater verschieben (wenn ein freier Tag da ist), sonst entlasten.
   //     Vergangene Tage zählen nur, wenn trainiert wurde; kommende so, wie sie geplant sind.
   const happened = (d) => (d < 0 ? null : d < T ? (isDone(ctx, d) ? ctx.plan(d) : null) : ctx.plan(d));
+  const extraAt = (d) => (ctx.extra ? ctx.extra(d) : []);
   for (const x of [T, T + 1]) {
     if (!ctx.sore || x > ctx.last || eased.has(x) || taken.has(x)) continue;
     const p = ctx.plan(x);
     if (!isHard(p) || p.easy || p.back || isDone(ctx, x)) continue;
-    const risk = overloadRisk(p, x, T, ctx.sore, happened);
+    const { risk, byExtra, runs } = overloadWithExtras({ day: p, x, today: T, soreAt: ctx.sore, planAt: happened, extraAt });
     if (!risk.length) continue;
-    const top = risk.slice(0, 2).map(overloadText).join("; ");
+    const top = risk.slice(0, 2).map(overloadText).join("; ") + (byExtra && runs.length ? `. Mitverursacht durch Zusatz-Einheiten: ${runs.map((r) => r.label).join(", ")}` : "");
+    const mark = byExtra ? { extra: true } : {};
     const slot = risk[0].kind === "sore" ? findSlot(ctx, x, x + 1, x + 3, taken) : null;
     if (slot != null) {
       taken.add(slot);
-      add({ id: `over:${x}`, type: "swap", day: x, to: slot, title: `Überlastung: ${p.t} verschieben`,
+      add({ ...mark, id: `over:${x}`, type: "swap", day: x, to: slot, title: `Überlastung: ${p.t} verschieben`,
         why: `${top}. Die Stelle braucht Ruhe – Einheit auf einen freien Tag legen. Bei anhaltendem Schmerz ärztlich abklären.` });
     } else {
       eased.add(x);
-      add({ id: `over:${x}`, type: "easy", day: x, title: `Überlastung: ${p.t} entlasten`,
+      add({ ...mark, id: `over:${x}`, type: "easy", day: x, title: `Überlastung: ${p.t} entlasten`,
         why: `${top}. Sprünge, Lunges und Tempoläufe reduzieren oder durch Rad/Rudern ersetzen, ca. 75 % Volumen.` });
     }
   }

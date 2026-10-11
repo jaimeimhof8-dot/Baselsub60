@@ -180,6 +180,7 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 .xrow .btn{flex:none;width:44px;padding:0}
 .xform{border-top:1px solid var(--line);padding-top:var(--s3)}
 .solo-t[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.xcause{margin-top:var(--s2);font-size:13px;color:var(--text)}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s3);text-align:center}
 .stat b{display:block;font-family:var(--f-head);font-size:24px;line-height:1.05}
 .stat span{font-size:12px;color:var(--muted);letter-spacing:.04em}
@@ -502,7 +503,9 @@ import * as sore from "./src/soreness.js";
 import { makeBackup, backupFileName, readBackup } from "./src/backup.js";
 import * as coach from "./src/coach.js";
 import { canSolo, soloize } from "./src/solo.js";
-import { EXTRA_TYPES, makeExtra, addExtra, removeExtra, extraLabel, extraMinutes, cleanExtras, loadDay } from "./src/extras.js";
+import { EXTRA_TYPES, makeExtra, addExtra, removeExtra, extraLabel, extraMinutes, cleanExtras, overloadWithExtras, extraAsDay } from "./src/extras.js";
+import { mergeState, stable } from "./src/merge.js";
+import { swapDayData } from "./src/swap.js";
 
 /* ---------- Zeit ---------- */
 // ?heute=2026-10-20 simuliert ein anderes Datum (zum Testen von Umplanen/Strava vor Planstart).
@@ -588,19 +591,11 @@ function dayPlan(i){
   if(!o.inj && S.solo[keyI(i)] && canSolo(p)) p=soloize(p,PARTNER);
   return p;
 }
-/* Einheiten von Tag i und j tauschen. Abgehakte Übungen und Werte wandern mit der Einheit mit. */
+/* Einheiten von Tag i und j tauschen. Abgehakte Übungen, Werte und der Solo-Schalter wandern mit der Einheit mit. */
 function swapDays(i,j){
   const a=srcOf(i), b=srcOf(j);
   setE(i,{src:b}); setE(j,{src:a});
-  const A=keyI(i)+"|", B=keyI(j)+"|";
-  for(const m of [S.done,S.val]){
-    const ea=[], eb=[];
-    for(const k of Object.keys(m)){ if(k.startsWith(A)) ea.push(k); else if(k.startsWith(B)) eb.push(k); }
-    const va=ea.map(k=>[k.slice(A.length),m[k]]), vb=eb.map(k=>[k.slice(B.length),m[k]]);
-    [...ea,...eb].forEach(k=>delete m[k]);
-    va.forEach(([s,v])=>m[B+s]=v); vb.forEach(([s,v])=>m[A+s]=v);
-  }
-  delete S.skip[keyI(i)]; delete S.skip[keyI(j)];
+  swapDayData(S,keyI(i),keyI(j));
 }
 function restoreDay(i){
   const o=S.sched[i]; if(!o) return;
@@ -662,19 +657,23 @@ const actsOf=(i)=>{ const e=rc().byDay[i]; return e ? e.acts.map(id=>S.strava.ac
 
 /* Hat an Tag d ein Training stattgefunden? (abgehakt, RPE oder passende Strava-Aktivität) */
 const trained=(d)=>{ if(d<0||d>LAST) return false; const e=rc().byDay[d]; return dayStatus(d).done>0||S.rpe[keyI(d)]!=null||!!(e&&e.match); };
-function overloadAt(i){
-  const p=loadDay(dayPlan(i),S.extra[keyI(i)]); if(!p||i<TODAY||i>TODAY+1) return [];
-  // Zusätzliche Läufe (Zusatz-Einheiten) belasten Sehnen wie ein geplanter Lauf
-  const at=(d)=>d<0?null:loadDay(d<TODAY?(trained(d)?dayPlan(d):null):dayPlan(d),S.extra[keyI(d)]);
-  return sore.overloadRisk(p,i,soreToday(),soreAt,at);
+/* Überlastung an Tag i (heute/morgen). Zusätzliche Läufe belasten Sehnen wie ein geplanter Lauf;
+   byExtra/runs zeigen, wenn erst die Zusatz-Einheiten die Warnung auslösen. */
+function overloadInfo(i){
+  const none={risk:[],byExtra:false,runs:[]};
+  if(i<TODAY||i>TODAY+1||!dayPlan(i)) return none;
+  return overloadWithExtras({day:dayPlan(i),x:i,today:soreToday(),soreAt,extraAt:(d)=>S.extra[keyI(d)],
+    planAt:(d)=>d<0?null:d<TODAY?(trained(d)?dayPlan(d):null):dayPlan(d)});
 }
+const overloadAt=(i)=>overloadInfo(i).risk;
 
 /* ---------- Vorschläge (Rescheduler) ---------- */
 let SUGS=[];
 function suggestions(){
   return suggest({today:TODAY,last:LAST,plan:dayPlan,status:dayStatus,
     skipped:(i)=>!!S.skip[keyI(i)], rpe:(i)=>S.rpe[keyI(i)]??undefined, checkin:(i)=>S.checkin[keyI(i)],
-    strava:(i)=>rc().byDay[i], moved:rc().moved.map(m=>({...m,toLabel:shortDay(m.to)})), dismissed:S.dismiss, sore:soreAt});
+    strava:(i)=>rc().byDay[i], moved:rc().moved.map(m=>({...m,toLabel:shortDay(m.to)})), dismissed:S.dismiss, sore:soreAt,
+    extra:(i)=>S.extra[keyI(i)]});
 }
 function applySug(s){
   if(s.type==="swap") swapDays(s.day,s.to);
@@ -722,8 +721,8 @@ function sessionCard(i){
   if(canSolo(p)) h+=`<button class="btn sm solo-t mt-3" data-act="solo" data-i="${i}" aria-pressed="${!!p.solo}">${p.solo?`👥 Wieder mit ${esc(PARTNER)}`:`👤 Solo – ${esc(PARTNER)} fällt aus`}</button>`;
   const hit=sore.impact(p,soreAt(i));
   if(hit.level>=4) h+=`<div class="target ${hit.level>=7?"bad":""}">Muskelkater: ${sore.summarize(hit.muscles.filter(m=>m.level>=4)).map(x=>esc(x).replace(/(\d+\/10)$/,"<b>$1</b>")).join(", ")}.${hit.names.length?` Betroffen: ${hit.names.slice(0,3).map(x=>`„${esc(x)}“`).join(", ")} – dort Last reduzieren.`:""}</div>`;
-  const ol=overloadAt(i);
-  if(ol.length) h+=`<div class="target bad"><b>⚠ Überlastung</b> – ${ol.slice(0,2).map(o=>esc(sore.overloadText(o))).join("; ")}.${p.easy?" Die Einheit ist bereits entlastet.":`<div class="grid2 mt-3"><button class="btn sm" data-act="ol-easy" data-i="${i}">Entlasten</button><button class="btn sm" data-move="${i}">Verschieben …</button></div>`}</div>`;
+  const oi=overloadInfo(i), ol=oi.risk;
+  if(ol.length) h+=`<div class="target bad"><b>⚠ Überlastung</b> – ${ol.slice(0,2).map(o=>esc(sore.overloadText(o))).join("; ")}.${oi.byExtra&&oi.runs.length?`<div class="xcause">Ausgelöst durch Zusatz-Einheit: ${oi.runs.map(r=>`${esc(r.label)} (${esc(shortDay(r.d))})`).join(", ")}</div>`:""}${p.easy?" Die Einheit ist bereits entlastet.":`<div class="grid2 mt-3"><button class="btn sm" data-act="ol-easy" data-i="${i}">Entlasten</button><button class="btn sm" data-move="${i}">Verschieben …</button></div>`}</div>`;
   h+=`<div class="prog"><i style="width:${n?done/n*100:0}%"></i></div><div class="row between"><span class="sub">${done} von ${n} erledigt</span>${done<n?`<button class="btn sm" data-act="all-done" data-i="${i}">✓ Alles erledigt</button>`:""}</div>`;
   if(p.tp){ const T=teamT();
     h+= isNaN(T)? `<div class="target">Noch kein Team-Tempo T. Trag zuerst den Pacing-Test ein (Menü → Profil).</div>`
@@ -816,7 +815,7 @@ function sugCard(){
     const act = s.type==="info" ? `<button class="btn sm" data-sug-no="${esc(s.id)}">Verstanden</button><span></span>`
       : `<button class="btn primary sm" data-sug="${esc(s.id)}">${s.type==="swap"?"Verschieben":s.type==="easy"?"Entlasten":"Übernehmen"}</button><button class="btn sm" data-sug-no="${esc(s.id)}">Ignorieren</button>`;
     const where = s.to!=null ? `<div class="sub">${shortDay(s.day)} → ${shortDay(s.to)}</div>` : `<div class="sub">${shortDay(s.day)}</div>`;
-    h+=`<div class="sug"><b>${esc(s.title)}</b>${where}<div class="sub">${esc(s.why)}</div><div class="grid2">${act}</div></div>`;
+    h+=`<div class="sug"><b>${esc(s.title)}</b>${s.extra?` <span class="badge ok">wegen Zusatz-Einheit</span>`:""}${where}<div class="sub">${esc(s.why)}</div><div class="grid2">${act}</div></div>`;
   }
   return h+`</div>`;
 }
@@ -1036,11 +1035,16 @@ const soreVal=(v)=>`${v}<small>${sore.strength(v)}</small>`;
 const soreOwn=(t)=>{ const o={}; for(const [id,v] of Object.entries(S.sore[t]||{})) for(const z of sore.expand(id)) o[z]=Math.max(o[z]||0,+v||0); return o; };
 /* Stellen, die die Einheit von gestern belastet hat – nur wenn trainiert wurde und es hart war (harte Einheit oder RPE ≥ 7) */
 function soreYesterday(t){
-  const y=t-1, p=y>=0?dayPlan(y):null;
-  if(!p||!trained(y)||!(isHardP(p)||(S.rpe[keyI(y)]||0)>=7)) return new Set();
-  // Abgehakte Übungen sind genauer als die ganze Einheit (nur RPE/Strava → ganze Einheit)
-  const dk=keyI(y), ticked=p.i.filter((_,j)=>S.done[dk+"|"+j]);
-  return new Set(sore.loadOf(ticked.length?{...p,i:ticked}:p));
+  const y=t-1, p=y>=0?dayPlan(y):null, out=new Set();
+  if(p&&trained(y)&&(isHardP(p)||(S.rpe[keyI(y)]||0)>=7)){
+    // Abgehakte Übungen sind genauer als die ganze Einheit (nur RPE/Strava → ganze Einheit)
+    const dk=keyI(y), ticked=p.i.filter((_,j)=>S.done[dk+"|"+j]);
+    sore.loadOf(ticked.length?{...p,i:ticked}:p).forEach(z=>out.add(z)); out.plan=p;
+  }
+  // Zusatz-Einheiten von gestern belasten zusätzlich (z. B. Zone 2 Lauf: Waden, Achillessehne)
+  out.extras=y>=0?cleanExtras(S.extra[keyI(y)]).filter(e=>extraAsDay(e)):[];
+  for(const e of out.extras) sore.loadOf(extraAsDay(e)).forEach(z=>out.add(z));
+  return out;
 }
 function soreItem(z,own,lv,ys){
   const v=own[z.id]||0, carry=lv[z.id]>v?lv[z.id]:0;
@@ -1056,9 +1060,9 @@ function soreWarn(t){
 }
 function soreHtml(){
   const t=soreToday(), own=soreOwn(t), lv=soreAt(t), top=sore.sectionLevels(lv), ys=soreYesterday(t);
-  const yp=ys.size?dayPlan(t-1):null;
+  const yp=ys.size?ys.plan:null, yx=ys.size?ys.extras.map(extraLabel):[];
   let h=`<p class="sub" style="margin:0 0 var(--s4)">Stell für jede Stelle ein, wie stark sie heute zwickt (0 = nichts, 10 = sehr stark). Die App entlastet oder verschiebt harte Einheiten, die genau diese Stellen belasten, und füllt den Check-in „Muskelkater“ aus.</p>
-    ${soreWarn(t)}${yp?`<p class="sub" style="margin:0 0 var(--s3)">Gestern: <b>${esc(yp.t)}</b>${S.rpe[keyI(t-1)]?` (RPE ${S.rpe[keyI(t-1)]})`:""} – belastete Stellen sind markiert.</p>`:""}
+    ${soreWarn(t)}${yp||yx.length?`<p class="sub" style="margin:0 0 var(--s3)">Gestern: ${yp?`<b>${esc(yp.t)}</b>${S.rpe[keyI(t-1)]?` (RPE ${S.rpe[keyI(t-1)]})`:""}`:""}${yx.length?`${yp?" + ":""}Zusatz: <b>${esc(yx.join(", "))}</b>`:""} – belastete Stellen sind markiert.</p>`:""}
     <div class="legend sub"><span><i style="background:${SORE_COL.l}"></i>leicht (1–3)</span><span><i style="background:${SORE_COL.m}"></i>mittel (4–6)</span><span><i style="background:${SORE_COL.s}"></i>stark (7–10)</span></div>`;
   for(const [sec,title] of sore.SECTIONS){
     const zs=sore.zonesOf(sec), n=zs.filter(z=>lv[z.id]).length, m=top[sec]||0, yn=zs.filter(z=>ys.has(z.id)).length;
@@ -1283,7 +1287,7 @@ let ccBusy=false, ccErr="", ccDraft="", coachTab="chat"; // coachTab: "chat" | "
 const coachReady=()=>!!(sb&&USER);
 function coachCtx(){
   return coach.planContext({today:TODAY,last:LAST,plan:dayPlan,status:dayStatus,
-    rpe:(i)=>S.rpe[keyI(i)], skipped:(i)=>!!S.skip[keyI(i)], checkin:S.checkin[keyI(Math.max(0,TODAY))], me:ME, partner:PARTNER,
+    rpe:(i)=>S.rpe[keyI(i)], skipped:(i)=>!!S.skip[keyI(i)], checkin:S.checkin[keyI(Math.max(0,TODAY))], me:ME, partner:PARTNER, extra:(i)=>S.extra[keyI(i)],
     soreness:Object.fromEntries(Object.entries(soreAt(soreToday())).map(([z,v])=>[sore.LABEL[z]||z,v]))});
 }
 const coachCheck=(actions)=>coach.validateActions(actions,{today:TODAY,last:LAST,idxOf:idxOfIso,plan:dayPlan});
@@ -1447,20 +1451,37 @@ function acctHtml(link){
 function setSync(s){ syncState=s; document.querySelectorAll(".acct-sync").forEach(el=>el.textContent=syncLabel()); }
 const syncLabel=()=>({ok:"✓ gespeichert in der Cloud",offline:"Offline – wird später gespeichert",busy:"Speichert …"}[syncState]||"");
 function queuePush(){ if(!sb||!USER) return; dirty=true; setSync("busy"); clearTimeout(pushT); pushT=setTimeout(push,1200); }
-async function push(){
-  if(!sb||!USER) return; dirty=false;
-  const {error}=await sb.from("plan_state").upsert({user_id:USER.id,data:S,updated_at:new Date().toISOString()});
-  if(error){ dirty=true; setSync("offline"); } else setSync("ok");
-}
-/* Neuere Version aus der Cloud holen (z. B. vom anderen Gerät). Gibt true zurück, wenn sich S geändert hat. */
-async function pull(){
+/* Sync ohne Datenverlust: Cloud-Stand holen, pro Eintrag mit dem lokalen Stand zusammenführen (Basis = letzter
+   gemeinsamer Stand, src/merge.js), Ergebnis zurückschreiben. Gibt true zurück, wenn sich lokal etwas geändert hat. */
+const baseKey=()=>LSK+":base";
+function loadBase(){ try{ return JSON.parse(lsGet(baseKey())||"null"); }catch(_){ return null; } }
+let syncing=null;
+function sync(){ if(!syncing) syncing=doSync().finally(()=>{ syncing=null; }); return syncing; }
+async function doSync(){
+  if(!sb||!USER) return false;
+  const was=dirty; dirty=false;
   const {data,error}=await sb.from("plan_state").select("data").eq("user_id",USER.id).maybeSingle();
-  if(error){ setSync("offline"); return false; }
-  const rt=data&&data.data&&data.data._t||0, lt=S._t||0;
-  if(data && rt>lt){ S=fill(data.data); saveLocal(); setSync("ok"); return true; }
-  if(!data || lt>rt) await push(); else setSync("ok");
-  return false;
+  if(error){ dirty=dirty||was; setSync("offline"); return false; }
+  const remote=data&&data.data||null, before=stable(S);
+  if(remote) S=fill(mergeState(loadBase(),S,remote));
+  const changed=stable(S)!==before;
+  if(changed) saveLocal();
+  // Basis = genau der Stand, der in der Cloud liegt – Änderungen während des Hochladens gehören noch nicht dazu
+  const snap=JSON.stringify(S);
+  if(!remote || stable(S)!==stable(remote)){
+    const {error:e2}=await sb.from("plan_state").upsert({user_id:USER.id,data:JSON.parse(snap),updated_at:new Date().toISOString()});
+    if(e2){ dirty=true; setSync("offline"); return changed; }
+  }
+  lsSet(baseKey(),snap); setSync(dirty?"busy":"ok");
+  if(dirty) queuePush();
+  return changed;
 }
+async function push(){
+  if(!sb||!USER) return;
+  const busy=document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName);
+  if(await sync() && !busy) render();
+}
+const pull=()=>sync();
 async function onLogin(user){
   USER=user; LSK="hx:"+user.id; lsSet("hx:last",user.id);
   lsDel("hx:strava-secret"); // Secret gehört auf den Server (Edge Function „strava“)
@@ -1528,7 +1549,7 @@ function afterBoot(){
   // Erster Start / erstes Login ohne Strava: einmalig das Onboarding zeigen
   if(authed() && view==="today" && needsOnb()){ view="onb"; render(); }
 }
-window.addEventListener("online",()=>{ $("#offline").hidden=true; if(dirty) push(); });
+window.addEventListener("online",()=>{ $("#offline").hidden=true; if(sb&&USER) push(); });
 window.addEventListener("offline",()=>{ $("#offline").hidden=false; });
 if(navigator.onLine===false) $("#offline").hidden=false;
 /* Geteilter Link, während die App schon offen ist (nur der Hash ändert sich) */
@@ -1541,7 +1562,8 @@ document.addEventListener("visibilitychange",()=>{
 document.addEventListener("visibilitychange",async()=>{
   if(!sb||!USER) return;
   if(document.visibilityState==="hidden"){ if(dirty){ clearTimeout(pushT); push(); } return; }
-  if(dirty) return;
+  // Auch mit offenen Änderungen holen: die Zusammenführung behält beide Seiten
+  clearTimeout(pushT);
   const busy=document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName);
   if(await pull() && !busy) render();
 });

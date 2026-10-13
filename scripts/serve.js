@@ -15,7 +15,7 @@ createServer(async (req, res) => {
   if (path.startsWith("..") || /^(node_modules|test|scripts|supabase)\b/.test(path)) { res.writeHead(404); return res.end(); }
   try {
     const body = await readFile(join(ROOT, path || "index.html"));
-    res.writeHead(200, { "Content-Type": TYPES[extname(path || ".html")] || "application/octet-stream", "Cache-Control": "no-store" });
+    res.writeHead(200, { "Content-Type": TYPES[extname(path || "index.html")] || "application/octet-stream", "Cache-Control": "no-store" });
     res.end(body);
   } catch (_) { res.writeHead(404); res.end("Not found"); }
 }).listen(PORT, () => console.log(`Basel Sub-60 läuft auf http://localhost:${PORT}`));

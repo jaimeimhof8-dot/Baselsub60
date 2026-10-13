@@ -1,0 +1,9 @@
+[project]
+name = "hyrox-garmin-login"
+version = "1.0.0"
+requires-python = ">=3.12"
+# Exakt gepinnt: eine kompromittierte neue Version könnte sonst Passwörter abgreifen. Updates bewusst prüfen und anheben.
+dependencies = ["garminconnect==0.3.17", "curl_cffi==0.15.0", "requests==2.33.0"]
+
+[tool.vercel]
+entrypoint = "api.login:handler"

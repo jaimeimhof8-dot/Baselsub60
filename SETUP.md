@@ -52,6 +52,57 @@ Ohne Cloud (Vorschau-Modus) gibt es zum Ausprobieren weiterhin die Eingabe von C
 
 Ohne API-App geht es auch per Datei: Strava → Einstellungen → Mein Konto → Account-Daten herunterladen → aus dem ZIP `activities.csv` in der App importieren.
 
+# Garmin verbinden (optional, ca. 15 Minuten)
+
+Garmin und Strava gehen gleichzeitig, beide im Tab **Strava / Garmin**. Dieselbe Einheit zählt nur einmal: Kommt ein Lauf über beide Wege, behält die App die Garmin-Version. Garmin liefert zusätzlich **HRV, Schlaf, Body Battery, Training Readiness und Ruhepuls**. Ist die Erholung schlecht und steht heute eine harte Einheit an, schlägt die App „entlasten“ vor. Ein eigener Check-in hat Vorrang.
+
+**Inoffiziell:** Garmin hat keine API für Privatpersonen. Die App nutzt deshalb denselben Weg wie die Garmin-Connect-App (über `python-garminconnect`). Garmin kann das jederzeit ändern. Strava und der Datei-Import bleiben deshalb bestehen.
+
+**Warum der Login am PC passiert:** Seit März 2026 blockiert Garmin Logins aus Rechenzentren. Deshalb meldet sich jeder einmal auf dem eigenen PC an. Hochgeladen wird nur die Token-Datei, nie das Passwort. Die Tokens liegen AES-verschlüsselt in `garmin_tokens`, ohne Zugriff aus der App. Die Edge Function `garmin` erneuert sie und holt die Daten.
+
+## Einrichten (einmalig, durch den Admin)
+1. `schema.sql` nochmals im SQL Editor ausführen. Das legt die Tabelle `garmin_tokens` an.
+2. Zwei zufällige Werte erzeugen, z. B. mit `openssl rand -hex 32` oder einem Passwort-Generator mit 40 oder mehr Zeichen. Dann setzen und deployen (im Ordner `app/`):
+   ```
+   npx supabase secrets set GARMIN_TOKEN_KEY=<zufällig-1> GARMIN_CRON_SECRET=<zufällig-2>
+   npx supabase functions deploy garmin --no-verify-jwt
+   ```
+   **`GARMIN_TOKEN_KEY` nie ändern.** Sonst lassen sich die gespeicherten Tokens nicht mehr entschlüsseln, und alle müssen ihre Datei neu hochladen.
+3. `supabase/garmin-cron.sql` öffnen, `<GARMIN_CRON_SECRET>` durch den zweiten Wert ersetzen und im SQL Editor ausführen. Der Cron erneuert alle 6 Stunden die Tokens. Ohne ihn verfällt die Verbindung, wenn jemand 30 Tage die App nicht öffnet.
+
+## Login-Server auf Vercel (einmalig, durch den Admin)
+Damit sich jeder direkt in der App mit Garmin-E-Mail und Passwort anmelden kann, läuft der Login auf einem kleinen Python-Server (Ordner `garmin-login/`, gratis auf Vercel). Er prüft, dass der Aufrufer ein Mitglied der App ist, meldet sich bei Garmin an und gibt nur die Tokens zurück. Das Passwort wird nicht gespeichert. Verlangt Garmin einen Bestätigungscode, zeigt die App ein Code-Feld (Tabelle `garmin_pending`).
+
+1. `npx vercel login` (mit GitHub).
+2. Im Ordner `app/garmin-login/`:
+   ```
+   npx vercel link --yes --project hyrox-garmin-login
+   npx vercel env add SUPABASE_URL production        # https://mwhbjrulzxiwtjvcwojo.supabase.co
+   npx vercel env add SUPABASE_ANON_KEY production   # derselbe Key wie in config.js
+   npx vercel deploy --prod
+   ```
+3. Die Adresse `https://<projekt>.vercel.app/api/login` in `config.js` bei `garminLoginUrl` eintragen.
+4. Falls die App „Login-Server nicht erreichbar“ meldet: unter Vercel → Projekt → Settings → **Deployment Protection** die „Vercel Authentication“ für Production ausschalten.
+
+Getestet am 13.10.2026: Der Login von Vercel klappt (Garmin blockiert dort die Mobile-Variante mit 429, die Bibliothek weicht automatisch auf eine andere aus). Die Anmeldung dauert deshalb rund 10 Sekunden. Klappt es nicht („Garmin blockiert die Anmeldung“), bleibt in der App die Alternative mit Login am PC und Datei-Upload (unten).
+
+## Verbinden (jeder Nutzer selbst)
+In der App: Menü → **Strava / Garmin** → Garmin-E-Mail und Passwort eingeben → **Mit Garmin anmelden**. Kommt ein Code per Mail, SMS oder Authenticator, diesen eingeben.
+
+### Alternative: Login am PC und Datei hochladen
+1. In der App: Menü → **Strava / Garmin** → „Anmeldung klappt nicht?“ öffnen. Die Schritte stehen auch dort.
+2. Einmalig **uv** installieren:
+   - Windows (PowerShell): `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+   - Mac: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+3. Terminal neu öffnen und den Befehl aus der App ausführen (**Kopieren**), z. B. `uv run "https://<deine-app>/garmin-login.py"`. Dann Garmin-E-Mail, Passwort und ggf. den MFA-Code eingeben. Das Skript speichert `garmin_tokens.json` im aktuellen Ordner.
+4. In der App **garmin_tokens.json hochladen**, dann die Datei auf dem PC löschen. Die App erneuert die Tokens sofort, dadurch wird die Kopie auf dem PC ungültig.
+
+Die Verbindung gilt danach auf allen Geräten dieses Kontos. **Trennen** löscht die Tokens vom Server.
+
+Meldet die App „Garmin hat den Zugang abgelehnt“, die Schritte 3 und 4 wiederholen. Das passiert, wenn das Garmin-Passwort geändert, der Zugriff in Garmin widerrufen oder der Cron 30 Tage nicht gelaufen ist.
+
+**Nicht gleichzeitig mit garmin_mcp oder anderen Tools dieselbe Datei verwenden:** Die Tokens rotieren bei jeder Erneuerung. Wer Garmin zusätzlich in Claude nutzt, meldet sich dort separat an.
+
 # Coach-Chat einrichten (optional, ca. 10 Minuten)
 
 Der Coach-Chat (Menü → Coach-Chat) schickt deinen Plan der nächsten drei Wochen, die letzten 7 Tage und deine Nachricht an die Supabase Edge Function `coach`. Diese fragt Claude (`claude-opus-5-5`) und gibt Vorschläge zurück (tauschen, entlasten, ausfallen lassen, Übungen ändern). Die App prüft jeden Vorschlag und wendet ihn erst an, wenn du **Übernehmen** tippst. Vergangene Tage und den Renntag kann der Coach nicht ändern.

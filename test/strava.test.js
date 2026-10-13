@@ -10,7 +10,7 @@ const API = [
 
 test("API-Aktivität normalisieren", () => {
   const a = normalizeApi(API[0]);
-  assert.deepEqual(a, { id: "1", name: "Intervalle", type: "Run", group: "run", date: "2026-10-13", dist: 8200, time: 2460, hr: 161, watts: null });
+  assert.deepEqual(a, { id: "1", name: "Intervalle", type: "Run", group: "run", date: "2026-10-13", start: "2026-10-13T18:05", dist: 8200, time: 2460, hr: 161, watts: null });
   assert.equal(normalizeApi(API[1]).group, "ride");
 });
 

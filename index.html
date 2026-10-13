@@ -2,6 +2,9 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<!-- Sicherheit: Daten dürfen nur an die eigenen Dienste gehen (Supabase, Garmin-Login-Server, Strava). Neue Dienste hier ergänzen. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://hyrox-garmin-login.vercel.app https://www.strava.com https://cdn.jsdelivr.net; worker-src 'self' blob: https://cdn.jsdelivr.net; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f1113">
 <meta name="color-scheme" content="dark">
@@ -18,12 +21,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- defer: Splash-Screen erscheint sofort, Skripte laufen danach in dieser Reihenfolge -->
 <script src="config.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous" defer></script>
+<!-- Animationen im Dashboard: GSAP + ScrollTrigger, feste Version mit Prüfsumme (SRI) -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" integrity="sha384-XmJ9SoHtVOHoQUcKvFAzVXwdkKo1Ie3bhmSoIAkcdsHGaIrVJIkmozyq0FJeb/Ly" crossorigin="anonymous" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" integrity="sha384-wl5TeDVvOWt30Pbf8aSo2ZrzsOjddu3avOBvHe+p+OhJt9gP6w9YXmDkN5DK2/dF" crossorigin="anonymous" defer></script>
 <style>
 :root{
   color-scheme:dark;
   --bg:#0f1113;--card:#181b1e;--surface2:#222629;--text:#ecebe5;--muted:#8d9096;--line:#2b2f33;
-  --accent:#ffd21f;--on-accent:#16181a;--ok:#6fcf86;--warn:#ffc04d;--danger:#ff8a80;--strava:#fc6a2c;
+  --accent:#ffd21f;--on-accent:#16181a;--ok:#6fcf86;--warn:#ffc04d;--danger:#ff8a80;--strava:#fc6a2c;--garmin:#11a9ed;
   --kraft:#f0834a;--lauf:#6ea4f0;--bike:#5fcf80;--station:#b996ef;--sim:#ff7b6b;--rest:#6d7176;--race:#ffd21f;
   --f-head:'Barlow Condensed','Arial Narrow',Impact,sans-serif;--f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
   /* Abstände: ein 4-px-Raster für alles */
@@ -73,6 +79,17 @@ main{padding:var(--s4);max-width:640px;margin:0 auto}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s5);margin-bottom:var(--s4)}
 .card.tight{padding:var(--s4)}
 .card.hero{border-top:5px solid var(--kc,var(--accent))}
+/* Erledigte Einheit: schmaler Balken statt ganzer Karte (antippen = Details) */
+.done-bar{display:flex;align-items:center;gap:var(--s3);width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer;
+  padding:var(--s3) var(--s4);border:1px solid var(--line);border-left:5px solid var(--kc,var(--ok));background:var(--card);border-radius:var(--r-m);min-height:60px}
+.done-bar .ck{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--kc,var(--ok));color:#101214;font-weight:700}
+.done-bar .t{flex:1;min-width:0}.done-bar .t b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.done-bar .more{flex:none;font-size:12px;color:var(--muted)}
+.done-bar .miss{color:var(--warn)}
+.card.closing{overflow:hidden}
+.card.closing > *{transition:opacity .2s ease}
+.card.closing.fade > *{opacity:0}
+.prog.full i{background:var(--ok)}
 .card > :last-child{margin-bottom:0}
 .row{display:flex;align-items:center;gap:var(--s2)}.between{justify-content:space-between}.wrap{flex-wrap:wrap}
 .k-kraft{--kc:var(--kraft)}.k-lauf{--kc:var(--lauf)}.k-bike{--kc:var(--bike)}.k-station{--kc:var(--station)}.k-sim{--kc:var(--sim)}.k-rest{--kc:var(--rest)}.k-race{--kc:var(--race)}
@@ -136,6 +153,7 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 .btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .btn.ghost{background:transparent}
 .btn.strava{background:var(--strava);border-color:var(--strava);color:#fff}
+.btn.garmin{background:var(--garmin);border-color:var(--garmin);color:#fff}
 .btn.sm{min-height:44px;font-size:14px;width:auto;padding:0 var(--s3)}
 .btn:active:not(:disabled){transform:scale(.98)}
 .btn:disabled{opacity:.5}
@@ -211,7 +229,7 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 .pday-body .hint{margin-top:var(--s2)}
 
 /* Tabs */
-.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:grid;grid-template-columns:repeat(3,1fr);background:rgba(24,27,30,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(24,27,30,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 .tabs button{background:none;border:0;min-height:var(--tabs-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.03em}
 .tabs svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tabs button.on{color:var(--text)}
@@ -288,6 +306,7 @@ td.l{font-size:13px;color:var(--muted)}
 .badge.ok{background:rgba(111,207,134,.15);color:var(--ok)}
 .badge.easy{background:rgba(255,192,77,.15);color:var(--warn)}
 .badge.strava{background:rgba(252,106,44,.15);color:var(--strava)}
+.badge.garmin{background:rgba(17,169,237,.15);color:var(--garmin)}
 .chips{display:flex;flex-wrap:wrap;gap:var(--s2)}
 .chips button{min-width:48px;height:44px;padding:0 14px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--bg);font-weight:600}
 .chips button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
@@ -357,6 +376,84 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 .sug .sub{margin-top:var(--s1)}
 .sug .grid2{margin-top:var(--s3)}
 
+.wide{max-width:1040px;margin:0 auto}
+/* Dashboard: Diagramme (dataviz-Regeln: dünne Marken, zurückhaltendes Raster, Werte in Textfarbe) */
+:root{--viz-1:#3987e5;--viz-2:#d95926}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s2)}
+@media(min-width:600px){.kpis{grid-template-columns:repeat(3,1fr)}}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s3) var(--s4)}
+/* Spotlight (nach React Bits „SpotlightCard“): weicher Lichtkegel folgt dem Zeiger */
+.spot{position:relative;overflow:hidden;isolation:isolate;transition:border-color .25s,transform .25s}
+.spot::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(255,210,31,.09),transparent 65%)}
+.spot:hover{border-color:#3a3f45}.spot:hover::before{opacity:1}
+@media (hover:hover){.kpi.spot:hover{transform:translateY(-2px)}}
+.dash-hero{display:grid;gap:var(--s3);grid-template-columns:1fr;margin-bottom:var(--s3)}
+@media(min-width:600px){.dash-hero{grid-template-columns:auto 1fr}}
+.dash-rings{display:flex;gap:var(--s4);justify-content:center;align-items:center;padding:var(--s4);
+  background:linear-gradient(160deg,#1d2125 0%,#15181b 100%);border:1px solid var(--line);border-radius:var(--r-m)}
+.ring{position:relative;display:grid;place-items:center}
+.ring svg{display:block}
+.ring .ring-bg{fill:none;stroke:#262a2e;stroke-width:9}
+.ring .ring-fg{fill:none;stroke:var(--ring);stroke-width:9;stroke-linecap:round}
+.ring::before{content:"";position:absolute;inset:18%;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--ring) 14%,transparent),transparent 70%);pointer-events:none}
+/* Hochzählende Zahl übernimmt Schrift und Farbe der umgebenden Zahl */
+.kpi b .cnt,.ring-t b .cnt{font:inherit;color:inherit;letter-spacing:inherit;text-transform:none;margin:0;display:inline}
+.ring-t{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.1}
+.ring-t b{font-family:var(--f-head);font-size:30px;color:var(--text)}
+.ring-t span{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+.ring-t em{font-style:normal;font-size:11px;margin-top:2px}
+.ring-t em span{text-transform:none;letter-spacing:0;font-size:12px}
+.dash-title{font-family:var(--f-head);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:var(--s6) 0 var(--s2);display:flex;align-items:center;gap:var(--s2)}
+.dash-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.wide .card{transition:border-color .25s}
+.viz .bar{transform-box:fill-box;transform-origin:50% 100%}
+.lchips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--s1)) var(--s3);padding:0 var(--s1) 2px;-webkit-overflow-scrolling:touch}
+.lchips::-webkit-scrollbar{display:none}
+.lchips{mask-image:linear-gradient(90deg,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent)}
+.lchips button{flex:none;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font:600 13px var(--f-body);white-space:nowrap}
+.lchips button.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.lstats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s2)}
+.lstats div{min-width:0}
+.lstats span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.lstats b{display:block;font-family:var(--f-head);font-size:22px;line-height:1.15;white-space:nowrap}
+.lstats b.up{color:var(--ok)}.lstats b.down{color:var(--warn)}
+.lstats em{font-style:normal;font-size:12px;color:var(--muted)}
+.lstats.l3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:420px){.lstats{gap:var(--s1)}.lstats b{font-size:19px}.lstats span{font-size:10px;letter-spacing:.04em}}
+.wlist{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:var(--s2);font-size:13px;color:var(--muted)}
+.wlist b{color:var(--text)}
+.more-acts summary{padding:var(--s2) 0 var(--s3);cursor:pointer}
+.kpi b{display:block;font-family:var(--f-head);font-size:28px;line-height:1.1;color:var(--text)}
+.kpi span{font-size:12px;color:var(--muted)}
+.kpi .rec-gut,.kpi .rec-mittel,.kpi .rec-schlecht{font-size:22px}
+.dgrid{display:grid;gap:var(--s3)}
+.dgrid>*{min-width:0}
+.dpair{display:grid;gap:0 var(--s3)}
+.dpair>section{min-width:0;display:flex;flex-direction:column}
+.dpair>section>.card{flex:1}
+@media(min-width:900px){.dpair{grid-template-columns:1fr 1fr}}
+@media(min-width:900px){.dgrid{grid-template-columns:1fr 1fr}}
+.viz{width:100%;max-width:620px;height:auto;display:block;margin-top:var(--s2);overflow:visible}
+.viz .grid{stroke:var(--line);stroke-width:1}
+.viz .base{stroke:#3c4146;stroke-width:1}
+.viz .ax{fill:var(--muted);font-size:10px;font-family:var(--f-body)}
+.viz .cross{stroke:var(--muted);stroke-width:1;opacity:0}
+.viz .dot{opacity:0}
+.viz .pt:hover .cross,.viz .pt:hover .dot,.viz .pt.on .cross,.viz .pt.on .dot{opacity:1}
+.viz .hit{cursor:default}
+.viz .hit:hover path{filter:brightness(1.15)}
+.legend{display:flex;gap:var(--s4);flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:var(--s2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.cistrip{display:flex;gap:3px;margin-top:var(--s2)}
+.cistrip span{flex:1;min-width:0;text-align:center;font-size:10px;border-radius:4px;padding:4px 0;background:var(--surface2);color:var(--muted)}
+.cistrip .green{background:rgba(111,207,134,.18);color:var(--ok)}.cistrip .yellow{background:rgba(255,192,77,.18);color:var(--warn)}.cistrip .red{background:rgba(255,138,128,.2);color:var(--danger)}
+.laps{width:100%;border-collapse:collapse;font-size:13px;margin-top:var(--s3)}
+.laps td,.laps th{padding:5px 4px;text-align:right;border-top:1px solid var(--line);white-space:nowrap}
+.laps th{color:var(--muted);font-weight:600;border-top:0}.laps td:first-child,.laps th:first-child{text-align:left}
+.laps tr.work td{color:var(--text);font-weight:600}.laps tr:not(.work) td{color:var(--muted)}
+#viztip{position:fixed;z-index:99;pointer-events:none;background:#0b0d0f;border:1px solid var(--line);color:var(--text);font-size:12px;padding:6px 8px;border-radius:6px;max-width:240px;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+
 /* Strava */
 .act{display:flex;gap:var(--s3);padding:var(--s3) 0;border-top:1px solid var(--line);align-items:flex-start}
 .act:first-child{border-top:0}
@@ -366,6 +463,15 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 .sbox{border:1px solid rgba(252,106,44,.35);background:rgba(252,106,44,.08);border-radius:var(--r-s);padding:var(--s3);margin-top:var(--s4);font-size:14px}
 .sbox b{color:var(--strava)}
 .sbox .btn{margin-top:var(--s3)}
+.sbox.g{border-color:rgba(17,169,237,.35);background:rgba(17,169,237,.08)}.sbox.g b{color:var(--garmin)}
+.well{width:100%;border-collapse:collapse;font-size:13px;margin-top:var(--s3)}
+.well th,.well td{padding:6px 4px;text-align:right;border-top:1px solid var(--line);white-space:nowrap}
+.well th:first-child,.well td:first-child{text-align:left}
+.well th{font-weight:600;color:var(--muted);border-top:0}
+.rec-gut{color:var(--ok)}.rec-mittel{color:var(--warn)}.rec-schlecht{color:var(--danger)}
+.steps{margin:var(--s3) 0 0;padding-left:20px}.steps li{margin-top:var(--s2)}
+.cmd{display:flex;gap:var(--s2);align-items:center;margin-top:var(--s2)}
+.cmd code{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;background:var(--surface2);border-radius:6px;padding:6px 8px;font-size:12px}
 
 /* Splash: deckt alles ab, bis feststeht, ob Login oder Trainingsplan gezeigt wird */
 #splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s5);transition:opacity .25s}
@@ -403,7 +509,7 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 }
 @media (min-width:600px){
   main{max-width:720px;padding:var(--s6)}
-  .tabs{left:50%;right:auto;bottom:calc(var(--s4) + env(safe-area-inset-bottom));transform:translateX(-50%);width:400px;
+  .tabs{left:50%;right:auto;bottom:calc(var(--s4) + env(safe-area-inset-bottom));transform:translateX(-50%);width:480px;
     border:1px solid var(--line);border-radius:var(--r-l);padding-bottom:0;box-shadow:0 10px 30px rgba(0,0,0,.45)}
   body{padding-bottom:calc(var(--tabs-h) + var(--s8) + env(safe-area-inset-bottom))}
   #toast{bottom:calc(var(--tabs-h) + var(--s8) + env(safe-area-inset-bottom))}
@@ -470,16 +576,18 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
   <button data-v="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>Heute</button>
   <button data-v="week"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Woche</button>
   <button data-v="plan"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Plan</button>
+  <button data-v="dashboard"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Dashboard</button>
 </nav>
 <div class="scrim" id="scrim" data-act="close"></div>
 <div class="drawer" id="sheet" role="dialog" aria-label="Menü" aria-hidden="true">
   <div class="drawer-h"><h2>Menü</h2><button class="menu-btn" data-act="close" aria-label="Menü schliessen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg></button></div>
   <div class="cap">App</div>
   <button class="mi" data-v="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg><span><b>Trainingsplan</b><span class="sub">Heute, Woche und Gesamtplan</span></span></button>
+  <button class="mi" data-v="dashboard"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span><b>Dashboard</b><span class="sub">Alle Daten auf einen Blick</span></span></button>
   <button class="mi" data-v="coach"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><span><b>Coach &amp; Verletzt / krank</b><span class="sub">Chatten oder Trainings für mehrere Tage anpassen</span></span></button>
   <button class="mi" data-v="backup"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span><b>Backup</b><span class="sub">Daten als Datei sichern oder einspielen</span></span></button>
   <div class="cap">Training</div>
-  <button class="mi" data-v="strava"><svg viewBox="0 0 24 24"><path d="M10 3l-6 12h4l2-4 2 4h4zM14 15l2 4 2-4"/></svg><span><b>Strava</b><span class="sub">Läufe und Fahrten mit dem Plan abgleichen</span></span></button>
+  <button class="mi" data-v="strava"><svg viewBox="0 0 24 24"><path d="M10 3l-6 12h4l2-4 2 4h4zM14 15l2 4 2-4"/></svg><span><b>Strava / Garmin</b><span class="sub">Aktivitäten und Erholung mit dem Plan abgleichen</span></span></button>
   <button class="mi" data-v="import"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 18v-6M9 15l3-3 3 3"/></svg><span><b>Plan importieren</b><span class="sub">Neues PDF vom Coach einlesen</span></span></button>
   <div class="cap">Konto</div>
   <div id="acct"></div>
@@ -494,6 +602,8 @@ import { parsePlanText } from "./src/parser.js";
 import { fileToText } from "./src/pdf-import.js";
 import { suggest, readiness, isFixedRest, CHECKIN_FIELDS } from "./src/adapt.js";
 import * as strava from "./src/strava.js";
+import * as garmin from "./src/garmin.js";
+import * as dash from "./src/dashboard.js";
 import { callServer, syncErrorText, completeOAuth } from "./src/strava-auth.js";
 import { linkCode, decodeSnapshot } from "./src/share.js";
 import { isFiller, valueHint, missingValues } from "./src/validate.js";
@@ -518,6 +628,7 @@ const TODAY = idxFromDate(NOW);
 const CURW  = Math.max(0,Math.min(NWEEKS-1,Math.floor(TODAY/7)));
 const key = (d)=>d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
 const keyI = (i)=>key(dateFromIdx(i));
+const isoI = (i)=>{ const d=dateFromIdx(i); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
 const dow = (i)=>((i%7)+7)%7;
 const shortDay = (i)=>DAYS[dow(i)]+" "+fmt(dateFromIdx(i));
 const idxOfIso = (s)=>idxFromDate(isoToDate(s));
@@ -530,9 +641,9 @@ let S, LSK="hx";
    weights: Standard-Arbeitsgewichte aus dem Profil ({übungsname: "kg"}),
    sore: Muskelkater-Meldungen ({tagIndex: {muskel: 1–10}}),
    extra: Zusatz-Einheiten neben dem Plan ({datum: [{id,type,min,note}]}), solo: Partner-Einheit allein ({datum: 1}) */
-const def = ()=>({done:{},val:{},rpe:{},notes:{},sched:{},skip:{},edit:{},checkin:{},dismiss:{},plan:null,strava:{acts:{},at:0},onb:{},chat:[],weights:{},sore:{},extra:{},solo:{},
+const def = ()=>({done:{},val:{},rpe:{},notes:{},sched:{},skip:{},edit:{},checkin:{},dismiss:{},plan:null,strava:{acts:{},at:0},garmin:{well:{},at:0},onb:{},chat:[],weights:{},sore:{},extra:{},solo:{},
   tests:{lauf:{j:["","","",""],m:["","","",""]},station:{},trans:["","","","","",""]}});
-const fill = (o)=>{ for(const [k,v] of Object.entries(def())) if(o[k]==null) o[k]=v; if(!o.strava||!o.strava.acts) o.strava={acts:{},at:0}; return o; };
+const fill = (o)=>{ for(const [k,v] of Object.entries(def())) if(o[k]==null) o[k]=v; if(!o.strava||!o.strava.acts) o.strava={acts:{},at:0}; if(!o.garmin||!o.garmin.well) o.garmin={well:{},at:0}; return o; };
 const lsGet = (k)=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
 const lsSet = (k,v)=>{ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } };
 const lsDel = (k)=>{ try{ localStorage.removeItem(k); }catch(e){} };
@@ -672,6 +783,7 @@ let SUGS=[];
 function suggestions(){
   return suggest({today:TODAY,last:LAST,plan:dayPlan,status:dayStatus,
     skipped:(i)=>!!S.skip[keyI(i)], rpe:(i)=>S.rpe[keyI(i)]??undefined, checkin:(i)=>S.checkin[keyI(i)],
+    recovery:(i)=>garmin.recoveryHint(S.garmin.well[isoI(i)]),
     strava:(i)=>rc().byDay[i], moved:rc().moved.map(m=>({...m,toLabel:shortDay(m.to)})), dismissed:S.dismiss, sore:soreAt,
     extra:(i)=>S.extra[keyI(i)]});
 }
@@ -683,15 +795,19 @@ function applySug(s){
 }
 
 /* ---------- Bausteine ---------- */
+const srcName=(a)=>a&&a.src==="garmin"?"Garmin":"Strava";
+const srcCls=(a)=>a&&a.src==="garmin"?"garmin":"strava";
 function stravaBox(i,p,n,done){
   const acts=actsOf(i); if(!acts.length) return "";
-  const e=rc().byDay[i];
-  let h=`<div class="sbox"><b>Strava</b> · ${e.match?"passt zur Einheit":"andere Sportart als geplant"}`;
-  for(const a of acts) h+=`<div class="mt-1">${esc(a.name)} – ${esc(strava.summary(a))}</div>`;
+  const e=rc().byDay[i], g=acts.every(a=>a.src==="garmin");
+  let h=`<div class="sbox${g?" g":""}"><b>${g?"Garmin":acts.some(a=>a.src==="garmin")?"Strava / Garmin":"Strava"}</b> · ${e.match?"passt zur Einheit":"andere Sportart als geplant"}`;
+  const ivText=p&&p.i?p.i.find(t=>dash.parseReps(t))||"":"";
+  for(const a of acts){ h+=`<div class="mt-1">${esc(a.name)} – ${esc(strava.summary(a))}</div>`;
+    const rs=dash.repSummary(a,ivText); if(rs) h+=`<div class="sub mt-1">Intervalle ${esc(rs)}</div>`; }
   // Steht der Tag schon im Banner oben auf „Heute“, hier nicht noch einmal fragen
   const inBanner=view==="today"&&sel==null&&stravaOffers().some(o=>o.x===i);
   if(e.match && n && done<n && !inBanner) h+=`<button class="btn sm" data-act="strava-take" data-i="${i}">Als erledigt übernehmen</button>`;
-  else if(inBanner) h+=`<div class="sub mt-1">Übernehmen oben im Strava-Vorschlag.</div>`;
+  else if(inBanner) h+=`<div class="sub mt-1">Übernehmen oben im Vorschlag.</div>`;
   return h+`</div>`;
 }
 /* Strava-Treffer der letzten 3 Tage, die noch nicht übernommen sind – Ein-Klick-Vorschlag statt automatisch abhaken */
@@ -704,12 +820,20 @@ function stravaOffers(){
   }
   return out;
 }
-const stravaBanner=()=>stravaOffers().map(({x,p,a})=>`<div class="card tight sban"><div class="row between"><b>Strava-Aktivität erkannt</b><span class="badge strava">${x===TODAY?"heute":esc(shortDay(x))}</span></div>
+const stravaBanner=()=>stravaOffers().map(({x,p,a})=>`<div class="card tight sban"><div class="row between"><b>${srcName(a)}-Aktivität erkannt</b><span class="badge ${srcCls(a)}">${x===TODAY?"heute":esc(shortDay(x))}</span></div>
   <div class="mt-2">${a.name?`<b>${esc(a.name)}</b> · `:""}${esc(strava.summary(a))}</div><div class="sub mt-1">Passt zu „${esc(p.t)}“. Als erledigt übernehmen?</div>
   <div class="grid2 mt-3"><button class="btn primary sm" data-act="strava-take" data-i="${x}">Übernehmen</button><button class="btn sm" data-act="strava-no" data-i="${x}">Nein</button></div></div>`).join("");
+/* Erledigte Einheiten, die trotzdem offen angezeigt werden sollen (nach Antippen des Balkens) */
+const doneOpen=new Set();
+function doneBar(i,p){
+  const dk=keyI(i), r=S.rpe[dk], d=dateFromIdx(i);
+  const info=[shortDay(i), r!=null?`RPE ${r}`:`<span class="miss">RPE fehlt</span>`];
+  return `<button class="done-bar k-${p.k}" data-act="done-open" data-i="${i}" data-day="${i}" aria-label="${esc(p.t)} erledigt – Details anzeigen"><span class="ck" aria-hidden="true">✓</span><span class="t"><b>${esc(p.t)}</b><span class="sub">Erledigt · ${info.join(" · ")}</span></span><span class="more">Details ▾</span></button>`;
+}
 function sessionCard(i){
   const p=dayPlan(i), d=dateFromIdx(i), dk=keyI(i), dw=dow(i);
   const {n,done}=dayStatus(i);
+  if(p.k!=="rest"&&n&&done>=n&&!doneOpen.has(i)) return doneBar(i,p);
   const badges=dayBadges(i,p,true);
   let h=`<div class="card hero k-${p.k}" data-day="${i}">
     <div class="session-h"><div class="row between"><span class="kind">${KIND[p.k]}</span><span class="sub">${DAYSF[dw]}, ${fmt(d)}</span></div>
@@ -723,7 +847,7 @@ function sessionCard(i){
   if(hit.level>=4) h+=`<div class="target ${hit.level>=7?"bad":""}">Muskelkater: ${sore.summarize(hit.muscles.filter(m=>m.level>=4)).map(x=>esc(x).replace(/(\d+\/10)$/,"<b>$1</b>")).join(", ")}.${hit.names.length?` Betroffen: ${hit.names.slice(0,3).map(x=>`„${esc(x)}“`).join(", ")} – dort Last reduzieren.`:""}</div>`;
   const oi=overloadInfo(i), ol=oi.risk;
   if(ol.length) h+=`<div class="target bad"><b>⚠ Überlastung</b> – ${ol.slice(0,2).map(o=>esc(sore.overloadText(o))).join("; ")}.${oi.byExtra&&oi.runs.length?`<div class="xcause">Ausgelöst durch Zusatz-Einheit: ${oi.runs.map(r=>`${esc(r.label)} (${esc(shortDay(r.d))})`).join(", ")}</div>`:""}${p.easy?" Die Einheit ist bereits entlastet.":`<div class="grid2 mt-3"><button class="btn sm" data-act="ol-easy" data-i="${i}">Entlasten</button><button class="btn sm" data-move="${i}">Verschieben …</button></div>`}</div>`;
-  h+=`<div class="prog"><i style="width:${n?done/n*100:0}%"></i></div><div class="row between"><span class="sub">${done} von ${n} erledigt</span>${done<n?`<button class="btn sm" data-act="all-done" data-i="${i}">✓ Alles erledigt</button>`:""}</div>`;
+  h+=`<div class="prog"><i style="width:${n?done/n*100:0}%"></i></div><div class="row between"><span class="sub">${done} von ${n} erledigt</span>${done<n?`<button class="btn sm" data-act="all-done" data-i="${i}">✓ Alles erledigt</button>`:`<button class="btn sm" data-act="done-close" data-i="${i}">Einklappen ▴</button>`}</div>`;
   if(p.tp){ const T=teamT();
     h+= isNaN(T)? `<div class="target">Noch kein Team-Tempo T. Trag zuerst den Pacing-Test ein (Menü → Profil).</div>`
       : `<div class="target">Team-Tempo T = ${mmss(T)}/km · Ziel heute <b>${mmss(T+p.tp[0])}–${mmss(T+p.tp[1])}/km</b></div>`; }
@@ -774,7 +898,7 @@ function dayBadges(i,p,full){
   if(S.skip[keyI(i)]) b.push(`<span class="badge warn">Ausgefallen</span>`);
   if(p.solo) b.push(`<span class="badge">Solo</span>`);
   if(cleanExtras(S.extra[keyI(i)]).length) b.push(`<span class="badge ok">＋Zusatz</span>`);
-  const e=rc().byDay[i]; if(e && (e.match||full)) b.push(`<span class="badge strava">Strava</span>`);
+  const e=rc().byDay[i]; if(e && (e.match||full)){ const a=actsOf(i)[0]; b.push(`<span class="badge ${srcCls(a)}">${srcName(a)}</span>`); }
   return b.join("");
 }
 function dayRow(i){
@@ -834,7 +958,7 @@ function vToday(){
   if(TODAY>LAST && sel==null) intro+=`<div class="hint" style="margin:0 0 var(--s4)">Der Plan ist abgeschlossen. Stark gemacht! 🏁</div>`;
   // Tägliche Eingabe (Check-in) und Vorschläge: auf dem Handy über der Einheit, auf dem Desktop daneben
   if(sel==null) daily+=stravaBanner();
-  if(i===TODAY && TODAY>=0 && TODAY<=LAST) daily+=checkinCard(i);
+  if(i===TODAY && TODAY>=0 && TODAY<=LAST) daily+=recoveryCard(i)+checkinCard(i);
   daily+=sugCard();
   const w0=Math.floor(i/7)*7, rail=MID();
   // Handy: Leiste quer unter der Einheit. Ab Tablet: hochkant als Seitenleiste links.
@@ -859,7 +983,7 @@ function weekSummary(w){
   const ar=rp.length?(rp.reduce((a,b)=>a+b,0)/rp.length).toFixed(1):"–";
   const xs=[]; for(let d=0;d<7;d++) xs.push(...cleanExtras(S.extra[keyI(w*7+d)]));
   const xLine=xs.length?`<div class="sub xsum">＋ ${xs.length} Zusatz-${xs.length===1?"Einheit":"Einheiten"}${extraMinutes(xs)?` · ${extraMinutes(xs)}′`:""}</div>`:"";
-  return `<div class="wsum"><div class="stat"><b>${ok}/${plan}</b><span>Einheiten</span></div><div class="stat"><b>${ar}</b><span>Ø RPE</span></div><div class="stat"><b>${Object.values(S.strava.acts).filter(a=>{const x=idxOfIso(a.date);return x>=w*7&&x<w*7+7;}).length}</b><span>Strava</span></div></div>${xLine}`;
+  return `<div class="wsum"><div class="stat"><b>${ok}/${plan}</b><span>Einheiten</span></div><div class="stat"><b>${ar}</b><span>Ø RPE</span></div><div class="stat"><b>${Object.values(S.strava.acts).filter(a=>{const x=idxOfIso(a.date);return x>=w*7&&x<w*7+7;}).length}</b><span>Aktivitäten</span></div></div>${xLine}`;
 }
 function vWeek(){
   const info=weekInfo(wk), wide=WIDE();
@@ -1176,7 +1300,8 @@ const stInvoke=(body)=>callServer((b)=>sb.functions.invoke("strava",{body:b}),bo
 const stRefreshOpt=()=>stServer()?{refresh:(t)=>stInvoke({action:"refresh",refresh:t.refresh})}:{};
 let stBusy=false, stMsg="";
 const redirectUri=()=>location.origin+location.pathname;
-function mergeActs(acts){ let n=0; for(const a of acts) if(a.date>=STRAVA_MIN){ if(!S.strava.acts[a.id]) n++; S.strava.acts[a.id]=a; } return n; }
+/* Strava und Garmin landen in derselben Liste; dieselbe Einheit aus beiden Quellen zählt nur einmal (Garmin hat Vorrang) */
+const mergeActs=(acts)=>garmin.mergeActs(S.strava.acts,acts,STRAVA_MIN);
 /* Strava-Fehler in klare Handlungsanweisungen übersetzen */
 const stravaErr=(e)=>syncErrorText(e,{online:navigator.onLine!==false});
 async function stravaSync(silent){
@@ -1187,6 +1312,9 @@ async function stravaSync(silent){
     tok=await strava.ensureToken(fetch.bind(window),tok,{...stCfg(),...stRefreshOpt()}); lsSet(stKey(),JSON.stringify(tok));
     const since=Math.max(+START-7*dayMs, S.strava.at ? S.strava.at-3*dayMs : 0);
     const acts=await strava.fetchActivities(fetch.bind(window),tok.access,Math.floor(since/1000));
+    // Runden für neue Ausdauer-Einheiten nachladen (max. 8 pro Abruf wegen Strava-Limit) – für Intervallzeiten
+    const need=acts.filter(a=>["run","row","ride","ski"].includes(a.group)&&!(S.strava.acts[a.id]&&S.strava.acts[a.id].laps)).slice(0,8);
+    for(const a of need){ const l=await strava.fetchLaps(fetch.bind(window),tok.access,a.id); if(l.length) a.laps=l; }
     const n=mergeActs(acts); S.strava.at=Date.now(); save();
     stMsg=n?`${n} neue ${n===1?"Aktivität":"Aktivitäten"} geladen.`:"Alles aktuell.";
     if(!silent) toast(stMsg);
@@ -1216,25 +1344,160 @@ function stConnectForm(){
     <div class="btns"><button class="btn strava" data-act="st-connect">Mit Strava verbinden</button></div>`;
 }
 /* Einmal-Ansicht nach dem ersten Start/Login: nur solange weder verbunden noch übersprungen und keine Aktivitäten da sind */
-const needsOnb=()=>!(S.onb&&S.onb.strava) && !stTok() && !Object.keys(S.strava.acts).length;
+const needsOnb=()=>!(S.onb&&S.onb.strava) && !stTok() && !S.garmin.conn && !Object.keys(S.strava.acts).length;
 function vOnb(){
   return `<div class="onb"><div class="card"><span class="av">S</span><h2>Strava verbinden</h2>
     <p class="sub mt-2">Verbinde dein Strava-Konto, dann gleicht die App deine Läufe und Fahrten automatisch mit dem Plan ab:</p>
     <ul><li>Passende Aktivitäten als erledigt übernehmen</li><li>Einheit an einem anderen Tag gemacht? Die App schlägt vor, den Plan nachzuziehen</li><li>Die Verbindung gilt nur für dein Konto</li></ul></div>
     <div class="card">${stConnectForm()}</div>
     <div class="btns"><button class="btn ghost" data-act="onb-skip">Später – ohne Strava weiter</button></div>
-    <p class="sub mt-3" style="text-align:center">Jederzeit nachholbar unter Menü → Strava.</p></div>`;
+    <p class="sub mt-3" style="text-align:center">Jederzeit nachholbar unter Menü → Strava / Garmin.</p></div>`;
+}
+/* ---------- Garmin (inoffiziell, Edge Function „garmin“) ----------
+   Login einmalig am PC (garmin-login.py), hochgeladen wird nur die Token-Datei. Die Tokens liegen verschlüsselt auf dem Server,
+   der Verbindungsstatus (S.garmin.conn) und die Erholungswerte im Plan-Stand – damit gilt die Verbindung auf allen Geräten. */
+const gmOn=()=>!!(sb&&USER&&S.garmin.conn&&!S.garmin.conn.err);
+const gmInvoke=(body)=>garmin.call((b)=>sb.functions.invoke("garmin",{body:b}),body,{online:navigator.onLine!==false});
+const gmCmd=()=>`uv run "${new URL("garmin-login.py",location.href).href}"`;
+const isoD=(d)=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+let gmBusy=false, gmMsg="";
+const gmErr=(e)=>e instanceof TypeError||navigator.onLine===false?garmin.MSG.offline:e.message||garmin.MSG.down;
+async function garminSync(silent){
+  if(!gmOn()||gmBusy) return;
+  if(silent&&navigator.onLine===false) return;
+  gmBusy=true; gmMsg=""; if(!silent) render();
+  try{
+    // Fehlen bei älteren Garmin-Einheiten noch die Runden (Laps), ab Planstart neu holen (der Server lädt je Abruf 15)
+    const noLaps=Object.values(S.strava.acts).some(a=>a.src==="garmin"&&["run","row","ride","ski"].includes(a.group)&&a.laps===undefined);
+    const to=isoD(NOW), from=isoD(new Date(Math.min(+NOW,Math.max(+START-7*dayMs, S.garmin.at&&!noLaps ? S.garmin.at-3*dayMs : 0))));
+    const have=Object.values(S.strava.acts).filter(a=>a.src==="garmin"&&a.laps!==undefined).map(a=>a.id);
+    const r=await gmInvoke({action:"sync",from,to,have});
+    const n=mergeActs(r.acts||[]);
+    S.garmin.well=garmin.mergeWell(S.garmin.well,r.well||{}); S.garmin.at=Date.now();
+    // Welche Erholungs-Abfragen geklappt haben (ok / leer / HTTP-Status) – für die Fehlersuche im Tab sichtbar
+    S.garmin.diag=r.diag||null; if(r.shape) console.info("Garmin-Formate",r.shape);
+    if(r.name) S.garmin.conn={...S.garmin.conn,name:r.name};
+    save();
+    gmMsg=n?`${n} neue ${n===1?"Aktivität":"Aktivitäten"} von Garmin geladen.`:"Garmin ist aktuell.";
+    if(!silent) toast(gmMsg);
+  }catch(e){
+    gmMsg=gmErr(e);
+    if(e.code==="relogin"||e.code==="not_connected"){ S.garmin.conn={...S.garmin.conn,err:e.code}; save(); }
+    if(!silent) toast(gmMsg,true);
+  }
+  gmBusy=false;
+  if(!silent||!(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName))) render();
+}
+/* Tokens (aus dem Login-Server oder der Datei) verschlüsselt auf dem Server ablegen, dann sofort laden */
+async function gmStore(tokens){
+  const r=await gmInvoke({action:"connect",tokens});
+  S.garmin.conn={name:r.name||null,at:Date.now()}; S.onb.strava=S.onb.strava||Date.now(); save();
+  gmMsg="Verbunden. Lade Aktivitäten und Erholungswerte …";
+  gmBusy=false; render(); return garminSync(false);
+}
+async function garminConnect(file){
+  if(!(sb&&USER)){ toast("Garmin geht nur mit Cloud-Login.",true); return; }
+  let tokens;
+  try{ tokens=garmin.readTokenFile(await file.text()); }catch(e){ gmMsg=e.message; return render(); }
+  gmBusy=true; gmMsg=""; render();
+  try{ return await gmStore(tokens); }catch(e){ gmMsg=gmErr(e); }
+  gmBusy=false; render();
+}
+/* Login mit E-Mail + Passwort über den Login-Server (Vercel, garmin-login/). Verlangt Garmin einen MFA-Code,
+   meldet der Server das in garmin_pending; die App zeigt dann das Code-Feld und schreibt den Code dorthin. */
+let gmMfa=false, gmPoll=null;
+async function garminLogin(email,password){
+  if(!(sb&&USER)) return toast("Garmin geht nur mit Cloud-Login.",true);
+  if(!email||!password){ gmMsg="Bitte Garmin-E-Mail und Passwort eingeben."; return render(); }
+  if(!CFG.garminLoginUrl){ gmMsg=garmin.MSG.noLoginServer; return render(); }
+  if(navigator.onLine===false){ gmMsg=garmin.MSG.offline; return render(); }
+  gmBusy=true; gmMfa=false; gmMsg=""; render();
+  clearInterval(gmPoll);
+  gmPoll=setInterval(async()=>{ try{ const {data}=await sb.from("garmin_pending").select("status").eq("user_id",USER.id).maybeSingle();
+    if(data&&data.status==="mfa"&&!gmMfa){ gmMfa=true; render(); const m=$("#gm-mfa"); if(m) m.focus(); } }catch(_){ /* nächster Versuch */ } },2000);
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    const r=await fetch(CFG.garminLoginUrl,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+(session&&session.access_token||"")},body:JSON.stringify({email,password})});
+    const j=await r.json().catch(()=>({}));
+    clearInterval(gmPoll); gmMfa=false;
+    if(!r.ok||!j.tokens) throw Object.assign(new Error(garmin.loginErrorText(r.status,j.error)),{code:j.error||"login"});
+    return await gmStore(j.tokens);
+  }catch(e){ gmMsg=e instanceof TypeError?garmin.MSG.loginDown:e.message||garmin.MSG.down; }
+  finally{ clearInterval(gmPoll); gmMfa=false; }
+  gmBusy=false; render();
+}
+async function garminMfa(code){
+  code=String(code||"").replace(/\s+/g,"");
+  if(!/^\d{4,10}$/.test(code)) return toast("Bitte den Code aus der Mail oder App eingeben.",true);
+  const {error}=await sb.from("garmin_pending").update({code}).eq("user_id",USER.id);
+  if(error) return toast("Code konnte nicht gesendet werden. Nochmals versuchen.",true);
+  gmMsg="Code gesendet, Garmin prüft …"; gmMfa=false; render();
+}
+async function garminMfaCancel(){
+  await sb.from("garmin_pending").delete().eq("user_id",USER.id); gmMfa=false; render();
+}
+async function garminOff(){
+  if(!confirm("Garmin trennen? Die Zugangs-Tokens werden vom Server gelöscht. Geladene Aktivitäten und Erholungswerte bleiben.")) return;
+  try{ if(sb&&USER) await gmInvoke({action:"disconnect"}); }catch(e){ return toast(gmErr(e),true); }
+  delete S.garmin.conn; gmMsg=""; save(); render();
+}
+const HRV_TXT={BALANCED:"ok",UNBALANCED:"unausgegl.",LOW:"tief",POOR:"tief"};
+const fmtWell=(w,k)=>!w||w[k]==null?"–":k==="sleepH"?String(w[k]).replace(".",","):k==="hrvStatus"?(HRV_TXT[w[k]]||String(w[k]).toLowerCase()):w[k];
+const REC_TXT={gut:"Gut erholt",mittel:"Mittel erholt",schlecht:"Schlecht erholt"};
+function wellTable(days){
+  const rows=Object.keys(S.garmin.well).sort().reverse().slice(0,days);
+  if(!rows.length) return `<p class="sub mt-2">Noch keine Erholungswerte.</p>`;
+  return `<table class="well"><tr><th>Tag</th><th>Ready</th><th>HRV</th><th>Schlaf</th><th>BB</th><th>Ruhepuls</th></tr>`+
+    rows.map(d=>{ const w=S.garmin.well[d], r=garmin.recoveryHint(w), dt=isoToDate(d);
+      return `<tr><td class="${r.level?"rec-"+r.level:""}">${DAYS[(dt.getDay()+6)%7]} ${dt.getDate()}.${dt.getMonth()+1}.</td><td>${fmtWell(w,"readiness")}</td><td>${fmtWell(w,"hrv")}${w.hrvStatus?` <span class="sub">${esc(fmtWell(w,"hrvStatus"))}</span>`:""}</td><td>${fmtWell(w,"sleepH")}${w.sleepH!=null?" h":""}</td><td>${fmtWell(w,"bb")}</td><td>${fmtWell(w,"rhr")}</td></tr>`; }).join("")+`</table>`;
+}
+/* Erholung heute (Garmin) auf der Startseite – nur wenn Werte da sind */
+function recoveryCard(i){
+  const w=S.garmin.well[isoI(i)], r=garmin.recoveryHint(w);
+  if(!r.level) return "";
+  const parts=[w.readiness!=null?"Readiness "+w.readiness:"",w.hrv!=null?"HRV "+w.hrv+" ms":"",w.sleepH!=null?fmtWell(w,"sleepH")+" h Schlaf":"",w.bb!=null?"Body Battery "+w.bb:""].filter(Boolean);
+  return `<div class="card tight"><div class="row between"><h3>Erholung (Garmin)</h3><b class="rec-${r.level}">${REC_TXT[r.level]}</b></div><p class="sub mt-1">${esc(parts.join(" · "))}</p>${r.level==="schlecht"?`<p class="sub mt-1">${esc(r.why.join(", "))}: harte Einheit heute eher entlasten.</p>`:""}</div>`;
+}
+const DIAG_LBL={hrv:"HRV",sleep:"Schlaf",bb:"Body Battery",tr:"Readiness",rhr:"Ruhepuls"};
+const gmDiag=()=>S.garmin.diag?`<p class="sub mt-2">Letzter Abruf: ${Object.entries(DIAG_LBL).map(([k,l])=>l+" "+esc(S.garmin.diag[k]||"–")).join(" · ")}</p>`:"";
+function garminCard(){
+  let h=`<div class="card"><div class="acct"><span class="av" style="background:var(--garmin);color:#fff">G</span><div><b>Garmin</b><div class="sub">Aktivitäten, HRV, Schlaf, Body Battery, Readiness</div></div></div>`;
+  if(!(sb&&USER)) return h+`<p class="sub mt-3">Garmin geht nur mit Cloud-Login (die Zugangsdaten liegen verschlüsselt auf dem Server).</p></div>`;
+  const c=S.garmin.conn;
+  if(c&&!c.err){
+    return h+`<p class="mt-3"><b>Verbunden${c.name?" als "+esc(c.name):""}</b></p><div class="sub">${S.garmin.at?"Zuletzt synchronisiert "+new Date(S.garmin.at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}):"Noch nicht synchronisiert"}</div>
+      ${gmMsg?`<p class="sub mt-2">${esc(gmMsg)}</p>`:""}
+      <div class="grid2 mt-4"><button class="btn garmin" data-act="gm-sync" ${gmBusy?"disabled":""}>${gmBusy?"Lädt …":"Jetzt synchronisieren"}</button><button class="btn" data-act="gm-off">Trennen</button></div>
+      <details class="mt-3"><summary class="sub">Erholung der letzten 14 Tage</summary>${wellTable(14)}${gmDiag()}</details></div>`;
+  }
+  if(c&&c.err) h+=`<div class="target bad">${esc(garmin.MSG.relogin)}</div>`;
+  if(gmMfa) return h+`<form data-form="gm-mfa" class="mt-3"><b>Bestätigungscode</b><p class="sub mt-1">Garmin hat dir einen Code geschickt (Mail, SMS oder Authenticator-App).</p>
+    <label class="lbl" for="gm-mfa">Code</label><input type="text" id="gm-mfa" inputmode="numeric" autocomplete="one-time-code" maxlength="10">
+    <div class="grid2 mt-3"><button type="submit" class="btn garmin">Bestätigen</button><button type="button" class="btn" data-act="gm-mfa-x">Abbrechen</button></div></form></div>`;
+  h+=`<form data-form="gm-login" class="mt-3"><p class="sub">Mit deinem Garmin-Connect-Konto anmelden. Das Passwort wird nur für die Anmeldung an Garmin weitergereicht und nirgends gespeichert. Inoffizieller Weg: Garmin kann ihn jederzeit ändern.</p>
+    <label class="lbl" for="gm-mail">Garmin E-Mail</label><input type="email" id="gm-mail" inputmode="email" autocomplete="off" autocapitalize="off" ${gmBusy?"disabled":""}>
+    <label class="lbl" for="gm-pw">Garmin Passwort</label><input type="password" id="gm-pw" autocomplete="new-password" spellcheck="false" ${gmBusy?"disabled":""}>
+    ${gmMsg?`<div class="target ${gmBusy?"":"bad"}">${esc(gmMsg)}</div>`:""}
+    <div class="btns"><button type="submit" class="btn garmin" ${gmBusy?"disabled":""}>${gmBusy?"Melde an … (bis 30 s)":"Mit Garmin anmelden"}</button></div></form>`;
+  return h+`<details class="mt-4"><summary class="sub">Anmeldung klappt nicht? Alternative: Login am PC und Datei hochladen</summary>
+    <ol class="steps">
+      <li>Einmalig <b>uv</b> installieren. Windows (PowerShell):<div class="cmd"><code>powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"</code></div><div class="sub mt-1">Mac (Terminal):</div><div class="cmd"><code>curl -LsSf https://astral.sh/uv/install.sh | sh</code></div></li>
+      <li>Terminal neu öffnen, diesen Befehl ausführen und mit Garmin-E-Mail, Passwort und ggf. MFA-Code anmelden:<div class="cmd"><code>${esc(gmCmd())}</code><button class="btn sm" data-act="gm-copy">Kopieren</button></div></li>
+      <li>Die erzeugte Datei <b>garmin_tokens.json</b> hier hochladen und danach auf dem PC löschen.</li>
+    </ol>
+    <div class="btns"><label class="btn file">${gmBusy?"Verbinde …":"garmin_tokens.json hochladen"}<input type="file" accept=".json,application/json" data-file="garmin" ${gmBusy?"disabled":""}></label></div></details></div>`;
 }
 function vStrava(){
   const tok=stTok();
-  let h=`<div class="narrow">${vhead("Strava","Läufe und Fahrten werden den geplanten Einheiten zugeordnet. Passt eine Aktivität zu einem anderen Tag, schlägt die App vor, den Plan nachzuziehen.",true)}`;
+  let h=`<div class="narrow">${vhead("Strava / Garmin","Aktivitäten werden den geplanten Einheiten zugeordnet. Strava und Garmin gehen gleichzeitig, dieselbe Einheit zählt nur einmal. Passt eine Aktivität zu einem anderen Tag, schlägt die App vor, den Plan nachzuziehen.",true)}`;
+  h+=garminCard();
   h+=`<div class="card">`;
   if(tok){
     h+=`<div class="row between"><div class="acct"><span class="av" style="background:var(--strava);color:#fff">S</span><div><b>Verbunden${tok.athlete?" als "+esc(tok.athlete):""}</b><div class="sub">${S.strava.at?"Zuletzt synchronisiert "+new Date(S.strava.at).toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"}):"Noch nicht synchronisiert"}</div></div></div></div>
       ${stMsg?`<p class="sub mt-3">${esc(stMsg)}</p>`:""}
       <div class="grid2 mt-4"><button class="btn strava" data-act="st-sync" ${stBusy?"disabled":""}>${stBusy?"Lädt …":"Jetzt synchronisieren"}</button><button class="btn" data-act="st-off">Trennen</button></div>`;
-  } else h+=stConnectForm();
-  h+=`</div><div class="card tight"><b>Ohne Verbindung: Datei importieren</b><p class="sub mt-1">Strava → Einstellungen → Mein Konto → „Account-Daten herunterladen“. Aus dem ZIP die Datei <b>activities.csv</b> wählen.</p>
+  } else h+=`<div class="acct" style="margin-bottom:var(--s3)"><span class="av" style="background:var(--strava);color:#fff">S</span><div><b>Strava</b></div></div>`+stConnectForm();
+  h+=`</div><div class="card tight"><b>Strava ohne Verbindung: Datei importieren</b><p class="sub mt-1">Strava → Einstellungen → Mein Konto → „Account-Daten herunterladen“. Aus dem ZIP die Datei <b>activities.csv</b> wählen.</p>
     <div class="btns"><label class="btn file">activities.csv auswählen<input type="file" accept=".csv,.json,text/csv,application/json" data-file="strava"></label></div></div>`;
   const acts=Object.values(S.strava.acts).sort((a,b)=>a.date<b.date?1:-1).slice(0,30);
   const movedTo=new Map(rc().moved.map(m=>[m.act.id,m.from]));
@@ -1246,12 +1509,209 @@ function vStrava(){
     let st=`<span class="sub">ausserhalb des Plans</span>`;
     if(p) st = e&&e.match&&strava.fits(p.k,a.group) ? `<span class="badge ok">passt</span> <span class="sub">${esc(p.t)}</span>`
       : movedTo.has(a.id) ? `<span class="badge mv">passt zu ${shortDay(movedTo.get(a.id))}</span>` : `<span class="sub">Plan: ${esc(p.t)}</span>`;
-    h+=`<div class="act"><div class="d">${DAYS[(d.getDay()+6)%7]}<b>${d.getDate()}</b></div><div><b>${esc(a.name||strava.SPORT_LABEL[a.group])}</b><div class="sub">${esc(strava.summary(a))}</div><div class="mt-1">${st}</div></div></div>`;
+    h+=`<div class="act"><div class="d">${DAYS[(d.getDay()+6)%7]}<b>${d.getDate()}</b></div><div><b>${esc(a.name||strava.SPORT_LABEL[a.group])}</b> <span class="badge ${srcCls(a)}">${srcName(a)}</span><div class="sub">${esc(strava.summary(a))}</div><div class="mt-1">${st}</div></div></div>`;
   }
   h+=`</div>`;
   if(Object.keys(S.strava.acts).length) h+=`<button class="btn ghost" data-act="st-clear">Aktivitäten aus der App löschen</button>`;
   return h+`</div>`;
 }
+
+/* ---------- Dashboard: alle Daten der App auf einen Blick ---------- */
+const dmy=(iso)=>{ const d=isoToDate(iso); return d.getDate()+"."+(d.getMonth()+1)+"."; };
+/* Plan-Einheit (ohne Ruhetag) an Tag x – für Erledigt-Quoten */
+const isSession=(x)=>{ const p=dayPlan(x); return !!p&&p.k!=="rest"&&p.i&&p.i.length>0; };
+/* Letzte Aktivität mit erkannten Intervallen (inkl. Plan-Vorgabe des Tages, z. B. "4×1km") */
+function lastIntervalAct(){
+  const acts=Object.values(S.strava.acts).filter(a=>a.laps&&a.laps.length>1).sort((a,b)=>(a.start||a.date)<(b.start||b.date)?1:-1);
+  for(const a of acts){ const i=idxOfIso(a.date), p=i>=0&&i<=LAST?dayPlan(i):null, plan=p&&p.i?p.i.find(t=>dash.parseReps(t))||"":"";
+    const iv=dash.intervals(a.laps,plan); if(iv.kind==="intervals") return {a,iv,plan}; }
+  return null;
+}
+/* Gewichtsverlauf: Einträge aller bisherigen Tage (inkl. Kraftteile an Lauftagen, z. B. Back Squat) */
+let dashLift=null, dashWeek="min", dashWell=null;
+/* Umschalt-Chips (eine Auswahl pro Karte): g = Gruppe, items = [[key,label]] */
+const dchips=(g,items,sel)=>items.length>1?`<div class="lchips" role="tablist">${items.map(([k,l])=>`<button role="tab" aria-selected="${k===sel}" class="${k===sel?"on":""}" data-act="dash-chip" data-g="${g}" data-k="${esc(k)}">${esc(l)}</button>`).join("")}</div>`:"";
+function liftData(){
+  const days=[]; const T=Math.min(TODAY,LAST);
+  for(let x=0;x<=T;x++){ const p=dayPlan(x); if(!p||!p.i) continue; const dk=keyI(x);
+    days.push({date:isoI(x),k:p.k,items:p.i.map((t,j)=>({t,v:S.val[dk+"|"+j]}))}); }
+  return dash.liftHistory(days);
+}
+function liftCard(){
+  const L=liftData(), Wt=Object.entries(S.weights||{}).filter(([,v])=>v);
+  const std=Wt.length?`<details class="mt-3"><summary class="sub">Standard-Arbeitsgewichte im Profil (${Wt.length})</summary><div class="wlist">${Wt.map(([k,v])=>`<span><b>${esc(String(v))} kg</b> ${esc(k.replace(/^./,c=>c.toUpperCase()))}</span>`).join("")}</div></details>`:"";
+  if(!L.length) return `<div class="card"><p class="sub">Noch kein Gewicht eingetragen. Bei Kraftübungen das Gewicht ins Feld schreiben (z. B. „80 kg × 5“) – hier entsteht daraus dein Verlauf pro Übung.</p>${std}</div>`;
+  const cur=L.find(e=>e.key===dashLift)||L[0];
+  const kg=(v)=>String(Math.round(v*10)/10).replace(".",",")+" kg";
+  const diff=cur.last-cur.start, pctD=cur.start?diff/cur.start*100:0;
+  const chips=dchips("lift",L.map(e=>[e.key,e.label]),cur.key);
+  const pts=cur.points.map(p=>({label:dmy(p.date),value:p.kg,tip:`${dmy(p.date)}: ${kg(p.kg)}${p.kg===cur.best?" · Bestwert":""}`}));
+  const chart=cur.n>1?dash.lineChart(pts,{fmt:v=>Math.round(v)+" kg",label:"Gewichtsverlauf "+cur.label,height:150})
+    :`<p class="sub mt-2">Erst ein Eintrag (${kg(cur.last)} am ${esc(dmy(cur.points[0].date))}). Ab dem zweiten entsteht hier die Kurve.</p>`;
+  return `<div class="card spot" id="dc-lift">${chips}<div class="lstats">
+      <div><span>Start</span><b>${kg(cur.start)}</b></div>
+      <div><span>Aktuell</span><b>${kg(cur.last)}</b></div>
+      <div><span>Bestwert</span><b>${kg(cur.best)}</b></div>
+      <div><span>Fortschritt</span><b class="${diff>0?"up":diff<0?"down":""}">${diff>0?"+":""}${kg(diff)}</b><em>${cur.n>1?(diff>0?"+":"")+Math.round(pctD)+" %":"–"}</em></div>
+    </div>${chart}${std}</div>`;
+}
+function vDashboard(){
+  const T=Math.max(-1,Math.min(TODAY,LAST)), curW=Math.max(0,Math.floor(Math.max(T,0)/7));
+  const acts=Object.values(S.strava.acts);
+  // Kennzahlen
+  let plan=0, done=0; for(let x=0;x<=T;x++) if(isSession(x)){ plan++; if(trained(x)) done++; }
+  let wPlan=0, wDone=0; for(let x=curW*7;x<curW*7+7&&x<=LAST;x++) if(isSession(x)){ wPlan++; if(x<=T&&trained(x)) wDone++; }
+  const wk=dash.weekly(acts,idxOfIso,curW), cw=wk[curW]||{min:0,runKm:0,n:0};
+  const rp=[]; for(let x=Math.max(0,T-6);x<=T;x++) if(S.rpe[keyI(x)]!=null) rp.push(+S.rpe[keyI(x)]);
+  const rec=garmin.recoveryHint(S.garmin.well[isoD(NOW)]);
+  let h=`<div class="wide">${vhead("Dashboard","Plan, Intervalle, Erholung, Kraft und Tests. Werte antippen für Details.",false)}`;
+  // Zahl, die beim Einblenden hochzählt (nach React Bits „CountUp“); Endwert steht schon im HTML (ohne JS korrekt)
+  const cnt=(v,dec=0,suf="")=>`<span class="cnt" data-to="${v}" data-dec="${dec}" data-suf="${esc(suf)}">${dec?(+v).toFixed(dec).replace(".",","):Math.round(v)}${esc(suf)}</span>`;
+  const pct=plan?Math.round(done/plan*100):0, wtr=S.garmin.well[isoD(NOW)]||{};
+  const recCol={gut:"var(--ok)",mittel:"var(--warn)",schlecht:"var(--danger)"}[rec.level]||"var(--muted)";
+  const avgR=rp.length?rp.reduce((a,b)=>a+b,0)/rp.length:null;
+  h+=`<div class="dash-hero"><div class="dash-rings spot">
+      ${dash.ringGauge(pct,{label:"Plan",value:cnt(pct,0,"%"),sub:`<span style="color:var(--muted)">${done} von ${plan}</span>`,color:"var(--accent)"})}
+      ${dash.ringGauge(wtr.readiness??0,{label:"Readiness",value:wtr.readiness!=null?cnt(wtr.readiness):"–",sub:rec.level?`<span style="color:${recCol}">${REC_TXT[rec.level]}</span>`:"",color:recCol})}
+    </div><div class="kpis">
+    <div class="kpi spot"><span>Diese Woche (W${curW+1})</span><b>${cnt(wDone)}/${wPlan}</b><span>Einheiten erledigt</span></div>
+    <div class="kpi spot"><span>Laufen diese Woche</span><b>${cnt(cw.runKm,1," km")}</b><span>${cw.n} Aktivitäten</span></div>
+    <div class="kpi spot"><span>Trainingszeit diese Woche</span><b>${dash.hm(cw.min).replace(" h","")}</b><span>Stunden (Aktivitäten)</span></div>
+    <div class="kpi spot"><span>Ø RPE 7 Tage</span><b>${avgR!=null?cnt(avgR,1):"–"}</b><span>${rp.length} Einträge</span></div>
+    <div class="kpi spot"><span>Erholung heute (Garmin)</span><b class="${rec.level?"rec-"+rec.level:""}">${rec.level?REC_TXT[rec.level]:"–"}</b><span>${rec.why.length?esc(rec.why.join(", ")):S.garmin.conn?"keine Auffälligkeiten":"Garmin nicht verbunden"}</span></div>
+    <div class="kpi spot"><span>Aktivitäten gesamt</span><b>${cnt(acts.length)}</b><span>Strava + Garmin</span></div>
+  </div></div>`;
+
+  // Wochen
+  const wtip=(x)=>{ let p=0,d=0; for(let i=x.w*7;i<x.w*7+7&&i<=LAST;i++) if(isSession(i)){ p++; if(i<=T&&trained(i)) d++; }
+    return `Woche ${x.w+1}: ${dash.hm(x.min)} · ${String(x.runKm).replace(".",",")} km Lauf · ${x.n} Aktivitäten · ${d}/${p} Einheiten erledigt`; };
+  const WK={min:["Trainingszeit","Minuten pro Woche aus Strava/Garmin",x=>x.min,v=>Math.round(v)+"′"],km:["Lauf-km","Kilometer pro Woche, alle Läufe",x=>x.runKm,v=>(Math.round(v*10)/10+"").replace(".",",")+" km"]};
+  const wsel=WK[dashWeek]?dashWeek:"min", [,wsub,wget,wfmt]=WK[wsel];
+  // Desktop: zwei Abschnitte nebeneinander (dpair), Handy: untereinander
+  h+=`<div class="dpair"><section><div class="dash-title">Wochen</div><div class="card spot" id="dc-week">${dchips("week",Object.entries(WK).map(([k,v])=>[k,v[0]]),wsel)}
+    <div class="sub">${wsub}</div>${dash.barChart(wk.map(x=>({label:"W"+(x.w+1),value:wget(x),tip:wtip(x),hi:x.w===curW})),{label:wsub,fmt:wfmt})}</div>`;
+
+  // Intervalle der letzten Intervall-Einheit
+  const li=lastIntervalAct();
+  h+=`</section><section><div class="dash-title">Letzte Intervall-Einheit</div><div class="card">`;
+  if(!li) h+=`<p class="sub">Noch keine Einheit mit Runden (Laps). Garmin bzw. Strava synchronisieren – Intervalle werden aus den Runden der Uhr erkannt (Auto-Lap oder Runden-Taste).</p>`;
+  else {
+    const {a,iv,plan}=li, W=iv.work.map(i=>a.laps[i]), km=W.every(l=>Math.abs(l.d-1000)<=150);
+    h+=`<div class="row between"><b>${esc(a.name||strava.SPORT_LABEL[a.group])}</b><span class="badge ${srcCls(a)}">${srcName(a)}</span></div>
+      <div class="sub">${esc(dmy(a.date))} · ${esc(strava.summary(a))}${plan?" · Plan: "+esc(plan):""}</div>
+      <p class="mt-2"><b>${esc(dash.repSummary(a,plan))}</b></p>`;
+    h+=dash.pairChart(W.map((l,k)=>({label:"Rep "+(k+1),values:[km?dash.paceOf(l):l.t]})),{names:[km?"Pace":"Zeit"],fmt:v=>mmss(v)+(km?"/km":""),afmt:v=>mmss(v),label:"Intervallzeiten"});
+    h+=`<details class="mt-2"><summary class="sub">Alle Runden (${a.laps.length})</summary><table class="laps"><tr><th>Runde</th><th>Distanz</th><th>Zeit</th><th>Pace</th><th>HF</th></tr>`+
+      a.laps.map((l,i)=>`<tr class="${iv.work.includes(i)?"work":""}"><td>${i+1}${iv.work.includes(i)?" · Intervall":""}</td><td>${l.d>=1000?(l.d/1000).toFixed(2).replace(".",",")+" km":l.d+" m"}</td><td>${mmss(l.t)}</td><td>${dash.fmtPace(dash.paceOf(l))}</td><td>${l.hr||"–"}</td></tr>`).join("")+`</table></details>`;
+  }
+  h+=`</div></section></div>`;
+
+  // Erholung (Garmin): eine Kennzahl pro Diagramm (nie zwei Skalen), Auswahl über Chips – spart auf dem Handy viel Scrollen
+  const days=[]; for(let k=27;k>=0;k--) days.push(isoD(new Date(+NOW-k*dayMs)));
+  const one=(v)=>String(Math.round(v*10)/10).replace(".",",");
+  const WELL={readiness:["Readiness",v=>Math.round(v)+"",{min:0,max:100},"Training Readiness (0–100): wie bereit dein Körper für hartes Training ist"],
+    hrv:["HRV",v=>Math.round(v)+" ms",{},"Herzfrequenzvariabilität, Nacht-Durchschnitt – höher ist meist besser"],
+    sleepH:["Schlaf",v=>one(v)+" h",{min:0,max:10},"Schlafdauer pro Nacht"],
+    bb:["Body Battery",v=>Math.round(v)+"",{min:0,max:100},"Höchster Body-Battery-Wert des Tages"],
+    rhr:["Ruhepuls",v=>Math.round(v)+" bpm",{},"Ruhepuls – steigt er deutlich an, ist oft Erholung nötig"]};
+  const have=Object.keys(WELL).filter(k=>days.some(d=>S.garmin.well[d]&&S.garmin.well[d][k]!=null));
+  h+=`<div class="dpair"><section><div class="dash-title">Erholung (Garmin)</div>`;
+  if(have.length){
+    const ksel=have.includes(dashWell)?dashWell:have[0], [,wf,wo,wdesc]=WELL[ksel];
+    const vals=days.map(d=>{ const w=S.garmin.well[d]; return w&&w[ksel]!=null?+w[ksel]:null; });
+    const avgOf=(a)=>{ const v=a.filter(x=>x!=null); return v.length?v.reduce((x,y)=>x+y,0)/v.length:null; };
+    const lastV=[...vals].reverse().find(v=>v!=null), a7=avgOf(vals.slice(-7)), a28=avgOf(vals);
+    h+=`<div class="card spot" id="dc-well">${dchips("well",have.map(k=>[k,WELL[k][0]]),ksel)}
+      <div class="lstats l3"><div><span>Zuletzt</span><b>${lastV!=null?wf(lastV):"–"}</b></div><div><span>Ø 7 Tage</span><b>${a7!=null?wf(a7):"–"}</b></div><div><span>Ø 4 Wochen</span><b>${a28!=null?wf(a28):"–"}</b></div></div>
+      <div class="sub mt-2">${wdesc}</div>
+      ${dash.lineChart(days.map((d,i)=>({label:dmy(d),value:vals[i],tip:`${dmy(d)}: ${vals[i]==null?"keine Daten":wf(vals[i])}`})),{fmt:wf,label:WELL[ksel][0],...wo})}
+      <details class="mt-2"><summary class="sub">Alle Werte als Tabelle</summary>${wellTable(28)}${gmDiag()}</details></div>`;
+  } else h+=`<div class="card"><p class="sub">${S.garmin.conn?"Noch keine Erholungswerte geladen. Unter Strava / Garmin synchronisieren.":"Garmin verbinden (Menü → Strava / Garmin), dann erscheinen hier HRV, Schlaf, Body Battery, Readiness und Ruhepuls."}</p>${S.garmin.conn?gmDiag():""}</div>`;
+
+  // Kraft: Gewichtsverlauf je Übung (aus den Einträgen der Krafteinheiten) + Standard-Arbeitsgewichte – neben der Erholung
+  h+=`</section><section><div class="dash-title">Kraft · Gewichtsverlauf</div>`+liftCard()+`</section></div>`;
+
+  // Belastung: RPE und Check-in der letzten 14 Tage
+  const d14=[]; for(let x=Math.max(0,T-13);x<=T;x++) d14.push(x);
+  if(d14.length){
+    const rpeC=dash.barChart(d14.map(x=>{ const v=S.rpe[keyI(x)]; const p=dayPlan(x); return {label:String(dateFromIdx(x).getDate()),value:v!=null?+v:0,tip:`${shortDay(x)}: ${v!=null?"RPE "+v:"kein RPE"}${p?" · "+p.t:""}`}; }),{label:"RPE der letzten 14 Tage",fmt:v=>Math.round(v)+"",height:120});
+    const cnt3={green:0,yellow:0,red:0}; d14.forEach(x=>{ const r=readiness(S.checkin[keyI(x)]); if(r) cnt3[r]++; });
+    const nCi=cnt3.green+cnt3.yellow+cnt3.red;
+    const ciSum=`<div class="lstats l3 mt-3"><div><span>✓ Grün</span><b>${cnt3.green}</b></div><div><span>~ Gelb</span><b>${cnt3.yellow}</b></div><div><span>! Rot</span><b>${cnt3.red}</b></div></div><p class="sub mt-2">${nCi} von ${d14.length} Tagen eingecheckt${cnt3.red+cnt3.yellow>=4?" · auffällig viele gelbe/rote Tage – Belastung im Blick behalten":""}.</p>`;
+    const ci=d14.map(x=>{ const r=readiness(S.checkin[keyI(x)]); return `<span class="${r||""}" title="${esc(shortDay(x))}: ${r?{green:"Grün",yellow:"Gelb",red:"Rot"}[r]:"kein Check-in"}">${r?{green:"✓",yellow:"~",red:"!"}[r]:"·"}<br>${dateFromIdx(x).getDate()}</span>`; }).join("");
+    h+=`<div class="dash-title">Belastung</div><div class="dgrid"><div class="card"><b>RPE (Anstrengung 1–10)</b><div class="sub">letzte 14 Tage</div>${rpeC}</div>
+      <div class="card"><b>Check-in-Ampel</b><div class="sub">✓ grün · ~ gelb · ! rot · letzte 14 Tage</div><div class="cistrip">${ci}</div>${ciSum}</div></div>`;
+  }
+
+  // Tests: Pacing-Test ich vs. Partner
+  const A=myTests(), B=partnerTests(), TT=teamT();
+  const groups=A.lauf.map((v,r)=>({label:"Rep "+(r+1),values:[parseT(v),parseT(B.lauf[r])].map(x=>isNaN(x)?null:x)}));
+  const pc=dash.pairChart(groups,{names:[ME,PARTNER],fmt:v=>mmss(v),label:"Pacing-Test 4×1 km"});
+  h+=`<div class="dash-title">Tests &amp; Benchmarks</div><div class="dgrid"><div class="card"><b>Pacing-Test 4×1 km</b><div class="sub">Pace pro Wiederholung · Team-Tempo T ${isNaN(TT)?"–":mmss(TT)+"/km"}</div>
+    ${pc?pc+`<div class="legend"><span><i style="background:var(--viz-1)"></i>${esc(ME)}</span><span><i style="background:var(--viz-2)"></i>${esc(PARTNER)}</span></div>`:`<p class="sub mt-2">Noch keine Werte. Nach dem Pacing-Test „Übernehmen“ tippen, dann werden die Zeiten aus der Uhr eingetragen.</p>`}</div>`;
+  const ST=["SkiErg","Sled Push","Sled Pull","Burpee BJ","RowErg","Farmers","Lunges","Wall Balls"];
+  const stRows=ST.map((n,r)=>[n,A.station[r],B.station[r]]).filter(r=>r[1]||r[2]);
+  h+=`<div class="card"><b>Stationen-Benchmark</b>${stRows.length?`<table class="laps"><tr><th>Station</th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th></tr>${stRows.map(r=>`<tr class="work"><td>${r[0]}</td><td>${esc(r[1]||"–")}</td><td>${esc(r[2]||"–")}</td></tr>`).join("")}</table>`:`<p class="sub mt-2">Noch keine Stationen-Zeiten (Menü → Profil).</p>`}</div></div>`;
+
+
+  // Aktivitäten
+  const last=acts.slice().sort((a,b)=>(a.start||a.date)<(b.start||b.date)?1:-1).slice(0,15);
+  h+=`<div class="dash-title">Letzte Aktivitäten</div><div>`+(last.length?`<div class="list">${last.map((a,ix)=>{ const i=idxOfIso(a.date), p=i>=0&&i<=LAST?dayPlan(i):null, rs=dash.repSummary(a,p&&p.i?p.i.find(t=>dash.parseReps(t))||"":"");
+      return (ix===5?`</div><details class="more-acts"><summary class="sub">${last.length-5} weitere Aktivitäten</summary><div class="list">`:"")+`<div class="act"><div class="d">${DAYS[(isoToDate(a.date).getDay()+6)%7]}<b>${isoToDate(a.date).getDate()}</b></div><div><b>${esc(a.name||strava.SPORT_LABEL[a.group])}</b> <span class="badge ${srcCls(a)}">${srcName(a)}</span><div class="sub">${esc(strava.summary(a))}</div>${rs?`<div class="sub mt-1">Intervalle ${esc(rs)}</div>`:""}</div></div>`; }).join("")}</div>${last.length>5?"</details>":""}`:`<div class="card"><p class="sub">Noch keine Aktivitäten.</p></div>`)+`</div>`;
+  return h+`</div>`;
+}
+
+/* Dashboard-Animationen (GSAP): Karten fahren gestaffelt ein, Zahlen zählen hoch, Ringe füllen sich,
+   Balken wachsen aus der Grundlinie, Linien zeichnen sich. Weiter unten liegende Karten starten beim Hineinscrollen.
+   Nur beim Öffnen des Dashboards, nicht bei jedem Neuaufbau (Sync). „Bewegung reduzieren“ = keine Animation. */
+let dashSeen=false;
+function animateDash(){
+  const g=window.gsap; if(!g) return;
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if(window.ScrollTrigger) g.registerPlugin(window.ScrollTrigger);
+  const root=$("#main .wide"); if(!root) return;
+  const ease="power3.out";
+  // Kopf: Ringe und Kacheln
+  g.from(root.querySelectorAll(".dash-rings, .dash-hero .kpi"),{y:18,opacity:0,duration:.6,stagger:.06,ease,clearProps:"transform,opacity"});
+  root.querySelectorAll(".ring-fg").forEach(c=>{ const C=+c.dataset.c; g.fromTo(c,{strokeDashoffset:C},{strokeDashoffset:C*(1-(+c.dataset.pct)/100),duration:1.4,delay:.2,ease:"power2.out"}); });
+  root.querySelectorAll(".cnt").forEach(el=>{ const to=+el.dataset.to, dec=+el.dataset.dec, suf=el.dataset.suf||"", o={v:0};
+    if(isNaN(to)) return;
+    g.to(o,{v:to,duration:1.2,delay:.15,ease:"power2.out",onUpdate:()=>{ el.textContent=(dec?o.v.toFixed(dec).replace(".",","):Math.round(o.v))+suf; }}); });
+  // Abschnitte und Karten darunter: beim Hineinscrollen
+  const reveal=(el,extra)=>{ const st=window.ScrollTrigger?{trigger:el,start:"top 92%",once:true}:undefined; const tl=g.timeline({scrollTrigger:st});
+    tl.from(el,{y:24,opacity:0,duration:.55,ease,clearProps:"transform,opacity"}); if(extra) extra(tl); };
+  root.querySelectorAll(".dash-title").forEach(t=>reveal(t));
+  root.querySelectorAll(".dgrid > .card, .dpair > section > .card, .wide > .card, .wide > div > .list").forEach(card=>reveal(card,tl=>{
+    const bars=card.querySelectorAll(".viz .bar"); if(bars.length) tl.from(bars,{scaleY:0,transformOrigin:"50% 100%",duration:.7,stagger:.04,ease:"back.out(1.4)"},"-=.3");
+    card.querySelectorAll(".viz .ln").forEach(p=>{ const L=p.getTotalLength(); tl.fromTo(p,{strokeDasharray:L,strokeDashoffset:L},{strokeDashoffset:0,duration:1.1,ease:"power2.inOut",clearProps:"strokeDasharray,strokeDashoffset"},"-=.35"); });
+    const ar=card.querySelectorAll(".viz .area, .viz .last"); if(ar.length) tl.from(ar,{opacity:0,duration:.5},"-=.4");
+    const rows=card.querySelectorAll(".act, .laps tr, .cistrip span, .kpis .kpi"); if(rows.length) tl.from(rows,{opacity:0,y:8,duration:.35,stagger:.03,ease,clearProps:"transform,opacity"},"-=.3");
+  }));
+}
+/* Nur das Diagramm einer Karte neu einblenden (nach Umschalten per Chip) */
+function animateChart(card){
+  const g=window.gsap; if(!g||!card||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const bars=card.querySelectorAll(".viz .bar"); if(bars.length) g.from(bars,{scaleY:0,transformOrigin:"50% 100%",duration:.55,stagger:.025,ease:"back.out(1.3)"});
+  card.querySelectorAll(".viz .ln").forEach(p=>{ const L=p.getTotalLength(); g.fromTo(p,{strokeDasharray:L,strokeDashoffset:L},{strokeDashoffset:0,duration:.8,ease:"power2.inOut",clearProps:"strokeDasharray,strokeDashoffset"}); });
+  const ar=card.querySelectorAll(".viz .area, .viz .last"); if(ar.length) g.from(ar,{opacity:0,duration:.5,delay:.2});
+  const st=card.querySelectorAll(".lstats b"); if(st.length) g.from(st,{opacity:0,y:6,duration:.3,stagger:.04});
+}
+/* Spotlight: Zeigerposition als CSS-Variablen (nur Dashboard-Karten) */
+document.addEventListener("pointermove",e=>{ const c=e.target.closest&&e.target.closest(".spot"); if(!c) return; const r=c.getBoundingClientRect();
+  c.style.setProperty("--mx",(e.clientX-r.left)+"px"); c.style.setProperty("--my",(e.clientY-r.top)+"px"); },{passive:true});
+
+/* Tooltip für Diagramme: [data-tip] überfahren oder antippen */
+(function(){
+  let tipEl=null, onEl=null;
+  const show=(el,x,y)=>{ if(!tipEl){ tipEl=document.createElement("div"); tipEl.id="viztip"; tipEl.setAttribute("role","status"); document.body.appendChild(tipEl); }
+    tipEl.textContent=el.getAttribute("data-tip"); tipEl.hidden=false;
+    const r=tipEl.getBoundingClientRect(); tipEl.style.left=Math.max(6,Math.min(innerWidth-r.width-6,x-r.width/2))+"px"; tipEl.style.top=Math.max(6,y-r.height-12)+"px";
+    if(onEl&&onEl!==el) onEl.classList.remove("on"); onEl=el; el.classList.add("on"); };
+  const hide=()=>{ if(tipEl) tipEl.hidden=true; if(onEl){ onEl.classList.remove("on"); onEl=null; } };
+  document.addEventListener("pointermove",e=>{ const el=e.target.closest&&e.target.closest(".viz [data-tip]"); if(el) show(el,e.clientX,e.clientY); else if(onEl) hide(); });
+  document.addEventListener("pointerdown",e=>{ const el=e.target.closest&&e.target.closest(".viz [data-tip]"); if(el) show(el,e.clientX,e.clientY); else hide(); });
+  document.addEventListener("scroll",hide,{passive:true});
+})();
 
 /* ---------- Backup ---------- */
 let bkp=null; // eingelesenes Backup, wartet auf Bestätigung: {name, data, meta, summary}
@@ -1526,6 +1986,26 @@ async function boot(){
 /* Rückmeldung beim Abhaken: fehlt ein Wert (Zeit, Watt, Pace, Runden …), wird gewarnt; ist alles abgehakt, bestätigt */
 /* Übungsname ohne Satz-/RPE-Angaben, z. B. „Bulgarian Split Squat“ – nie mitten im Wort abgeschnitten */
 const exLabel=(t)=>{ const n=String(t).split(/\s\d|\s@|,|\sRPE\b/i)[0].trim(); return n.length>=3&&!/^\d/.test(n)?n:String(t).split(",")[0].trim(); };
+/* Abschluss-Animation: Fortschritt wird grün, Inhalt blendet aus, die Karte schrumpft auf Balkenhöhe,
+   danach erscheint der Balken. Ohne Animation, wenn das System „Bewegung reduzieren“ eingestellt hat. */
+function closeCard(i){
+  doneOpen.delete(i);
+  const card=document.querySelector(`.card.hero[data-day="${i}"]`);
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(!card||reduce||!card.animate){ render(); return; }
+  const pr=card.querySelector(".prog"); if(pr){ pr.classList.add("full"); const b=pr.querySelector("i"); if(b) b.style.width="100%"; }
+  card.classList.add("closing");
+  setTimeout(()=>{
+    card.classList.add("fade");
+    const h0=card.getBoundingClientRect().height;
+    card.animate([{height:h0+"px"},{height:"60px"}],{duration:480,delay:120,easing:"cubic-bezier(.3,.7,.2,1)",fill:"forwards"})
+      .finished.then(()=>{ render();
+        const bar=document.querySelector(`.done-bar[data-day="${i}"]`);
+        if(bar){ bar.animate([{opacity:.4,transform:"scale(.97)"},{opacity:1,transform:"scale(1)"}],{duration:260,easing:"ease-out"});
+          const ck=bar.querySelector(".ck"); if(ck) ck.animate([{transform:"scale(.3)"},{transform:"scale(1.25)"},{transform:"scale(1)"}],{duration:420,easing:"ease-out"}); } })
+      .catch(()=>render());
+  },380);
+}
 function workoutFeedback(i,id,all){
   const p=dayPlan(i), dk=keyI(i); if(!p) return;
   const miss=missingValues(p.i,S.done,S.val,dk);
@@ -1546,6 +2026,7 @@ function hideSplash(){
 /* Strava im Hintergrund aktualisieren, wenn die letzte Synchronisierung über eine Stunde her ist. */
 function afterBoot(){
   if(stTok() && Date.now()-(S.strava.at||0)>36e5) stravaSync(true);
+  if(gmOn() && Date.now()-(S.garmin.at||0)>36e5) garminSync(true);
   // Erster Start / erstes Login ohne Strava: einmalig das Onboarding zeigen
   if(authed() && view==="today" && needsOnb()){ view="onb"; render(); }
 }
@@ -1558,6 +2039,7 @@ window.addEventListener("hashchange",()=>{ const c=linkCode(location.hash); if(!
 /* Nach dem Training zurück in die App: Strava nachladen (höchstens alle 15 Min.). Treffer erscheinen als Vorschlag. */
 document.addEventListener("visibilitychange",()=>{
   if(document.visibilityState==="visible" && authed() && stTok() && Date.now()-(S.strava.at||0)>15*60e3) stravaSync(true);
+  if(document.visibilityState==="visible" && authed() && gmOn() && Date.now()-(S.garmin.at||0)>15*60e3) garminSync(true);
 });
 document.addEventListener("visibilitychange",async()=>{
   if(!sb||!USER) return;
@@ -1570,6 +2052,8 @@ document.addEventListener("visibilitychange",async()=>{
 document.addEventListener("submit",async e=>{
   const f=e.target.closest("[data-form]"); if(!f) return; e.preventDefault();
   if(f.dataset.form==="coach"){ if(!ccBusy) sendCoach($("#cc-in").value); return; }
+  if(f.dataset.form==="gm-login"){ if(!gmBusy) garminLogin($("#gm-mail").value.trim(),$("#gm-pw").value); return; }
+  if(f.dataset.form==="gm-mfa"){ garminMfa($("#gm-mfa").value); return; }
   const btn=f.querySelector("button[type=submit]"); btn.disabled=true; loginMsg="";
   if(f.dataset.form==="login"){
     loginEmail=$("#le").value.trim().toLowerCase();
@@ -1613,7 +2097,7 @@ function loginError(e){
 
 /* ---------- Render + Events ---------- */
 const VIEWS={today:vToday,week:vWeek,plan:vPlan,profile:vProfile,edit:vEdit,login:vLogin,import:vImport,strava:vStrava,shared:vShared,
-  backup:vBackup,coach:vCoach,onb:vOnb};
+  backup:vBackup,coach:vCoach,onb:vOnb,dashboard:vDashboard};
 function render(){
   RC=null;
   if(!authed() && view!=="shared") view="login";
@@ -1623,6 +2107,8 @@ function render(){
   SUGS = view==="today" ? suggestions() : [];
   const fid=document.activeElement&&$("#main").contains(document.activeElement)?document.activeElement.id:"";
   $("#main").innerHTML=VIEWS[view]();
+  // Dashboard nur beim Öffnen animieren, nicht bei jedem Neuaufbau
+  if(view==="dashboard"){ if(!dashSeen){ dashSeen=true; requestAnimationFrame(animateDash); } } else dashSeen=false;
   if(fid){ const el=document.getElementById(fid); if(el) el.focus({preventScroll:true}); }
   document.querySelectorAll("#nav button").forEach(b=>{ const on=b.dataset.v===view; b.classList.toggle("on",on); if(on) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
   const bare=view==="login"||view==="shared"||view==="onb";
@@ -1696,7 +2182,11 @@ document.addEventListener("click",e=>{
     p.i.forEach((_,j)=>{ const id=dk+"|"+j; S.done[id]=1;
       // Vorbelegtes Standardgewicht wie beim einzelnen Abhaken übernehmen
       const pv=document.querySelector(`[data-v2="${id}"].pre`); if(pv&&!S.val[id]) S.val[id]=pv.value; });
-    save(); render(); return workoutFeedback(i,null,true); }
+    save(); workoutFeedback(i,null,true); return closeCard(i); }
+  if(d.act==="dash-chip"){ if(d.g==="lift") dashLift=d.k; else if(d.g==="week") dashWeek=d.k; else if(d.g==="well") dashWell=d.k;
+    render(); animateChart(document.querySelector("#dc-"+d.g)); return; }
+  if(d.act==="done-open"){ doneOpen.add(+d.i); return render(); }
+  if(d.act==="done-close"){ return closeCard(+d.i); }
   if(d.last){ const el=document.querySelector(`[data-v2="${d.last}"]`); S.val[d.last]=d.lv; save();
     if(el){ el.value=d.lv; el.classList.remove("pre"); el.focus(); } return toast(`Übernommen: ${d.lv}`); }
   if(d.act==="sore-clear"){ delete S.sore[soreToday()]; soreSave(); toast("Muskelkater zurückgesetzt"); return render(); }
@@ -1748,7 +2238,16 @@ document.addEventListener("click",e=>{
   if(d.act==="strava-take"){ const i=+d.i, p=dayPlan(i), dk=keyI(i), a=actsOf(i).find(x=>strava.fits(p.k,x.group));
     p.i.forEach((_,j)=>S.done[dk+"|"+j]=1);
     const j=p.i.findIndex(t=>!isFiller(t)); if(a && j>=0 && !S.val[dk+"|"+j]) S.val[dk+"|"+j]=strava.summary(a);
-    save(); toast("Workout erledigt – von Strava übernommen"); return render(); }
+    let msg="Workout erledigt – von "+srcName(a)+" übernommen";
+    if(a&&a.laps){
+      // Zeile mit Intervall-Vorgabe ("4×1km") bekommt die Zeiten jeder Wiederholung statt nur der Gesamtzeit
+      const r=p.i.findIndex(t=>dash.parseReps(t)), plan=r>=0?p.i[r]:"", rs=dash.repSummary(a,plan);
+      if(rs){ const k=r>=0?r:j; if(k>=0) S.val[dk+"|"+k]=rs; msg="Erledigt – Intervallzeiten übernommen";
+        // Pacing-Test: Pace jeder Wiederholung direkt in Profil → Tests (nur leere Felder, nichts überschreiben)
+        if(p.test&&p.k==="lauf"){ const P=dash.repPaces(a,plan), mc=myCol(), L=S.tests.lauf[mc]||(S.tests.lauf[mc]=["","","",""]);
+          let n=0; P.slice(0,4).forEach((v,x)=>{ if(v&&!String(L[x]||"").trim()){ L[x]=mmss(v); n++; } });
+          if(n) msg="Erledigt – Intervallzeiten auch in den Pacing-Test übernommen"; } } }
+    save(); toast(msg); return render(); }
   if(d.act==="st-connect"&&stServer()){
     if(navigator.onLine===false) return toast("Offline – zum Verbinden braucht es Internet",true);
     stBusy=true; stMsg=""; render();
@@ -1762,8 +2261,12 @@ document.addEventListener("click",e=>{
     if(navigator.onLine===false) return toast("Offline – zum Verbinden braucht es Internet",true);
     lsSet("hx:strava-id",id); lsSet("hx:strava-secret",sec); location.href=strava.authUrl(id,redirectUri()); return; }
   if(d.act==="st-sync") return stravaSync(false);
+  if(d.act==="gm-sync") return garminSync(false);
+  if(d.act==="gm-off") return garminOff();
+  if(d.act==="gm-mfa-x") return garminMfaCancel();
+  if(d.act==="gm-copy"){ const txt=gmCmd(); if(navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>toast("Befehl kopiert"),()=>prompt("Befehl:",txt)); else prompt("Befehl:",txt); return; }
   if(d.act==="st-off"){ if(!confirm("Strava trennen? Bereits geladene Aktivitäten bleiben.")) return; lsDel(stKey()); stMsg=""; return render(); }
-  if(d.act==="st-clear"){ if(!confirm("Alle Strava-Aktivitäten aus der App löschen?")) return; S.strava={acts:{},at:0}; save(); return render(); }
+  if(d.act==="st-clear"){ if(!confirm("Alle Strava- und Garmin-Aktivitäten aus der App löschen? Beim nächsten Synchronisieren werden sie neu geladen.")) return; S.strava={acts:{},at:0}; save(); return render(); }
   if(d.act==="shared-close"){ SHARED=null; history.replaceState(null,"",location.pathname+location.search); return go("today"); }
   if(d.wk){ wk=Math.max(0,Math.min(NWEEKS-1,wk+ +d.wk)); openDay=null; return render(); }
   if(d.pb){ planBlk=planBlk===d.pb?null:d.pb; planDay=null; render(); const el=document.querySelector(`[data-pb="${CSS.escape(d.pb)}"]`); return el&&el.scrollIntoView({block:"nearest"}); }
@@ -1800,6 +2303,7 @@ document.addEventListener("change",async e=>{
   if(t.dataset.sz){ soreSave(); return render(); }
   if(t.dataset.file){ const f=t.files&&t.files[0]; t.value=""; if(!f) return;
     if(t.dataset.file==="plan") return importFile(f);
+    if(t.dataset.file==="garmin") return garminConnect(f);
     if(t.dataset.file==="backup"){ try{ bkp={name:f.name,...readBackup(await f.text())}; }catch(err){ toast(err.message); } return render(); }
     try{ const n=mergeActs(strava.parseActivities(await f.text())); save(); toast(n?`${n} neue Aktivitäten importiert`:"Keine neuen Aktivitäten seit Planstart"); }
     catch(err){ toast(err.code==="csv_format"?"Das ist keine Strava-activities.csv":"Datei konnte nicht gelesen werden"); }
@@ -1813,7 +2317,8 @@ document.addEventListener("change",async e=>{
     const card=t.closest(".card"); if(card){ const all=card.querySelectorAll("[data-c]"), n=all.length, dn=[...all].filter(x=>x.checked).length;
       const bar=card.querySelector(".prog i"); if(bar) bar.style.width=(dn/n*100)+"%";
       const s=card.querySelector(".prog+.sub"); if(s) s.textContent=dn+" von "+n+" erledigt";
-      if(t.checked && card.dataset.day) workoutFeedback(+card.dataset.day,t.dataset.c,dn===n); } }
+      if(t.checked && card.dataset.day) workoutFeedback(+card.dataset.day,t.dataset.c,dn===n);
+      if(t.checked && dn===n && card.dataset.day && card.classList.contains("hero") && dayPlan(+card.dataset.day).k!=="rest") closeCard(+card.dataset.day); } }
 });
 document.addEventListener("input",e=>{
   const t=e.target, d=t.dataset; let redo=false;

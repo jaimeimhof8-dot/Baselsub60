@@ -77,6 +77,35 @@ create policy "eigener Plan ändern"  on public.plan_state for update to authent
 --   create policy "eigene Zeilen" on public.xyz for all to authenticated
 --     using (user_id = auth.uid() and public.is_member()) with check (user_id = auth.uid() and public.is_member());
 
+-- Garmin-Verbindung pro Nutzer (Edge Function "garmin"). Inhalt AES-verschlüsselt; keine Policy = kein Zugriff aus der App,
+-- nur die Edge Function liest/schreibt mit dem Service-Role-Key. Die Erholungswerte selbst landen wie die Aktivitäten in plan_state.
+create table if not exists public.garmin_tokens (
+  user_id      uuid primary key references auth.users on delete cascade,
+  data         text not null,
+  display_name text,
+  access_exp   timestamptz,
+  refresh_exp  timestamptz,
+  last_error   text,
+  updated_at   timestamptz not null default now()
+);
+alter table public.garmin_tokens enable row level security;
+revoke all on public.garmin_tokens from anon, authenticated;
+
+-- Garmin-Login mit MFA: Der Login-Server (Vercel, garmin-login/) meldet hier "mfa" und wartet, bis die App den Code einträgt.
+-- Kurzlebig (wird nach dem Login gelöscht), nur die eigene Zeile sichtbar.
+create table if not exists public.garmin_pending (
+  user_id    uuid primary key default auth.uid() references auth.users on delete cascade,
+  status     text not null,
+  code       text check (code is null or char_length(code) <= 12),
+  updated_at timestamptz not null default now()
+);
+alter table public.garmin_pending enable row level security;
+revoke all on public.garmin_pending from anon;
+grant select, insert, update, delete on public.garmin_pending to authenticated;
+drop policy if exists "eigener Garmin-Login" on public.garmin_pending;
+create policy "eigener Garmin-Login" on public.garmin_pending for all to authenticated
+  using (user_id = auth.uid() and public.is_member()) with check (user_id = auth.uid() and public.is_member());
+
 -- Die zwei Nutzer + ein Test-Konto im eigenen Team (sieht Jaime/Jimoh nicht und taucht bei ihnen nicht als Partner auf)
 insert into public.members (email, name, team) values
   ('jaimeimhof8@gmail.com', 'Jaime', 'basel'),

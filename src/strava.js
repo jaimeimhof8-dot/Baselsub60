@@ -1,5 +1,6 @@
 // Strava: Aktivitäten einlesen (API-JSON oder Export-CSV), normalisieren und den geplanten Einheiten zuordnen.
 // Netzwerkfunktionen bekommen `fetch` übergeben, damit alles ohne Browser testbar bleibt.
+import { normalizeLaps } from "./dashboard.js";
 
 const SPORT = {
   run: ["Run", "TrailRun", "VirtualRun", "Lauf", "Laufen", "Trail Run", "Virtueller Lauf"],
@@ -8,7 +9,7 @@ const SPORT = {
   ski: ["NordicSki", "BackcountrySki", "Skilanglauf"],
   strength: ["WeightTraining", "Workout", "Crossfit", "HighIntensityIntervalTraining", "Krafttraining", "Training", "HIIT"]
 };
-const sportGroup = (type) => {
+export const sportGroup = (type) => {
   const t = String(type || "").replace(/\s+/g, "").toLowerCase();
   for (const [g, list] of Object.entries(SPORT)) if (list.some((x) => x.replace(/\s+/g, "").toLowerCase() === t)) return g;
   return "other";
@@ -26,12 +27,13 @@ const pad = (n) => String(n).padStart(2, "0");
 /** "2026-10-13T18:05:00Z" (start_date_local ist Lokalzeit mit "Z") -> "2026-10-13" */
 const isoDay = (s) => { const m = String(s || "").match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[1]}-${m[2]}-${m[3]}` : null; };
 
-/** Strava-API-Aktivität -> {id, name, group, date, dist (m), time (s), hr, watts} */
+/** Strava-API-Aktivität -> {id, name, group, date, start (Lokalzeit "YYYY-MM-DDTHH:MM"), dist (m), time (s), hr, watts} */
 export function normalizeApi(a) {
   const type = a.sport_type || a.type;
   return {
     id: String(a.id), name: a.name || "", type, group: sportGroup(type),
     date: isoDay(a.start_date_local || a.start_date),
+    start: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(a.start_date_local || "") ? a.start_date_local.slice(0, 16) : undefined,
     dist: Math.round(+a.distance || 0), time: Math.round(+a.moving_time || +a.elapsed_time || 0),
     hr: a.average_heartrate ? Math.round(a.average_heartrate) : null,
     watts: a.average_watts ? Math.round(a.average_watts) : null
@@ -199,4 +201,12 @@ export async function fetchActivities(fetchFn, access, after, maxPages = 5) {
     if (list.length < 100) break;
   }
   return all.filter((a) => a.date);
+}
+
+/** Runden (Laps) einer Aktivität – daraus erkennt die App Intervalle. Fehler -> [] (Runden sind optional). */
+export async function fetchLaps(fetchFn, access, id) {
+  try {
+    const r = await fetchFn(`https://www.strava.com/api/v3/activities/${encodeURIComponent(id)}/laps`, { headers: { Authorization: "Bearer " + access } });
+    return r.ok ? normalizeLaps(await r.json()) : [];
+  } catch (_) { return []; }
 }

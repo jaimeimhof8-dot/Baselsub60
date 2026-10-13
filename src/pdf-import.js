@@ -10,6 +10,9 @@ function loadPdfJs() {
     loading = new Promise((ok, fail) => {
       const s = document.createElement("script");
       s.src = PDFJS + "pdf.min.js";
+      // Prüfsumme (SRI): manipulierte CDN-Datei wird nicht ausgeführt. Bei Versionswechsel neu berechnen.
+      s.integrity = "sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e";
+      s.crossOrigin = "anonymous";
       s.onload = () => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + "pdf.worker.min.js"; ok(window.pdfjsLib); };
       s.onerror = () => { loading = null; fail(Object.assign(new Error("PDF-Leser konnte nicht geladen werden (offline?)"), { code: "pdfjs" })); };
       document.head.appendChild(s);

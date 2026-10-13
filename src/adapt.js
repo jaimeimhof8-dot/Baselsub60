@@ -13,6 +13,7 @@
 //   dismissed   -> {id: 1}
 //   sore(i)     -> {muskel: 1–10}     wirksamer Muskelkater (optional, aus dem Muskelkater-Melder)
 //   extra(i)    -> [{id,type,min}]    Zusatz-Einheiten (optional) – zusätzliche Läufe zählen für die Überlastung
+//   recovery(i) -> {level: "gut"|"mittel"|"schlecht"|null, why: [..]}  Garmin-Erholung (optional, src/garmin.js recoveryHint)
 // }
 import { impact, summarize, overloadText } from "./soreness.js";
 import { overloadWithExtras } from "./extras.js";
@@ -101,6 +102,15 @@ export function suggest(ctx) {
       add({ id: `easy:${T}`, type: "easy", day: T, title: `${today.t} entlasten`,
         why: "Check-in gelb. Einheit machen, aber mit ca. 75 % Volumen und RPE max. 6." });
     }
+  }
+
+  // 1c) Garmin-Erholung schlecht (Readiness, HRV, Schlaf, Body Battery) -> heutige harte Einheit entlasten.
+  //     Nur wenn der Check-in nicht schon reagiert hat; der eigene Check-in hat Vorrang vor der Uhr.
+  const rec = ctx.recovery ? ctx.recovery(T) : null;
+  if (rec && rec.level === "schlecht" && isHard(today) && !today.easy && !isDone(ctx, T) && !eased.has(T) && !taken.has(T) && !r) {
+    eased.add(T);
+    add({ id: `rec:${T}`, type: "easy", day: T, title: `${today.t} entlasten`,
+      why: `Garmin meldet schlechte Erholung (${rec.why.join(", ")}). Ca. 75 % Volumen, RPE max. 6 – oder kurz einchecken, wenn du dich gut fühlst.` });
   }
 
   // 1a) Überlastung: Stelle seit 3+ Tagen über 6/10 oder Sehne zu oft hintereinander stossartig belastet

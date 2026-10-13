@@ -4,8 +4,11 @@
 // Den "Secret"/"service_role"-Key NIE hier eintragen.
 // stravaClientId (optional): Client-ID der eigenen Strava-API-App. Das Secret NIE hier eintragen –
 // es wird in der App unter Menü → Strava eingegeben und bleibt nur auf dem Gerät.
+// garminLoginUrl (optional): Adresse des Garmin-Login-Servers auf Vercel (Ordner garmin-login/, siehe SETUP.md),
+// z. B. "https://hyrox-garmin-login.vercel.app/api/login".
 window.HX_CONFIG = {
   supabaseUrl: "https://mwhbjrulzxiwtjvcwojo.supabase.co",
   supabaseAnonKey: "sb_publishable_srJQv2rw2Njbv10g_eYioA_igQMR1vN",
-  stravaClientId: ""
+  stravaClientId: "",
+  garminLoginUrl: "https://hyrox-garmin-login.vercel.app/api/login"
 };

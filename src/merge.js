@@ -55,6 +55,11 @@ export function mergeState(base, local, remote) {
       v = { ...pick(bs, local.strava, remote.strava, localNewer),
         acts: mergeMap(bs.acts, local.strava.acts, remote.strava.acts, localNewer),
         at: Math.max(local.strava.at || 0, remote.strava.at || 0) };
+    } else if (k === "garmin" && isObj(local.garmin) && isObj(remote.garmin)) {
+      const bg = isObj(b.garmin) ? b.garmin : {};
+      v = { ...pick(bg, local.garmin, remote.garmin, localNewer),
+        well: mergeMap(bg.well, local.garmin.well, remote.garmin.well, localNewer),
+        at: Math.max(local.garmin.at || 0, remote.garmin.at || 0) };
     } else v = pick(b[k], local[k], remote[k], localNewer);
     if (v !== undefined) out[k] = v;
   }

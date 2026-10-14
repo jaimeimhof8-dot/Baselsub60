@@ -194,7 +194,7 @@ export function ringGauge(pct, { label = "", value = "", sub = "", color = "var(
   const p = Math.max(0, Math.min(100, +pct || 0)), r = 52, c = 2 * Math.PI * r;
   return `<div class="ring" style="--ring:${color}"><svg viewBox="0 0 120 120" width="${size}" height="${size}" role="img" aria-label="${esc(label)}: ${esc(String(value).replace(/<[^>]*>/g, ""))}">
     <circle cx="60" cy="60" r="${r}" class="ring-bg"/>
-    <circle cx="60" cy="60" r="${r}" class="ring-fg" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${(c * (1 - p / 100)).toFixed(1)}" data-pct="${p}" data-c="${c.toFixed(1)}" transform="rotate(-90 60 60)"/>
+    <circle cx="60" cy="60" r="${r}" class="ring-fg"${p ? "" : ' opacity="0"'} stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${(c * (1 - p / 100)).toFixed(1)}" data-pct="${p}" data-c="${c.toFixed(1)}" transform="rotate(-90 60 60)"/>
   </svg><div class="ring-t"><b>${value}</b><span>${esc(label)}</span>${sub ? `<em>${sub}</em>` : ""}</div></div>`;
 }
 

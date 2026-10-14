@@ -51,14 +51,14 @@
         color-scheme: dark;
         /* Glas-Design: dunkler, ruhiger Hintergrund; Karten sind durchscheinende Glasflächen mit heller Oberkante.
      --card/--surface2 sind halbtransparent (der Hintergrund scheint durch), --well = eingelassene Felder (Eingaben, Segmente) */
-        --bg: #07080b;
-        --card: rgba(255, 255, 255, 0.065);
-        --surface2: rgba(255, 255, 255, 0.1);
-        --well: rgba(0, 0, 0, 0.28);
+        --bg: #06070a;
+        --card: #0e1016;
+        --surface2: #1b1e29;
+        --well: #161922;
         --text: #f5f5f7;
         --muted: #9a9ba3;
-        --line: rgba(255, 255, 255, 0.1);
-        --edge: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        --line: rgba(255, 255, 255, 0.06);
+        --edge: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
         --tint: #3b5375;
         --accent: #ffd21f;
         --on-accent: #16181a;
@@ -430,10 +430,13 @@
         overflow: hidden;
       }
       .card.closing > * {
-        transition: opacity 0.2s ease;
+        transition:
+          transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.3s ease;
       }
       .card.closing.fade > * {
         opacity: 0;
+        transform: translateY(-8px);
       }
       .prog.full i {
         background: var(--ok);
@@ -1272,22 +1275,22 @@
       .hold-fill {
         position: absolute;
         inset: 0;
-        background: color-mix(in srgb, var(--ok) 38%, transparent);
-        transform: scaleX(0);
-        transform-origin: left center;
-        transition: transform 0.18s var(--ios);
+        background: rgba(16, 185, 129, 0.2);
+        border-left: 2px solid #10b981;
+        clip-path: inset(0 100% 0 0);
+        transition: clip-path 0.18s var(--ios);
         pointer-events: none;
       }
       .hold.holding {
         transform: scale(0.98);
       }
       .hold.holding .hold-fill {
-        transform: scaleX(1);
-        transition: transform 0.8s linear;
+        clip-path: inset(0 0 0 0);
+        transition: clip-path 0.8s linear;
       }
       .hold.held .hold-fill {
-        transform: scaleX(1);
-        background: var(--ok);
+        clip-path: inset(0 0 0 0);
+        background: rgba(16, 185, 129, 0.45);
       }
       .hold > :not(.hold-fill) {
         position: relative;
@@ -1345,57 +1348,76 @@
       .rpe-s.unset .rpe-n {
         color: var(--muted);
       }
+      .rpe-track {
+        position: relative;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        margin-top: var(--s2);
+      }
+      /* Verlauf liegt fest auf der Skala (1 Eisblau … 10 Puls-Rot) und wird bis zum Wert aufgedeckt */
+      .rpe-fill {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to right,
+          #7dd3fc 0%,
+          #10b981 38%,
+          #facc15 72%,
+          #ef4444 100%
+        );
+        clip-path: inset(0 calc((1 - var(--pf, 0.44)) * (100% - 6px) + 3px) 0 0);
+        pointer-events: none;
+      }
+      .rpe-s.unset .rpe-fill {
+        opacity: 0;
+      }
       .rpe-range {
         -webkit-appearance: none;
         appearance: none;
+        position: absolute;
+        inset: 0;
         display: block;
         width: 100%;
-        height: 44px;
+        height: 100%;
         margin: 0;
         background: transparent;
         touch-action: pan-y;
         cursor: pointer;
       }
       .rpe-range::-webkit-slider-runnable-track {
-        height: 10px;
-        border-radius: 5px;
-        background: linear-gradient(to right, var(--rc) var(--p), var(--well) var(--p));
-        border: 1px solid var(--line);
+        height: 34px;
+        background: transparent;
       }
       .rpe-range::-moz-range-track {
-        height: 10px;
-        border-radius: 5px;
-        background: var(--well);
-        border: 1px solid var(--line);
-      }
-      .rpe-range::-moz-range-progress {
-        height: 10px;
-        border-radius: 5px;
-        background: var(--rc);
+        height: 34px;
+        background: transparent;
       }
       .rpe-range::-webkit-slider-thumb {
         -webkit-appearance: none;
-        width: 30px;
-        height: 30px;
-        margin-top: -11px;
-        border-radius: 50%;
+        width: 6px;
+        height: 24px;
+        margin-top: 5px;
+        border-radius: 3px;
         background: #fff;
-        border: 4px solid var(--rc);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        border: 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
       }
       .rpe-range::-moz-range-thumb {
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
+        width: 6px;
+        height: 24px;
+        border-radius: 3px;
         background: #fff;
-        border: 4px solid var(--rc);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        border: 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
       }
       .rpe-s.unset .rpe-range::-webkit-slider-thumb {
-        border-color: var(--muted);
+        opacity: 0.55;
       }
-      .rpe-s.unset .rpe-range::-webkit-slider-runnable-track {
-        background: var(--well);
+      .rpe-s.unset .rpe-range::-moz-range-thumb {
+        opacity: 0.55;
       }
       .rpe-scale {
         display: grid;
@@ -3163,6 +3185,132 @@
           padding-right: max(var(--s6), env(safe-area-inset-right));
         }
       }
+
+      /* ===== Tiefen-System (Design-Audit): keine Rahmen-Boxen, Flächen trennen sich über Helligkeit =====
+         Hintergrund #06070A · Karten #0E1016 + Lichtkante oben · Eingaben/Interaktives #161922 */
+      body::before {
+        background:
+          radial-gradient(
+            110% 40% at 20% -5%,
+            color-mix(in srgb, var(--tint) 12%, transparent),
+            transparent 70%
+          ),
+          var(--bg);
+      }
+      .card,
+      .done-bar,
+      .stat,
+      .list,
+      .sore-acc,
+      .msg.assistant,
+      #viztip,
+      #toast,
+      .menu-btn,
+      .strip button,
+      .wk button {
+        border-color: transparent;
+        background: var(--card);
+        box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+      }
+      .card.hero {
+        background: linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--kc, var(--accent)) 9%, var(--card)),
+          var(--card) 60%
+        );
+        border-color: transparent;
+      }
+      .tabs {
+        border-color: rgba(255, 255, 255, 0.06);
+        box-shadow: none;
+      }
+      .btn,
+      .chips button,
+      .seg button,
+      .opt,
+      .lchips button,
+      .ex-h.hold,
+      input[type="text"],
+      input[type="number"],
+      input[type="password"],
+      input[type="email"],
+      textarea {
+        border-color: transparent;
+        background: var(--well);
+        box-shadow: none;
+      }
+      input[type="text"],
+      input[type="number"],
+      input[type="password"],
+      input[type="email"],
+      textarea,
+      .chips button,
+      .seg button,
+      .lchips button {
+        border-radius: 10px;
+      }
+      .btn.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      .btn.ghost {
+        background: transparent;
+      }
+      .chips button,
+      .seg button,
+      .lchips button,
+      .btn,
+      .opt,
+      .strip button,
+      .wk button {
+        min-height: 44px;
+      }
+      .rpe-track {
+        height: 44px;
+        background: var(--well);
+        border: 0;
+      }
+      .rpe-range::-webkit-slider-runnable-track,
+      .rpe-range::-moz-range-track {
+        height: 44px;
+      }
+      .rpe-range::-webkit-slider-thumb {
+        margin-top: 10px;
+      }
+      /* Mikro-Labels */
+      .lbl,
+      .cap,
+      .stat span,
+      .ring-t span,
+      .lstats span,
+      .extras .lbl {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: rgba(255, 255, 255, 0.45);
+      }
+      .lbl .tgt-l {
+        color: var(--accent);
+      }
+      /* Zahlen */
+      .cd span,
+      .stat b,
+      .lstats b,
+      .ring-t b,
+      .rpe-n,
+      .strip .dd,
+      .day .d b,
+      .cnt {
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.03em;
+      }
+      .ex-h.hold + .ex-v {
+        margin-left: 0;
+      }
+      .tabs {
+        background: rgba(14, 16, 22, 0.88);
+      }
     </style>
   </head>
   <body>
@@ -3771,9 +3919,23 @@
       /* Erledigte Einheiten, die trotzdem offen angezeigt werden sollen (nach Antippen des Balkens) */
       const doneOpen = new Set();
       /* RPE-Farbe: Eisblau (1) → Grün → Gelb → Rot (10); --p = Füllung in Prozent */
+      const RPE_STOPS = [
+        [0, [125, 211, 252]],
+        [0.38, [16, 185, 129]],
+        [0.72, [250, 204, 21]],
+        [1, [239, 68, 68]],
+      ]; // identisch mit dem Verlauf des Balkens (.rpe-fill)
+      function rpeColor(t) {
+        let k = 1;
+        while (k < RPE_STOPS.length - 1 && t > RPE_STOPS[k][0]) k++;
+        const [t0, a] = RPE_STOPS[k - 1],
+          [t1, b] = RPE_STOPS[k],
+          f = Math.max(0, Math.min(1, (t - t0) / (t1 - t0)));
+        return `rgb(${a.map((x, n) => Math.round(x + (b[n] - x) * f)).join(",")})`;
+      }
       function rpeStyle(v) {
         const t = (v - 1) / 9;
-        return `--rc:hsl(${Math.round(200 - 195 * t)} 85% 58%);--p:${(t * 100).toFixed(1)}%`;
+        return `--rc:${rpeColor(t)};--p:${(t * 100).toFixed(1)}%;--pf:${t.toFixed(3)}`;
       }
       function doneBar(i, p) {
         const dk = keyI(i),
@@ -3877,7 +4039,7 @@
         h += `<label class="lbl" for="rpe-${i}">Wie hart war's? (RPE)${tg ? ` · <span class="tgt-l">Ziel ${tg[0] === tg[1] ? tg[0] : tg[0] + "–" + tg[1]}</span>` : ""}</label>
     <div class="rpe-s${rv ? "" : " unset"}" data-rpe-wrap style="${rpeStyle(rv || 5)}">
       <div class="rpe-head"><b class="rpe-n" aria-hidden="true">${rv || "–"}</b><span class="rpe-t">${rv ? esc(RPE_TXT[rv] || "") : "Schieben, um zu bewerten"}</span>${rv ? `<button type="button" class="rpe-x" data-act="rpe-clear" data-k="${dk}" aria-label="RPE löschen">✕</button>` : ""}</div>
-      <input type="range" class="rpe-range" id="rpe-${i}" data-rpe="${dk}" min="1" max="10" step="1" value="${rv || 5}" aria-valuetext="${rv ? rv + " – " + esc(RPE_TXT[rv] || "") : "noch nicht bewertet"}">
+      <div class="rpe-track"><i class="rpe-fill" aria-hidden="true"></i><input type="range" class="rpe-range" id="rpe-${i}" data-rpe="${dk}" min="1" max="10" step="1" value="${rv || 5}" aria-valuetext="${rv ? rv + " – " + esc(RPE_TXT[rv] || "") : "noch nicht bewertet"}"></div>
       <div class="rpe-scale" aria-hidden="true">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((r) => `<span class="${inT(r) ? "tgt" : ""}">${r}</span>`).join("")}</div>
     </div>${tg && S.rpe[dk] > tg[1] + 1 ? `<p class="sub mt-2">Deutlich über dem Ziel – wird bei der Entlastung der nächsten harten Einheiten berücksichtigt.</p>` : ""}
     <label class="lbl" for="n-${i}">Notiz</label><textarea id="n-${i}" data-n="${dk}" placeholder="Gefühl, Schlaf, Fuss, was auffiel …">${esc(S.notes[dk] || S.notes["n|" + dk] || "")}</textarea>`;
@@ -5667,7 +5829,7 @@
       function vCoach() {
         const tab = (id, label) =>
           `<button role="tab" data-act="cc-tab" data-tab="${id}" class="${coachTab === id ? "on" : ""}" aria-selected="${coachTab === id}">${label}</button>`;
-        let h = `<div class="narrow">${vhead("Coach", "", true)}<div class="chips cc-tabs" role="tablist">${tab("chat", "Chat")}${tab("move", "Umplanen")}${tab("sore", "Muskelkater")}${tab("inj", "Verletzt / krank")}</div>`;
+        let h = `<div class="narrow">${vhead("Coach", "", false)}<div class="chips cc-tabs" role="tablist">${tab("chat", "Chat")}${tab("move", "Umplanen")}${tab("sore", "Muskelkater")}${tab("inj", "Verletzt / krank")}</div>`;
         if (coachTab === "inj") return h + injHtml() + `</div>`;
         if (coachTab === "move") return h + moveHtml() + `</div>`;
         if (coachTab === "sore") return h + soreHtml() + `</div>`;
@@ -6220,9 +6382,9 @@
           const h0 = card.getBoundingClientRect().height;
           card
             .animate([{ height: h0 + "px" }, { height: "60px" }], {
-              duration: 480,
-              delay: 120,
-              easing: "cubic-bezier(.3,.7,.2,1)",
+              duration: 380,
+              delay: 80,
+              easing: SMOOTH,
               fill: "forwards",
             })
             .finished.then(() => {
@@ -6249,7 +6411,7 @@
               }
             })
             .catch(() => render());
-        }, 380);
+        }, 300);
       }
       /* Alle Übungen eines Tages abhaken (Ziel des Hold-to-Complete) */
       function completeAll(i) {
@@ -6647,6 +6809,7 @@
    Arten: push / back (Navigation tiefer bzw. zurück), tab, next / prev (Tag/Woche), fade (Inhalt einer Seite).
    grow()/shrink(): Auf- und Zuklappen mit weicher Höhe – Inhalt darunter rutscht mit.
    Ohne View-Transition-Support oder bei „Bewegung reduzieren“: sofortiger Wechsel. */
+      const SMOOTH = "cubic-bezier(0.22, 1, 0.36, 1)";
       const IOS = "cubic-bezier(.32,.72,0,1)",
         EASE_IN = "cubic-bezier(.4,0,1,1)";
       const calm = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -6700,18 +6863,21 @@
         const h = el.getBoundingClientRect().height;
         if (!h) return;
         heightAnim(el, from, h, {
-          duration: Math.min(560, 320 + h * 0.25),
-          easing: IOS,
+          duration: Math.min(480, 300 + h * 0.2),
+          easing: SMOOTH,
         });
         for (const c of el.children)
           c.animate(
             from
-              ? [{ opacity: 0 }, { opacity: 1 }]
+              ? [
+                  { opacity: 0, transform: "translateY(-8px)" },
+                  { opacity: 1, transform: "none" },
+                ]
               : [{ transform: "translateY(-10px)" }, { transform: "none" }],
             {
-              duration: from ? 380 : 480,
-              delay: from ? 90 : 0,
-              easing: IOS,
+              duration: from ? 350 : 420,
+              delay: from ? 60 : 0,
+              easing: SMOOTH,
               fill: "backwards",
             },
           );

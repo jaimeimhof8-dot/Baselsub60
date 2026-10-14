@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://hyrox-garmin-login.vercel.app https://www.strava.com https://cdn.jsdelivr.net; worker-src 'self' blob: https://cdn.jsdelivr.net; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0f1113">
+<meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -22,34 +22,47 @@
 <!-- defer: Splash-Screen erscheint sofort, Skripte laufen danach in dieser Reihenfolge -->
 <script src="config.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous" defer></script>
-<!-- Animationen im Dashboard: GSAP + ScrollTrigger, feste Version mit Prüfsumme (SRI) -->
+<!-- Animationen im Dashboard: GSAP, feste Version mit Prüfsumme (SRI) -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" integrity="sha384-XmJ9SoHtVOHoQUcKvFAzVXwdkKo1Ie3bhmSoIAkcdsHGaIrVJIkmozyq0FJeb/Ly" crossorigin="anonymous" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" integrity="sha384-wl5TeDVvOWt30Pbf8aSo2ZrzsOjddu3avOBvHe+p+OhJt9gP6w9YXmDkN5DK2/dF" crossorigin="anonymous" defer></script>
 <style>
 :root{
   color-scheme:dark;
-  --bg:#0f1113;--card:#181b1e;--surface2:#222629;--text:#ecebe5;--muted:#8d9096;--line:#2b2f33;
-  --accent:#ffd21f;--on-accent:#16181a;--ok:#6fcf86;--warn:#ffc04d;--danger:#ff8a80;--strava:#fc6a2c;--garmin:#11a9ed;
-  --kraft:#f0834a;--lauf:#6ea4f0;--bike:#5fcf80;--station:#b996ef;--sim:#ff7b6b;--rest:#6d7176;--race:#ffd21f;
-  --f-head:'Barlow Condensed','Arial Narrow',Impact,sans-serif;--f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  /* Glas-Design: dunkler, ruhiger Hintergrund; Karten sind durchscheinende Glasflächen mit heller Oberkante.
+     --card/--surface2 sind halbtransparent (der Hintergrund scheint durch), --well = eingelassene Felder (Eingaben, Segmente) */
+  --bg:#07080b;--card:rgba(255,255,255,.065);--surface2:rgba(255,255,255,.1);--well:rgba(0,0,0,.28);--text:#f5f5f7;--muted:#9a9ba3;--line:rgba(255,255,255,.1);
+  --edge:inset 0 1px 0 rgba(255,255,255,.1);--tint:#3b5375;
+  --accent:#ffd21f;--on-accent:#16181a;--ok:#30d158;--warn:#ff9f0a;--danger:#ff6961;--strava:#fc6a2c;--garmin:#11a9ed;
+  --kraft:#ff8a4c;--lauf:#64a8ff;--bike:#4cd964;--station:#bf8cff;--sim:#ff6b5e;--rest:#6d7176;--race:#ffd21f;
+  /* Zahlen und kleine Labels: schmale Sportschrift. Titel und Text: Systemschrift (SF Pro auf dem iPhone) */
+  --f-head:'Barlow Condensed','Arial Narrow',Impact,sans-serif;
+  --f-title:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI Variable Display','Segoe UI',system-ui,sans-serif;
+  --f-body:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI Variable Text','Segoe UI','IBM Plex Sans',system-ui,sans-serif;
   /* Abstände: ein 4-px-Raster für alles */
   --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--s8:32px;
-  --r-s:10px;--r-m:12px;--r-l:16px;
+  --r-s:11px;--r-m:14px;--r-l:22px;
+  --ease:cubic-bezier(.25,.8,.25,1);--glass:rgba(46,50,60,.5);--blur:saturate(180%) blur(22px);
   --tabs-h:62px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg)}
-body{color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%;
-  overflow-x:hidden;padding-bottom:calc(var(--tabs-h) + var(--s4) + env(safe-area-inset-bottom))}
+html{background:var(--bg)}
+body{margin:0}
+/* Hintergrund hinter dem Glas: ruhiger dunkler Verlauf, oben leicht in der Farbe der heutigen Disziplin (--tint).
+   Fest stehend und ohne Weichzeichner – die Karten brauchen deshalb kein teures backdrop-filter. */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(120% 55% at 20% -5%,color-mix(in srgb,var(--tint) 26%,transparent),transparent 70%),
+    radial-gradient(90% 50% at 100% 105%,rgba(60,78,110,.22),transparent 70%),
+    linear-gradient(180deg,#12151c 0%,#0a0b10 55%,var(--bg) 100%)}
+body{color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;padding-bottom:calc(var(--tabs-h) + var(--s6) + env(safe-area-inset-bottom))}
 body.bare{padding-bottom:env(safe-area-inset-bottom)}
 button,textarea,input{font:inherit;color:inherit}
 button{cursor:pointer}
 button:disabled{cursor:default}
-h1,h2,h3{margin:0;font-family:var(--f-head);font-weight:700;text-transform:uppercase;letter-spacing:.03em;line-height:1.05}
-h1{font-size:34px}h2{font-size:24px}h3{font-size:19px}
+h1,h2,h3{margin:0;font-family:var(--f-title);font-weight:700;letter-spacing:-.02em;line-height:1.12}
+h1{font-size:30px}h2{font-size:28px;letter-spacing:-.025em}h3{font-size:17px;font-weight:600;letter-spacing:-.01em}
 p{margin:0}
 .sub{color:var(--muted);font-size:14px}
-.cap{font-family:var(--f-head);font-weight:600;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:var(--s6) 0 var(--s3)}
+.cap{font-size:15px;font-weight:600;color:var(--muted);margin:var(--s6) 0 var(--s3)}
 .cap:first-child{margin-top:0}
 .mt-1{margin-top:var(--s1)}.mt-2{margin-top:var(--s2)}.mt-3{margin-top:var(--s3)}.mt-4{margin-top:var(--s4)}.mt-5{margin-top:var(--s5)}
 .center{text-align:center}
@@ -57,15 +70,16 @@ p{margin:0}
 [hidden]{display:none!important}
 
 /* Kopf */
-.top{position:sticky;top:0;z-index:5;background:rgba(15,17,19,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+.top{position:sticky;top:0;z-index:5;background:rgba(10,12,16,.55);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
   border-bottom:1px solid var(--line);padding:var(--s3) var(--s4);padding-top:calc(var(--s3) + env(safe-area-inset-top));
   display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:var(--s3)}
 .brand{font-family:var(--f-head);font-weight:700;font-size:20px;letter-spacing:.06em;text-transform:uppercase;justify-self:start;white-space:nowrap}
-.brand b{background:var(--accent);color:var(--on-accent);padding:0 6px;margin-left:var(--s1)}
+.brand b{background:var(--accent);color:var(--on-accent);padding:0 6px;margin-left:var(--s1);border-radius:5px}
 .top .menu-btn{justify-self:end}
 .cd{font-family:var(--f-head);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;line-height:1.05}
 .cd span{display:block;font-size:26px;color:var(--text);letter-spacing:0}
-.menu-btn{width:44px;height:44px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--card);display:grid;place-items:center;padding:0}
+.menu-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);box-shadow:var(--edge);display:grid;place-items:center;padding:0;transition:transform .2s var(--ease)}
+.menu-btn:active{transform:scale(.9)}
 .menu-btn svg{width:20px;height:20px;fill:var(--text)}
 main{padding:var(--s4);max-width:640px;margin:0 auto}
 .sim-date{background:rgba(255,192,77,.12);color:var(--warn);font-size:13px;text-align:center;padding:var(--s2) var(--s4)}
@@ -76,9 +90,11 @@ main{padding:var(--s4);max-width:640px;margin:0 auto}
 .back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--muted);font-weight:600;padding:0;min-height:44px;margin-bottom:var(--s2)}
 
 /* Karten */
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s5);margin-bottom:var(--s4)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--s5);margin-bottom:var(--s4);box-shadow:var(--edge)}
 .card.tight{padding:var(--s4)}
-.card.hero{border-top:5px solid var(--kc,var(--accent))}
+/* Einheit des Tages: Glas, leicht in der Farbe der Disziplin getönt */
+.card.hero{background:linear-gradient(180deg,color-mix(in srgb,var(--kc,var(--accent)) 13%,rgba(255,255,255,.06)),var(--card) 70%);
+  border-color:color-mix(in srgb,var(--kc,var(--accent)) 22%,rgba(255,255,255,.1))}
 /* Erledigte Einheit: schmaler Balken statt ganzer Karte (antippen = Details) */
 .done-bar{display:flex;align-items:center;gap:var(--s3);width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer;
   padding:var(--s3) var(--s4);border:1px solid var(--line);border-left:5px solid var(--kc,var(--ok));background:var(--card);border-radius:var(--r-m);min-height:60px}
@@ -93,9 +109,9 @@ main{padding:var(--s4);max-width:640px;margin:0 auto}
 .card > :last-child{margin-bottom:0}
 .row{display:flex;align-items:center;gap:var(--s2)}.between{justify-content:space-between}.wrap{flex-wrap:wrap}
 .k-kraft{--kc:var(--kraft)}.k-lauf{--kc:var(--lauf)}.k-bike{--kc:var(--bike)}.k-station{--kc:var(--station)}.k-sim{--kc:var(--sim)}.k-rest{--kc:var(--rest)}.k-race{--kc:var(--race)}
-.kind{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--kc,var(--muted))}
+.kind{font-size:13px;font-weight:600;color:var(--kc,var(--muted))}
 .dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--kc,var(--rest))}
-.status{font-family:var(--f-head);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;white-space:nowrap}
+.status{font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
 .status.done{color:var(--ok)}
 .prog{height:6px;background:var(--surface2);border-radius:4px;overflow:hidden;margin:var(--s4) 0 var(--s2)}
 .prog i{display:block;height:100%;background:var(--kc,var(--accent));transition:width .25s}
@@ -131,11 +147,11 @@ button.last:active{border-color:var(--accent);color:var(--text)}
 .target.bad b{color:var(--danger)}
 
 /* Eingaben */
-input[type=text],input[type=number],input[type=password],input[type=email],textarea{width:100%;font-size:16px;padding:9px 12px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--bg);min-height:44px}
+input[type=text],input[type=number],input[type=password],input[type=email],textarea{width:100%;font-size:16px;padding:9px 12px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--well);min-height:44px}
 input::placeholder,textarea::placeholder{color:#80848a;opacity:1} /* 5,0:1 auf --bg, klar heller als getippter Text */
 textarea{min-height:76px;resize:vertical;display:block}
 input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px solid var(--accent);outline-offset:1px}
-.lbl{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:var(--s5) 0 var(--s2);letter-spacing:.08em;text-transform:uppercase}
+.lbl{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:var(--s5) 0 var(--s2)}
 .lbl:first-child{margin-top:0}
 .pw{position:relative}
 .pw input{padding-right:48px}
@@ -144,7 +160,7 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 .pw .off{display:none}
 .pw.show .on{display:none}.pw.show .off{display:block}
 .rpe{display:grid;grid-template-columns:repeat(10,1fr);gap:var(--s1)}
-.rpe button{height:44px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-weight:600;font-size:15px;padding:0}
+.rpe button{height:44px;border-radius:9px;border:1px solid var(--line);background:var(--well);font-weight:600;font-size:15px;padding:0}
 .rpe button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 
 /* Buttons */
@@ -155,7 +171,13 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 .btn.strava{background:var(--strava);border-color:var(--strava);color:#fff}
 .btn.garmin{background:var(--garmin);border-color:var(--garmin);color:#fff}
 .btn.sm{min-height:44px;font-size:14px;width:auto;padding:0 var(--s3)}
-.btn:active:not(:disabled){transform:scale(.98)}
+.btn{box-shadow:var(--edge);transition:transform .2s var(--ease),filter .2s,background-color .2s,border-color .2s}
+.btn.ghost{box-shadow:none}
+.btn:active:not(:disabled){transform:scale(.97)}
+/* Eindrücken beim Antippen (wie iOS): nur transform, läuft auf der Grafikkarte */
+.strip button,.day,.done-bar,.chips button,.seg button,.rpe button,.lchips button,.opt,.mi,.blk,.wk button{transition:transform .2s var(--ease),background-color .2s,border-color .2s,color .2s}
+.strip button:active,.done-bar:active,.chips button:active,.seg button:active,.rpe button:active,.lchips button:active,.opt:active,.wk button:active:not(:disabled){transform:scale(.94)}
+.day:active,.mi:active,.blk:active{transform:scale(.985)}
 .btn:disabled{opacity:.5}
 .btns{display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s4)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
@@ -164,9 +186,9 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 
 /* Wochenleiste + Tagesliste */
 .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:var(--s1)}
-.strip button{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s2) 0 10px;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
-.strip .dn{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em}
-.strip .dd{font-family:var(--f-head);font-weight:700;font-size:20px;line-height:1}
+.strip button{background:var(--card);box-shadow:var(--edge);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s2) 0 10px;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
+.strip .dn{font-size:11px;color:var(--muted);font-weight:600}
+.strip .dd{font-weight:600;font-size:19px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .strip button.today{border-color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent)}
 .strip button.sel{border-color:var(--text)}
 .strip .dot.done{background:var(--ok)}
@@ -176,15 +198,15 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 .list > .day:first-child{border-top:0}
 .day::before{content:"";position:absolute;left:calc(-1 * var(--s4));top:var(--s3);bottom:var(--s3);width:3px;border-radius:0 3px 3px 0;background:var(--kc);opacity:.9}
 .day.k-rest::before{opacity:.25}
-.day .d{width:38px;flex:none;font-family:var(--f-head);font-weight:600;font-size:12px;letter-spacing:.06em;color:var(--muted);line-height:1.05;text-transform:uppercase}
-.day .d b{display:block;font-size:22px;color:var(--text);letter-spacing:0}
+.day .d{width:38px;flex:none;font-weight:600;font-size:12px;color:var(--muted);line-height:1.1}
+.day .d b{display:block;font-size:21px;font-weight:600;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .day .t{flex:1;min-width:0}
 .day .t b{display:block;font-weight:600;overflow-wrap:anywhere}
 .day.today .d b{color:var(--accent)}
 .day.open{background:linear-gradient(90deg,rgba(255,255,255,.03),transparent)}
 .day .meta{display:flex;flex-direction:column;align-items:flex-end;gap:var(--s1);flex:none;max-width:45%}
 .day-body{padding:0 0 var(--s4)}
-.day-body .card{margin:0;background:var(--bg)}
+.day-body .card{margin:0;background:var(--well)}
 .wk{display:flex;gap:var(--s3);align-items:center}
 .wk button{width:46px;height:46px;border-radius:var(--r-m);border:1px solid var(--line);background:var(--card);font-size:22px;flex:none;padding:0}
 .wk button:disabled{opacity:.3}
@@ -209,7 +231,7 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 .blk{display:flex;gap:var(--s4);align-items:center;width:100%;padding:var(--s4) 0;background:none;border:0;border-top:1px solid var(--line);text-align:left;cursor:pointer;min-height:64px}
 .list > .blk:first-child{border-top:0}
 .blk .tag{font-family:var(--f-head);font-weight:700;font-size:26px;width:34px;flex:none;line-height:1;color:var(--accent);text-align:center}
-.blk.cur .tag{background:var(--accent);color:var(--on-accent);border-radius:6px;padding:var(--s1) 0}
+.blk.cur .tag{background:var(--accent);color:var(--on-accent);border-radius:10px;padding:var(--s1) 0}
 .blk .t{flex:1;min-width:0}
 .blk .t b{display:block;font-weight:600;overflow-wrap:anywhere}
 .blk .t .sub{display:block;margin-top:2px}
@@ -229,17 +251,29 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 .pday-body .hint{margin-top:var(--s2)}
 
 /* Tabs */
-.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(24,27,30,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-.tabs button{background:none;border:0;min-height:var(--tabs-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.03em}
+/* Tab-Leiste: schwebende Glas-Pille. Die helle Markierung (.tab-ind) gleitet per transform zum aktiven Tab –
+   ein einziges Element auf der Grafikkarte, deshalb flüssig, auch während die Seite neu aufgebaut wird. */
+.tabs{position:fixed;left:var(--s3);right:var(--s3);bottom:calc(var(--s2) + env(safe-area-inset-bottom));z-index:6;display:grid;grid-template-columns:repeat(4,1fr);padding:4px;
+  background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid rgba(255,255,255,.12);border-radius:30px;box-shadow:var(--edge),0 10px 30px rgba(0,0,0,.35)}
+.tab-ind{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px) / 4);border-radius:26px;pointer-events:none;
+  background:rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.16);transform:translateX(calc(var(--ti,0) * 100%));
+  transition:transform .42s cubic-bezier(.3,.8,.25,1);will-change:transform}
+.tabs.no-ind .tab-ind{opacity:0}
+.tabs button{position:relative;background:none;border:0;border-radius:26px;min-height:calc(var(--tabs-h) - 8px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted);
+  transition:color .25s,transform .2s var(--ease)}
+.tabs button:active{transform:scale(.94)}
 .tabs svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tabs button.on{color:var(--text)}
 .tabs button.on svg{stroke:var(--accent)}
+@media (prefers-reduced-motion:reduce){.tab-ind{transition:none}}
+
 .ci-mini h3{font-size:17px}
 
 /* Menü-Schublade (von rechts) */
-.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
 .scrim.open{opacity:1;visibility:visible;transition:opacity .25s}
-.drawer{position:fixed;top:0;right:0;bottom:0;z-index:21;width:min(340px,88vw);overflow-y:auto;background:var(--card);border-left:1px solid var(--line);
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:21;width:min(340px,88vw);overflow-y:auto;background:rgba(22,25,32,.72);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-left:1px solid var(--line);
   padding:calc(var(--s3) + env(safe-area-inset-top)) var(--s4) calc(var(--s5) + env(safe-area-inset-bottom));transform:translateX(100%);visibility:hidden;transition:transform .25s ease,visibility 0s .25s}
 .drawer.open{transform:none;visibility:visible;transition:transform .25s ease}
 .drawer-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--s2)}
@@ -254,6 +288,7 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 
 /* Coach-Chat */
 .chat{display:flex;flex-direction:column;gap:var(--s3);margin-bottom:var(--s4)}
+.note + .chat{margin-top:var(--s4)}
 .msg{max-width:88%;padding:var(--s3) var(--s4);border-radius:var(--r-m);font-size:15px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
 .msg.user{align-self:flex-end;background:var(--accent);color:var(--on-accent);border-bottom-right-radius:4px}
 .msg.assistant{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
@@ -282,7 +317,7 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 /* Tests */
 table{width:100%;border-collapse:collapse;font-size:14px}
 td,th{padding:var(--s1) 3px;text-align:left;vertical-align:middle}
-th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+th{color:var(--muted);font-weight:600;font-size:12px}
 td.l{font-size:13px;color:var(--muted)}
 .res{font-weight:700;color:var(--accent)}
 
@@ -290,7 +325,7 @@ td.l{font-size:13px;color:var(--muted)}
 .rpe button:active:not(.on),.seg button:active:not(.on),.chips button:active:not(.on),.strip button:active,.wk button:active:not(:disabled),
 .day:active,.blk:active,.mi:active,.opt:active:not(.on),.acct-link:active,.sore-acc summary:active{background:var(--surface2)}
 .btn:active:not(:disabled){filter:brightness(1.12)}
-@media (hover:hover){ .btn:hover:not(:disabled){border-color:#3a3f44} .btn.primary:hover:not(:disabled){filter:brightness(1.06)} .rpe button:hover:not(.on),.seg button:hover:not(.on),.chips button:hover:not(.on){border-color:#3a3f44} }
+@media (hover:hover){ .btn:hover:not(:disabled){border-color:rgba(255,255,255,.2)} .btn.primary:hover:not(:disabled){filter:brightness(1.06)} .rpe button:hover:not(.on),.seg button:hover:not(.on),.chips button:hover:not(.on){border-color:rgba(255,255,255,.2)} }
 .brk{overflow-wrap:anywhere}
 .offline-bar{background:rgba(255,138,128,.12);color:var(--danger);font-size:13px;text-align:center;padding:var(--s2) var(--s4)}
 /* Lange Wörter/Namen (Strava-Aktivitäten, Übungen) dürfen umbrechen statt den Rand zu sprengen */
@@ -300,7 +335,7 @@ td.l{font-size:13px;color:var(--muted)}
 .badges{display:flex;flex-wrap:wrap;gap:var(--s1);justify-content:flex-end;min-width:0}
 .badges .badge{white-space:normal;text-align:center}
 .session-h .badges{justify-content:flex-start}
-.badge{font-family:var(--f-head);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.badge{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);white-space:nowrap}
 .badge.warn{background:rgba(255,138,128,.15);color:var(--danger)}
 .badge.mv{background:rgba(110,164,240,.15);color:var(--lauf)}
 .badge.ok{background:rgba(111,207,134,.15);color:var(--ok)}
@@ -308,7 +343,7 @@ td.l{font-size:13px;color:var(--muted)}
 .badge.strava{background:rgba(252,106,44,.15);color:var(--strava)}
 .badge.garmin{background:rgba(17,169,237,.15);color:var(--garmin)}
 .chips{display:flex;flex-wrap:wrap;gap:var(--s2)}
-.chips button{min-width:48px;height:44px;padding:0 14px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--bg);font-weight:600}
+.chips button{min-width:48px;height:44px;padding:0 14px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--well);font-weight:600}
 .chips button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .cc-tabs{margin-bottom:var(--s4);display:grid;grid-template-columns:repeat(2,1fr)}
 @media (min-width:600px){ .cc-tabs{grid-template-columns:repeat(4,1fr)} }
@@ -329,8 +364,8 @@ td.l{font-size:13px;color:var(--muted)}
 .sore-it input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:44px;margin:0;display:block;background:transparent;touch-action:pan-y;cursor:pointer}
 .sore-it input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:var(--surface2)}
 .sore-it input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:var(--surface2)}
-.sore-it input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-11px;border-radius:50%;background:var(--sc,var(--muted));border:3px solid var(--card);box-shadow:0 0 0 1px var(--line)}
-.sore-it input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--sc,var(--muted));border:3px solid var(--card);box-shadow:0 0 0 1px var(--line)}
+.sore-it input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-11px;border-radius:50%;background:var(--sc,var(--muted));border:3px solid var(--bg);box-shadow:0 0 0 1px var(--line)}
+.sore-it input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--sc,var(--muted));border:3px solid var(--bg);box-shadow:0 0 0 1px var(--line)}
 .sore-it input[type=range]:focus{outline:none}
 .sore-it input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 2px var(--accent)}
 .sore-it input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 2px var(--accent)}
@@ -351,7 +386,7 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 .wt td{padding:3px 0}
 .wt td:last-child{width:28px;padding-left:var(--s2)}
 .wt input{width:100%}
-.opt{display:block;width:100%;text-align:left;padding:var(--s4);border-radius:var(--r-m);border:1px solid var(--line);background:var(--bg)}
+.opt{display:block;width:100%;text-align:left;padding:var(--s4);border-radius:var(--r-m);border:1px solid var(--line);background:var(--well)}
 .opt + .opt{margin-top:var(--s2)}
 .opt.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .opt b{display:block}
@@ -360,11 +395,11 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 .ci-row{display:grid;grid-template-columns:96px 1fr;gap:var(--s3);align-items:center;padding:var(--s2) 0}
 .ci-row > span{font-size:14px;font-weight:500}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s1)}
-.seg button{height:44px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font-size:13px;font-weight:600;color:var(--muted);padding:0 var(--s1)}
+.seg button{height:44px;border-radius:9px;border:1px solid var(--line);background:var(--well);font-size:13px;font-weight:600;color:var(--muted);padding:0 var(--s1)}
 .seg button.on.v-g{background:rgba(111,207,134,.18);border-color:var(--ok);color:var(--ok)}
 .seg button.on.v-y{background:rgba(255,192,77,.18);border-color:var(--warn);color:var(--warn)}
 .seg button.on.v-r{background:rgba(255,138,128,.18);border-color:var(--danger);color:var(--danger)}
-.amp{font-family:var(--f-head);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:6px}
+.amp{font-weight:600;font-size:13px;padding:3px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:6px}
 .amp::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
 .amp-green{color:var(--ok);background:rgba(111,207,134,.12)}.amp-yellow{color:var(--warn);background:rgba(255,192,77,.12)}.amp-red{color:var(--danger);background:rgba(255,138,128,.12)}
 
@@ -379,64 +414,48 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 .wide{max-width:1040px;margin:0 auto}
 /* Dashboard: Diagramme (dataviz-Regeln: dünne Marken, zurückhaltendes Raster, Werte in Textfarbe) */
 :root{--viz-1:#3987e5;--viz-2:#d95926}
-.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s2)}
-@media(min-width:600px){.kpis{grid-template-columns:repeat(3,1fr)}}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s3) var(--s4)}
-/* Spotlight (nach React Bits „SpotlightCard“): weicher Lichtkegel folgt dem Zeiger */
-.spot{position:relative;overflow:hidden;isolation:isolate;transition:border-color .25s,transform .25s}
-.spot::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity .3s;
-  background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(255,210,31,.09),transparent 65%)}
-.spot:hover{border-color:#3a3f45}.spot:hover::before{opacity:1}
-@media (hover:hover){.kpi.spot:hover{transform:translateY(-2px)}}
-.dash-hero{display:grid;gap:var(--s3);grid-template-columns:1fr;margin-bottom:var(--s3)}
-@media(min-width:600px){.dash-hero{grid-template-columns:auto 1fr}}
-.dash-rings{display:flex;gap:var(--s4);justify-content:center;align-items:center;padding:var(--s4);
-  background:linear-gradient(160deg,#1d2125 0%,#15181b 100%);border:1px solid var(--line);border-radius:var(--r-m)}
-.ring{position:relative;display:grid;place-items:center}
-.ring svg{display:block}
-.ring .ring-bg{fill:none;stroke:#262a2e;stroke-width:9}
+/* Drei Ringe wie bei Whoop: Erholung, Belastung, Woche */
+.dash-rings{display:grid;grid-template-columns:repeat(3,1fr);justify-items:center;gap:var(--s2);padding:var(--s5) var(--s3)}
+.ring{position:relative;display:grid;place-items:center;max-width:100%}
+.ring svg{display:block;max-width:100%;height:auto}
+.ring .ring-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:9}
 .ring .ring-fg{fill:none;stroke:var(--ring);stroke-width:9;stroke-linecap:round}
-.ring::before{content:"";position:absolute;inset:18%;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--ring) 14%,transparent),transparent 70%);pointer-events:none}
 /* Hochzählende Zahl übernimmt Schrift und Farbe der umgebenden Zahl */
-.kpi b .cnt,.ring-t b .cnt{font:inherit;color:inherit;letter-spacing:inherit;text-transform:none;margin:0;display:inline}
+.lstats b .cnt,.ring-t b .cnt{font:inherit;color:inherit;letter-spacing:inherit;margin:0;display:inline}
 .ring-t{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.1}
 .ring-t b{font-family:var(--f-head);font-size:30px;color:var(--text)}
-.ring-t span{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
-.ring-t em{font-style:normal;font-size:11px;margin-top:2px}
-.ring-t em span{text-transform:none;letter-spacing:0;font-size:12px}
-.dash-title{font-family:var(--f-head);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:var(--s6) 0 var(--s2);display:flex;align-items:center;gap:var(--s2)}
-.dash-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
-.wide .card{transition:border-color .25s}
+.ring-t b small{font-size:.6em;color:var(--muted)}
+.ring-t span{font-size:12px;color:var(--muted);margin-top:2px}
+.ring-t em{font-style:normal;font-size:11px;color:var(--muted)}
+@media(max-width:380px){.ring-t b{font-size:26px}}
+.dash-today .lstats{border-top:1px solid var(--line);padding-top:var(--s3)}
+.dash-links{padding:0 var(--s4)}
+.dash-links .mi{border-top:1px solid var(--line);gap:var(--s3)}
+.dash-links .mi:first-child{border-top:0}
+.dash-links .mi > span:first-child{flex:1}
+.dash-links .chev{font-size:24px;color:var(--muted)}
+.dash-title{font-family:var(--f-title);font-size:20px;font-weight:700;letter-spacing:-.015em;color:var(--text);margin:var(--s8) 0 var(--s3)}
 .viz .bar{transform-box:fill-box;transform-origin:50% 100%}
 .lchips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--s1)) var(--s3);padding:0 var(--s1) 2px;-webkit-overflow-scrolling:touch}
 .lchips::-webkit-scrollbar{display:none}
-.lchips{mask-image:linear-gradient(90deg,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent)}
-.lchips button{flex:none;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font:600 13px var(--f-body);white-space:nowrap}
+.lchips button{flex:none;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--well);color:var(--muted);font:600 13px var(--f-body);white-space:nowrap}
 .lchips button.on{background:var(--text);color:var(--bg);border-color:var(--text)}
 .lstats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s2)}
 .lstats div{min-width:0}
-.lstats span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.lstats span{display:block;font-size:12px;color:var(--muted)}
 .lstats b{display:block;font-family:var(--f-head);font-size:22px;line-height:1.15;white-space:nowrap}
 .lstats b.up{color:var(--ok)}.lstats b.down{color:var(--warn)}
-.lstats em{font-style:normal;font-size:12px;color:var(--muted)}
 .lstats.l3{grid-template-columns:repeat(3,1fr)}
-@media(max-width:420px){.lstats{gap:var(--s1)}.lstats b{font-size:19px}.lstats span{font-size:10px;letter-spacing:.04em}}
-.wlist{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:var(--s2);font-size:13px;color:var(--muted)}
-.wlist b{color:var(--text)}
-.more-acts summary{padding:var(--s2) 0 var(--s3);cursor:pointer}
-.kpi b{display:block;font-family:var(--f-head);font-size:28px;line-height:1.1;color:var(--text)}
-.kpi span{font-size:12px;color:var(--muted)}
-.kpi .rec-gut,.kpi .rec-mittel,.kpi .rec-schlecht{font-size:22px}
-.dgrid{display:grid;gap:var(--s3)}
-.dgrid>*{min-width:0}
-.dpair{display:grid;gap:0 var(--s3)}
-.dpair>section{min-width:0;display:flex;flex-direction:column}
-.dpair>section>.card{flex:1}
-@media(min-width:900px){.dpair{grid-template-columns:1fr 1fr}}
+.lstats.l2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:420px){.lstats{gap:var(--s1)}.lstats b{font-size:19px}}
+/* Trends und Kraft: Handy untereinander, Desktop nebeneinander */
+.dgrid{display:grid;gap:0 var(--s3)}
+.dgrid>*{min-width:0;display:flex;flex-direction:column}
+.dgrid>section>.card{flex:1}
 @media(min-width:900px){.dgrid{grid-template-columns:1fr 1fr}}
 .viz{width:100%;max-width:620px;height:auto;display:block;margin-top:var(--s2);overflow:visible}
 .viz .grid{stroke:var(--line);stroke-width:1}
-.viz .base{stroke:#3c4146;stroke-width:1}
+.viz .base{stroke:rgba(255,255,255,.18);stroke-width:1}
 .viz .ax{fill:var(--muted);font-size:10px;font-family:var(--f-body)}
 .viz .cross{stroke:var(--muted);stroke-width:1;opacity:0}
 .viz .dot{opacity:0}
@@ -445,19 +464,16 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 .viz .hit:hover path{filter:brightness(1.15)}
 .legend{display:flex;gap:var(--s4);flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:var(--s2)}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
-.cistrip{display:flex;gap:3px;margin-top:var(--s2)}
-.cistrip span{flex:1;min-width:0;text-align:center;font-size:10px;border-radius:4px;padding:4px 0;background:var(--surface2);color:var(--muted)}
-.cistrip .green{background:rgba(111,207,134,.18);color:var(--ok)}.cistrip .yellow{background:rgba(255,192,77,.18);color:var(--warn)}.cistrip .red{background:rgba(255,138,128,.2);color:var(--danger)}
 .laps{width:100%;border-collapse:collapse;font-size:13px;margin-top:var(--s3)}
 .laps td,.laps th{padding:5px 4px;text-align:right;border-top:1px solid var(--line);white-space:nowrap}
 .laps th{color:var(--muted);font-weight:600;border-top:0}.laps td:first-child,.laps th:first-child{text-align:left}
 .laps tr.work td{color:var(--text);font-weight:600}.laps tr:not(.work) td{color:var(--muted)}
-#viztip{position:fixed;z-index:99;pointer-events:none;background:#0b0d0f;border:1px solid var(--line);color:var(--text);font-size:12px;padding:6px 8px;border-radius:6px;max-width:240px;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+#viztip{position:fixed;z-index:99;pointer-events:none;background:rgba(20,22,28,.92);border:1px solid var(--line);color:var(--text);font-size:12px;padding:6px 8px;border-radius:6px;max-width:240px;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 
 /* Strava */
 .act{display:flex;gap:var(--s3);padding:var(--s3) 0;border-top:1px solid var(--line);align-items:flex-start}
 .act:first-child{border-top:0}
-.act .d{width:38px;flex:none;font-family:var(--f-head);font-weight:600;font-size:12px;color:var(--muted);text-transform:uppercase;line-height:1.05}
+.act .d{width:38px;flex:none;font-weight:600;font-size:12px;color:var(--muted);line-height:1.1}
 .act .d b{display:block;font-size:20px;color:var(--text)}
 .act > div:last-child{flex:1;min-width:0}
 .sbox{border:1px solid rgba(252,106,44,.35);background:rgba(252,106,44,.08);border-radius:var(--r-s);padding:var(--s3);margin-top:var(--s4);font-size:14px}
@@ -483,7 +499,11 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 /* Abgehakt, aber kein Wert eingetragen */
 .ex.is-done .ex-v input:placeholder-shown{border-color:var(--warn);box-shadow:inset 3px 0 0 var(--warn)}
 #toast.warn{background:var(--warn);color:var(--on-accent)}
-#toast{position:fixed;left:50%;bottom:calc(var(--tabs-h) + var(--s5) + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px var(--s4);border-radius:22px;font-size:14px;font-weight:600;z-index:30;pointer-events:none;max-width:calc(100vw - 32px);text-align:center}
+#toast{position:fixed;left:50%;bottom:calc(var(--tabs-h) + var(--s6) + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(44,48,58,.78);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);color:var(--text);border:1px solid rgba(255,255,255,.12);
+  padding:10px var(--s4);border-radius:22px;font-size:14px;font-weight:600;z-index:30;pointer-events:none;max-width:calc(100vw - 32px);text-align:center;
+  box-shadow:var(--edge),0 10px 30px rgba(0,0,0,.4);animation:toastIn .3s var(--ease)}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}}
+@media (prefers-reduced-motion:reduce){#toast{animation:none}}
 
 /* ---------- Responsive ----------
    < 480     Handy: eine Spalte, RPE in zwei Reihen
@@ -509,8 +529,7 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 }
 @media (min-width:600px){
   main{max-width:720px;padding:var(--s6)}
-  .tabs{left:50%;right:auto;bottom:calc(var(--s4) + env(safe-area-inset-bottom));transform:translateX(-50%);width:480px;
-    border:1px solid var(--line);border-radius:var(--r-l);padding-bottom:0;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+  .tabs{left:50%;right:auto;bottom:calc(var(--s4) + env(safe-area-inset-bottom));transform:translateX(-50%);width:480px}
   body{padding-bottom:calc(var(--tabs-h) + var(--s8) + env(safe-area-inset-bottom))}
   #toast{bottom:calc(var(--tabs-h) + var(--s8) + env(safe-area-inset-bottom))}
   /* Heute: Wochenleiste hochkant links, Einheit rechts daneben */
@@ -529,10 +548,11 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
   .cd{grid-column:3;display:flex;align-items:baseline;gap:var(--s2);text-align:left}
   .cd span{display:inline;font-size:24px}
   .tabs{position:fixed;top:calc(14px + env(safe-area-inset-top));bottom:auto;left:50%;transform:translateX(-50%);width:auto;
-    display:flex;gap:var(--s1);padding:var(--s1);background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);box-shadow:none;z-index:6}
-  .tabs button{min-height:36px;flex-direction:row;gap:var(--s2);padding:0 var(--s4);border-radius:9px;font-size:14px}
+    display:flex;gap:var(--s1);padding:var(--s1);border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.35);z-index:6}
+  .tabs button{min-height:36px;flex-direction:row;gap:var(--s2);padding:0 var(--s4);border-radius:999px;font-size:14px}
   .tabs svg{width:18px;height:18px}
-  .tabs button.on{background:var(--surface2)}
+  .tabs button.on{background:rgba(255,255,255,.12)}
+  .tab-ind{display:none}
   body{padding-bottom:var(--s8)}
   #toast{bottom:var(--s6)}
   main{max-width:1080px;padding:var(--s6) var(--s8)}
@@ -573,6 +593,7 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 <div class="offline-bar" id="offline" role="status" hidden>Offline – deine Einträge werden gespeichert und später synchronisiert.</div>
 <main id="main"></main>
 <nav class="tabs" id="nav">
+  <span class="tab-ind" aria-hidden="true"></span>
   <button data-v="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>Heute</button>
   <button data-v="week"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Woche</button>
   <button data-v="plan"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Plan</button>
@@ -932,6 +953,17 @@ function checkinCard(i){
   if(r) h+=`<p class="sub mt-2">${READY_TXT[r]}</p><button class="btn ghost sm mt-3" data-act="ci-done">Fertig</button>`;
   return h+`</div>`;
 }
+/* Check-in gehört auf die Startseite, solange er offen ist (oder gerade bearbeitet wird) */
+const ciPending=(i)=>ciOpen||!readiness(S.checkin[keyI(i)]||{});
+/* Garmin-Erholung auf der Startseite: nur in der ersten Sitzung des Tages, in der Werte da sind.
+   Gemerkt pro Gerät; beim nächsten Öffnen der App am selben Tag steht sie nur noch im Dashboard. */
+let recDay=null;
+function recFirstOpen(i){
+  const day=isoI(i);
+  if(recDay===day) return true;
+  if(!garmin.recoveryHint(S.garmin.well[day]).level || lsGet("rec-seen")===day) return false;
+  lsSet("rec-seen",day); recDay=day; return true;
+}
 function sugCard(){
   if(!SUGS.length) return "";
   let h=`<div class="card tight"><div class="row between"><h3>Plan-Vorschläge</h3><span class="badge">${SUGS.length}</span></div>`;
@@ -958,7 +990,9 @@ function vToday(){
   if(TODAY>LAST && sel==null) intro+=`<div class="hint" style="margin:0 0 var(--s4)">Der Plan ist abgeschlossen. Stark gemacht! 🏁</div>`;
   // Tägliche Eingabe (Check-in) und Vorschläge: auf dem Handy über der Einheit, auf dem Desktop daneben
   if(sel==null) daily+=stravaBanner();
-  if(i===TODAY && TODAY>=0 && TODAY<=LAST) daily+=recoveryCard(i)+checkinCard(i);
+  // Startseite ruhig halten: Garmin-Erholung nur beim ersten Öffnen des Tages, Check-in nur bis er ausgefüllt ist.
+  // Danach stehen beide im Dashboard („Heute“).
+  if(i===TODAY && TODAY>=0 && TODAY<=LAST) daily+=(recFirstOpen(i)?recoveryCard(i):"")+(ciPending(i)?checkinCard(i):"");
   daily+=sugCard();
   const w0=Math.floor(i/7)*7, rail=MID();
   // Handy: Leiste quer unter der Einheit. Ab Tablet: hochkant als Seitenleiste links.
@@ -1520,15 +1554,8 @@ function vStrava(){
 const dmy=(iso)=>{ const d=isoToDate(iso); return d.getDate()+"."+(d.getMonth()+1)+"."; };
 /* Plan-Einheit (ohne Ruhetag) an Tag x – für Erledigt-Quoten */
 const isSession=(x)=>{ const p=dayPlan(x); return !!p&&p.k!=="rest"&&p.i&&p.i.length>0; };
-/* Letzte Aktivität mit erkannten Intervallen (inkl. Plan-Vorgabe des Tages, z. B. "4×1km") */
-function lastIntervalAct(){
-  const acts=Object.values(S.strava.acts).filter(a=>a.laps&&a.laps.length>1).sort((a,b)=>(a.start||a.date)<(b.start||b.date)?1:-1);
-  for(const a of acts){ const i=idxOfIso(a.date), p=i>=0&&i<=LAST?dayPlan(i):null, plan=p&&p.i?p.i.find(t=>dash.parseReps(t))||"":"";
-    const iv=dash.intervals(a.laps,plan); if(iv.kind==="intervals") return {a,iv,plan}; }
-  return null;
-}
 /* Gewichtsverlauf: Einträge aller bisherigen Tage (inkl. Kraftteile an Lauftagen, z. B. Back Squat) */
-let dashLift=null, dashWeek="min", dashWell=null;
+let dashLift=null, dashWell=null;
 /* Umschalt-Chips (eine Auswahl pro Karte): g = Gruppe, items = [[key,label]] */
 const dchips=(g,items,sel)=>items.length>1?`<div class="lchips" role="tablist">${items.map(([k,l])=>`<button role="tab" aria-selected="${k===sel}" class="${k===sel?"on":""}" data-act="dash-chip" data-g="${g}" data-k="${esc(k)}">${esc(l)}</button>`).join("")}</div>`:"";
 function liftData(){
@@ -1538,157 +1565,128 @@ function liftData(){
   return dash.liftHistory(days);
 }
 function liftCard(){
-  const L=liftData(), Wt=Object.entries(S.weights||{}).filter(([,v])=>v);
-  const std=Wt.length?`<details class="mt-3"><summary class="sub">Standard-Arbeitsgewichte im Profil (${Wt.length})</summary><div class="wlist">${Wt.map(([k,v])=>`<span><b>${esc(String(v))} kg</b> ${esc(k.replace(/^./,c=>c.toUpperCase()))}</span>`).join("")}</div></details>`:"";
-  if(!L.length) return `<div class="card"><p class="sub">Noch kein Gewicht eingetragen. Bei Kraftübungen das Gewicht ins Feld schreiben (z. B. „80 kg × 5“) – hier entsteht daraus dein Verlauf pro Übung.</p>${std}</div>`;
+  const L=liftData();
+  if(!L.length) return `<div class="card"><p class="sub">Noch kein Gewicht eingetragen. Bei Kraftübungen das Gewicht ins Feld schreiben (z. B. „80 kg × 5“), dann entsteht hier dein Verlauf pro Übung.</p></div>`;
   const cur=L.find(e=>e.key===dashLift)||L[0];
   const kg=(v)=>String(Math.round(v*10)/10).replace(".",",")+" kg";
-  const diff=cur.last-cur.start, pctD=cur.start?diff/cur.start*100:0;
-  const chips=dchips("lift",L.map(e=>[e.key,e.label]),cur.key);
+  const diff=cur.last-cur.start;
   const pts=cur.points.map(p=>({label:dmy(p.date),value:p.kg,tip:`${dmy(p.date)}: ${kg(p.kg)}${p.kg===cur.best?" · Bestwert":""}`}));
-  const chart=cur.n>1?dash.lineChart(pts,{fmt:v=>Math.round(v)+" kg",label:"Gewichtsverlauf "+cur.label,height:150})
-    :`<p class="sub mt-2">Erst ein Eintrag (${kg(cur.last)} am ${esc(dmy(cur.points[0].date))}). Ab dem zweiten entsteht hier die Kurve.</p>`;
-  return `<div class="card spot" id="dc-lift">${chips}<div class="lstats">
-      <div><span>Start</span><b>${kg(cur.start)}</b></div>
+  const chart=cur.n>1?dash.lineChart(pts,{fmt:v=>Math.round(v)+" kg",label:"Gewichtsverlauf "+cur.label,height:130})
+    :`<p class="sub mt-2">Erst ein Eintrag. Ab dem zweiten entsteht hier die Kurve.</p>`;
+  return `<div class="card" id="dc-lift">${dchips("lift",L.map(e=>[e.key,e.label]),cur.key)}<div class="lstats l3">
       <div><span>Aktuell</span><b>${kg(cur.last)}</b></div>
       <div><span>Bestwert</span><b>${kg(cur.best)}</b></div>
-      <div><span>Fortschritt</span><b class="${diff>0?"up":diff<0?"down":""}">${diff>0?"+":""}${kg(diff)}</b><em>${cur.n>1?(diff>0?"+":"")+Math.round(pctD)+" %":"–"}</em></div>
-    </div>${chart}${std}</div>`;
+      <div><span>Seit Start</span><b class="${diff>0?"up":diff<0?"down":""}">${diff>0?"+":""}${kg(diff)}</b></div>
+    </div>${chart}</div>`;
+}
+
+/* Dashboard nach dem Vorbild von Whoop: drei Ringe (Erholung, Belastung, Woche), darunter eine klare Aussage für heute.
+   Danach nur, was eine Entscheidung erleichtert: diese Woche, Trends, Kraft, letzte Aktivitäten. */
+const LVL={gut:"green",mittel:"yellow",schlecht:"red"};
+const LVL_COL={green:"var(--ok)",yellow:"var(--warn)",red:"var(--danger)"};
+const LVL_TXT={green:"Gut",yellow:"Mittel",red:"Tief"};
+/* Schlechterer Wert aus Check-in-Ampel und Garmin-Erholung */
+const worst=(a,b)=>["red","yellow","green"].find(l=>l===a||l===b)||null;
+function todayVerdict(lvl,p){
+  if(!p) return "";
+  if(p.k==="rest") return lvl==="red"?"Ruhetag – genau richtig heute. Gut schlafen, viel trinken.":"Ruhetag. Erholung ist heute dein Training.";
+  if(!lvl) return `Heute: ${esc(p.t)}. Mach den Check-in, dann sagt dir die App, wie hart du gehen kannst.`;
+  return {green:`Bereit. ${esc(p.t)} wie geplant.`,
+    yellow:`Etwas angeschlagen. ${esc(p.t)} machen, aber harte Teile eher etwas lockerer.`,
+    red:`Heute Erholung vor Leistung. ${esc(p.t)} nur locker oder verschieben.`}[lvl];
 }
 function vDashboard(){
-  const T=Math.max(-1,Math.min(TODAY,LAST)), curW=Math.max(0,Math.floor(Math.max(T,0)/7));
+  const T=Math.max(-1,Math.min(TODAY,LAST)), inPlan=TODAY>=0&&TODAY<=LAST, curW=Math.max(0,Math.floor(Math.max(T,0)/7));
   const acts=Object.values(S.strava.acts);
-  // Kennzahlen
-  let plan=0, done=0; for(let x=0;x<=T;x++) if(isSession(x)){ plan++; if(trained(x)) done++; }
-  let wPlan=0, wDone=0; for(let x=curW*7;x<curW*7+7&&x<=LAST;x++) if(isSession(x)){ wPlan++; if(x<=T&&trained(x)) wDone++; }
-  const wk=dash.weekly(acts,idxOfIso,curW), cw=wk[curW]||{min:0,runKm:0,n:0};
-  const rp=[]; for(let x=Math.max(0,T-6);x<=T;x++) if(S.rpe[keyI(x)]!=null) rp.push(+S.rpe[keyI(x)]);
-  const rec=garmin.recoveryHint(S.garmin.well[isoD(NOW)]);
-  let h=`<div class="wide">${vhead("Dashboard","Plan, Intervalle, Erholung, Kraft und Tests. Werte antippen für Details.",false)}`;
-  // Zahl, die beim Einblenden hochzählt (nach React Bits „CountUp“); Endwert steht schon im HTML (ohne JS korrekt)
+  const w=S.garmin.well[isoD(NOW)]||{}, rec=garmin.recoveryHint(S.garmin.well[isoD(NOW)]);
+  const ci=inPlan?readiness(S.checkin[keyI(TODAY)]||{}):null;
+  // Zahl, die beim Einblenden hochzählt; Endwert steht schon im HTML (ohne JS korrekt)
   const cnt=(v,dec=0,suf="")=>`<span class="cnt" data-to="${v}" data-dec="${dec}" data-suf="${esc(suf)}">${dec?(+v).toFixed(dec).replace(".",","):Math.round(v)}${esc(suf)}</span>`;
-  const pct=plan?Math.round(done/plan*100):0, wtr=S.garmin.well[isoD(NOW)]||{};
-  const recCol={gut:"var(--ok)",mittel:"var(--warn)",schlecht:"var(--danger)"}[rec.level]||"var(--muted)";
-  const avgR=rp.length?rp.reduce((a,b)=>a+b,0)/rp.length:null;
-  h+=`<div class="dash-hero"><div class="dash-rings spot">
-      ${dash.ringGauge(pct,{label:"Plan",value:cnt(pct,0,"%"),sub:`<span style="color:var(--muted)">${done} von ${plan}</span>`,color:"var(--accent)"})}
-      ${dash.ringGauge(wtr.readiness??0,{label:"Readiness",value:wtr.readiness!=null?cnt(wtr.readiness):"–",sub:rec.level?`<span style="color:${recCol}">${REC_TXT[rec.level]}</span>`:"",color:recCol})}
-    </div><div class="kpis">
-    <div class="kpi spot"><span>Diese Woche (W${curW+1})</span><b>${cnt(wDone)}/${wPlan}</b><span>Einheiten erledigt</span></div>
-    <div class="kpi spot"><span>Laufen diese Woche</span><b>${cnt(cw.runKm,1," km")}</b><span>${cw.n} Aktivitäten</span></div>
-    <div class="kpi spot"><span>Trainingszeit diese Woche</span><b>${dash.hm(cw.min).replace(" h","")}</b><span>Stunden (Aktivitäten)</span></div>
-    <div class="kpi spot"><span>Ø RPE 7 Tage</span><b>${avgR!=null?cnt(avgR,1):"–"}</b><span>${rp.length} Einträge</span></div>
-    <div class="kpi spot"><span>Erholung heute (Garmin)</span><b class="${rec.level?"rec-"+rec.level:""}">${rec.level?REC_TXT[rec.level]:"–"}</b><span>${rec.why.length?esc(rec.why.join(", ")):S.garmin.conn?"keine Auffälligkeiten":"Garmin nicht verbunden"}</span></div>
-    <div class="kpi spot"><span>Aktivitäten gesamt</span><b>${cnt(acts.length)}</b><span>Strava + Garmin</span></div>
-  </div></div>`;
+  let h=`<div class="wide">${vhead("Dashboard",`${DAYSF[(NOW.getDay()+6)%7]}, ${fmt(NOW)}`,false)}`;
 
-  // Wochen
-  const wtip=(x)=>{ let p=0,d=0; for(let i=x.w*7;i<x.w*7+7&&i<=LAST;i++) if(isSession(i)){ p++; if(i<=T&&trained(i)) d++; }
-    return `Woche ${x.w+1}: ${dash.hm(x.min)} · ${String(x.runKm).replace(".",",")} km Lauf · ${x.n} Aktivitäten · ${d}/${p} Einheiten erledigt`; };
-  const WK={min:["Trainingszeit","Minuten pro Woche aus Strava/Garmin",x=>x.min,v=>Math.round(v)+"′"],km:["Lauf-km","Kilometer pro Woche, alle Läufe",x=>x.runKm,v=>(Math.round(v*10)/10+"").replace(".",",")+" km"]};
-  const wsel=WK[dashWeek]?dashWeek:"min", [,wsub,wget,wfmt]=WK[wsel];
-  // Desktop: zwei Abschnitte nebeneinander (dpair), Handy: untereinander
-  h+=`<div class="dpair"><section><div class="dash-title">Wochen</div><div class="card spot" id="dc-week">${dchips("week",Object.entries(WK).map(([k,v])=>[k,v[0]]),wsel)}
-    <div class="sub">${wsub}</div>${dash.barChart(wk.map(x=>({label:"W"+(x.w+1),value:wget(x),tip:wtip(x),hi:x.w===curW})),{label:wsub,fmt:wfmt})}</div>`;
+  // Ring 1 – Erholung: Garmin-Readiness (0–100); ohne Garmin die Check-in-Ampel
+  const recLvl=LVL[rec.level]||null, lvl=worst(recLvl,ci);
+  const r1=w.readiness!=null
+    ? dash.ringGauge(w.readiness,{label:"Erholung",value:cnt(w.readiness),color:LVL_COL[recLvl]||"var(--muted)"})
+    : dash.ringGauge(ci?100:0,{label:"Erholung",value:ci?`<small>${LVL_TXT[ci]}</small>`:"–",color:LVL_COL[ci]||"var(--muted)"});
+  // Ring 2 – Belastung: Anstrengung heute (RPE 1–10)
+  const rpe=inPlan?S.rpe[keyI(TODAY)]:null;
+  const r2=dash.ringGauge(rpe!=null?rpe*10:0,{label:"Belastung",value:rpe!=null?cnt(rpe):"–",sub:rpe!=null?"RPE heute":"heute",color:"var(--lauf)"});
+  // Ring 3 – Woche: erledigte Einheiten dieser Woche
+  let wPlan=0, wDone=0; for(let x=curW*7;x<curW*7+7&&x<=LAST;x++) if(isSession(x)){ wPlan++; if(x<=T&&trained(x)) wDone++; }
+  const r3=dash.ringGauge(wPlan?wDone/wPlan*100:0,{label:"Woche",value:`${cnt(wDone)}<small>/${wPlan}</small>`,color:"var(--accent)"});
+  h+=`<div class="card dash-rings">${r1}${r2}${r3}</div>`;
 
-  // Intervalle der letzten Intervall-Einheit
-  const li=lastIntervalAct();
-  h+=`</section><section><div class="dash-title">Letzte Intervall-Einheit</div><div class="card">`;
-  if(!li) h+=`<p class="sub">Noch keine Einheit mit Runden (Laps). Garmin bzw. Strava synchronisieren – Intervalle werden aus den Runden der Uhr erkannt (Auto-Lap oder Runden-Taste).</p>`;
-  else {
-    const {a,iv,plan}=li, W=iv.work.map(i=>a.laps[i]), km=W.every(l=>Math.abs(l.d-1000)<=150);
-    h+=`<div class="row between"><b>${esc(a.name||strava.SPORT_LABEL[a.group])}</b><span class="badge ${srcCls(a)}">${srcName(a)}</span></div>
-      <div class="sub">${esc(dmy(a.date))} · ${esc(strava.summary(a))}${plan?" · Plan: "+esc(plan):""}</div>
-      <p class="mt-2"><b>${esc(dash.repSummary(a,plan))}</b></p>`;
-    h+=dash.pairChart(W.map((l,k)=>({label:"Rep "+(k+1),values:[km?dash.paceOf(l):l.t]})),{names:[km?"Pace":"Zeit"],fmt:v=>mmss(v)+(km?"/km":""),afmt:v=>mmss(v),label:"Intervallzeiten"});
-    h+=`<details class="mt-2"><summary class="sub">Alle Runden (${a.laps.length})</summary><table class="laps"><tr><th>Runde</th><th>Distanz</th><th>Zeit</th><th>Pace</th><th>HF</th></tr>`+
-      a.laps.map((l,i)=>`<tr class="${iv.work.includes(i)?"work":""}"><td>${i+1}${iv.work.includes(i)?" · Intervall":""}</td><td>${l.d>=1000?(l.d/1000).toFixed(2).replace(".",",")+" km":l.d+" m"}</td><td>${mmss(l.t)}</td><td>${dash.fmtPace(dash.paceOf(l))}</td><td>${l.hr||"–"}</td></tr>`).join("")+`</table></details>`;
+  // Heute: Check-in (solange offen) bzw. eine klare Empfehlung + die wichtigsten Garmin-Werte
+  if(inPlan){
+    const p=dayPlan(TODAY);
+    const m=[["Schlaf",w.sleepH!=null?fmtWell(w,"sleepH")+" h":null],["HRV",w.hrv!=null?w.hrv+" ms":null],["Ruhepuls",w.rhr!=null?w.rhr:null],["Body Battery",w.bb!=null?w.bb:null]].filter(x=>x[1]!=null);
+    const mHtml=m.length?`<div class="lstats mt-3" style="grid-template-columns:repeat(${m.length},1fr)">${m.map(([l,v])=>`<div><span>${l}</span><b>${esc(String(v))}</b></div>`).join("")}</div>`:"";
+    // Check-in offen: hier nur eine Zeile (das Formular steht auf der Startseite); „Ausfüllen“ klappt es hier auf
+    if(ciOpen) h+=checkinCard(TODAY);
+    else if(ciPending(TODAY)) h+=`<div class="card dash-today"><div class="row between"><h3>Heute</h3><button class="btn primary sm" data-act="ci-edit">Check-in ausfüllen</button></div>
+      <p class="sub mt-2">${todayVerdict(recLvl,p)}</p>${mHtml}</div>`;
+    else h+=`<div class="card dash-today"><div class="row between"><h3>Heute</h3>${lvl?`<span class="amp amp-${lvl}">${LVL_TXT[lvl]}</span>`:""}</div>
+      <p class="mt-2">${todayVerdict(lvl,p)}</p>${rec.why.length?`<p class="sub mt-1">Garmin: ${esc(rec.why.join(", "))}</p>`:""}${mHtml}
+      <button class="btn ghost sm mt-3" data-act="ci-edit">Check-in ändern</button></div>`;
   }
-  h+=`</div></section></div>`;
 
-  // Erholung (Garmin): eine Kennzahl pro Diagramm (nie zwei Skalen), Auswahl über Chips – spart auf dem Handy viel Scrollen
+  // Diese Woche: Anstrengung pro Tag + drei Zahlen
+  const wk=dash.weekly(acts,idxOfIso,curW), cw=wk[curW]||{min:0,runKm:0,n:0};
+  const wd=[]; for(let x=curW*7;x<curW*7+7;x++) wd.push(x);
+  const rpes=wd.map(x=>x<=T?S.rpe[keyI(x)]:null).filter(v=>v!=null).map(Number);
+  h+=`<div class="dash-title">Diese Woche</div><div class="card"><div class="lstats l3">
+      <div><span>Laufen</span><b>${cnt(cw.runKm,1," km")}</b></div>
+      <div><span>Trainingszeit</span><b>${dash.hm(cw.min)}</b></div>
+      <div><span>Ø Anstrengung</span><b>${rpes.length?cnt(rpes.reduce((a,b)=>a+b,0)/rpes.length,1):"–"}</b></div></div>
+    <div class="sub mt-3">Anstrengung pro Tag (RPE 1–10)</div>
+    ${!rpes.length?`<p class="sub mt-2">Noch keine Einträge diese Woche. Nach jedem Training die Anstrengung (RPE) eintragen, dann entsteht hier dein Wochenbild.</p>`:dash.barChart(wd.map((x,d)=>{ const v=x<=T?S.rpe[keyI(x)]:null, p=dayPlan(x); return {label:DAYS[d],value:v!=null?+v:0,hi:x===TODAY,tip:`${DAYSF[d]}: ${v!=null?"RPE "+v:"kein Eintrag"}${p?" · "+p.t:""}`}; }),{label:"Anstrengung pro Tag",fmt:v=>Math.round(v)+"",height:110})}</div>`;
+
+  // Trends (4 Wochen): eine Kennzahl, Auswahl per Chip
   const days=[]; for(let k=27;k>=0;k--) days.push(isoD(new Date(+NOW-k*dayMs)));
   const one=(v)=>String(Math.round(v*10)/10).replace(".",",");
-  const WELL={readiness:["Readiness",v=>Math.round(v)+"",{min:0,max:100},"Training Readiness (0–100): wie bereit dein Körper für hartes Training ist"],
-    hrv:["HRV",v=>Math.round(v)+" ms",{},"Herzfrequenzvariabilität, Nacht-Durchschnitt – höher ist meist besser"],
-    sleepH:["Schlaf",v=>one(v)+" h",{min:0,max:10},"Schlafdauer pro Nacht"],
-    bb:["Body Battery",v=>Math.round(v)+"",{min:0,max:100},"Höchster Body-Battery-Wert des Tages"],
-    rhr:["Ruhepuls",v=>Math.round(v)+" bpm",{},"Ruhepuls – steigt er deutlich an, ist oft Erholung nötig"]};
+  const WELL={readiness:["Erholung",v=>Math.round(v)+"",{min:0,max:100},"Garmin Training Readiness (0–100). Über 60 = bereit für hartes Training."],
+    sleepH:["Schlaf",v=>one(v)+" h",{min:0,max:10},"Schlafdauer pro Nacht. Ziel: 7–9 Stunden."],
+    hrv:["HRV",v=>Math.round(v)+" ms",{},"Herzfrequenzvariabilität in der Nacht. Fällt sie über Tage, braucht der Körper Erholung."],
+    rhr:["Ruhepuls",v=>Math.round(v)+" bpm",{},"Steigt der Ruhepuls deutlich über deinen Schnitt, ist oft Erholung nötig."]};
   const have=Object.keys(WELL).filter(k=>days.some(d=>S.garmin.well[d]&&S.garmin.well[d][k]!=null));
-  h+=`<div class="dpair"><section><div class="dash-title">Erholung (Garmin)</div>`;
+  h+=`<div class="dgrid"><section><div class="dash-title">Trends · 4 Wochen</div>`;
   if(have.length){
     const ksel=have.includes(dashWell)?dashWell:have[0], [,wf,wo,wdesc]=WELL[ksel];
-    const vals=days.map(d=>{ const w=S.garmin.well[d]; return w&&w[ksel]!=null?+w[ksel]:null; });
+    const vals=days.map(d=>{ const x=S.garmin.well[d]; return x&&x[ksel]!=null?+x[ksel]:null; });
     const avgOf=(a)=>{ const v=a.filter(x=>x!=null); return v.length?v.reduce((x,y)=>x+y,0)/v.length:null; };
-    const lastV=[...vals].reverse().find(v=>v!=null), a7=avgOf(vals.slice(-7)), a28=avgOf(vals);
-    h+=`<div class="card spot" id="dc-well">${dchips("well",have.map(k=>[k,WELL[k][0]]),ksel)}
-      <div class="lstats l3"><div><span>Zuletzt</span><b>${lastV!=null?wf(lastV):"–"}</b></div><div><span>Ø 7 Tage</span><b>${a7!=null?wf(a7):"–"}</b></div><div><span>Ø 4 Wochen</span><b>${a28!=null?wf(a28):"–"}</b></div></div>
-      <div class="sub mt-2">${wdesc}</div>
-      ${dash.lineChart(days.map((d,i)=>({label:dmy(d),value:vals[i],tip:`${dmy(d)}: ${vals[i]==null?"keine Daten":wf(vals[i])}`})),{fmt:wf,label:WELL[ksel][0],...wo})}
-      <details class="mt-2"><summary class="sub">Alle Werte als Tabelle</summary>${wellTable(28)}${gmDiag()}</details></div>`;
-  } else h+=`<div class="card"><p class="sub">${S.garmin.conn?"Noch keine Erholungswerte geladen. Unter Strava / Garmin synchronisieren.":"Garmin verbinden (Menü → Strava / Garmin), dann erscheinen hier HRV, Schlaf, Body Battery, Readiness und Ruhepuls."}</p>${S.garmin.conn?gmDiag():""}</div>`;
+    const a7=avgOf(vals.slice(-7)), a28=avgOf(vals);
+    h+=`<div class="card" id="dc-well">${dchips("well",have.map(k=>[k,WELL[k][0]]),ksel)}
+      <div class="lstats l2"><div><span>Ø 7 Tage</span><b>${a7!=null?wf(a7):"–"}</b></div><div><span>Ø 4 Wochen</span><b>${a28!=null?wf(a28):"–"}</b></div></div>
+      ${dash.lineChart(days.map((d,i)=>({label:dmy(d),value:vals[i],tip:`${dmy(d)}: ${vals[i]==null?"keine Daten":wf(vals[i])}`})),{fmt:wf,label:WELL[ksel][0],height:120,...wo})}
+      <p class="sub mt-2">${wdesc}</p></div>`;
+  } else h+=`<div class="card"><p class="sub">${S.garmin.conn?"Noch keine Erholungswerte. Unter Menü → Strava / Garmin synchronisieren.":"Verbinde Garmin (Menü → Strava / Garmin), dann siehst du hier Erholung, Schlaf, HRV und Ruhepuls im Verlauf."}</p></div>`;
+  h+=`</section><section><div class="dash-title">Kraft</div>${liftCard()}</section></div>`;
 
-  // Kraft: Gewichtsverlauf je Übung (aus den Einträgen der Krafteinheiten) + Standard-Arbeitsgewichte – neben der Erholung
-  h+=`</section><section><div class="dash-title">Kraft · Gewichtsverlauf</div>`+liftCard()+`</section></div>`;
-
-  // Belastung: RPE und Check-in der letzten 14 Tage
-  const d14=[]; for(let x=Math.max(0,T-13);x<=T;x++) d14.push(x);
-  if(d14.length){
-    const rpeC=dash.barChart(d14.map(x=>{ const v=S.rpe[keyI(x)]; const p=dayPlan(x); return {label:String(dateFromIdx(x).getDate()),value:v!=null?+v:0,tip:`${shortDay(x)}: ${v!=null?"RPE "+v:"kein RPE"}${p?" · "+p.t:""}`}; }),{label:"RPE der letzten 14 Tage",fmt:v=>Math.round(v)+"",height:120});
-    const cnt3={green:0,yellow:0,red:0}; d14.forEach(x=>{ const r=readiness(S.checkin[keyI(x)]); if(r) cnt3[r]++; });
-    const nCi=cnt3.green+cnt3.yellow+cnt3.red;
-    const ciSum=`<div class="lstats l3 mt-3"><div><span>✓ Grün</span><b>${cnt3.green}</b></div><div><span>~ Gelb</span><b>${cnt3.yellow}</b></div><div><span>! Rot</span><b>${cnt3.red}</b></div></div><p class="sub mt-2">${nCi} von ${d14.length} Tagen eingecheckt${cnt3.red+cnt3.yellow>=4?" · auffällig viele gelbe/rote Tage – Belastung im Blick behalten":""}.</p>`;
-    const ci=d14.map(x=>{ const r=readiness(S.checkin[keyI(x)]); return `<span class="${r||""}" title="${esc(shortDay(x))}: ${r?{green:"Grün",yellow:"Gelb",red:"Rot"}[r]:"kein Check-in"}">${r?{green:"✓",yellow:"~",red:"!"}[r]:"·"}<br>${dateFromIdx(x).getDate()}</span>`; }).join("");
-    h+=`<div class="dash-title">Belastung</div><div class="dgrid"><div class="card"><b>RPE (Anstrengung 1–10)</b><div class="sub">letzte 14 Tage</div>${rpeC}</div>
-      <div class="card"><b>Check-in-Ampel</b><div class="sub">✓ grün · ~ gelb · ! rot · letzte 14 Tage</div><div class="cistrip">${ci}</div>${ciSum}</div></div>`;
-  }
-
-  // Tests: Pacing-Test ich vs. Partner
-  const A=myTests(), B=partnerTests(), TT=teamT();
-  const groups=A.lauf.map((v,r)=>({label:"Rep "+(r+1),values:[parseT(v),parseT(B.lauf[r])].map(x=>isNaN(x)?null:x)}));
-  const pc=dash.pairChart(groups,{names:[ME,PARTNER],fmt:v=>mmss(v),label:"Pacing-Test 4×1 km"});
-  h+=`<div class="dash-title">Tests &amp; Benchmarks</div><div class="dgrid"><div class="card"><b>Pacing-Test 4×1 km</b><div class="sub">Pace pro Wiederholung · Team-Tempo T ${isNaN(TT)?"–":mmss(TT)+"/km"}</div>
-    ${pc?pc+`<div class="legend"><span><i style="background:var(--viz-1)"></i>${esc(ME)}</span><span><i style="background:var(--viz-2)"></i>${esc(PARTNER)}</span></div>`:`<p class="sub mt-2">Noch keine Werte. Nach dem Pacing-Test „Übernehmen“ tippen, dann werden die Zeiten aus der Uhr eingetragen.</p>`}</div>`;
-  const ST=["SkiErg","Sled Push","Sled Pull","Burpee BJ","RowErg","Farmers","Lunges","Wall Balls"];
-  const stRows=ST.map((n,r)=>[n,A.station[r],B.station[r]]).filter(r=>r[1]||r[2]);
-  h+=`<div class="card"><b>Stationen-Benchmark</b>${stRows.length?`<table class="laps"><tr><th>Station</th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th></tr>${stRows.map(r=>`<tr class="work"><td>${r[0]}</td><td>${esc(r[1]||"–")}</td><td>${esc(r[2]||"–")}</td></tr>`).join("")}</table>`:`<p class="sub mt-2">Noch keine Stationen-Zeiten (Menü → Profil).</p>`}</div></div>`;
-
-
-  // Aktivitäten
-  const last=acts.slice().sort((a,b)=>(a.start||a.date)<(b.start||b.date)?1:-1).slice(0,15);
-  h+=`<div class="dash-title">Letzte Aktivitäten</div><div>`+(last.length?`<div class="list">${last.map((a,ix)=>{ const i=idxOfIso(a.date), p=i>=0&&i<=LAST?dayPlan(i):null, rs=dash.repSummary(a,p&&p.i?p.i.find(t=>dash.parseReps(t))||"":"");
-      return (ix===5?`</div><details class="more-acts"><summary class="sub">${last.length-5} weitere Aktivitäten</summary><div class="list">`:"")+`<div class="act"><div class="d">${DAYS[(isoToDate(a.date).getDay()+6)%7]}<b>${isoToDate(a.date).getDate()}</b></div><div><b>${esc(a.name||strava.SPORT_LABEL[a.group])}</b> <span class="badge ${srcCls(a)}">${srcName(a)}</span><div class="sub">${esc(strava.summary(a))}</div>${rs?`<div class="sub mt-1">Intervalle ${esc(rs)}</div>`:""}</div></div>`; }).join("")}</div>${last.length>5?"</details>":""}`:`<div class="card"><p class="sub">Noch keine Aktivitäten.</p></div>`)+`</div>`;
+  // Letzte Aktivitäten (3) + Weg zu allen Aktivitäten und zu den Tests
+  const last=acts.slice().sort((a,b)=>(a.start||a.date)<(b.start||b.date)?1:-1).slice(0,3);
+  h+=`<div class="dash-title">Letzte Aktivitäten</div>`;
+  h+=last.length?`<div class="list">${last.map(a=>{ const i=idxOfIso(a.date), p=i>=0&&i<=LAST?dayPlan(i):null, rs=dash.repSummary(a,p&&p.i?p.i.find(t=>dash.parseReps(t))||"":""), d=isoToDate(a.date);
+      return `<div class="act"><div class="d">${DAYS[(d.getDay()+6)%7]}<b>${d.getDate()}</b></div><div><b>${esc(a.name||strava.SPORT_LABEL[a.group])}</b> <span class="badge ${srcCls(a)}">${srcName(a)}</span><div class="sub">${esc(strava.summary(a))}</div>${rs?`<div class="sub mt-1">Intervalle ${esc(rs)}</div>`:""}</div></div>`; }).join("")}</div>`
+    :`<div class="card"><p class="sub">Noch keine Aktivitäten. Verbinde Strava oder Garmin im Menü.</p></div>`;
+  h+=`<div class="list dash-links"><button class="mi" data-v="strava"><span><b>Alle Aktivitäten</b><span class="sub">Strava / Garmin</span></span><span class="chev">›</span></button>
+    <button class="mi" data-v="tests"><span><b>Tests &amp; Benchmarks</b><span class="sub">Pacing-Test, Stationen, Übergaben</span></span><span class="chev">›</span></button></div>`;
   return h+`</div>`;
 }
 
-/* Dashboard-Animationen (GSAP): Karten fahren gestaffelt ein, Zahlen zählen hoch, Ringe füllen sich,
-   Balken wachsen aus der Grundlinie, Linien zeichnen sich. Weiter unten liegende Karten starten beim Hineinscrollen.
+/* Dashboard-Animationen (GSAP), bewusst sparsam wie bei Whoop: die drei Ringe füllen sich, Zahlen zählen hoch.
+   Alles andere steht sofort da (kein Verstecken bis zum Hineinscrollen – das ruckelt und kann Inhalte verschlucken).
    Nur beim Öffnen des Dashboards, nicht bei jedem Neuaufbau (Sync). „Bewegung reduzieren“ = keine Animation. */
 let dashSeen=false;
 function animateDash(){
   const g=window.gsap; if(!g) return;
   if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  if(window.ScrollTrigger) g.registerPlugin(window.ScrollTrigger);
   const root=$("#main .wide"); if(!root) return;
-  const ease="power3.out";
-  // Kopf: Ringe und Kacheln
-  g.from(root.querySelectorAll(".dash-rings, .dash-hero .kpi"),{y:18,opacity:0,duration:.6,stagger:.06,ease,clearProps:"transform,opacity"});
-  root.querySelectorAll(".ring-fg").forEach(c=>{ const C=+c.dataset.c; g.fromTo(c,{strokeDashoffset:C},{strokeDashoffset:C*(1-(+c.dataset.pct)/100),duration:1.4,delay:.2,ease:"power2.out"}); });
-  root.querySelectorAll(".cnt").forEach(el=>{ const to=+el.dataset.to, dec=+el.dataset.dec, suf=el.dataset.suf||"", o={v:0};
+  root.querySelectorAll(".ring-fg").forEach(c=>{ const C=+c.dataset.c; g.fromTo(c,{strokeDashoffset:C},{strokeDashoffset:C*(1-(+c.dataset.pct)/100),duration:1.1,ease:"power2.out"}); });
+  root.querySelectorAll(".dash-rings .cnt").forEach(el=>{ const to=+el.dataset.to, dec=+el.dataset.dec, suf=el.dataset.suf||"", o={v:0};
     if(isNaN(to)) return;
-    g.to(o,{v:to,duration:1.2,delay:.15,ease:"power2.out",onUpdate:()=>{ el.textContent=(dec?o.v.toFixed(dec).replace(".",","):Math.round(o.v))+suf; }}); });
-  // Abschnitte und Karten darunter: beim Hineinscrollen
-  const reveal=(el,extra)=>{ const st=window.ScrollTrigger?{trigger:el,start:"top 92%",once:true}:undefined; const tl=g.timeline({scrollTrigger:st});
-    tl.from(el,{y:24,opacity:0,duration:.55,ease,clearProps:"transform,opacity"}); if(extra) extra(tl); };
-  root.querySelectorAll(".dash-title").forEach(t=>reveal(t));
-  root.querySelectorAll(".dgrid > .card, .dpair > section > .card, .wide > .card, .wide > div > .list").forEach(card=>reveal(card,tl=>{
-    const bars=card.querySelectorAll(".viz .bar"); if(bars.length) tl.from(bars,{scaleY:0,transformOrigin:"50% 100%",duration:.7,stagger:.04,ease:"back.out(1.4)"},"-=.3");
-    card.querySelectorAll(".viz .ln").forEach(p=>{ const L=p.getTotalLength(); tl.fromTo(p,{strokeDasharray:L,strokeDashoffset:L},{strokeDashoffset:0,duration:1.1,ease:"power2.inOut",clearProps:"strokeDasharray,strokeDashoffset"},"-=.35"); });
-    const ar=card.querySelectorAll(".viz .area, .viz .last"); if(ar.length) tl.from(ar,{opacity:0,duration:.5},"-=.4");
-    const rows=card.querySelectorAll(".act, .laps tr, .cistrip span, .kpis .kpi"); if(rows.length) tl.from(rows,{opacity:0,y:8,duration:.35,stagger:.03,ease,clearProps:"transform,opacity"},"-=.3");
-  }));
-}
-/* Nur das Diagramm einer Karte neu einblenden (nach Umschalten per Chip) */
+    g.to(o,{v:to,duration:1,ease:"power2.out",onUpdate:()=>{ el.textContent=(dec?o.v.toFixed(dec).replace(".",","):Math.round(o.v))+suf; }}); });
+}/* Nur das Diagramm einer Karte neu einblenden (nach Umschalten per Chip) */
 function animateChart(card){
   const g=window.gsap; if(!g||!card||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const bars=card.querySelectorAll(".viz .bar"); if(bars.length) g.from(bars,{scaleY:0,transformOrigin:"50% 100%",duration:.55,stagger:.025,ease:"back.out(1.3)"});
@@ -1696,9 +1694,6 @@ function animateChart(card){
   const ar=card.querySelectorAll(".viz .area, .viz .last"); if(ar.length) g.from(ar,{opacity:0,duration:.5,delay:.2});
   const st=card.querySelectorAll(".lstats b"); if(st.length) g.from(st,{opacity:0,y:6,duration:.3,stagger:.04});
 }
-/* Spotlight: Zeigerposition als CSS-Variablen (nur Dashboard-Karten) */
-document.addEventListener("pointermove",e=>{ const c=e.target.closest&&e.target.closest(".spot"); if(!c) return; const r=c.getBoundingClientRect();
-  c.style.setProperty("--mx",(e.clientX-r.left)+"px"); c.style.setProperty("--my",(e.clientY-r.top)+"px"); },{passive:true});
 
 /* Tooltip für Diagramme: [data-tip] überfahren oder antippen */
 (function(){
@@ -2110,7 +2105,10 @@ function render(){
   // Dashboard nur beim Öffnen animieren, nicht bei jedem Neuaufbau
   if(view==="dashboard"){ if(!dashSeen){ dashSeen=true; requestAnimationFrame(animateDash); } } else dashSeen=false;
   if(fid){ const el=document.getElementById(fid); if(el) el.focus({preventScroll:true}); }
-  document.querySelectorAll("#nav button").forEach(b=>{ const on=b.dataset.v===view; b.classList.toggle("on",on); if(on) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
+  markNav();
+  // Hintergrund hinter dem Glas: auf „Heute“ leicht in der Farbe der gezeigten Einheit, sonst neutral
+  const tp=view==="today"&&dayPlan(sel!=null?sel:Math.max(0,Math.min(LAST,TODAY)));
+  document.body.style.setProperty("--tint",tp&&tp.k!=="rest"?`var(--${tp.k})`:"#3b5375");
   const bare=view==="login"||view==="shared"||view==="onb";
   $("#nav").hidden=bare; document.body.classList.toggle("bare",bare);
   document.querySelector(".top .menu-btn").style.visibility=bare?"hidden":"";
@@ -2131,7 +2129,19 @@ function go(v){
   if(v==="tests"){ profWho="me"; view="profile"; menu(false); render(); loadPartner(); return $("#tests").scrollIntoView(); }
   if(v==="profile"){ profWho="me"; loadPartner(); }
   if(v==="import" && imp.step!=="preview") imp={step:"pick"};
-  view=v; if(v==="today") sel=null; menu(false); render(); window.scrollTo(0,0);
+  const changed=v!==view;
+  view=v; ciOpen=false; if(v==="today") sel=null; menu(false);
+  // Erst die Tab-Markierung losgleiten lassen, dann im nächsten Frame die Seite aufbauen –
+  // so startet die Bewegung sofort und ruckelt nicht, während das neue HTML entsteht.
+  // Wie bei iOS: der Inhalt wechselt sofort (keine Einblendung – die würde die ganze Seite neu zeichnen und ruckeln)
+  if(changed){ markNav(); requestAnimationFrame(()=>{ render(); window.scrollTo(0,0); }); }
+  else { render(); window.scrollTo(0,0); }
+}
+/* Aktiven Tab markieren; die Glas-Markierung gleitet per transform an seine Stelle */
+function markNav(){
+  const bs=[...document.querySelectorAll("#nav button")], ix=bs.findIndex(b=>b.dataset.v===view);
+  bs.forEach((b,k)=>{ b.classList.toggle("on",k===ix); if(k===ix) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
+  $("#nav").classList.toggle("no-ind",ix<0); if(ix>=0) $("#nav").style.setProperty("--ti",ix);
 }
 function menu(open){
   $("#sheet").classList.toggle("open",open); $("#scrim").classList.toggle("open",open);
@@ -2183,7 +2193,7 @@ document.addEventListener("click",e=>{
       // Vorbelegtes Standardgewicht wie beim einzelnen Abhaken übernehmen
       const pv=document.querySelector(`[data-v2="${id}"].pre`); if(pv&&!S.val[id]) S.val[id]=pv.value; });
     save(); workoutFeedback(i,null,true); return closeCard(i); }
-  if(d.act==="dash-chip"){ if(d.g==="lift") dashLift=d.k; else if(d.g==="week") dashWeek=d.k; else if(d.g==="well") dashWell=d.k;
+  if(d.act==="dash-chip"){ if(d.g==="lift") dashLift=d.k; else if(d.g==="well") dashWell=d.k;
     render(); animateChart(document.querySelector("#dc-"+d.g)); return; }
   if(d.act==="done-open"){ doneOpen.add(+d.i); return render(); }
   if(d.act==="done-close"){ return closeCard(+d.i); }

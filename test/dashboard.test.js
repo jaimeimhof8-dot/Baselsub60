@@ -75,6 +75,8 @@ test("Ring-Anzeige und Verlaufsfläche", () => {
   assert.match(r, /data-pct="75"/);
   assert.match(r, /stroke-dashoffset="81\.7"/);
   assert.match(ringGauge(140), /data-pct="100"/);
+  // Wert mit HTML (Hochzähl-Span): Screenreader-Text ohne Tags
+  assert.match(ringGauge(40, { label: "Woche", value: '<span class="cnt">2</span><small>/5</small>' }), /aria-label="Woche: 2\/5"/);
   const l = lineChart([{ label: "a", value: 1 }, { label: "b", value: 2 }, { label: "c", value: null }, { label: "d", value: 3 }]);
   assert.match(l, /class="area"/);
 });

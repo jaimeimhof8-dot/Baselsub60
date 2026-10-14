@@ -69,15 +69,21 @@ p{margin:0}
 .stack{display:flex;flex-direction:column;gap:var(--s3)}
 [hidden]{display:none!important}
 
-/* Kopf */
-.top{position:sticky;top:0;z-index:5;background:rgba(10,12,16,.55);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
-  border-bottom:1px solid var(--line);padding:var(--s3) var(--s4);padding-top:calc(var(--s3) + env(safe-area-inset-top));
-  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:var(--s3)}
+/* Kopf wie in iOS-Apps: keine Leiste, kein Logo (das steht nur im Startbildschirm).
+   Der Countdown steht frei über dem Inhalt und scrollt mit, das Menü schwebt als Glas-Kreis oben rechts. */
+.top{position:relative;z-index:5;max-width:640px;margin:0 auto;display:flex;align-items:center;
+  padding:calc(var(--s3) + env(safe-area-inset-top)) calc(var(--s4) + 56px) 0 max(var(--s4),env(safe-area-inset-left))}
+.top .menu-btn{position:fixed;z-index:7;top:calc(var(--s3) + env(safe-area-inset-top));right:max(var(--s4),env(safe-area-inset-right));
+  background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-color:rgba(255,255,255,.12);box-shadow:var(--edge),0 6px 18px rgba(0,0,0,.3)}
+/* iPhone-Statusleiste: hauchdünner Glasstreifen, damit beim Scrollen nichts unter Uhrzeit und Akku liegt */
+body::after{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top);z-index:8;pointer-events:none;
+  background:rgba(10,12,16,.5);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
 .brand{font-family:var(--f-head);font-weight:700;font-size:20px;letter-spacing:.06em;text-transform:uppercase;justify-self:start;white-space:nowrap}
 .brand b{background:var(--accent);color:var(--on-accent);padding:0 6px;margin-left:var(--s1);border-radius:5px}
-.top .menu-btn{justify-self:end}
-.cd{font-family:var(--f-head);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;line-height:1.05}
-.cd span{display:block;font-size:26px;color:var(--text);letter-spacing:0}
+/* Countdown: grosse Zahl, daneben klein „Tage bis Basel“ */
+.cd{display:flex;align-items:center;gap:var(--s2);min-height:44px}
+.cd span{font-family:var(--f-head);font-size:32px;font-weight:700;line-height:1;color:var(--text)}
+.cd small{font-size:12px;font-weight:600;line-height:1.2;color:var(--muted)}
 .menu-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);box-shadow:var(--edge);display:grid;place-items:center;padding:0;transition:transform .2s var(--ease)}
 .menu-btn:active{transform:scale(.9)}
 .menu-btn svg{width:20px;height:20px;fill:var(--text)}
@@ -513,14 +519,15 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
 /* Seitenwechsel (View Transitions): Kopf, Tab-Leiste, Menü und Meldung bleiben stehen, nur der Inhalt bewegt sich */
 #main{view-transition-name:main}
 .top{view-transition-name:top}
+.top .menu-btn{view-transition-name:menubtn}
 #nav{view-transition-name:nav}
 #sheet{view-transition-name:sheet}
 #scrim{view-transition-name:scrim}
 #toast{view-transition-name:toast}
 ::view-transition-old(root),::view-transition-new(root){animation:none}
-::view-transition-old(top),::view-transition-old(nav),::view-transition-old(sheet),::view-transition-old(scrim),::view-transition-old(toast){display:none}
-::view-transition-new(top),::view-transition-new(nav),::view-transition-new(sheet),::view-transition-new(scrim),::view-transition-new(toast){animation:none}
-::view-transition-group(top),::view-transition-group(nav),::view-transition-group(toast){z-index:3;animation:none}
+::view-transition-old(top),::view-transition-old(menubtn),::view-transition-old(nav),::view-transition-old(sheet),::view-transition-old(scrim),::view-transition-old(toast){display:none}
+::view-transition-new(top),::view-transition-new(menubtn),::view-transition-new(nav),::view-transition-new(sheet),::view-transition-new(scrim),::view-transition-new(toast){animation:none}
+::view-transition-group(top),::view-transition-group(menubtn),::view-transition-group(nav),::view-transition-group(toast){z-index:3;animation:none}
 ::view-transition-group(scrim){z-index:4;animation:none}
 ::view-transition-group(sheet){z-index:5;animation:none}
 /* Der Inhalt springt nicht mit der Scrollposition: alter Stand bleibt dort, wo er zu sehen war (--vt-s = Scroll-Differenz) */
@@ -622,7 +629,9 @@ html[data-vt=fade]::view-transition-new(main){animation:vt-rise .3s var(--out) b
   #toast{bottom:calc(var(--tabs-h) + var(--s8) + env(safe-area-inset-bottom))}
   /* Heute: Wochenleiste hochkant links, Einheit rechts daneben */
   .cols.today{display:grid;grid-template-columns:64px minmax(0,1fr);gap:var(--s4);align-items:start}
-  .rail{position:sticky;top:84px}
+  .top{max-width:720px;padding-left:var(--s6)}
+  .top .menu-btn{right:max(var(--s6),calc((100vw - 720px) / 2 + var(--s6)))}
+  .rail{position:sticky;top:calc(var(--s4) + env(safe-area-inset-top))}
   .rail .cap{font-size:12px;text-align:center;margin:0 0 var(--s2)}
   .strip.v{grid-template-columns:1fr;gap:6px}
   .strip.v button{padding:var(--s2) 0;gap:3px}
@@ -630,11 +639,9 @@ html[data-vt=fade]::view-transition-new(main){animation:vt-rise .3s var(--out) b
   .strip.v button.today{box-shadow:inset 3px 0 0 var(--accent)}
 }
 @media (min-width:900px){
-  /* Kopfzeile bündig mit dem Inhalt, Navigation als Segment in der Mitte */
-  .top{--pad:max(var(--s8),calc((100vw - 1080px) / 2 + var(--s8)));padding-left:var(--pad);padding-right:var(--pad);
-    grid-template-columns:auto 1fr auto auto;min-height:72px}
-  .cd{grid-column:3;display:flex;align-items:baseline;gap:var(--s2);text-align:left}
-  .cd span{display:inline;font-size:24px}
+  /* Kopf bündig mit dem Inhalt: Countdown links, Tabs als Glas-Segment in der Mitte, Menü rechts */
+  .top{max-width:1080px;padding:calc(14px + env(safe-area-inset-top)) var(--s8) 0}
+  .top .menu-btn{top:calc(14px + env(safe-area-inset-top));right:max(var(--s8),calc((100vw - 1080px) / 2 + var(--s8)))}
   .tabs{position:fixed;top:calc(14px + env(safe-area-inset-top));bottom:auto;left:50%;transform:translateX(-50%);width:auto;
     display:flex;gap:var(--s1);padding:var(--s1);border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.35);z-index:6}
   .tabs button{min-height:36px;flex-direction:row;gap:var(--s2);padding:0 var(--s4);border-radius:999px;font-size:14px}
@@ -648,21 +655,22 @@ html[data-vt=fade]::view-transition-new(main){animation:vt-rise .3s var(--out) b
   .cols.week{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}
   .cols.today{grid-template-columns:72px minmax(0,1.3fr) minmax(300px,1fr)}
   .cols.today.two{grid-template-columns:72px minmax(0,1fr)}
-  .rail{top:96px}
+  .rail{top:80px}
   /* Seitenspalte bleibt stehen, scrollt aber selbst, wenn sie höher als der Bildschirm ist */
-  .cols:not(.week) > .side{position:sticky;top:96px;max-height:calc(100vh - 112px);overflow-y:auto;scrollbar-width:thin}
+  .cols:not(.week) > .side{position:sticky;top:80px;max-height:calc(100vh - 96px);overflow-y:auto;scrollbar-width:thin}
   .narrow{max-width:680px;margin:0 auto}
 }
 @media (min-width:1400px){
   main{max-width:1200px}
-  .top{--pad:max(var(--s8),calc((100vw - 1200px) / 2 + var(--s8)))}
+  .top{max-width:1200px}
+  .top .menu-btn{right:max(var(--s8),calc((100vw - 1200px) / 2 + var(--s8)))}
 }
 @media (max-height:500px) and (orientation:landscape) and (max-width:899px){
   :root{--tabs-h:48px}
-  .top{padding-top:calc(var(--s1) + env(safe-area-inset-top));padding-bottom:var(--s1);padding-left:max(var(--s4),env(safe-area-inset-left));padding-right:max(var(--s4),env(safe-area-inset-right))}
-  .cd{display:flex;gap:var(--s2);align-items:baseline}
-  .cd span{display:inline;font-size:20px}
-  .menu-btn{width:40px;height:40px}
+  .top{padding-top:calc(var(--s1) + env(safe-area-inset-top))}
+  .top .menu-btn{top:calc(var(--s1) + env(safe-area-inset-top));width:40px;height:40px}
+  .cd{min-height:40px}
+  .cd span{font-size:26px}
   .tabs button{flex-direction:row;gap:var(--s2);font-size:13px}
   .tabs svg{width:18px;height:18px}
   .sim-date{padding:2px var(--s4)}
@@ -673,8 +681,7 @@ html[data-vt=fade]::view-transition-new(main){animation:vt-rise .3s var(--out) b
 <body>
 <div id="splash" role="status" aria-label="App wird geladen"><div class="brand">Basel<b>Sub-60</b></div><div class="spin"></div></div>
 <div class="top">
-  <div class="brand">Basel<b>Sub-60</b></div>
-  <div class="cd"><span id="cd">–</span>Tage bis Basel</div>
+  <div class="cd"><span id="cd">–</span><small>Tage bis<br>Basel</small></div>
   <button class="menu-btn" data-act="menu" aria-label="Menü öffnen" aria-controls="sheet"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg></button>
 </div>
 <div class="sim-date" id="simdate" hidden></div>

@@ -126,13 +126,13 @@ main{padding:var(--s4);max-width:640px;margin:0 auto}
 .ex-h input{width:24px;height:24px;margin:0;flex:none;accent-color:var(--ok)}
 .ex-h span{flex:1;font-size:15.5px}
 .ex.is-done .ex-h span{color:var(--muted);text-decoration:line-through}
-.ex-v{display:flex;gap:var(--s2);align-items:center;margin:var(--s2) 0 0 36px}
+.ex-v{display:flex;gap:var(--s2);align-items:center;margin:var(--s2) 0 0 38px}
 .ex-v input{flex:1;min-width:0}
 .last{font-size:12px;color:var(--muted);white-space:nowrap}
 button.last{background:none;border:1px dashed var(--line);border-radius:var(--r-s);min-height:44px;padding:6px 10px;flex:0 1 auto;max-width:100%;white-space:normal;text-align:left;line-height:1.3;overflow-wrap:anywhere}
 button.last.up{border-color:rgba(255,210,31,.45);color:var(--accent)}
 button.last small{color:var(--muted);font-size:11px}
-.quick{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s2) 0 0 36px}
+.quick{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s2) 0 0 38px}
 @media (max-width:370px){ .quick{margin-left:0} }
 .rpe button.tgt{border:1px dashed var(--accent)}
 .tgt-l{color:var(--accent)}
@@ -504,6 +504,94 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
   box-shadow:var(--edge),0 10px 30px rgba(0,0,0,.4);animation:toastIn .3s var(--ease)}
 @keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}}
 @media (prefers-reduced-motion:reduce){#toast{animation:none}}
+
+/* ---------- Motion im Stil von iOS ----------
+   Nur transform und opacity (läuft auf der Grafikkarte). --ios = Kurve der iOS-Navigation und -Sheets:
+   schneller Start, sehr weiches Auslaufen. Öffnen etwas länger als Schliessen. „Bewegung reduzieren“ = alles aus. */
+:root{--ios:cubic-bezier(.32,.72,0,1);--out:cubic-bezier(.22,1,.36,1);--in:cubic-bezier(.4,0,1,1)}
+
+/* Seitenwechsel (View Transitions): Kopf, Tab-Leiste, Menü und Meldung bleiben stehen, nur der Inhalt bewegt sich */
+#main{view-transition-name:main}
+.top{view-transition-name:top}
+#nav{view-transition-name:nav}
+#sheet{view-transition-name:sheet}
+#scrim{view-transition-name:scrim}
+#toast{view-transition-name:toast}
+::view-transition-old(root),::view-transition-new(root){animation:none}
+::view-transition-old(top),::view-transition-old(nav),::view-transition-old(sheet),::view-transition-old(scrim),::view-transition-old(toast){display:none}
+::view-transition-new(top),::view-transition-new(nav),::view-transition-new(sheet),::view-transition-new(scrim),::view-transition-new(toast){animation:none}
+::view-transition-group(top),::view-transition-group(nav),::view-transition-group(toast){z-index:3;animation:none}
+::view-transition-group(scrim){z-index:4;animation:none}
+::view-transition-group(sheet){z-index:5;animation:none}
+/* Der Inhalt springt nicht mit der Scrollposition: alter Stand bleibt dort, wo er zu sehen war (--vt-s = Scroll-Differenz) */
+::view-transition-group(main){animation:none}
+::view-transition-old(main){translate:0 var(--vt-s,0px)}
+::view-transition-old(main),::view-transition-new(main){animation-fill-mode:both}
+
+/* push / back: alte und neue Seite gleiten exakt gekoppelt nebeneinander (gleiche Kurve, gleiche Strecke).
+   Bei Glas-Karten wichtig: die Seiten überlappen nie, nichts scheint durcheinander durch. */
+html[data-vt=push]::view-transition-new(main){animation:vt-in-r .5s var(--ios) both}
+html[data-vt=push]::view-transition-old(main){animation:vt-out-l .5s var(--ios) both}
+html[data-vt=back]::view-transition-old(main){animation:vt-out-r .46s var(--ios) both}
+html[data-vt=back]::view-transition-new(main){animation:vt-in-l .46s var(--ios) both}
+@keyframes vt-in-r{from{transform:translateX(100vw)}}
+@keyframes vt-out-l{to{transform:translateX(-100vw);opacity:.4}}
+@keyframes vt-out-r{to{transform:translateX(100vw);opacity:.4}}
+@keyframes vt-in-l{from{transform:translateX(-100vw)}}
+/* tab: weiches Überblenden, neuer Inhalt hebt sich minimal */
+html[data-vt=tab]::view-transition-old(main){animation:vt-fade-out .16s ease-out both}
+html[data-vt=tab]::view-transition-new(main){animation:vt-rise .34s var(--out) both}
+@keyframes vt-fade-out{to{opacity:0}}
+@keyframes vt-rise{from{opacity:0;transform:translateY(8px)}}
+/* next/prev: anderer Tag oder andere Woche – seitlich gleiten */
+html[data-vt=next]::view-transition-old(main){animation:vt-side-out-l .28s var(--out) both}
+html[data-vt=next]::view-transition-new(main){animation:vt-side-in-r .4s var(--ios) both}
+html[data-vt=prev]::view-transition-old(main){animation:vt-side-out-r .28s var(--out) both}
+html[data-vt=prev]::view-transition-new(main){animation:vt-side-in-l .4s var(--ios) both}
+@keyframes vt-side-out-l{to{opacity:0;transform:translateX(-40px)}}
+@keyframes vt-side-in-r{from{opacity:0;transform:translateX(40px)}}
+@keyframes vt-side-out-r{to{opacity:0;transform:translateX(40px)}}
+@keyframes vt-side-in-l{from{opacity:0;transform:translateX(-40px)}}
+/* fade: Inhalt einer Seite wechselt (Coach-Tabs, Profil, Vorschläge) */
+html[data-vt=fade]::view-transition-old(main){animation:vt-fade-out .18s ease-out both}
+html[data-vt=fade]::view-transition-new(main){animation:vt-rise .3s var(--out) both}
+/* Desktop: Seiten schieben wirkt auf breiten Bildschirmen unruhig – dort kurz und dezent */
+@media (min-width:900px){
+  html[data-vt=push]::view-transition-new(main),html[data-vt=back]::view-transition-new(main){animation:vt-rise .34s var(--out) both}
+  html[data-vt=push]::view-transition-old(main),html[data-vt=back]::view-transition-old(main){animation:vt-fade-out .16s ease-out both}
+}
+
+/* Menü: Schublade gleitet mit iOS-Kurve, Einträge folgen gestaffelt; Schliessen kürzer */
+.scrim{transition:opacity .3s var(--in),visibility 0s .3s}
+.scrim.open{transition:opacity .45s var(--out)}
+.drawer{transition:transform .3s var(--in),visibility 0s .3s}
+.drawer.open{transition:transform .5s var(--ios)}
+.drawer.open .drawer-h,.drawer.open .cap,.drawer.open .mi,.drawer.open #acct{animation:menu-in .55s var(--ios) backwards;animation-delay:calc(60ms + var(--i,0) * 28ms)}
+@keyframes menu-in{from{opacity:0;transform:translateX(28px)}}
+
+/* Meldung: federt herein, gleitet weich wieder hinaus */
+#toast.out{animation:toast-out .24s var(--in) forwards}
+@keyframes toast-out{to{opacity:0;transform:translate(-50%,10px) scale(.97)}}
+
+/* Übung abhaken: runder Haken wie in „Erinnerungen“ – füllt sich, Häkchen springt hinein */
+.ex-h input{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.32);background:transparent;
+  display:grid;place-items:center;cursor:pointer;transition:background-color .28s var(--out),border-color .28s var(--out),transform .35s var(--ios)}
+.ex-h input::after{content:"";width:6px;height:11px;border:solid #07130b;border-width:0 2.5px 2.5px 0;transform:translateY(-1px) rotate(45deg) scale(0);transition:transform .4s var(--ios)}
+.ex-h input:checked{background:var(--ok);border-color:var(--ok)}
+.ex-h input:checked::after{transform:translateY(-1px) rotate(45deg) scale(1)}
+.ex-h input:active{transform:scale(.86)}
+.ex-h span{transition:color .3s var(--out)}
+.ex.is-done .ex-h span{text-decoration-color:rgba(255,255,255,.35)}
+.prog i{transition:width .55s var(--ios),background-color .3s}
+
+/* Auswahl (Segmente, RPE, Chips): kurzes Federn beim Antippen – per JS nach dem Neuaufbau ausgelöst */
+.pop{animation:pop .38s var(--ios)}
+@keyframes pop{0%{transform:scale(.9)}55%{transform:scale(1.04)}100%{transform:scale(1)}}
+
+@media (prefers-reduced-motion:reduce){
+  .drawer,.drawer.open,.scrim,.scrim.open,.ex-h input,.ex-h input::after,.prog i{transition:none}
+  .drawer.open .drawer-h,.drawer.open .cap,.drawer.open .mi,.drawer.open #acct,#toast.out,.pop{animation:none}
+}
 
 /* ---------- Responsive ----------
    < 480     Handy: eine Spalte, RPE in zwei Reihen
@@ -2119,22 +2207,78 @@ function render(){
   const mv=view==="week"?"today":view==="import"?"plan":view;
   document.querySelectorAll("#sheet .mi[data-v]").forEach(b=>{ const on=b.dataset.v===mv; b.classList.toggle("on",on); if(on) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
 }
-function go(v){
+/* ---------- Motion im Stil von iOS ----------
+   transition(): Seitenwechsel als View Transition (Browser animiert ein Standbild auf der Grafikkarte).
+   Arten: push / back (Navigation tiefer bzw. zurück), tab, next / prev (Tag/Woche), fade (Inhalt einer Seite).
+   grow()/shrink(): Auf- und Zuklappen mit weicher Höhe – Inhalt darunter rutscht mit.
+   Ohne View-Transition-Support oder bei „Bewegung reduzieren“: sofortiger Wechsel. */
+const IOS="cubic-bezier(.32,.72,0,1)", EASE_IN="cubic-bezier(.4,0,1,1)";
+const calm=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+function transition(type,update){
+  if(calm()||!document.startViewTransition){ update(); return; }
+  const html=document.documentElement, y0=scrollY;
+  html.dataset.vt=type;
+  const t=document.startViewTransition(()=>{ update(); html.style.setProperty("--vt-s",(scrollY-y0)+"px"); });
+  t.finished.finally(()=>{ if(html.dataset.vt===type) delete html.dataset.vt; html.style.removeProperty("--vt-s"); });
+}
+/* Höhe animieren (inkl. Innenabstand), danach Inline-Stile wieder entfernen */
+function heightAnim(el,from,to,opts){
+  // Innen- und Aussenabstand laufen mit, sonst ruckt es am Ende um den Abstand nach
+  const cs=getComputedStyle(el), pt=cs.paddingTop, pb=cs.paddingBottom, mb=cs.marginBottom;
+  const st=(hh,closed)=>({height:hh+"px",paddingTop:closed?"0px":pt,paddingBottom:closed?"0px":pb,marginBottom:closed?"0px":mb,opacity:closed?0:1});
+  const kf=[st(from,from===0),st(to,to===0)];
+  el.style.overflow="hidden";
+  const a=el.animate(kf,opts);
+  a.finished.then(()=>{ el.style.overflow=""; },()=>{ el.style.overflow=""; });
+  return a;
+}
+/* Aufklappen: Inhalt wächst aus der Zeile, rutscht dabei ein paar Pixel nach unten ins Bild */
+function grow(el,from=0){
+  if(!el||calm()) return;
+  const h=el.getBoundingClientRect().height; if(!h) return;
+  heightAnim(el,from,h,{duration:Math.min(560,320+h*.25),easing:IOS});
+  for(const c of el.children) c.animate(from?[{opacity:0},{opacity:1}]:[{transform:"translateY(-10px)"},{transform:"none"}],{duration:from?380:480,delay:from?90:0,easing:IOS,fill:"backwards"});
+}
+/* Zuklappen: erst schrumpfen, dann neu aufbauen (done) */
+function shrink(el,done){
+  if(!el||calm()){ done(); return; }
+  const h=el.getBoundingClientRect().height;
+  heightAnim(el,h,0,{duration:Math.min(340,200+h*.12),easing:EASE_IN,fill:"forwards"}).finished.then(done,done);
+}
+/* Kurzes Federn des gewählten Knopfs nach dem Neuaufbau */
+function pop(sel){ if(calm()) return; const el=document.querySelector(sel); if(el){ el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); } }
+/* <details> (Muskelkater, Tabellen): weich auf- und zuklappen statt springen */
+document.addEventListener("click",e=>{
+  const s=e.target.closest&&e.target.closest("summary"); if(!s||calm()) return;
+  const det=s.parentElement; if(!det||det.tagName!=="DETAILS"||det.dataset.anim) return;
+  e.preventDefault(); det.dataset.anim="1";
+  const from=det.getBoundingClientRect().height, end=()=>{ delete det.dataset.anim; };
+  if(det.open){
+    const to=s.getBoundingClientRect().height+(parseFloat(getComputedStyle(det).borderTopWidth)||0)*2;
+    det.style.overflow="hidden";
+    det.animate([{height:from+"px"},{height:to+"px"}],{duration:300,easing:EASE_IN}).finished.then(()=>{ det.open=false; det.style.overflow=""; end(); },end);
+  } else {
+    det.open=true; const to=det.getBoundingClientRect().height; det.style.overflow="hidden";
+    det.animate([{height:from+"px"},{height:to+"px"}],{duration:Math.min(560,320+(to-from)*.2),easing:IOS}).finished.then(()=>{ det.style.overflow=""; end(); },end);
+    [...det.children].filter(c=>c!==s).forEach(c=>c.animate([{opacity:0,transform:"translateY(-8px)"},{opacity:1,transform:"none"}],{duration:420,easing:IOS}));
+  }
+},true);
+
+const TABS=["today","week","dashboard"];
+/* how: "back" für Zurück, sonst automatisch – Tab ↔ Tab überblenden, tiefer in die App = push */
+function go(v,how){
   if(["today","week","plan"].includes(view)) prevView=view;
   if(v==="inj" && view!=="move") injStart=null;
   // Verletzt/krank ist ein Tab im Coach, Tests & Benchmarks stehen im Profil
   if(v==="inj"){ coachTab="inj"; v="coach"; }
   if(v==="move"){ coachTab="move"; v="coach"; }
-  if(v==="tests"){ profWho="me"; view="profile"; menu(false); render(); loadPartner(); return $("#tests").scrollIntoView(); }
+  if(v==="tests"){ profWho="me"; return transition(how||"push",()=>{ view="profile"; menu(false); render(); loadPartner(); const t=$("#tests"); if(t) t.scrollIntoView(); }); }
   if(v==="profile"){ profWho="me"; loadPartner(); }
   if(v==="import" && imp.step!=="preview") imp={step:"pick"};
-  const changed=v!==view;
-  view=v; ciOpen=false; if(v==="today") sel=null; menu(false);
-  // Erst die Tab-Markierung losgleiten lassen, dann im nächsten Frame die Seite aufbauen –
-  // so startet die Bewegung sofort und ruckelt nicht, während das neue HTML entsteht.
-  // Wie bei iOS: der Inhalt wechselt sofort (keine Einblendung – die würde die ganze Seite neu zeichnen und ruckeln)
-  if(changed){ markNav(); requestAnimationFrame(()=>{ render(); window.scrollTo(0,0); }); }
-  else { render(); window.scrollTo(0,0); }
+  const changed=v!==view, kind=how||(TABS.includes(v)?"tab":"push");
+  const apply=()=>{ view=v; ciOpen=false; if(v==="today") sel=null; menu(false); render(); window.scrollTo(0,0); };
+  // Die Tab-Markierung gleitet im neuen Zustand (live) zum Ziel, während der Inhalt wechselt
+  if(changed) transition(kind,apply); else apply();
 }
 /* Aktiven Tab markieren; die Glas-Markierung gleitet per transform an seine Stelle */
 function markNav(){
@@ -2149,7 +2293,13 @@ function menu(open){
 }
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") menu(false); });
 /* warn: gelb hinterlegt und länger sichtbar */
-function toast(m,warn){ const t=$("#toast"); t.textContent=m; t.classList.toggle("warn",!!warn); t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(()=>t.hidden=true,warn?4200:2600); }
+function toast(m,warn){ const t=$("#toast"); clearTimeout(toast.h); clearTimeout(toast.o); t.classList.remove("out");
+  t.textContent=m; t.classList.toggle("warn",!!warn); t.hidden=false;
+  toast.h=setTimeout(()=>{ if(calm()){ t.hidden=true; return; } t.classList.add("out"); toast.o=setTimeout(()=>{ t.hidden=true; t.classList.remove("out"); },240); },warn?4200:2600); }
+/* Check-in fertig: auf der Startseite schrumpft die Karte weg, im Dashboard blendet die Empfehlung ein */
+function leaveCheckin(t){ const card=t.closest(".card"); if(view==="today"&&card) shrink(card,render); else transition("fade",render); }
+/* Menü-Einträge gestaffelt einfliegen lassen (Reihenfolge als --i) */
+document.querySelectorAll("#sheet .drawer-h, #sheet .cap, #sheet .mi, #acct").forEach((el,k)=>el.style.setProperty("--i",k));
 const layout=()=>WIDE()?2:MID()?1:0;
 let wasWide=layout();
 addEventListener("resize",()=>{ const w=layout(); if(w!==wasWide){ wasWide=w; if(!document.activeElement||!/INPUT|TEXTAREA/.test(document.activeElement.tagName)) render(); } });
@@ -2165,7 +2315,7 @@ document.addEventListener("click",e=>{
     t.setAttribute("aria-pressed",show); t.setAttribute("aria-label",show?"Passwort verbergen":"Passwort anzeigen");
     i.focus(); const n=i.value.length; try{ i.setSelectionRange(n,n); }catch(_){} return; }
   if(d.v){ if(d.v==="coach" && t.closest("#sheet")) coachTab="chat"; return go(d.v); }
-  if(d.back!==undefined) return go(view==="edit"&&editBack?editBack:prevView);
+  if(d.back!==undefined) return go(view==="edit"&&editBack?editBack:prevView,"back");
   if(d.move!==undefined){ moveFrom=+d.move; return go("move"); }
   if(d.edit!==undefined){ editFrom=+d.edit; editBack=view==="coach"?"coach":null; return go("edit"); }
   if(d.act==="mv-day"){ moveFrom=Math.max(0,Math.min(LAST,moveFrom+ +d.d)); return render(); }
@@ -2174,8 +2324,8 @@ document.addEventListener("click",e=>{
   if(d.act==="strava-no"){ S.dismiss["stv:"+d.i]=1; save(); return render(); }
   if(d.act==="solo"){ const dk=keyI(+d.i); if(S.solo[dk]) delete S.solo[dk]; else S.solo[dk]=1; save();
     toast(S.solo[dk]?"Solo: Einheit für allein angepasst":`Wieder mit ${PARTNER}`); return render(); }
-  if(d.act==="x-open"){ xOpen=+d.i; render(); const m=$("#x-min"); if(m) m.focus(); return; }
-  if(d.act==="x-cancel"){ xOpen=null; return render(); }
+  if(d.act==="x-open"){ xOpen=+d.i; render(); grow($(".xform")); const m=$("#x-min"); if(m) m.focus({preventScroll:true}); return; }
+  if(d.act==="x-cancel"){ return shrink($(".xform"),()=>{ xOpen=null; render(); }); }
   if(d.act==="x-type"){ t.parentNode.querySelectorAll("button").forEach(b=>{ b.classList.toggle("on",b===t); b.setAttribute("aria-pressed",b===t); }); return; }
   if(d.act==="x-add"){ const i=+d.i, f=t.closest(".xform"), on=f.querySelector("[data-xt].on");
     const e=makeExtra({type:on&&on.dataset.xt,min:f.querySelector("#x-min").value,note:f.querySelector("#x-note").value});
@@ -2186,30 +2336,31 @@ document.addEventListener("click",e=>{
   if(d.act==="ci-ok"){ const c=S.checkin[d.k]=S.checkin[d.k]||{};
     // Gemeldeter Muskelkater bleibt massgebend, der Rest wird grün
     const sl=sore.checkinLevel(soreAt(soreToday())); for(const [f] of CHECKIN_FIELDS) c[f]=f==="sore"&&sl?sl:"g";
-    ciOpen=false; save(); toast(sl&&sl!=="g"?"Check-in gespeichert – Muskelkater aus deinen Meldungen":"Check-in: keine Beschwerden"); return render(); }
+    ciOpen=false; save(); toast(sl&&sl!=="g"?"Check-in gespeichert – Muskelkater aus deinen Meldungen":"Check-in: keine Beschwerden"); return leaveCheckin(t); }
   if(d.act==="all-done"){ const i=+d.i, p=dayPlan(i), dk=keyI(i); if(!p) return; ciOpen=false;
     p.i.forEach((_,j)=>{ const id=dk+"|"+j; S.done[id]=1;
       // Vorbelegtes Standardgewicht wie beim einzelnen Abhaken übernehmen
       const pv=document.querySelector(`[data-v2="${id}"].pre`); if(pv&&!S.val[id]) S.val[id]=pv.value; });
     save(); workoutFeedback(i,null,true); return closeCard(i); }
   if(d.act==="dash-chip"){ if(d.g==="lift") dashLift=d.k; else if(d.g==="well") dashWell=d.k;
-    render(); animateChart(document.querySelector("#dc-"+d.g)); return; }
-  if(d.act==="done-open"){ doneOpen.add(+d.i); return render(); }
+    render(); animateChart(document.querySelector("#dc-"+d.g)); return pop(`#dc-${d.g} .lchips .on`); }
+  if(d.act==="done-open"){ const i=+d.i, bar=t.closest(".done-bar"), h0=bar?bar.getBoundingClientRect().height:60;
+    doneOpen.add(i); render(); return grow(document.querySelector(`.card.hero[data-day="${i}"]`),h0); }
   if(d.act==="done-close"){ return closeCard(+d.i); }
   if(d.last){ const el=document.querySelector(`[data-v2="${d.last}"]`); S.val[d.last]=d.lv; save();
     if(el){ el.value=d.lv; el.classList.remove("pre"); el.focus(); } return toast(`Übernommen: ${d.lv}`); }
   if(d.act==="sore-clear"){ delete S.sore[soreToday()]; soreSave(); toast("Muskelkater zurückgesetzt"); return render(); }
   if(d.ci){ const [k,f,v]=d.ci.split("|"); const c=S.checkin[k]=S.checkin[k]||{}; if(c[f]===v) delete c[f]; else c[f]=v;
-    ciOpen=true; save(); return render(); }
-  if(d.act==="ci-edit"){ ciOpen=true; return render(); }
-  if(d.act==="ci-done"){ ciOpen=false; return render(); }
-  if(d.sug){ const s=SUGS.find(x=>x.id===d.sug); if(!s) return; applySug(s); save(); toast(s.type==="swap"?`${dayPlan(s.to).t} → ${shortDay(s.to)}`:"Plan angepasst"); return render(); }
-  if(d.sugNo){ S.dismiss[d.sugNo]=1; save(); return render(); }
+    ciOpen=true; save(); render(); return pop(`[data-ci="${d.ci}"]`); }
+  if(d.act==="ci-edit"){ return transition("fade",()=>{ ciOpen=true; render(); }); }
+  if(d.act==="ci-done"){ ciOpen=false; return leaveCheckin(t); }
+  if(d.sug){ const s=SUGS.find(x=>x.id===d.sug); if(!s) return; applySug(s); save(); toast(s.type==="swap"?`${dayPlan(s.to).t} → ${shortDay(s.to)}`:"Plan angepasst"); return transition("fade",render); }
+  if(d.sugNo){ S.dismiss[d.sugNo]=1; save(); return transition("fade",render); }
   if(d.act==="edit-save"){ const lines=$("#ed-i").value.split("\n").map(s=>s.trim()).filter(Boolean);
     if(!lines.length) return toast("Mindestens eine Übung eintragen");
     const src=srcOf(editFrom), k=S.edit[src]&&S.edit[src].k; // vom Coach gesetzte Disziplin behalten
-    S.edit[src]={t:$("#ed-t").value.trim(),i:lines,n:$("#ed-n").value.trim(),...(k?{k}:{})}; save(); toast("Einheit angepasst"); return go(editBack||prevView); }
-  if(d.act==="edit-reset"){ delete S.edit[srcOf(editFrom)]; save(); toast("Original wiederhergestellt"); return go(editBack||prevView); }
+    S.edit[src]={t:$("#ed-t").value.trim(),i:lines,n:$("#ed-n").value.trim(),...(k?{k}:{})}; save(); toast("Einheit angepasst"); return go(editBack||prevView,"back"); }
+  if(d.act==="edit-reset"){ delete S.edit[srcOf(editFrom)]; save(); toast("Original wiederhergestellt"); return go(editBack||prevView,"back"); }
   if(d.who){ const el=$("#le"); if(el) loginEmail=el.value.trim(); loginWho=d.who; return render(); }
   if(d.act==="logout"){ menu(false);
     if(!sb){ lsDel("hx:mock"); setNames("Jaime"); toast("Abgemeldet"); return render(); }
@@ -2236,8 +2387,8 @@ document.addEventListener("click",e=>{
     toast(S.skip[k]?`Training vom ${shortDay(moveFrom)} als ausgefallen markiert – wähle unten einen neuen Tag`:"Ausgefallen-Markierung entfernt"); return render(); }
   if(d.act==="restore"){ restoreDay(moveFrom); save(); toast("Original wiederhergestellt"); return render(); }
   if(d.act==="inj-from"){ injStart=Math.max(0,moveFrom); return go("inj"); }
-  if(d.act==="inj-apply"){ applyInjury(injStart,injDays,injMode); save(); toast("Plan angepasst. Gute Besserung!"); return go(prevView); }
-  if(d.act==="inj-end"){ endInjury(); save(); toast("Willkommen zurück – 3 Comeback-Einheiten geplant"); return go(prevView); }
+  if(d.act==="inj-apply"){ applyInjury(injStart,injDays,injMode); save(); toast("Plan angepasst. Gute Besserung!"); return go(prevView,"back"); }
+  if(d.act==="inj-end"){ endInjury(); save(); toast("Willkommen zurück – 3 Comeback-Einheiten geplant"); return go(prevView,"back"); }
   if(d.impAll!==undefined){ imp.all=d.impAll==="1"; return render(); }
   if(d.act==="imp-apply"){ const {plan,changed}=mergeImport(PLAN(),imp.parsed,{from:imp.all?0:Math.max(0,TODAY),name:imp.name});
     S.plan=plan; imp={step:"pick"}; wk=CURW; openDay=null; save(); toast(`Plan übernommen – ${changed.length} Tage aktualisiert`); return go("week"); }
@@ -2277,13 +2428,28 @@ document.addEventListener("click",e=>{
   if(d.act==="st-off"){ if(!confirm("Strava trennen? Bereits geladene Aktivitäten bleiben.")) return; lsDel(stKey()); stMsg=""; return render(); }
   if(d.act==="st-clear"){ if(!confirm("Alle Strava- und Garmin-Aktivitäten aus der App löschen? Beim nächsten Synchronisieren werden sie neu geladen.")) return; S.strava={acts:{},at:0}; save(); return render(); }
   if(d.act==="shared-close"){ SHARED=null; history.replaceState(null,"",location.pathname+location.search); return go("today"); }
-  if(d.wk){ wk=Math.max(0,Math.min(NWEEKS-1,wk+ +d.wk)); openDay=null; return render(); }
-  if(d.pb){ planBlk=planBlk===d.pb?null:d.pb; planDay=null; render(); const el=document.querySelector(`[data-pb="${CSS.escape(d.pb)}"]`); return el&&el.scrollIntoView({block:"nearest"}); }
-  if(d.pd!==undefined){ const i=+d.pd; planDay=planDay===i?null:i; return render(); }
+  if(d.wk){ const n=Math.max(0,Math.min(NWEEKS-1,wk+ +d.wk)); if(n===wk) return;
+    return transition(n>wk?"next":"prev",()=>{ wk=n; openDay=null; render(); }); }
+  if(d.pb){ const id=d.pb, body=document.querySelector("#main .blk-body");
+    if(planBlk===id) return shrink(body,()=>{ planBlk=null; planDay=null; render(); });
+    const open=()=>{ planBlk=id; planDay=null; render(); grow(document.querySelector("#main .blk-body"));
+      const el=document.querySelector(`[data-pb="${CSS.escape(id)}"]`); if(el) el.scrollIntoView({block:"nearest",behavior:calm()?"auto":"smooth"}); };
+    return body?shrink(body,open):open(); }
+  if(d.pd!==undefined){ const i=+d.pd, body=document.querySelector("#main .pday-body");
+    if(planDay===i) return shrink(body,()=>{ planDay=null; render(); });
+    const open=()=>{ planDay=i; render(); grow(document.querySelector("#main .pday-body")); };
+    return body?shrink(body,open):open(); }
   if(d.pgo!==undefined){ const i=+d.pgo; wk=Math.floor(i/7); openDay=i; return go("week"); }
-  if(d.open!==undefined){ const i=+d.open; openDay=openDay===i&&!WIDE()?null:i; return render(); }
-  if(d.sel!==undefined){ sel=+d.sel===TODAY?null:+d.sel; render(); return window.scrollTo(0,0); }
-  if(d.r){ const [k,r]=d.r.split("|"), set=S.rpe[k]!=r; if(set) S.rpe[k]=+r; else delete S.rpe[k]; ciOpen=false; save(); render();
+  if(d.open!==undefined){ const i=+d.open;
+    // Breit: Tag steht rechts daneben → überblenden. Schmal: unter der Zeile aufklappen
+    if(WIDE()){ if(openDay===i) return; return transition("fade",()=>{ openDay=i; render(); }); }
+    const body=document.querySelector("#main .day-body");
+    if(openDay===i) return shrink(body,()=>{ openDay=null; render(); });
+    const open=()=>{ openDay=i; render(); grow(document.querySelector("#main .day-body")); };
+    return body?shrink(body,open):open(); }
+  if(d.sel!==undefined){ const n=+d.sel, cur=sel!=null?sel:Math.max(0,Math.min(LAST,TODAY)); if(n===cur) return;
+    return transition(n>cur?"next":"prev",()=>{ sel=n===TODAY?null:n; render(); window.scrollTo(0,0); }); }
+  if(d.r){ const [k,r]=d.r.split("|"), set=S.rpe[k]!=r; if(set) S.rpe[k]=+r; else delete S.rpe[k]; ciOpen=false; save(); render(); pop(`[data-r="${d.r}"]`);
     // Nach der RPE-Wahl direkt weiter zur Notiz
     const n=set&&document.querySelector(`[data-n="${k}"]`); if(n){ n.focus({preventScroll:true}); n.scrollIntoView({block:"center",behavior:"smooth"}); } return; }
   if(d.act==="menu") return menu(true);
@@ -2301,8 +2467,8 @@ document.addEventListener("click",e=>{
     const {valid}=coachCheck(m.actions); if(!valid.length) return toast("Keine Vorschläge mehr anwendbar");
     applyCoach(valid); m.state="applied"; save(); toast(`Plan angepasst (${valid.length} ${valid.length===1?"Änderung":"Änderungen"})`); return render(); }
   if(d.act==="cc-dismiss"){ const m=S.chat[+d.k]; if(m){ m.state="dismissed"; save(); } return render(); }
-  if(d.act==="prof-who"){ profWho=d.whoP; if(profWho==="partner") loadPartner(); return render(); }
-  if(d.act==="cc-tab"){ if(d.tab==="sore"&&coachTab!=="sore") soreInitOpen(); coachTab=d.tab; return render(); }
+  if(d.act==="prof-who"){ if(profWho===d.whoP) return; return transition("fade",()=>{ profWho=d.whoP; if(profWho==="partner") loadPartner(); render(); }); }
+  if(d.act==="cc-tab"){ if(coachTab===d.tab) return; return transition("fade",()=>{ if(d.tab==="sore"&&coachTab!=="sore") soreInitOpen(); coachTab=d.tab; render(); }); }
   if(d.act==="cc-clear"){ if(!confirm("Chatverlauf löschen? Der Plan bleibt unverändert.")) return; S.chat=[]; ccErr=""; save(); return render(); }
   if(d.act==="cc-copy"){ try{ copyCoach(coach.buildCoachRequest({context:coachCtx(),chat:S.chat,message:$("#cc-in").value})); }catch(e){ toast(e.message); } return; }
 });

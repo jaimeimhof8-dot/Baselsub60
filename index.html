@@ -253,10 +253,10 @@ input:focus,textarea:focus,button:focus-visible,.file:focus-within{outline:2px s
 /* Tabs */
 /* Tab-Leiste: schwebende Glas-Pille. Die helle Markierung (.tab-ind) gleitet per transform zum aktiven Tab –
    ein einziges Element auf der Grafikkarte, deshalb flüssig, auch während die Seite neu aufgebaut wird. */
-.tabs{position:fixed;left:var(--s3);right:var(--s3);bottom:calc(var(--s2) + env(safe-area-inset-bottom));z-index:6;display:grid;grid-template-columns:repeat(4,1fr);padding:4px;
+.tabs{position:fixed;left:var(--s3);right:var(--s3);bottom:calc(var(--s2) + env(safe-area-inset-bottom));z-index:6;display:grid;grid-template-columns:repeat(3,1fr);padding:4px;
   background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
   border:1px solid rgba(255,255,255,.12);border-radius:30px;box-shadow:var(--edge),0 10px 30px rgba(0,0,0,.35)}
-.tab-ind{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px) / 4);border-radius:26px;pointer-events:none;
+.tab-ind{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px) / 3);border-radius:26px;pointer-events:none;
   background:rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.16);transform:translateX(calc(var(--ti,0) * 100%));
   transition:transform .42s cubic-bezier(.3,.8,.25,1);will-change:transform}
 .tabs.no-ind .tab-ind{opacity:0}
@@ -596,20 +596,19 @@ input.ro{background:transparent;border-style:dashed;color:var(--muted);cursor:no
   <span class="tab-ind" aria-hidden="true"></span>
   <button data-v="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>Heute</button>
   <button data-v="week"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Woche</button>
-  <button data-v="plan"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Plan</button>
-  <button data-v="dashboard"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Dashboard</button>
+ <button data-v="dashboard"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Dashboard</button>
 </nav>
 <div class="scrim" id="scrim" data-act="close"></div>
 <div class="drawer" id="sheet" role="dialog" aria-label="Menü" aria-hidden="true">
   <div class="drawer-h"><h2>Menü</h2><button class="menu-btn" data-act="close" aria-label="Menü schliessen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg></button></div>
   <div class="cap">App</div>
-  <button class="mi" data-v="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg><span><b>Trainingsplan</b><span class="sub">Heute, Woche und Gesamtplan</span></span></button>
+  <button class="mi" data-v="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg><span><b>Trainingsplan</b><span class="sub">Heute und Woche</span></span></button>
   <button class="mi" data-v="dashboard"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span><b>Dashboard</b><span class="sub">Alle Daten auf einen Blick</span></span></button>
   <button class="mi" data-v="coach"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg><span><b>Coach &amp; Verletzt / krank</b><span class="sub">Chatten oder Trainings für mehrere Tage anpassen</span></span></button>
   <button class="mi" data-v="backup"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span><b>Backup</b><span class="sub">Daten als Datei sichern oder einspielen</span></span></button>
   <div class="cap">Training</div>
   <button class="mi" data-v="strava"><svg viewBox="0 0 24 24"><path d="M10 3l-6 12h4l2-4 2 4h4zM14 15l2 4 2-4"/></svg><span><b>Strava / Garmin</b><span class="sub">Aktivitäten und Erholung mit dem Plan abgleichen</span></span></button>
-  <button class="mi" data-v="import"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 18v-6M9 15l3-3 3 3"/></svg><span><b>Plan importieren</b><span class="sub">Neues PDF vom Coach einlesen</span></span></button>
+  <button class="mi" data-v="plan"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg><span><b>Plan</b><span class="sub">Gesamtplan bis Basel, neues PDF importieren</span></span></button>
   <div class="cap">Konto</div>
   <div id="acct"></div>
 </div>
@@ -2116,8 +2115,8 @@ function render(){
   $("#acct").innerHTML=acctHtml(true);
   hideSplash();
   const al=$("#acct .acct-link"); if(al){ al.classList.toggle("on",view==="profile"); if(view==="profile") al.setAttribute("aria-current","page"); }
-  // Aktive Seite im Burger-Menü markieren (Trainingsplan = Heute/Woche/Plan)
-  const mv=["week","plan"].includes(view)?"today":view;
+  // Aktive Seite im Burger-Menü markieren (Trainingsplan = Heute/Woche, Plan = Gesamtplan und Import)
+  const mv=view==="week"?"today":view==="import"?"plan":view;
   document.querySelectorAll("#sheet .mi[data-v]").forEach(b=>{ const on=b.dataset.v===mv; b.classList.toggle("on",on); if(on) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
 }
 function go(v){

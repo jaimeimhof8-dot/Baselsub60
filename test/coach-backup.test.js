@@ -110,3 +110,15 @@ test("Backup: altes Text-Backup wird gelesen, Fremdes abgelehnt", () => {
     assert.throws(() => readBackup(bad), { code: "invalid" });
   assert.throws(() => readBackup(JSON.stringify({ app: "basel-sub60", version: 99, data: { done: {} } })), { code: "newer" });
 });
+
+test("Erklär-Anfrage: enthält die Einheit und setzt mode", async () => {
+  const { explainMessage } = await import("../src/coach.js");
+  const m = explainMessage(3, { t: "Kraft 1", i: ["Squat 5x5", "Zug"], n: "locker" });
+  assert.match(m, /Kraft 1/);
+  assert.match(m, /– Squat 5x5/);
+  assert.match(m, /Hinweis im Plan: locker/);
+  assert.ok(m.length <= 2000);
+  assert.equal(buildCoachRequest({ context: {}, chat: [], message: "Was ist Zone 2?", mode: "explain" }).mode, "explain");
+  assert.equal(buildCoachRequest({ context: {}, chat: [], message: "x" }).mode, undefined);
+  assert.ok(explainMessage(0, { t: "A", i: Array(500).fill("sehr lange Übung ".repeat(5)) }).length <= 2000);
+});

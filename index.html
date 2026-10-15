@@ -3614,13 +3614,42 @@
       const HARD = ["kraft", "lauf", "station", "sim"];
       const isHardP = (p) => !!p && HARD.includes(p.k);
 
-      /* ---------- Plan ---------- */
+      /* ---------- Gemeinsame Planänderungen (Tabelle shared_edits, siehe supabase/shared_edits.sql) ---------- */
+      let TEAM_EDITS = {}; // {tagIndex: {data: {t,k,i,n}, by, at}}
+      try {
+        TEAM_EDITS = JSON.parse(lsGet("hx:team-edits") || "{}") || {};
+      } catch (_) {}
+      /* Holt die Änderungen des Teams. Gibt true zurück, wenn sich etwas geändert hat. Offline bleibt der letzte Stand. */
+      async function loadTeamEdits() {
+        if (!sb || !USER) return false;
+        const { data, error } = await sb
+          .from("shared_edits")
+          .select("day,data,updated_by,updated_at");
+        if (error || !Array.isArray(data)) return false;
+        const next = {};
+        for (const r of data) next[r.day] = { data: r.data, by: r.updated_by, at: r.updated_at };
+        if (stable(next) === stable(TEAM_EDITS)) return false;
+        TEAM_EDITS = next;
+        lsSet("hx:team-edits", JSON.stringify(next));
+        return true;
+      }
       const PLAN = () => activePlan(S.plan);
       const weekInfo = (w) => planWeekInfo(PLAN(), w);
       const blockLabel = (b) => (b === "T" ? "Taper" : "Block " + b);
       /* Originalplan eines Tages (ohne Umplanungen) */
       function basePlan(i) {
-        return i < 0 || i > LAST ? null : PLAN().days[i] || null;
+        if (i < 0 || i > LAST) return null;
+        const b = PLAN().days[i] || null,
+          sh = TEAM_EDITS[i];
+        if (!sh || !b || b.race) return b;
+        // Gemeinsame Änderung (alle Mitglieder): ersetzt die Einheit, persönliche Änderungen (S.edit) liegen darüber
+        return Object.assign({}, b, {
+          t: sh.data.t,
+          k: sh.data.k,
+          i: sh.data.i,
+          n: sh.data.n || "",
+          shared: { by: sh.by, at: sh.at },
+        });
       }
 
       /* ---------- Umplanen ----------
@@ -3961,6 +3990,8 @@
     <h1>${esc(p.t)}</h1>${badges ? `<div class="badges">${badges}</div>` : ""}</div>`;
         if (p.moved != null)
           h += `<div class="sub mt-2">Ursprünglich ${shortDay(p.moved)}</div>`;
+        if (p.shared && !p.edited)
+          h += `<div class="sub mt-2">Gemeinsam angepasst von ${esc(p.shared.by)}</div>`;
         if (S.skip[dk])
           h += `<div class="target bad">Als <b>ausgefallen</b> markiert. Tipp: auf einen freien Tag verschieben.</div>`;
         // Umplanen und Übungen anpassen liegen zentral im Coach (Reiter „Umplanen“), nicht mehr an jedem Tag
@@ -4045,6 +4076,8 @@
     <label class="lbl" for="n-${i}">Notiz</label><textarea id="n-${i}" data-n="${dk}" placeholder="Gefühl, Schlaf, Fuss, was auffiel …">${esc(S.notes[dk] || S.notes["n|" + dk] || "")}</textarea>`;
         const sl = sore.effective(S.sore, i),
           sn = Object.keys(sl).length;
+        if (coachReady())
+          h += `<button class="btn mt-3" data-act="explain" data-i="${i}">Erkläre mir das</button>`;
         h += `<button class="btn mt-3" data-act="sore-open">${sn ? `Muskelkater: ${sn} ${sn === 1 ? "Stelle" : "Stellen"}, max ${Math.max(...Object.values(sl))}/10 – ändern` : "Muskelkater eintragen"} →</button>`;
         if (p.test)
           h += `<div class="btns"><button class="btn" data-v="tests">Testergebnisse eintragen →</button></div>`;
@@ -4742,13 +4775,15 @@
         const i = editFrom,
           src = srcOf(i),
           p = ownPlan(src);
-        return `<div class="narrow">${vhead("Übungen anpassen", `${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))} · gilt nur für diese Einheit`, true)}
+        return `<div class="narrow">${vhead("Übungen anpassen", `${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))} · „Nur für mich“ oder „Für alle“`, true)}
     <div class="card k-${p.k}">
       <label class="lbl" for="ed-t">Titel</label><input type="text" id="ed-t" value="${esc(p.t)}">
       <label class="lbl" for="ed-i">Übungen – eine pro Zeile</label><textarea id="ed-i" rows="8" style="min-height:190px">${esc(p.i.join("\n"))}</textarea>
       <label class="lbl" for="ed-n">Hinweis</label><textarea id="ed-n">${esc(p.n)}</textarea>
-      <div class="btns"><button class="btn primary" data-act="edit-save">Speichern</button>
-      ${S.edit[src] ? `<button class="btn" data-act="edit-reset">Original wiederherstellen</button>` : ""}</div>
+      <div class="btns"><button class="btn primary" data-act="edit-save">Nur für mich speichern</button>
+      ${S.edit[src] ? `<button class="btn" data-act="edit-reset">Meine Änderung zurücksetzen</button>` : ""}</div>
+      ${sb && USER ? `<div class="cap">Für alle</div><p class="sub" style="margin:0 0 var(--s3)">${TEAM_EDITS[src] ? `Gemeinsam geändert von <b>${esc(TEAM_EDITS[src].by)}</b> am ${esc(fmt(new Date(TEAM_EDITS[src].at)))}. ` : ""}Eine gemeinsame Änderung gilt für alle Nutzer dieser Gruppe, auch für ihre Wochenübersicht. Abgehakte Übungen hängen an der Zeilennummer.</p>
+      <div class="btns"><button class="btn" data-act="edit-save-all">Für alle speichern</button>${TEAM_EDITS[src] ? `<button class="btn" data-act="edit-reset-all">Gemeinsame Änderung zurücksetzen</button>` : ""}</div>` : ""}
     </div>
     <p class="sub">Z. B. Back Squat durch Front Squat ersetzen oder Gewichte an deine Testwerte anpassen. Abgehakte Übungen hängen an der Zeilennummer.</p></div>`;
       }
@@ -5797,6 +5832,7 @@
       let ccBusy = false,
         ccErr = "",
         ccDraft = "",
+        ccExplain = false, // true: Coach erklärt nur (ausführlich, keine Planänderung)
         coachTab = "chat"; // coachTab: "chat" | "move" | "sore" | "inj"
       const coachReady = () => !!(sb && USER);
       function coachCtx() {
@@ -5870,7 +5906,8 @@
         if (ccBusy) h += `<div class="msg assistant">Coach denkt nach …</div>`;
         if (ccErr) h += `<div class="msg err">${esc(ccErr)}</div>`;
         h += `</div><form class="card chat-in" data-form="coach"><label class="lbl" for="cc-in" style="margin-top:0">Deine Nachricht</label>
-    <textarea id="cc-in" maxlength="${coach.MAX_MSG}" placeholder="Was soll angepasst werden?" ${ccBusy ? "disabled" : ""}>${esc(ccDraft)}</textarea>
+    <div class="chips" role="group" aria-label="Art der Anfrage" style="margin-bottom:var(--s3)"><button type="button" data-act="cc-mode" data-m="" class="${ccExplain ? "" : "on"}" aria-pressed="${!ccExplain}">Plan anpassen</button><button type="button" data-act="cc-mode" data-m="explain" class="${ccExplain ? "on" : ""}" aria-pressed="${ccExplain}">Erklären</button></div>
+    <textarea id="cc-in" maxlength="${coach.MAX_MSG}" placeholder="${ccExplain ? "Was soll ich dir erklären? z. B. „Was heisst Zone 2?“" : "Was soll angepasst werden?"}" ${ccBusy ? "disabled" : ""}>${esc(ccDraft)}</textarea>
     <div class="grid2 mt-3"><button type="submit" class="btn primary" ${ccBusy ? "disabled" : ""}>${coachReady() ? "Senden" : "Vorbereiten"}</button>
     ${coachReady() ? (S.chat.length ? `<button type="button" class="btn ghost" data-act="cc-clear">Verlauf löschen</button>` : "<span></span>") : `<button type="button" class="btn" data-act="cc-copy">Anfrage kopieren</button>`}</div></form>`;
         return h + `</div>`;
@@ -5903,6 +5940,7 @@
             context: coachCtx(),
             chat: S.chat,
             message: text,
+            mode: ccExplain ? "explain" : "",
           });
         } catch (e) {
           ccErr = e.message;
@@ -6189,10 +6227,11 @@
           setSync("offline");
           return false;
         }
+        const teamChanged = await loadTeamEdits();
         const remote = (data && data.data) || null,
           before = stable(S);
         if (remote) S = fill(mergeState(loadBase(), S, remote));
-        const changed = stable(S) !== before;
+        const changed = stable(S) !== before || teamChanged;
         if (changed) saveLocal();
         // Basis = genau der Stand, der in der Cloud liegt – Änderungen während des Hochladens gehören noch nicht dazu
         const snap = JSON.stringify(S);
@@ -6672,7 +6711,7 @@
         if (f.dataset.form === "forgot") {
           loginEmail = $("#le").value.trim().toLowerCase();
           loginOk = "";
-          if (!/^S+@S+.S+$/.test(loginEmail)) {
+          if (!/^\S+@\S+\.\S+$/.test(loginEmail)) {
             loginMsg = "Bitte eine gültige E-Mail eingeben.";
             render();
             return $("#le").focus();
@@ -7079,7 +7118,7 @@
 
       const CLICK =
         "[data-v],[data-last],[data-wk],[data-open],[data-sel],[data-r],[data-act],[data-back],[data-move],[data-swap],[data-injs],[data-injd],[data-injm],[data-edit],[data-ci],[data-sug],[data-sug-no],[data-who],[data-imp-all],[data-pb],[data-pd],[data-pgo]";
-      document.addEventListener("click", (e) => {
+      document.addEventListener("click", async (e) => {
         const t = e.target.closest(CLICK);
         if (!t) return;
         const d = t.dataset;
@@ -7322,6 +7361,40 @@
           };
           save();
           toast("Einheit angepasst");
+          return go(editBack || prevView, "back");
+        }
+        if (d.act === "edit-save-all" || d.act === "edit-reset-all") {
+          if (!sb || !USER) return toast("Dafür ist der Cloud-Login nötig", true);
+          const src = srcOf(editFrom);
+          let err;
+          if (d.act === "edit-reset-all") {
+            if (!confirm("Gemeinsame Änderung für ALLE zurücksetzen?")) return;
+            ({ error: err } = await sb.rpc("reset_shared_edit", { p_day: src }));
+          } else {
+            const lines = $("#ed-i")
+              .value.split("\n")
+              .map((x) => x.trim())
+              .filter(Boolean);
+            if (!lines.length) return toast("Mindestens eine Übung eintragen");
+            if (!$("#ed-t").value.trim()) return toast("Titel fehlt");
+            if (!confirm("Diese Änderung gilt für ALLE Nutzer der Gruppe. Speichern?")) return;
+            // Pläne sind aus Jaimes Sicht geschrieben: der Name des Partners wird dafür zurückgetauscht
+            const canon = (x) => (ME === "Jaime" ? x : String(x).split(PARTNER).join("Jimoh"));
+            ({ error: err } = await sb.rpc("set_shared_edit", {
+              p_day: src,
+              p_data: {
+                t: canon($("#ed-t").value.trim()),
+                k: ownPlan(src).k,
+                i: lines.map(canon),
+                n: canon($("#ed-n").value.trim()),
+              },
+            }));
+            if (!err) delete S.edit[src]; // sonst würde die eigene Änderung die gemeinsame überdecken
+          }
+          if (err) return toast("Speichern fehlgeschlagen. Bitte Verbindung prüfen.", true);
+          await loadTeamEdits();
+          save();
+          toast(d.act === "edit-reset-all" ? "Für alle zurückgesetzt" : "Für alle gespeichert");
           return go(editBack || prevView, "back");
         }
         if (d.act === "edit-reset") {
@@ -7765,6 +7838,23 @@
             coachTab = d.tab;
             render();
           });
+        }
+        if (d.act === "cc-mode") {
+          const ta = $("#cc-in");
+          if (ta) ccDraft = ta.value;
+          ccExplain = d.m === "explain";
+          return render();
+        }
+        if (d.act === "explain") {
+          const i = +d.i,
+            p = dayPlan(i);
+          if (!p) return;
+          if (!coachReady() || ccBusy)
+            return toast("Der Coach braucht den Cloud-Login", true);
+          ccExplain = true;
+          coachTab = "chat";
+          go("coach");
+          return sendCoach(coach.explainMessage(i, p));
         }
         if (d.act === "cc-clear") {
           if (!confirm("Chatverlauf löschen? Der Plan bleibt unverändert."))

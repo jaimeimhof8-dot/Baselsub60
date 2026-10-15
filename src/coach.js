@@ -92,11 +92,20 @@ export function coachErrorText(status, code) {
 }
 
 /** Request-Body für die Edge Function. Wirft bei leerer oder zu langer Nachricht. */
-export function buildCoachRequest({ context, chat, message }) {
+export function buildCoachRequest({ context, chat, message, mode }) {
   const text = String(message || "").trim();
   if (!text) throw Object.assign(new Error("Bitte beschreibe kurz, was nicht passt."), { code: "empty" });
   if (text.length > MAX_MSG) throw Object.assign(new Error(`Bitte höchstens ${MAX_MSG} Zeichen.`), { code: "too_long" });
-  return { context, history: toApiHistory(chat || []), message: text };
+  return { context, history: toApiHistory(chat || []), message: text, ...(mode === "explain" ? { mode: "explain" } : {}) };
+}
+
+/** Frage „Erkläre mir diese Einheit“: enthält die Einheit selbst, damit sie auch ausserhalb der Plan-Vorschau verständlich ist. */
+export function explainMessage(i, p) {
+  const items = (p.i || []).map((x) => "– " + x).join("\n");
+  const note = p.n ? "\nHinweis im Plan: " + p.n : "";
+  const msg = "Erkläre mir bitte genauer, was ich in dieser Einheit machen soll (" + DAYSF[dow(i)] + " " + isoFromIdx(i) + ", „" + p.t + "“):\n" + items + note +
+    "\nWie läuft sie Schritt für Schritt ab, mit welchem Tempo/Gewicht/Gefühl, worauf achte ich bei der Technik und wozu ist sie gut?";
+  return msg.length > MAX_MSG ? msg.slice(0, MAX_MSG - 1) + "…" : msg;
 }
 
 /** Automatische Nachricht, wenn eine Einheit als ausgefallen markiert wird. */

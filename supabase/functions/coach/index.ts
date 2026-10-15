@@ -36,6 +36,18 @@ Halte dich an diese Regeln, weil der Plan vom Coach der beiden so aufgebaut ist:
 
 Antworte in "reply" auf Deutsch in Schweizer Schreibweise (ss statt ß), in der Du-Form, in 2–5 Sätzen. Nenne Tage mit Wochentag und Datum (z. B. „Mi 21.10.“). Die App zeigt deine actions nur als Vorschlag an; der Athlet bestätigt sie selbst.`;
 
+// Erklär-Modus: ausführlich und anfängerfreundlich, nie Planänderungen
+const EXPLAIN = `Du bist der Trainings-Coach in der App „Basel Sub-60“. Zwei Athleten trainieren gemeinsam für HYROX Basel (Doubles Men PRO, 13.02.2027) mit dem Ziel unter 60 Minuten. Der Athlet versteht eine Einheit oder einen Begriff aus seinem Plan nicht ganz und möchte es genauer erklärt bekommen. Du änderst NICHTS am Plan: "actions" ist immer eine leere Liste.
+
+Im <plan>-Block steht sein Stand als JSON (recent, upcoming, checkin, soreness, extra). Die zu erklärende Einheit steht ausserdem in seiner Nachricht. Erkläre auf dieser Grundlage:
+- Wozu die Einheit gut ist (ein Satz).
+- Wie sie Schritt für Schritt abläuft: Reihenfolge, Pausen, Wiederholungen, Tempo oder Gewicht nur so genau, wie es im Plan steht. Gib RPE (1–10) oder Gefühl als Orientierung an, erfinde aber keine persönlichen Zahlen, die nicht im Plan oder in seinen Einträgen stehen.
+- Technik-Hinweise und typische Fehler bei den wichtigsten Übungen.
+- Wie er merkt, dass es richtig dosiert ist, und wann er die Einheit abbricht oder entlastet.
+Fachbegriffe (z. B. Zone 2, RPE, Sled, Wall Balls, Topsatz) erklärst du kurz in einem Halbsatz. Wenn der Plan etwas Unklares enthält oder dir eine Information fehlt, sag das und frag nach, statt zu raten. Bei Schmerzen rätst du zu Arzt oder Physio; du stellst keine Diagnosen.
+
+Format: reiner Text ohne Markdown (kein **, kein #). Kurze Absätze, Aufzählungen mit „–“. Schweizer Schreibweise (ss statt ß), Du-Form, Deutsch. Höchstens ca. 250 Wörter, ausser er fragt ausdrücklich nach mehr.`;
+
 const nullable = (t: Record<string, unknown>) => ({ anyOf: [t, { type: "null" }] });
 const SCHEMA = {
   type: "object",
@@ -66,9 +78,9 @@ const SCHEMA = {
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-function readBody(b: unknown): { context: unknown; history: Msg[]; message: string } | null {
+function readBody(b: unknown): { context: unknown; history: Msg[]; message: string; explain: boolean } | null {
   if (!b || typeof b !== "object") return null;
-  const { context, history, message } = b as Record<string, unknown>;
+  const { context, history, message, mode } = b as Record<string, unknown>;
   if (typeof message !== "string" || !message.trim() || message.length > 2000) return null;
   if (!context || typeof context !== "object" || JSON.stringify(context).length > 60_000) return null;
   const h = Array.isArray(history) ? history : [];
@@ -81,7 +93,7 @@ function readBody(b: unknown): { context: unknown; history: Msg[]; message: stri
   }
   while (clean.length && clean[0].role !== "user") clean.shift();
   while (clean.length && clean[clean.length - 1].role !== "assistant") clean.pop();
-  return { context, history: clean, message: message.trim() };
+  return { context, history: clean, message: message.trim(), explain: mode === "explain" };
 }
 
 Deno.serve(async (req) => {
@@ -111,12 +123,12 @@ Deno.serve(async (req) => {
   try {
     const response = await client.beta.messages.create({
       model: "claude-sonnet-5-5",
-      max_tokens: 16000,
+      max_tokens: body.explain ? 2000 : 16000,
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
-      output_config: { effort: "medium", format: { type: "json_schema", schema: SCHEMA } },
+      output_config: { effort: body.explain ? "low" : "medium", format: { type: "json_schema", schema: SCHEMA } },
       // Cache-Punkt auf dem festen System-Prompt: der <plan>-Teil ändert sich bei jeder Anfrage
-      system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
+      system: [{ type: "text", text: body.explain ? EXPLAIN : SYSTEM, cache_control: { type: "ephemeral" } }],
       messages,
     });
     // Token-Nutzung für die Supabase-Logs: cache_read > 0 heisst, der System-Prompt kam aus dem Cache
@@ -133,7 +145,9 @@ Deno.serve(async (req) => {
     if (response.stop_reason === "max_tokens") return json({ error: "too_long" }, 502);
     const text = response.content.find((b) => b.type === "text");
     if (!text || text.type !== "text") return json({ error: "empty" }, 502);
-    return json(JSON.parse(text.text));
+    const out = JSON.parse(text.text);
+    if (body.explain) out.actions = []; // Erklär-Modus ändert nie den Plan
+    return json(out);
   } catch (e) {
     if (e instanceof Anthropic.RateLimitError) return json({ error: "rate_limit" }, 429);
     if (e instanceof Anthropic.APIError) { console.error("Claude API", e.status, e.message); return json({ error: "upstream" }, 502); }

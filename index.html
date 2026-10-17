@@ -682,6 +682,26 @@
         outline: 2px solid var(--accent);
         outline-offset: 1px;
       }
+      [role="button"]:focus-visible,
+      [tabindex="0"]:focus-visible,
+      summary:focus-visible,
+      a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: 6px;
+      }
+      h1,
+      h2,
+      h3 {
+        text-wrap: balance;
+      }
+      p,
+      li {
+        text-wrap: pretty;
+      }
+      .wide p.sub {
+        max-width: 70ch;
+      }
       .lbl {
         display: block;
         font-size: 13px;
@@ -756,6 +776,7 @@
       }
       .btn.ghost {
         background: transparent;
+        border-color: rgba(255, 255, 255, 0.16);
       }
       .btn.strava {
         background: var(--strava);
@@ -1705,6 +1726,22 @@
         .chips button:hover:not(.on) {
           border-color: rgba(255, 255, 255, 0.2);
         }
+        .btn.ghost:hover:not(:disabled) {
+          border-color: rgba(255, 255, 255, 0.28);
+          background: var(--surface2);
+        }
+        .mi:hover,
+        .blk:hover,
+        .day:hover,
+        .rv-wk-c:not(.rv-future):hover {
+          background: var(--surface2);
+        }
+        .mi,
+        .blk,
+        .day,
+        .rv-wk-c {
+          transition: background-color 0.2s var(--ease), transform 0.2s var(--ease);
+        }
       }
       .brk {
         overflow-wrap: anywhere;
@@ -2332,6 +2369,9 @@
         display: flex;
         flex-direction: column;
       }
+      .dgrid > section:only-child {
+        grid-column: 1 / -1;
+      }
       .dgrid > section > .card {
         flex: 1;
       }
@@ -2342,7 +2382,7 @@
       }
       .viz {
         width: 100%;
-        max-width: 620px;
+        max-width: 480px;
         height: auto;
         display: block;
         margin-top: var(--s2);
@@ -2365,6 +2405,12 @@
       @media (max-width: 380px) {
         .viz .ax {
           font-size: 14px;
+        }
+      }
+      /* Breite Fenster: Diagramm bis 480 px = Faktor 1,5 – Schrift ausgleichen, damit sie ~12–13 px bleibt */
+      @media (min-width: 600px) {
+        .viz .ax {
+          font-size: 8.5px;
         }
       }
       .viz .cross {
@@ -3323,7 +3369,7 @@
       /* Wochenrückblick als Dashboard */
       .rv-of { font-size: 0.55em; color: var(--muted); font-weight: 500; }
       .rv-hero { display: grid; grid-template-columns: auto 1fr; gap: var(--s4); align-items: center; }
-      .rv-verdict { margin: var(--s2) 0 0; font-weight: 600; font-size: 17px; line-height: 1.35; }
+      .rv-verdict { margin: var(--s2) 0 0; font-weight: 600; font-size: 17px; line-height: 1.35; text-wrap: balance; }
       .rv-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--s1); text-align: center; }
       .rv-day { display: grid; justify-items: center; gap: 6px; padding: var(--s2) 0; border-radius: 10px; background: var(--well); font-size: 12px; color: var(--muted); }
       .rv-day.today { box-shadow: inset 0 0 0 1.5px var(--accent); }
@@ -3359,14 +3405,17 @@
       .rv-leg .b-run i { background: var(--lauf); }
       .rv-leg .b-st i { background: var(--station); }
       .rv-leg .b-rox i { background: var(--rest); }
-      .rv-how summary { cursor: pointer; color: var(--muted); font-size: 13px; min-height: 32px; display: flex; align-items: center; }
+      .rv-how summary { cursor: pointer; color: var(--muted); font-size: 13px; min-height: 44px; display: flex; align-items: center; gap: 6px; list-style: none; }
+      .rv-how summary::-webkit-details-marker { display: none; }
+      .rv-how summary::after { content: "›"; font-size: 16px; transition: transform 0.2s var(--ease); }
+      .rv-how[open] summary::after { transform: rotate(90deg); }
       .rv-anss { display: flex; flex-wrap: wrap; gap: var(--s2); }
       .rv-ans { background: var(--well); border-radius: 999px; padding: 6px 12px; font-size: 13px; color: var(--muted); }
       .rv-ans.v-g b { color: var(--ok); }
       .rv-ans.v-y b { color: var(--warn); }
       .rv-ans.v-r b { color: var(--danger); }
       .rv-season { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; }
-      .rv-wk-c { min-height: 40px; border-radius: 10px; display: grid; place-items: center; font: 600 14px var(--f-head); border: 0; background: var(--well); color: var(--muted); border-bottom: 3px solid transparent; cursor: pointer; }
+      .rv-wk-c { min-height: 44px; border-radius: 10px; display: grid; place-items: center; font: 600 14px var(--f-head); border: 0; background: var(--well); color: var(--muted); border-bottom: 3px solid transparent; cursor: pointer; }
       .rv-wk-c.rv-green { border-bottom-color: var(--ok); color: var(--text); }
       .rv-wk-c.rv-yellow { border-bottom-color: var(--warn); color: var(--text); }
       .rv-wk-c.rv-red { border-bottom-color: var(--danger); color: var(--text); }
@@ -3400,12 +3449,11 @@
       <button
         class="menu-btn"
         data-act="menu"
-        aria-label="Einstellungen öffnen"
+        aria-label="Menü öffnen"
         aria-controls="sheet"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3.2" />
-          <path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" />
         </svg>
       </button>
     </div>
@@ -3445,12 +3493,12 @@
       class="drawer"
       id="sheet"
       role="dialog"
-      aria-label="Einstellungen"
+      aria-label="Menü"
       aria-hidden="true"
     >
       <div class="drawer-h">
-        <h2>Einstellungen</h2>
-        <button class="menu-btn" data-act="close" aria-label="Einstellungen schliessen">
+        <h2>Menü</h2>
+        <button class="menu-btn" data-act="close" aria-label="Menü schliessen">
           <svg viewBox="0 0 24 24">
             <path
               d="M6 6l12 12M18 6L6 18"
@@ -3462,27 +3510,7 @@
           </svg>
         </button>
       </div>
-      <div class="cap">Daten</div>
-      <button class="mi" data-v="backup">
-        <svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg
-        ><span
-          ><b>Backup</b
-          ><span class="sub"
-            >Daten als Datei sichern oder einspielen</span
-          ></span
-        >
-      </button>
       <div class="cap">Training</div>
-      <button class="mi" data-v="strava">
-        <svg viewBox="0 0 24 24">
-          <path d="M10 3l-6 12h4l2-4 2 4h4zM14 15l2 4 2-4" /></svg
-        ><span
-          ><b>Strava / Garmin</b
-          ><span class="sub"
-            >Aktivitäten und Erholung mit dem Plan abgleichen</span
-          ></span
-        >
-      </button>
       <button class="mi" data-v="review">
         <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg
         ><span
@@ -3493,11 +3521,31 @@
         >
       </button>
       <button class="mi" data-v="plan">
-        <svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9" /></svg
+        <svg viewBox="0 0 24 24"><path d="M5 21V4h11l-2 4 2 4H5" /></svg
         ><span
           ><b>Plan</b
           ><span class="sub"
             >Gesamtplan bis Basel, neues PDF importieren</span
+          ></span
+        >
+      </button>
+      <button class="mi" data-v="strava">
+        <svg viewBox="0 0 24 24">
+          <path d="M10 3l-6 12h4l2-4 2 4h4zM14 15l2 4 2-4" /></svg
+        ><span
+          ><b>Strava / Garmin</b
+          ><span class="sub"
+            >Aktivitäten und Erholung mit dem Plan abgleichen</span
+          ></span
+        >
+      </button>
+      <div class="cap">Daten</div>
+      <button class="mi" data-v="backup">
+        <svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg
+        ><span
+          ><b>Backup</b
+          ><span class="sub"
+            >Daten als Datei sichern oder einspielen</span
           ></span
         >
       </button>
@@ -4449,9 +4497,8 @@
             p = dayPlan(i);
           if (!p || p.k === "rest") continue;
           plan++;
-          const { n, done } = dayStatus(i),
-            e = rc().byDay[i];
-          if ((n && done === n) || (e && e.match)) ok++;
+          // gleiche Regel wie Dashboard und Wochenrückblick: trainiert = abgehakt, RPE oder passende Aktivität
+          if (trained(i)) ok++;
           const r = S.rpe[keyI(i)];
           if (r != null) rp.push(+r);
         }

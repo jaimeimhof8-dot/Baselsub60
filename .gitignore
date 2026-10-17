@@ -23,3 +23,6 @@ desktop.ini
 .vscode/
 .idea/
 garmin_tokens.json
+
+# Wochenbericht-Push: Secrets und fertig ausgefüllte SQL-Datei (supabase/push.sql mit Cron-Secret)
+supabase/*.local.sql

@@ -14,7 +14,7 @@ export const ROXZONE = 300; // s für alle Wege in der Roxzone
 
 export const SELF = {
   feel: { label: "Wie fühlst du dich?", opts: ["gut", "okay", "müde"] },
-  prog: { label: "Fortschritt gespürt?", opts: ["stärker", "gleich", "schwächer"] },
+  prog: { label: "Stärker geworden?", opts: ["ja", "etwas", "nein"] }, // kurze Wörter: drei Knöpfe passen auch auf 375 px
   pain: { label: "Schmerzen?", opts: ["keine", "leicht", "stark"] },
 };
 
@@ -124,10 +124,14 @@ export function cleanSelf(o) {
   return out;
 }
 
-/** Ist der Check einer Woche fällig? Ab Samstag der Woche bis Dienstag danach, solange nicht gemacht. */
-export function reviewDue(today, reviews) {
+/**
+ * Welche Woche soll als Karte auf der Startseite erscheinen? Nur am Wochenende (Sa/So) und – falls dann nicht gemacht –
+ * noch in der ersten Sitzung der neuen Woche (firstOpen). Danach verschwindet die Karte, der Check bleibt im Menü.
+ */
+export function reviewDue(today, reviews, firstOpen = false) {
   const w = Math.floor(today / 7), d = ((today % 7) + 7) % 7;
-  if (d >= 5 && !(reviews && reviews[w] && reviews[w].at)) return w;
-  if (d <= 1 && w > 0 && !(reviews && reviews[w - 1] && reviews[w - 1].at)) return w - 1;
+  const done = (x) => !!(reviews && reviews[x] && reviews[x].at);
+  if (d >= 5 && !done(w)) return w;
+  if (firstOpen && w > 0 && !done(w - 1)) return w - 1;
   return null;
 }

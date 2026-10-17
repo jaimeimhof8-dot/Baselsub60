@@ -30,6 +30,14 @@ Bei der ersten Anmeldung fragt die App, ob die bisherigen Einträge auf dem Hand
 ## Cloud-Verlauf (Schutz vor Datenverlust)
 `supabase/history.sql` im SQL Editor ausführen (einmalig, gefahrlos wiederholbar). Danach sichert die Datenbank vor jeder Änderung automatisch den alten Stand: höchstens stündlich und immer vor grossen Änderungen, 45 Tage lang, die letzten 30 Stände immer. Wiederherstellen in der App unter **Menü → Backup → Früheren Stand wiederherstellen**. Zusätzlich löscht die App beim Synchronisieren nie mehr als die Hälfte der Einträge auf einmal (`safeMerge` in `src/merge.js`), sondern führt dann beide Stände zusammen.
 
+## Wochenbericht per Push (jeden Sonntag 18 Uhr)
+Die Schlüssel sind schon erzeugt: der öffentliche steht in `config.js`, der private und das Cron-Secret in `supabase/.env.push` (nicht im Repo). Im Ordner `app/`:
+```
+npx supabase secrets set --env-file supabase/.env.push
+npx supabase functions deploy weekly --no-verify-jwt
+```
+Dann `supabase/push.local.sql` (fertig ausgefüllte Kopie von `push.sql`, nicht im Repo) im SQL Editor ausführen. In der App: **Dashboard → Wochen-Check → Wochenbericht einschalten**, danach **Test senden**. Auf Android in Chrome über das Menü „App installieren“, damit die Nachrichten zuverlässig ankommen.
+
 ## Hinweise
 - **Pausieren:** Gratis-Projekte pausieren nach 7 Tagen ohne Nutzung. Mit täglichem Training passiert das nicht, sonst im Dashboard auf „Restore“ klicken.
 - **Fremde Anmeldungen:** Ist „Allow new users to sign up“ ausgeschaltet (Schritt 3), kann niemand sonst ein Konto anlegen. Auch mit Konto sähe ein Fremder nichts, solange seine E-Mail nicht in `schema.sql` steht.

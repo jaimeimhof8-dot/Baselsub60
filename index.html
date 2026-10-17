@@ -3318,7 +3318,16 @@
       .rv-notes .rv-yellow::before { background: var(--warn); }
       .rv-notes .rv-red::before { background: var(--danger); }
       .rv-focus { padding-left: 18px; }
-      button.amp { border: 0; cursor: pointer; font: inherit; }
+      .vh-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+      /* Ampel zusätzlich über die Form: gelb = Raute, rot = Quadrat (nicht nur Farbe) */
+      .rv-notes .rv-yellow::before { border-radius: 1px; transform: rotate(45deg); }
+      .rv-notes .rv-red::before { border-radius: 1px; }
+      .rv-wbtn { display: inline-flex; align-items: center; gap: 8px; }
+      .rv-wbtn::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
+      .rv-wbtn.rv-green::before { background: var(--ok); }
+      .rv-wbtn.rv-yellow::before { background: var(--warn); border-radius: 1px; transform: rotate(45deg); }
+      .rv-wbtn.rv-red::before { background: var(--danger); border-radius: 1px; }
+      :root { --sl-deep: #2f5fb3; --sl-rem: #6c9be6; --sl-light: #b4ccf0; --sl-awake: #e0a24a; }
       .sl-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; gap: 2px; }
       .sl-bar span { display: block; min-width: 2px; }
       .sl-leg { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font-size: 0.85em; color: var(--muted); }
@@ -3417,6 +3426,15 @@
           ><b>Strava / Garmin</b
           ><span class="sub"
             >Aktivitäten und Erholung mit dem Plan abgleichen</span
+          ></span
+        >
+      </button>
+      <button class="mi" data-v="review">
+        <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg
+        ><span
+          ><b>Wochen-Check</b
+          ><span class="sub"
+            >Auf Kurs für Sub-60? Prognose, Verlauf, Wochenbericht</span
           ></span
         >
       </button>
@@ -3619,6 +3637,7 @@
           toast("Speicher voll – bitte Backup exportieren");
       }
       function save() {
+        weekSnap();
         S._t = Date.now();
         saveLocal();
         queuePush();
@@ -5649,9 +5668,12 @@
     }</div>`;
 
         // Trends (4 Wochen): eine Kennzahl, Auswahl per Chip
+        // Letzte 4 Wochen, aber nur ab Planstart (Werte von davor gehören nicht zum Plan)
         const days = [];
-        for (let k = 27; k >= 0; k--)
-          days.push(isoD(new Date(+NOW - k * dayMs)));
+        for (let k = 27; k >= 0; k--) {
+          const d = isoD(new Date(+NOW - k * dayMs));
+          if (idxOfIso(d) >= 0) days.push(d);
+        }
         const one = (v) => String(Math.round(v * 10) / 10).replace(".", ",");
         const WELL = {
           readiness: [
@@ -5682,7 +5704,7 @@
         const have = Object.keys(WELL).filter((k) =>
           days.some((d) => S.garmin.well[d] && S.garmin.well[d][k] != null),
         );
-        h += `<div class="dgrid"><section><div class="dash-title">Trends · 4 Wochen</div>`;
+        h += `<div class="dgrid"><section><div class="dash-title">Trends · ${days.length >= 28 ? "4 Wochen" : "seit Planstart"}</div>`;
         if (have.length) {
           const ksel = have.includes(dashWell) ? dashWell : have[0],
             [, wf, wo, wdesc] = WELL[ksel];
@@ -5701,7 +5723,7 @@
             have.map((k) => [k, WELL[k][0]]),
             ksel,
           )}
-      <div class="lstats l2"><div><span>Ø 7 Tage</span><b>${a7 != null ? wf(a7) : "–"}</b></div><div><span>Ø 4 Wochen</span><b>${a28 != null ? wf(a28) : "–"}</b></div></div>
+      <div class="lstats l2"><div><span>Ø 7 Tage</span><b>${a7 != null ? wf(a7) : "–"}</b></div><div><span>${days.length >= 28 ? "Ø 4 Wochen" : "Ø seit Start"}</span><b>${a28 != null ? wf(a28) : "–"}</b></div></div>
       ${dash.lineChart(
         days.map((d, i) => ({
           label: dmy(d),
@@ -5736,15 +5758,17 @@
               })
               .join("")}</div>`
           : `<div class="card"><p class="sub">Noch keine Aktivitäten. Verbinde Strava oder Garmin im Menü.</p></div>`;
-        h += `<div class="list dash-links"><button class="mi" data-v="review"><span><b>Wochen-Check</b><span class="sub">Auf Kurs für Sub-60? Prognose und Einschätzung</span></span><span class="chev">›</span></button><button class="mi" data-v="strava"><span><b>Alle Aktivitäten</b><span class="sub">Strava / Garmin</span></span><span class="chev">›</span></button>
+        h += `<div class="list dash-links"><button class="mi" data-v="strava"><span><b>Alle Aktivitäten</b><span class="sub">Strava / Garmin</span></span><span class="chev">›</span></button>
     <button class="mi" data-v="tests"><span><b>Tests &amp; Benchmarks</b><span class="sub">Pacing-Test, Stationen, Übergaben</span></span><span class="chev">›</span></button></div>`;
         return h + `</div>`;
       }
 
       /* Schlaf (Garmin): letzte Nacht mit Phasen, Schnitt 7 Tage, Verlauf 4 Wochen und alle Nächte als Tabelle.
    days = ISO-Daten der letzten 28 Tage (älteste zuerst). Zeigt nur, was Garmin liefert. */
-      let sleepAll = false;
-      function sleepCard(days) {
+      let sleepOpen = false; // Details (Nachtwerte, Verlauf, alle Nächte) aufgeklappt
+      function sleepCard(allDays) {
+        // Nur Nächte ab Planstart – was davor war, gehört nicht zum Plan
+        const days = allDays.filter((d) => idxOfIso(d) >= 0);
         const W = S.garmin.well,
           nights = days.filter((d) => W[d] && W[d].sleepH != null);
         if (!nights.length)
@@ -5758,10 +5782,10 @@
         const last = nights[nights.length - 1],
           n = W[last];
         const PH = [
-          ["deep", "Tief", "#1f4e9c"],
-          ["rem", "REM", "#5b8fe0"],
-          ["light", "Leicht", "#a9c6f2"],
-          ["awake", "Wach", "#e0a24a"],
+          ["deep", "Tief", "var(--sl-deep)"],
+          ["rem", "REM", "var(--sl-rem)"],
+          ["light", "Leicht", "var(--sl-light)"],
+          ["awake", "Wach", "var(--sl-awake)"],
         ];
         const tot = PH.reduce((a, [k]) => a + (n[k] || 0), 0);
         let h = `<div class="card"><div class="row between"><h3>Letzte Nacht</h3><span class="sub">${dmy(last)}${n.bed && n.wake ? ` · ${n.bed} – ${n.wake}` : ""}</span></div>
@@ -5769,6 +5793,12 @@
         if (tot)
           h += `<div class="sl-bar mt-3" role="img" aria-label="Schlafphasen">${PH.filter(([k]) => n[k]).map(([k, l, c]) => `<span style="flex:${n[k]};background:${c}" title="${l}: ${hm(n[k])} h"></span>`).join("")}</div>
     <div class="sl-leg">${PH.filter(([k]) => n[k] != null).map(([k, l, c]) => `<span><i style="background:${c}"></i>${l} ${hm(n[k])} (${Math.round((n[k] / tot) * 100)} %)</span>`).join("")}</div>`;
+        // Schnitt 7 Tage kompakt in einer Zeile, Rest auf Wunsch
+        const w7 = nights.filter((d) => days.indexOf(d) >= days.length - 7);
+        const a = (k, list, fmtf) => { const v = avg(k, list); return v == null ? "–" : fmtf(v); };
+        h += `<p class="sub mt-3">Ø 7 Nächte: <b>${a("sleepH", w7, (v) => one(v) + " h")}</b> · Score ${a("sleepScore", w7, (v) => Math.round(v))} · Tief ${a("deep", w7, hm)} · REM ${a("rem", w7, hm)}</p>`;
+        h += `<button class="btn ghost sm mt-2" data-act="sleep-open" aria-expanded="${sleepOpen}">${sleepOpen ? "Weniger anzeigen" : "Details und alle Nächte"}</button>`;
+        if (!sleepOpen) return h + `</div>`;
         const night = [
           ["Atmung", n.resp != null ? one(n.resp) + " /min" : null],
           ["SpO₂", n.spo2 != null ? n.spo2 + " %" : null],
@@ -5779,14 +5809,8 @@
         ].filter((x) => x[1] != null);
         if (night.length)
           h += `<div class="lstats mt-3" style="grid-template-columns:repeat(${Math.min(3, night.length)},1fr)">${night.map(([l, v]) => `<div><span>${l}</span><b>${esc(String(v))}</b></div>`).join("")}</div>`;
-        // Schnitt 7 Tage vs. 4 Wochen
-        const w7 = nights.filter((d) => days.indexOf(d) >= days.length - 7);
-        const a = (k, list, fmtf) => { const v = avg(k, list); return v == null ? "–" : fmtf(v); };
-        h += `<div class="cap mt-4">Schnitt</div><table class="well"><tr><th></th><th>Dauer</th><th>Score</th><th>Tief</th><th>REM</th></tr>
-    <tr><td>7 Tage</td><td>${a("sleepH", w7, (v) => one(v) + " h")}</td><td>${a("sleepScore", w7, (v) => Math.round(v))}</td><td>${a("deep", w7, hm)}</td><td>${a("rem", w7, hm)}</td></tr>
-    <tr><td>4 Wochen</td><td>${a("sleepH", nights, (v) => one(v) + " h")}</td><td>${a("sleepScore", nights, (v) => Math.round(v))}</td><td>${a("deep", nights, hm)}</td><td>${a("rem", nights, hm)}</td></tr></table>`;
-        // Verlauf Schlafdauer 4 Wochen
-        h += `<div class="sub mt-3">Schlafdauer pro Nacht (Ziel 7–9 h)</div>${dash.barChart(
+        // Verlauf Schlafdauer seit Planstart (höchstens 4 Wochen)
+        if (days.length > 1) h += `<div class="sub mt-3">Schlafdauer pro Nacht (Ziel 7–9 h)</div>${dash.barChart(
           days.map((d) => ({
             label: isoToDate(d).getDay() === 1 ? dmy(d).slice(0, 5) : "", // nur Montage beschriften
             value: W[d] && W[d].sleepH != null ? W[d].sleepH : 0,
@@ -5795,14 +5819,14 @@
           })),
           { label: "Schlafdauer", fmt: (v) => Math.round(v) + " h", height: 120 },
         )}`;
+        if (nights.length > 7)
+          h += `<p class="sub mt-2">Ø seit Planstart: ${a("sleepH", nights, (v) => one(v) + " h")} · Score ${a("sleepScore", nights, (v) => Math.round(v))}</p>`;
         // Alle Nächte (neueste zuerst)
         const list = nights.slice().reverse(),
-          shown = sleepAll ? list : list.slice(0, 7);
-        h += `<div class="cap mt-4">Alle Nächte</div><div style="overflow-x:auto"><table class="well"><tr><th>Nacht</th><th>Dauer</th><th>Score</th><th>Tief</th><th>REM</th><th>Leicht</th><th>Wach</th><th>Zu Bett</th><th>Auf</th></tr>${shown
-          .map((d) => { const x = W[d]; return `<tr><td>${dmy(d).slice(0, 5)}</td><td>${one(x.sleepH)}</td><td>${x.sleepScore ?? "–"}</td><td>${hm(x.deep)}</td><td>${hm(x.rem)}</td><td>${hm(x.light)}</td><td>${hm(x.awake)}</td><td>${x.bed || "–"}</td><td>${x.wake || "–"}</td></tr>`; })
+          shown = list;
+        h += `<div class="cap mt-4">Alle Nächte</div><div style="overflow-x:auto"><table class="well"><tr><th>Nacht</th><th>Dauer</th><th>Score</th><th>Tief</th><th>REM</th><th>Schlafzeit</th></tr>${shown
+          .map((d) => { const x = W[d]; return `<tr><td>${dmy(d).slice(0, 5)}</td><td>${one(x.sleepH)}</td><td>${x.sleepScore ?? "–"}</td><td>${hm(x.deep)}</td><td>${hm(x.rem)}</td><td>${x.bed && x.wake ? x.bed + "–" + x.wake : "–"}</td></tr>`; })
           .join("")}</table></div>`;
-        if (list.length > shown.length)
-          h += `<button class="btn ghost sm mt-2" data-act="sleep-all">Alle ${list.length} Nächte anzeigen</button>`;
         if (nights.some((d) => W[d].deep == null))
           h += `<p class="sub mt-2">Phasen und Zeiten fehlen bei älteren Nächten. „Alles neu laden“ unter Strava / Garmin holt sie nach.</p>`;
         return h + `</div>`;
@@ -5933,6 +5957,7 @@
       let rvW = null, // angezeigte Woche (null = fällige bzw. aktuelle)
         rvDraft = null; // eigene Einschätzung in Bearbeitung {w, feel, prog, pain, note}
       const LVL_LABEL = { green: "Auf Kurs", yellow: "Aufpassen", red: "Nachsteuern" };
+      const RV_SR = { green: "Gut", yellow: "Achtung", red: "Kritisch" };
       function rvData(w) {
         const T = Math.min(TODAY, LAST),
           days = [];
@@ -5971,9 +5996,105 @@
           station: me.station.map((v, r) => [parseT(v), parseT(pa.station[r])]),
         });
       }
+      /* Kurzfassung der laufenden Woche in S.wsnap – die Edge Function „weekly“ macht daraus den Push am Sonntag.
+   Gibt true zurück, wenn sich etwas geändert hat. */
+      function weekSnap() {
+        if (TODAY < 0 || TODAY > LAST + 1 || !S.review) return false;
+        const w = Math.floor(Math.min(TODAY, LAST) / 7),
+          r = rvData(w),
+          fc = rvForecast();
+        const sl = [];
+        for (let k = 0; k < 7; k++) {
+          const x = S.garmin.well[isoD(new Date(+NOW - k * dayMs))];
+          if (x && x.sleepH != null) sl.push(x.sleepH);
+        }
+        const snap = {
+          w,
+          level: r.level,
+          done: r.done,
+          planned: r.planned,
+          rpe: r.avgRpe != null ? Math.round(r.avgRpe * 10) / 10 : null,
+          sleep: sl.length ? Math.round((sl.reduce((a, b) => a + b, 0) / sl.length) * 10) / 10 : null,
+          fc: fc && fc.total ? Math.round(fc.total) : null,
+          focus: r.focus[0] || "",
+          reviewed: !!(S.review[w] && S.review[w].at),
+        };
+        if (stable(snap) === stable(S.wsnap || null)) return false;
+        S.wsnap = snap;
+        return true;
+      }
+      /* ---------- Wochenbericht per Push (Edge Function „weekly“, supabase/push.sql) ---------- */
+      const PUSH_OK =
+        "serviceWorker" in navigator && "PushManager" in window && "Notification" in window && !!(window.HX_CONFIG || {}).vapidPublicKey;
+      let pushState = null, // null = unbekannt, "on" | "off" | "denied"
+        pushBusy = false;
+      async function pushSub() {
+        const reg = await navigator.serviceWorker.ready;
+        return reg.pushManager.getSubscription();
+      }
+      async function pushCheck() {
+        if (!PUSH_OK) return;
+        const sub = await pushSub().catch(() => null);
+        pushState = Notification.permission === "denied" ? "denied" : sub ? "on" : "off";
+        if (view === "review") render();
+      }
+      async function pushOn() {
+        const perm = await Notification.requestPermission();
+        if (perm !== "granted") {
+          pushState = perm === "denied" ? "denied" : "off";
+          return toast("Ohne Erlaubnis keine Push-Nachrichten", true);
+        }
+        const reg = await navigator.serviceWorker.ready;
+        const key = Uint8Array.from(
+          atob(CFG.vapidPublicKey.replace(/-/g, "+").replace(/_/g, "/")),
+          (c) => c.charCodeAt(0),
+        );
+        const sub =
+          (await reg.pushManager.getSubscription()) ||
+          (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key }));
+        const j = sub.toJSON();
+        const { error } = await sb
+          .from("push_subs")
+          .upsert({ endpoint: j.endpoint, user_id: USER.id, p256dh: j.keys.p256dh, auth: j.keys.auth });
+        if (error) throw error;
+        pushState = "on";
+        toast("Wochenbericht ist aktiv – jeden Sonntag um 18 Uhr");
+      }
+      async function pushOff() {
+        const sub = await pushSub();
+        if (sub) {
+          await sb.from("push_subs").delete().eq("endpoint", sub.endpoint);
+          await sub.unsubscribe();
+        }
+        pushState = "off";
+        toast("Wochenbericht ausgeschaltet");
+      }
+      function pushCard() {
+        let h = `<div class="card"><h3>Wochenbericht aufs Handy</h3><p class="sub mt-1">Jeden Sonntag um 18 Uhr eine Push-Nachricht mit deiner Woche: Einheiten, Anstrengung, Schlaf, Prognose und Fokus. Ein Tipp darauf öffnet den Wochen-Check.</p>`;
+        if (!(sb && USER)) return h + `<p class="sub mt-2">Nur mit Anmeldung verfügbar.</p></div>`;
+        if (!PUSH_OK)
+          return h + `<p class="sub mt-2">Dieser Browser kann keine Push-Nachrichten empfangen. Auf Android: in Chrome öffnen und über das Menü „App installieren“ wählen.</p></div>`;
+        if (pushState === null) {
+          pushCheck();
+          return h + `<p class="sub mt-2">Prüfe …</p></div>`;
+        }
+        if (pushState === "denied")
+          return h + `<p class="sub mt-2">Benachrichtigungen sind für diese Seite blockiert. In den Browser- bzw. App-Einstellungen unter „Benachrichtigungen“ erlauben, dann hier einschalten.</p></div>`;
+        if (pushState === "on")
+          return h + `<p class="mt-2"><span class="amp amp-green">Aktiv auf diesem Gerät</span></p><div class="grid2 mt-3"><button class="btn" data-act="push-test" ${pushBusy ? "disabled" : ""}>Test senden</button><button class="btn ghost" data-act="push-off" ${pushBusy ? "disabled" : ""}>Ausschalten</button></div></div>`;
+        return h + `<div class="btns"><button class="btn primary" data-act="push-on" ${pushBusy ? "disabled" : ""}>Wochenbericht einschalten</button></div></div>`;
+      }
+      /* Erste Sitzung in einer neuen Planwoche (pro Gerät gemerkt): nur dann erscheint der offene Check der Vorwoche */
+      const RV_FIRST = (() => {
+        const w = Math.floor(Math.max(0, Math.min(TODAY, LAST)) / 7),
+          seen = lsGet("rv-open-w");
+        if (seen === String(w)) return false;
+        lsSet("rv-open-w", String(w));
+        return seen !== null;
+      })();
       const rvDueW = () =>
         TODAY >= 0 && TODAY <= LAST + 2
-          ? review.reviewDue(Math.min(TODAY, LAST), S.review)
+          ? review.reviewDue(Math.min(TODAY, LAST), S.review, RV_FIRST)
           : null;
       function reviewCard() {
         const w = rvDueW();
@@ -5995,7 +6116,7 @@
     <button data-act="rv-wk" data-d="1" aria-label="Nächste Woche" ${w >= cur ? "disabled" : ""}>›</button></div>`;
         // 1. Zahlen der Woche
         h += `<div class="card"><div class="row between"><h3>Die Woche</h3><span class="amp amp-${r.level}">${LVL_LABEL[r.level]}</span></div>
-    <ul class="rv-notes mt-2">${r.notes.map((n) => `<li class="rv-${n.level}">${esc(n.text)}</li>`).join("")}${r.extraN ? `<li class="rv-green">${r.extraN} Zusatz-${r.extraN === 1 ? "Einheit" : "Einheiten"}${r.extraMin ? ` · ${r.extraMin}′` : ""}.</li>` : ""}</ul>
+    <ul class="rv-notes mt-2">${r.notes.map((n) => `<li class="rv-${n.level}"><span class="vh-only">${RV_SR[n.level]}: </span>${esc(n.text)}</li>`).join("")}${r.extraN ? `<li class="rv-green"><span class="vh-only">${RV_SR.green}: </span>${r.extraN} Zusatz-${r.extraN === 1 ? "Einheit" : "Einheiten"}${r.extraMin ? ` · ${r.extraMin}′` : ""}.</li>` : ""}</ul>
     <div class="cap mt-3">Fokus nächste Woche</div><ul class="rv-focus mt-1">${r.focus.map((f) => `<li>${esc(f)}</li>`).join("")}</ul></div>`;
         // 2. Rennprognose
         const fc = rvForecast(),
@@ -6022,16 +6143,16 @@
         h += `<div class="card"><h3>Deine Einschätzung</h3>`;
         for (const [k, q] of Object.entries(review.SELF))
           h += `<div class="ci-row"><span>${q.label}</span><div class="seg" role="group" aria-label="${q.label}">${q.opts.map((o, j) => `<button class="v-${["g", "y", "r"][j]} ${self[k] === j ? "on" : ""}" data-act="rv-self" data-f="${k}" data-j="${j}" aria-pressed="${self[k] === j}">${o}</button>`).join("")}</div></div>`;
-        h += `<textarea id="rv-note" class="mt-3" maxlength="300" rows="2" placeholder="Was lief gut, was nicht? (optional)">${esc(self.note || "")}</textarea>
+        h += `<label class="lbl mt-3" for="rv-note">Notiz (optional)</label><textarea id="rv-note" maxlength="300" rows="2" placeholder="Was lief gut, was nicht?">${esc(self.note || "")}</textarea>
     <div class="btns"><button class="btn primary" data-act="rv-save" data-w="${w}">${saved.at ? "Aktualisieren" : "Wochen-Check abschliessen"}</button></div>${saved.at ? `<p class="sub mt-2">Abgeschlossen am ${new Date(saved.at).toLocaleDateString("de-CH")}.</p>` : ""}</div>`;
         // Verlauf: Ampel pro abgeschlossener Woche
         const past = [];
         for (let x = 0; x <= cur; x++)
           if (S.review[x] && S.review[x].at)
-            past.push(`<button class="amp amp-${S.review[x].level || "green"}" data-act="rv-go" data-w="${x}" aria-label="Woche ${x + 1}: ${LVL_LABEL[S.review[x].level || "green"]}">W${x + 1}</button>`);
+            past.push(`<button class="btn sm rv-wbtn rv-${S.review[x].level || "green"}" data-act="rv-go" data-w="${x}" aria-label="Woche ${x + 1}: ${LVL_LABEL[S.review[x].level || "green"]}">W${x + 1}</button>`);
         if (past.length)
           h += `<div class="card tight"><div class="cap">Bisherige Wochen</div><div class="chiprow mt-2">${past.join("")}</div></div>`;
-        return h + `</div>`;
+        return h + pushCard() + `</div>`;
       }
 
       /* ---------- Backup ---------- */
@@ -6596,6 +6717,11 @@
         render();
         loadPartner();
         gmRestore();
+        if (weekSnap()) save();
+        if (QS.get("v") === "review") {
+          history.replaceState(null, "", location.pathname);
+          go("review");
+        }
       }
       async function boot() {
         const code = linkCode(location.hash);
@@ -8112,8 +8238,34 @@
           toast("Wochen-Check gespeichert");
           return render();
         }
-        if (d.act === "sleep-all") {
-          sleepAll = true;
+        if (["push-on", "push-off", "push-test"].includes(d.act)) {
+          if (pushBusy) return;
+          pushBusy = true;
+          render();
+          (async () => {
+            try {
+              if (d.act === "push-on") await pushOn();
+              if (d.act === "push-off") await pushOff();
+              if (d.act === "push-test") {
+                const { data, error } = await sb.functions.invoke("weekly", { body: { action: "test" } });
+                if (error || !data || !data.sent) throw error || new Error("not_sent");
+                toast("Test gesendet – kommt gleich aufs Handy");
+              }
+            } catch (_) {
+              toast(
+                d.act === "push-test"
+                  ? "Test fehlgeschlagen. Ist die Function „weekly“ eingerichtet (SETUP.md)?"
+                  : "Hat nicht geklappt. Ist supabase/push.sql ausgeführt?",
+                true,
+              );
+            }
+            pushBusy = false;
+            render();
+          })();
+          return;
+        }
+        if (d.act === "sleep-open") {
+          sleepOpen = !sleepOpen;
           return render();
         }
         if (d.act === "hist-all") {
@@ -8402,6 +8554,14 @@
         console.error(e);
         render();
       });
+      // Tipp auf den Wochenbericht, während die App schon offen ist
+      if ("serviceWorker" in navigator)
+        navigator.serviceWorker.addEventListener("message", (e) => {
+          if (e.data && e.data.open === "review" && authed()) {
+            rvW = null;
+            go("review");
+          }
+        });
       if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
         navigator.serviceWorker.register("sw.js").catch(() => {});
     </script>

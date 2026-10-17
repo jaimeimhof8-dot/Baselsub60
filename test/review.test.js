@@ -53,8 +53,10 @@ test("Eigene Einschätzung säubern und Fälligkeit", () => {
   assert.deepEqual(cleanSelf({ feel: 0, prog: 5, pain: "x", note: "  gut  " }), { feel: 0, note: "gut" });
   assert.equal(reviewDue(5, {}), 0); // Samstag Woche 1
   assert.equal(reviewDue(3, {}), null); // Donnerstag
-  assert.equal(reviewDue(7, {}), 0); // Montag danach, noch offen
-  assert.equal(reviewDue(7, { 0: { at: 1 } }), null);
+  assert.equal(reviewDue(7, {}, true), 0); // erste Sitzung der neuen Woche, Vorwoche noch offen
+  assert.equal(reviewDue(7, {}, false), null); // danach verschwindet die Karte
+  assert.equal(reviewDue(9, {}, true), 0); // auch wenn die erste Sitzung erst am Mittwoch ist
+  assert.equal(reviewDue(7, { 0: { at: 1 } }, true), null);
   assert.equal(reviewDue(12, { 1: { at: 1 } }), null);
 });
 
@@ -80,4 +82,17 @@ test("Passende Zusatz-Einheit: vorsichtig je nach Tag", () => {
   assert.ok(suggestExtras({ day: { k: "bike" } }).some((x) => x.type === "z2run"));
   assert.ok(!suggestExtras({ day: { k: "bike" }, runRisk: true }).some((x) => x.type === "z2run"));
   assert.deepEqual(suggestExtras({ day: { k: "bike" }, weekMin: 160 }).map((x) => x.type), ["mobility"]);
+});
+
+test("Wochenbericht-Push: Text aus der Kurzfassung, Erinnerung ohne Daten", async () => {
+  const { weeklyMessage, weekOf, zurichDate } = await import("../supabase/functions/weekly/report.js");
+  assert.equal(weekOf("2026-10-18"), 0);
+  assert.equal(weekOf("2026-10-25"), 1);
+  const m = weeklyMessage({ w: 1, level: "green", done: 5, planned: 6, rpe: 6.54, sleep: 7.1, fc: 3550, focus: "Weiter so.", reviewed: false }, 1);
+  assert.equal(m.title, "Wochenbericht Woche 2");
+  assert.match(m.body, /^Auf Kurs ✅ 5\/6 Einheiten · Ø RPE 6,5 · Schlaf Ø 7,1 h · Prognose 59:10\nFokus: Weiter so\.\nTipp hier/);
+  assert.equal(m.url, "./?v=review");
+  assert.match(weeklyMessage({ w: 0 }, 1, { name: "Jaime" }).body, /^Jaime, diese Woche ist noch nichts eingetragen/);
+  assert.match(weeklyMessage(null, 3).body, /^Diese Woche/);
+  assert.equal(zurichDate(Date.UTC(2026, 9, 18, 23, 30)), "2026-10-19"); // 00:30 in Zürich
 });

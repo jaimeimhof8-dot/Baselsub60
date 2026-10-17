@@ -1670,6 +1670,8 @@
       td.l {
         font-size: 13px;
         color: var(--muted);
+        overflow-wrap: normal; /* „Sled Push“ darf zwischen Wörtern umbrechen, nie mitten im Wort */
+        min-width: 4.5em;
       }
       .res {
         font-weight: 700;
@@ -3579,7 +3581,7 @@
       } from "./src/extras.js";
       import { safeMerge, countEntries, stable } from "./src/merge.js";
       import * as review from "./src/review.js";
-      import { extractTests, applyTests, isRunTest } from "./src/testsync.js";
+      import { extractTests, applyTests, isRunTest, isStationTest } from "./src/testsync.js";
       import { swapDayData } from "./src/swap.js";
 
       /* ---------- Zeit ---------- */
@@ -3891,6 +3893,15 @@
         return applyTests(S.tests, myCol(), extractTests(p, p.i.map((_, j) => S.val[dk + "|" + j])), { onlyEmpty });
       }
       let testToast = {}; // pro Tag nur einmal melden
+      /* Beim Start: Testtage bis heute nachtragen (z. B. Werte von vor dem Update). Füllt nur leere Felder im Profil. */
+      function testsBackfill() {
+        let n = 0;
+        for (let i = 0; i <= Math.min(TODAY, LAST); i++) {
+          const p = dayPlan(i);
+          if (isRunTest(p) || isStationTest(p)) n += testsFromDay(i, true);
+        }
+        return n;
+      }
       /* Letzter Eintrag derselben Übung vor Tag i: {v: Wert, rpe: RPE jener Einheit} oder null */
       function lastEntry(i, t) {
         const n = exName(t);
@@ -6802,6 +6813,8 @@
         replaceCloud = false;
         // Backup/Wiederherstellung: lokaler Stand ersetzt die Cloud bewusst. Sonst zusammenführen, nie massenhaft löschen.
         if (remote && !replace) S = fill(safeMerge(loadBase(), S, remote));
+        // Testwerte aus Einheiten, die erst mit der Cloud gekommen sind (anderes Gerät, vor dem Update)
+        if (remote && testsBackfill()) toast("Testwerte aus deinen Einheiten in Tests & Benchmarks übernommen");
         const changed = stable(S) !== before || teamChanged;
         if (changed) saveLocal();
         // Basis = genau der Stand, der in der Cloud liegt – Änderungen während des Hochladens gehören noch nicht dazu
@@ -7173,6 +7186,11 @@
       }
       /* Strava im Hintergrund aktualisieren, wenn die letzte Synchronisierung über eine Stunde her ist. */
       function afterBoot() {
+        if (authed() && testsBackfill()) {
+          save();
+          render();
+          toast("Testwerte aus deinen Einheiten in Tests & Benchmarks übernommen");
+        }
         if (stTok() && Date.now() - (S.strava.at || 0) > 36e5) stravaSync(true);
         if (gmOn() && Date.now() - (S.garmin.at || 0) > 36e5) garminSync(true);
         // Erster Start / erstes Login ohne Strava: einmalig das Onboarding zeigen

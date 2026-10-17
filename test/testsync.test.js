@@ -18,6 +18,14 @@ test("Testtage am Titel erkennen, auch ohne Flag", () => {
   assert.deepEqual(timesIn("3:52 3:55, 3:50/3:58 (RPE 9)"), [232, 235, 230, 238]);
 });
 
+test("Handytastatur: Punkt, Komma, Apostroph statt Doppelpunkt", () => {
+  assert.deepEqual(timesIn("3.52 3.55 3.50 3.58"), [232, 235, 230, 238]);
+  assert.deepEqual(timesIn("3,52 / 3,55"), [232, 235]);
+  assert.deepEqual(timesIn("3'52 3′55"), [232, 235]);
+  assert.deepEqual(timesIn("RPE 8.5, 1000 m, 3:72"), []);
+  assert.deepEqual(extractTests(pacing, ["", "3.52 3.55 3.50 3.58", ""]).lauf, ["3:52", "3:55", "3:50", "3:58"]);
+});
+
 test("Pacing-Test: Splits aus der 4×1-km-Zeile, Einlaufzeit wird ignoriert", () => {
   assert.deepEqual(extractTests(pacing, ["15:00", "3:52 3:55 3:50 3:58", ""]), { lauf: ["3:52", "3:55", "3:50", "3:58"] });
   assert.deepEqual(extractTests(pacing, ["", "3:52, 3:55", ""]).lauf, ["3:52", "3:55", "", ""]);

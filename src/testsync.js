@@ -1,7 +1,7 @@
 // Testwerte aus einer Einheit in Profil → Tests & Benchmarks übernehmen (Pacing-Test, T-Test, Stationen-Benchmark).
 // Testtage werden am Flag (eingebauter Plan) oder am Titel erkannt – importierte PDF-Pläne setzen kein Flag.
 // Reine Funktionen, ohne DOM.
-import { mmss, parseT } from "./util.js";
+import { mmss } from "./util.js";
 
 /** Lauf-Test (4×1 km): Pacing-Test, T-Test, Lauf-Test T */
 export const isRunTest = (p) => !!p && p.k === "lauf" && (!!p.test || /pacing.?test|lauf.?test|\bt.?test\b/i.test(p.t || ""));
@@ -12,8 +12,12 @@ export const isStationTest = (p) => !!p && p.k === "station" && (!!p.test || /be
 const STATION_RE = [/ski/i, /sled push|schlitten.*schieb/i, /sled pull|schlitten.*zieh/i, /burpee/i, /row/i, /farmer/i, /lunge|sandbag/i, /wall ?ball/i];
 export const stationIndex = (text) => STATION_RE.findIndex((re) => re.test(String(text || "")));
 
-/** Alle Zeiten "m:ss" bzw. "mm:ss" in einem Eintrag, als Sekunden ("3:52 3:55, 3:50/3:58" → [232, 235, 230, 238]) */
-export const timesIn = (v) => (String(v || "").match(/\b\d{1,2}:[0-5]\d\b/g) || []).map(parseT);
+/** Alle Zeiten "m:ss" in einem Eintrag, als Sekunden ("3:52 3:55, 3:50/3:58" → [232, 235, 230, 238]).
+ * Auf der Handytastatur auch "3.52", "3,52" oder "3'52" (Punkt, Komma, Apostroph statt Doppelpunkt). */
+export const timesIn = (v) =>
+  [...String(v || "").matchAll(/(?<!\d|\d[.,:])(\d{1,2})[:.,'′’](\d{2})(?!\d|[.,:]\d)/g)]
+    .filter((m) => +m[2] < 60)
+    .map((m) => +m[1] * 60 + +m[2]);
 
 /**
  * Testwerte aus den Einträgen einer Einheit.

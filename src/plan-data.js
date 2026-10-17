@@ -9,7 +9,7 @@ const KRAFT = (items, n) => ({ t: "Kraft 1", k: "kraft", i: items, n });
 export const WEEKS_A = [
   { name: "Standortbestimmung", days: [
     KRAFT(["Back Squat 3×5 @75% RPE 7", "Bulgarian Split Squat 3×8 je Seite RPE 7", "Bench Press 3×6 RPE 7", "Shoulder Press 3×8 RPE 7", "Pull-ups 3×6 RPE 7", "Plank 3×50″"], "Arbeitsgewicht, kein Testsatz. Kein Zone-2-Zusatz danach."),
-    { t: "Lauf-Pacing-Test mit Jimoh", k: "lauf", i: ["15′ Einlaufen + Mobility", "4×1km zusammen, RPE 8–9 (kein Sprint), 2′ Trabpause", "Abstand zwischen euch notieren (5–15 Sek. Toleranz)", "10′ Auslaufen"], n: "Splits auch unter Menü → Tests eintragen, daraus entsteht dein Team-Tempo T.", test: true },
+    { t: "Lauf-Pacing-Test mit Jimoh", k: "lauf", i: ["15′ Einlaufen + Mobility", "4×1km zusammen, RPE 8–9 (kein Sprint), 2′ Trabpause", "Abstand zwischen euch notieren (5–15 Sek. Toleranz)", "10′ Auslaufen"], n: "Splits hier eintragen (z. B. 3:52 3:55 3:50 3:58), sie landen automatisch unter Tests & Benchmarks und ergeben dein Team-Tempo T.", test: true },
     { t: "Zone 2 Bike", k: "bike", i: ["Bike 45–60′ bei 65–70% max HF"] },
     { t: "Stationen-Benchmark mit Jimoh", k: "station", i: ["SkiErg 1000m", "Sled Push", "Sled Pull", "Burpee Broad Jumps 80m", "RowErg 1000m", "Farmers Carry", "Sandbag Lunges", "100 Wall Balls"], n: "3–5′ Pause zwischen den Stationen, im Wechsel: einer testet, einer stoppt. Ein Test, kein Erschöpfungs-Circuit.", test: true },
     R("Fix Ruhetag."),

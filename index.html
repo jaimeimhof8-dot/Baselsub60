@@ -3527,6 +3527,7 @@
       } from "./src/extras.js";
       import { safeMerge, countEntries, stable } from "./src/merge.js";
       import * as review from "./src/review.js";
+      import { extractTests, applyTests, isRunTest } from "./src/testsync.js";
       import { swapDayData } from "./src/swap.js";
 
       /* ---------- Zeit ---------- */
@@ -3824,10 +3825,20 @@
           return /plank/i.test(t)
             ? "Zeit, z. B. 50/55/50″"
             : "Gewicht, z. B. 80 kg × 5";
-        if (k === "lauf") return "Splits, z. B. 4:12 / 4:10 …";
+        if (k === "lauf")
+          return /4\s*[×x]\s*1\s*km/i.test(t) ? "4 Splits, z. B. 3:52 3:55 3:50 3:58" : "Splits, z. B. 4:12 / 4:10 …";
         if (k === "bike") return "Dauer, Ø HF, Watt";
         return "Zeit / Gewicht";
       }
+      /* Testtag (Pacing-/T-Test, Stationen-Benchmark): Einträge der Einheit in Profil → Tests & Benchmarks übernehmen.
+   onlyEmpty = nur leere Felder füllen (Garmin/Strava); Handeinträge ersetzen den alten Wert. Gibt die Anzahl Änderungen zurück. */
+      function testsFromDay(i, onlyEmpty) {
+        const p = dayPlan(i);
+        if (!p) return 0;
+        const dk = keyI(i);
+        return applyTests(S.tests, myCol(), extractTests(p, p.i.map((_, j) => S.val[dk + "|" + j])), { onlyEmpty });
+      }
+      let testToast = {}; // pro Tag nur einmal melden
       /* Letzter Eintrag derselben Übung vor Tag i: {v: Wert, rpe: RPE jener Einheit} oder null */
       function lastEntry(i, t) {
         const n = exName(t);
@@ -7984,21 +7995,10 @@
               const k = r >= 0 ? r : j;
               if (k >= 0) S.val[dk + "|" + k] = rs;
               msg = "Erledigt – Intervallzeiten übernommen";
-              // Pacing-Test: Pace jeder Wiederholung direkt in Profil → Tests (nur leere Felder, nichts überschreiben)
-              if (p.test && p.k === "lauf") {
-                const P = dash.repPaces(a, plan),
-                  mc = myCol(),
-                  L = S.tests.lauf[mc] || (S.tests.lauf[mc] = ["", "", "", ""]);
-                let n = 0;
-                P.slice(0, 4).forEach((v, x) => {
-                  if (v && !String(L[x] || "").trim()) {
-                    L[x] = mmss(v);
-                    n++;
-                  }
-                });
-                if (n)
-                  msg =
-                    "Erledigt – Intervallzeiten auch in den Pacing-Test übernommen";
+              // Lauf-Test: Pace jeder Wiederholung direkt in Profil → Tests (nur leere Felder, nichts überschreiben)
+              if (isRunTest(p)) {
+                if (testsFromDay(i, true))
+                  msg = "Erledigt – Intervallzeiten auch in den Pacing-Test übernommen";
               }
             }
           }
@@ -8506,6 +8506,11 @@
         } else if (d.v2) {
           S.val[d.v2] = t.value;
           t.classList.remove("pre");
+          const di = idxOfIso(d.v2.split("|")[0]);
+          if (testsFromDay(di, false) && !testToast[di]) {
+            testToast[di] = 1;
+            toast("Wird automatisch in Tests & Benchmarks übernommen");
+          }
         } else if (
           t.readOnly ||
           ((d.w || d.l || d.s || d.t) &&

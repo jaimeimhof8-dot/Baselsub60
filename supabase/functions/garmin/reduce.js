@@ -71,6 +71,17 @@ export function reduceWell(raw = {}) {
     const o = at(day(d.calendarDate));
     o.sleepH = Math.round(d.sleepTimeSeconds / 360) / 10;
     const sc = d.sleepScores && d.sleepScores.overall; o.sleepScore = sc && sc.value != null ? round(sc.value) : null;
+    // Schlafphasen (Minuten), Zeiten (HH:MM lokal) und Nachtwerte – nur, was Garmin liefert
+    const min = (v) => (v == null || isNaN(+v) ? null : Math.round(+v / 60));
+    const hhmm = (ts) => { if (ts == null || isNaN(+ts)) return null; const t = new Date(+ts); return String(t.getUTCHours()).padStart(2, "0") + ":" + String(t.getUTCMinutes()).padStart(2, "0"); };
+    const extra = {
+      deep: min(d.deepSleepSeconds), light: min(d.lightSleepSeconds), rem: min(d.remSleepSeconds), awake: min(d.awakeSleepSeconds),
+      bed: hhmm(d.sleepStartTimestampLocal), wake: hhmm(d.sleepEndTimestampLocal),
+      resp: d.averageRespirationValue != null ? Math.round(+d.averageRespirationValue * 10) / 10 : null,
+      spo2: round(d.averageSpO2Value), sleepStress: d.avgSleepStress != null ? Math.round(+d.avgSleepStress * 10) / 10 : null,
+      restless: round(s.restlessMomentsCount),
+    };
+    for (const [k, v] of Object.entries(extra)) if (v != null) o[k] = v;
   }
   for (const t of raw.tr || []) {
     const list = Array.isArray(t) ? t : t ? [t] : [];

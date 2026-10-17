@@ -150,3 +150,11 @@ test("Body Battery auch im Format mit Beschreibungsliste", () => {
     bodyBatteryValuesArray: [[1, "MEASURED", 30, 3.0], [2, "MEASURED", 77, 3.0]] }] });
   assert.equal(w["2026-10-13"].bb, 77);
 });
+
+test("Schlaf: Phasen, Zeiten und Nachtwerte, nur wenn vorhanden", () => {
+  const well = reduceWell({ sleep: [{ restlessMomentsCount: 41, dailySleepDTO: { calendarDate: "2026-10-16", sleepTimeSeconds: 27000,
+    deepSleepSeconds: 5400, lightSleepSeconds: 14400, remSleepSeconds: 7200, awakeSleepSeconds: 900,
+    sleepStartTimestampLocal: Date.UTC(2026, 9, 15, 22, 40), sleepEndTimestampLocal: Date.UTC(2026, 9, 16, 6, 25),
+    averageRespirationValue: 14.37, averageSpO2Value: 95.6, avgSleepStress: 18.24, sleepScores: { overall: { value: 81 } } } }] });
+  assert.deepEqual(well["2026-10-16"], { sleepH: 7.5, sleepScore: 81, deep: 90, light: 240, rem: 120, awake: 15, bed: "22:40", wake: "06:25", resp: 14.4, spo2: 96, sleepStress: 18.2, restless: 41 });
+});

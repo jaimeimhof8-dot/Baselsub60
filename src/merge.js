@@ -5,7 +5,7 @@
 // Reine Funktionen, ohne DOM.
 
 /** Felder, die pro Eintrag zusammengeführt werden ({schlüssel: wert}). Alles andere zählt als Ganzes. */
-export const MAP_FIELDS = ["done", "val", "rpe", "notes", "sched", "skip", "edit", "checkin", "dismiss", "weights", "sore", "extra", "solo", "onb"];
+export const MAP_FIELDS = ["done", "val", "rpe", "notes", "sched", "skip", "edit", "checkin", "dismiss", "weights", "sore", "extra", "solo", "onb", "review"];
 
 const isObj = (o) => !!o && typeof o === "object" && !Array.isArray(o);
 
@@ -63,5 +63,32 @@ export function mergeState(base, local, remote) {
     } else v = pick(b[k], local[k], remote[k], localNewer);
     if (v !== undefined) out[k] = v;
   }
+  return out;
+}
+
+/** Wie viel steckt in einem Stand: Einträge aller Listen-Felder, Strava/Garmin-Werte, ausgefüllte Tests, importierter Plan. */
+export function countEntries(s) {
+  if (!isObj(s)) return 0;
+  const n = (o) => (isObj(o) ? Object.keys(o).length : 0);
+  let c = MAP_FIELDS.reduce((sum, k) => sum + n(s[k]), 0);
+  if (isObj(s.strava)) c += n(s.strava.acts);
+  if (isObj(s.garmin)) c += n(s.garmin.well);
+  const filled = (v) => (Array.isArray(v) ? v.reduce((x, y) => x + filled(y), 0) : isObj(v) ? Object.values(v).reduce((x, y) => x + filled(y), 0) : String(v ?? "").trim() ? 1 : 0);
+  c += filled(s.tests);
+  if (isObj(s.plan)) c += 1;
+  return c;
+}
+
+/**
+ * mergeState mit Schutz vor Massenlöschung. Ein Sync löscht nie mehr als die Hälfte der Einträge auf einmal
+ * (ab 5 Einträgen) – so etwas tippt niemand von Hand, das ist ein leeres oder veraltetes Gerät
+ * (z. B. nach Abmelden/Anmelden). Dann wird ohne Basis vereinigt: nichts geht verloren, beide Seiten bleiben.
+ * Ausnahme: Backup/Wiederherstellung ersetzt bewusst alles, das läuft ohne Zusammenführung (App: replaceCloud).
+ */
+export function safeMerge(base, local, remote) {
+  const out = mergeState(base, local, remote);
+  if (!isObj(base) || !isObj(local) || !isObj(remote)) return out;
+  const before = Math.max(countEntries(local), countEntries(remote)), after = countEntries(out);
+  if (before - after >= 5 && after < before / 2) return mergeState(null, local, remote);
   return out;
 }

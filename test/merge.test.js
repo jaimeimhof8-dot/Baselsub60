@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mergeState, stable } from "../src/merge.js";
+import { mergeState, safeMerge, countEntries, stable } from "../src/merge.js";
 
 const st = (o) => ({ done: {}, val: {}, notes: {}, extra: {}, solo: {}, strava: { acts: {}, at: 0 }, chat: [], plan: null, _t: 1, ...o });
 
@@ -60,4 +60,34 @@ test("ohne Cloud-Stand bleibt der lokale, Eingaben bleiben unverändert", () => 
   mergeState(null, local, remote);
   assert.equal(stable(remote), snap);
   assert.deepEqual(local.done, { a: 1 });
+});
+
+test("Abmelden + Anmelden: leeres Gerät mit alter Basis löscht die Cloud nicht (Fehler vom 17.10.2026)", () => {
+  const full = st({ done: { a: 1, b: 1, c: 1, d: 1, e: 1, f: 1 }, notes: { x: "Wade" }, plan: { days: {} }, _t: 50 });
+  const empty = { done: {}, val: {}, notes: {}, extra: {}, solo: {}, strava: { acts: {}, at: 0 }, chat: [], plan: null };
+  // Ohne Schutz wäre alles weg (das ist der alte Fehler)
+  assert.deepEqual(mergeState(full, empty, full).done, {});
+  const m = safeMerge(full, empty, full);
+  assert.equal(countEntries(m), countEntries(full));
+  assert.deepEqual(m.plan, { days: {} });
+  assert.equal(m.notes.x, "Wade");
+});
+
+test("Anderes Gerät mit vollen Daten holt eine geleerte Cloud zurück", () => {
+  const full = st({ done: { a: 1, b: 1, c: 1, d: 1, e: 1, f: 1 }, plan: { days: {} }, _t: 50 });
+  const wiped = st({ _t: 60 });
+  const m = safeMerge(full, full, wiped);
+  assert.deepEqual(Object.keys(m.done).sort(), ["a", "b", "c", "d", "e", "f"]);
+  assert.ok(m.plan);
+});
+
+test("Einzelne Haken entfernen bleibt möglich", () => {
+  const base = st({ done: { a: 1, b: 1, c: 1, d: 1, e: 1, f: 1 } });
+  const local = st({ done: { a: 1, b: 1, c: 1, d: 1 }, _t: 5 });
+  assert.deepEqual(Object.keys(safeMerge(base, local, base).done).sort(), ["a", "b", "c", "d"]);
+});
+
+test("countEntries zählt Listen, Aktivitäten, Tests und Plan", () => {
+  assert.equal(countEntries(null), 0);
+  assert.equal(countEntries({ done: { a: 1 }, strava: { acts: { x: {} } }, tests: { lauf: { j: ["3:50", ""] }, trans: ["", "6"] }, plan: { days: {} } }), 5);
 });

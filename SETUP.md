@@ -27,6 +27,9 @@ Wer `schema.sql` schon einmal ausgeführt hat, führt die neue Version einfach n
 
 Bei der ersten Anmeldung fragt die App, ob die bisherigen Einträge auf dem Handy übernommen werden sollen. Beim eigenen Handy: **Ja**.
 
+## Cloud-Verlauf (Schutz vor Datenverlust)
+`supabase/history.sql` im SQL Editor ausführen (einmalig, gefahrlos wiederholbar). Danach sichert die Datenbank vor jeder Änderung automatisch den alten Stand: höchstens stündlich und immer vor grossen Änderungen, 45 Tage lang, die letzten 30 Stände immer. Wiederherstellen in der App unter **Menü → Backup → Früheren Stand wiederherstellen**. Zusätzlich löscht die App beim Synchronisieren nie mehr als die Hälfte der Einträge auf einmal (`safeMerge` in `src/merge.js`), sondern führt dann beide Stände zusammen.
+
 ## Hinweise
 - **Pausieren:** Gratis-Projekte pausieren nach 7 Tagen ohne Nutzung. Mit täglichem Training passiert das nicht, sonst im Dashboard auf „Restore“ klicken.
 - **Fremde Anmeldungen:** Ist „Allow new users to sign up“ ausgeschaltet (Schritt 3), kann niemand sonst ein Konto anlegen. Auch mit Konto sähe ein Fremder nichts, solange seine E-Mail nicht in `schema.sql` steht.

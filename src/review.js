@@ -1,0 +1,133 @@
+// Wochen-Check: einmal pro Woche ehrlich prüfen, ob du auf Kurs Richtung Sub-60 bist – nicht erst am Race Day.
+// Drei Teile: (1) automatische Zahlen der Woche, (2) Rennprognose aus den Tests, (3) eigene Einschätzung.
+// Gespeicherte Form (S.review): {wochenIndex: {feel, prog, pain, note, at, level, fc}} – fc = Prognose in Sekunden zum Zeitpunkt des Checks.
+// Reine Funktionen, ohne DOM.
+import { mmss } from "./util.js";
+
+export const GOAL_S = 3600;
+/** Obergrenze der mittleren Anstrengung (RPE) je Wochentyp – darüber war die Woche härter als geplant. */
+export const RPE_MAX = { Test: 8.5, moderat: 6.5, hart: 7.5, Spitzenreiz: 8.5, Deload: 5.5, Taper: 6 };
+/** Annahmen der Prognose (bewusst sichtbar, siehe forecastText) */
+export const RUN_PENALTY = 20; // s/km langsamer als im 1-km-Test (8 km, nach Stationen)
+export const DOUBLES_SHARE = 0.55; // Anteil der Solo-Stationszeit im Doubles (Arbeit wird geteilt, Wechsel kosten)
+export const ROXZONE = 300; // s für alle Wege in der Roxzone
+
+export const SELF = {
+  feel: { label: "Wie fühlst du dich?", opts: ["gut", "okay", "müde"] },
+  prog: { label: "Fortschritt gespürt?", opts: ["stärker", "gleich", "schwächer"] },
+  pain: { label: "Schmerzen?", opts: ["keine", "leicht", "stark"] },
+};
+
+const ok = (v) => typeof v === "number" && isFinite(v) && v > 0;
+const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+const RANK = { green: 0, yellow: 1, red: 2 };
+const worse = (a, b) => (RANK[b] > RANK[a] ? b : a);
+
+/**
+ * Zahlen einer Woche bewerten.
+ * days: [{t, k, done, skip, rpe, ready}] – nur Tage bis heute; k "rest" zählt nicht
+ * load: {runKm, min} diese Woche, prev: [{runKm, min}] Vorwochen (neueste zuletzt)
+ * extras: Zusatz-Einheiten der Woche, self: eigene Einschätzung ({feel, prog, pain} als Index 0–2) oder null
+ * @returns {level, planned, done, missedKey: [t], avgRpe, rpeMax, reds, yellows, runRamp, extraN, extraMin, notes: [{level, text}], focus: [text]}
+ */
+export function weekCheck({ days = [], wave = "moderat", load = null, prev = [], extras = [], self = null } = {}) {
+  const sessions = days.filter((d) => d && d.k !== "rest");
+  const done = sessions.filter((d) => d.done).length;
+  const missedKey = sessions.filter((d) => !d.done && ["lauf", "station", "sim", "kraft"].includes(d.k)).map((d) => d.t);
+  const rpes = sessions.map((d) => d.rpe).filter((v) => v != null && !isNaN(v)).map(Number);
+  const avgRpe = rpes.length ? mean(rpes) : null;
+  const rpeMax = RPE_MAX[wave] ?? 7.5;
+  const reds = days.filter((d) => d && d.ready === "red").length;
+  const yellows = days.filter((d) => d && d.ready === "yellow").length;
+  const extraMin = extras.reduce((s, e) => s + (e.min || 0), 0);
+  const notes = [], focus = [];
+  let level = "green";
+  const add = (lv, text, f) => { level = worse(level, lv); notes.push({ level: lv, text }); if (f) focus.push(f); };
+
+  const quota = sessions.length ? done / sessions.length : 1;
+  if (sessions.length) {
+    const txt = `${done} von ${sessions.length} Einheiten erledigt (${Math.round(quota * 100)} %).`;
+    if (quota < 0.6) add("red", txt, "Wochenplan realistisch machen: feste Zeiten im Kalender, notfalls mit dem Coach umplanen statt ausfallen lassen.");
+    else if (quota < 0.85) add("yellow", txt, "Ausgefallene Einheiten nicht doppelt nachholen – lieber mit „Umplanen“ verschieben und die Woche sauber beenden.");
+    else add("green", txt);
+  }
+  if (missedKey.length >= 2) add("red", `Verpasste Schlüsseleinheiten: ${missedKey.join(", ")}.`, "Schlüsseleinheiten (Lauf, Stationen, Doubles) haben Vorrang – Rad und Zusatz notfalls streichen.");
+  else if (missedKey.length === 1) add("yellow", `Verpasst: ${missedKey[0]}.`);
+
+  if (avgRpe != null) {
+    const r = avgRpe.toFixed(1).replace(".", ",");
+    if (avgRpe > rpeMax + 1) add("red", `Ø Anstrengung ${r} – deutlich härter als für eine ${wave}-Woche vorgesehen (bis ${String(rpeMax).replace(".", ",")}).`, "Lockere Einheiten wirklich locker halten (Zone 2 = du kannst noch sprechen).");
+    else if (avgRpe > rpeMax) add("yellow", `Ø Anstrengung ${r} – etwas härter als geplant (bis ${String(rpeMax).replace(".", ",")}).`, "Bei Intervallen das Tempo halten, nicht schneller laufen als vorgegeben.");
+    else add("green", `Ø Anstrengung ${r} – passt zur ${wave}-Woche.`);
+  } else if (sessions.some((d) => d.done)) notes.push({ level: "yellow", text: "Keine RPE-Werte – nach jedem Training die Anstrengung eintragen, sonst fehlt die Hälfte des Bildes." });
+
+  if (reds >= 2) add("red", `${reds}× Check-in rot.`, "Schlaf und Erholung priorisieren. Bei anhaltend rot: Coach → Verletzt/krank.");
+  else if (reds === 1 || yellows >= 3) add("yellow", `Check-ins: ${reds}× rot, ${yellows}× gelb.`);
+
+  let runRamp = null;
+  const pr = prev.filter((p) => p && p.runKm > 0).slice(-3);
+  if (load && pr.length) {
+    const base = mean(pr.map((p) => p.runKm));
+    runRamp = base > 0 ? load.runKm / base - 1 : null;
+    if (runRamp != null && runRamp > 0.3 && load.runKm >= 10)
+      add("yellow", `Laufumfang +${Math.round(runRamp * 100)} % gegenüber den Vorwochen.`, "Laufumfang höchstens ~10–20 % pro Woche steigern (Knie, Achillessehne).");
+  }
+
+  if (self) {
+    if (self.pain === 2) add("red", "Starke Schmerzen gemeldet.", "Schmerzen abklären lassen und im Coach unter „Verletzt / krank“ eintragen – nicht drüber trainieren.");
+    else if (self.pain === 1) add("yellow", "Leichte Schmerzen gemeldet.", "Schmerzstelle beobachten, im Muskelkater-Melder eintragen.");
+    if (self.feel === 2 && self.prog === 2) add("yellow", "Müde und schwächer – mögliches Zeichen für zu wenig Erholung.", "Eine Woche lang 8 h Schlaf anpeilen, Zusatz-Einheiten weglassen.");
+  }
+  if (!focus.length) focus.push(level === "green" ? "Weiter so – Plan wie vorgesehen durchziehen." : "Kleine Stellschraube: die gelben Punkte oben im Blick behalten.");
+  return { level, planned: sessions.length, done, missedKey, avgRpe, rpeMax, reds, yellows, runRamp, extraN: extras.length, extraMin, notes, focus: [...new Set(focus)].slice(0, 3) };
+}
+
+/**
+ * Grobe Rennprognose (Doubles) aus den Testwerten in Sekunden.
+ * lauf: 1-km-Testzeiten (beide Partner), station: 8× [ich, Partner] Solo-Stationszeiten.
+ * @returns null ohne Laufwerte, sonst {T, run, st (null, falls Stationen fehlen), rox, total (null, falls unvollständig), missing}
+ */
+export function forecast({ lauf = [], station = [] } = {}) {
+  const runs = lauf.filter(ok);
+  if (!runs.length) return null;
+  const T = mean(runs), run = 8 * (T + RUN_PENALTY);
+  const per = Array.from({ length: 8 }, (_, r) => { const v = (station[r] || []).filter(ok); return v.length ? mean(v) : null; });
+  const known = per.filter((v) => v != null);
+  const st = known.length === 8 ? known.reduce((a, b) => a + b, 0) * DOUBLES_SHARE : null;
+  return { T, run, st, rox: ROXZONE, total: st == null ? null : run + st + ROXZONE, missing: 8 - known.length };
+}
+
+/**
+ * Prognose gegen Ziel: {level, gap (s, positiv = zu langsam), perWeek (nötige Verbesserung pro Woche)}.
+ * Bis 40 s pro Woche gilt als machbar (gelb), mehr ist unrealistisch (rot).
+ */
+export function onTrack(total, weeksLeft, goal = GOAL_S) {
+  if (!ok(total)) return null;
+  const gap = total - goal, perWeek = gap > 0 ? gap / Math.max(1, weeksLeft) : 0;
+  const level = gap <= 0 ? "green" : perWeek <= 40 ? "yellow" : "red";
+  return { level, gap, perWeek };
+}
+
+/** Kurztext, z. B. "62:10 – 2:10 über dem Ziel, ca. 9 s pro Woche aufholen" */
+export function trackText(total, t) {
+  if (!t) return "";
+  if (t.gap <= 0) return `${mmss(total)} – ${mmss(-t.gap)} unter dem Ziel 60:00`;
+  return `${mmss(total)} – ${mmss(t.gap)} über dem Ziel, ca. ${Math.ceil(t.perWeek)} s pro Woche aufholen`;
+}
+
+/** Eigene Einschätzung prüfen (Index 0–2 je Frage, Notiz max. 300 Zeichen). Ungültiges fällt weg. */
+export function cleanSelf(o) {
+  const out = {};
+  for (const k of Object.keys(SELF)) if ([0, 1, 2].includes(o && o[k])) out[k] = o[k];
+  const n = String((o && o.note) || "").trim().slice(0, 300);
+  if (n) out.note = n;
+  return out;
+}
+
+/** Ist der Check einer Woche fällig? Ab Samstag der Woche bis Dienstag danach, solange nicht gemacht. */
+export function reviewDue(today, reviews) {
+  const w = Math.floor(today / 7), d = ((today % 7) + 7) % 7;
+  if (d >= 5 && !(reviews && reviews[w] && reviews[w].at)) return w;
+  if (d <= 1 && w > 0 && !(reviews && reviews[w - 1] && reviews[w - 1].at)) return w - 1;
+  return null;
+}

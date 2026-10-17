@@ -6043,6 +6043,20 @@
         const reg = await navigator.serviceWorker.ready;
         return reg.pushManager.getSubscription();
       }
+      /* Function „weekly“ aufrufen; das Abo geht immer mit, damit es dem angemeldeten Konto gehört
+         (über die Function, weil ein Abo eines anderen Kontos auf demselben Gerät per RLS nicht übernommen werden kann) */
+      async function pushInvoke(action, sub) {
+        const j = sub ? sub.toJSON() : null;
+        const { data, error } = await sb.functions.invoke("weekly", {
+          body: { action, sub: j ? { endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth } : undefined },
+        });
+        if (error) {
+          // Grund aus der Antwort der Function lesen (no_subscription, forbidden …)
+          const r = await (error.context && error.context.json ? error.context.json().catch(() => null) : null);
+          throw new Error((r && r.error) || error.message || "http");
+        }
+        return data;
+      }
       async function pushCheck() {
         if (!PUSH_OK) return;
         const sub = await pushSub().catch(() => null);
@@ -6063,18 +6077,14 @@
         const sub =
           (await reg.pushManager.getSubscription()) ||
           (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key }));
-        const j = sub.toJSON();
-        const { error } = await sb
-          .from("push_subs")
-          .upsert({ endpoint: j.endpoint, user_id: USER.id, p256dh: j.keys.p256dh, auth: j.keys.auth });
-        if (error) throw error;
+        await pushInvoke("subscribe", sub);
         pushState = "on";
         toast("Wochenbericht ist aktiv – jeden Sonntag um 18 Uhr");
       }
       async function pushOff() {
         const sub = await pushSub();
         if (sub) {
-          await sb.from("push_subs").delete().eq("endpoint", sub.endpoint);
+          await sb.from("push_subs").delete().eq("endpoint", sub.endpoint); // nur eigene Abos (RLS)
           await sub.unsubscribe();
         }
         pushState = "off";
@@ -8247,12 +8257,7 @@
               if (d.act === "push-on") await pushOn();
               if (d.act === "push-off") await pushOff();
               if (d.act === "push-test") {
-                const { data, error } = await sb.functions.invoke("weekly", { body: { action: "test" } });
-                if (error) {
-                  // Grund aus der Antwort der Function lesen (no_subscription, forbidden …)
-                  const j = await (error.context && error.context.json ? error.context.json().catch(() => null) : null);
-                  throw new Error((j && j.error) || error.message || "http");
-                }
+                const data = await pushInvoke("test", await pushSub());
                 if (!data || !data.sent) throw new Error(data && data.failed ? "send_failed" : "not_sent");
                 toast("Test gesendet – kommt gleich aufs Handy");
               }
@@ -8262,6 +8267,7 @@
                 no_subscription: "Dieses Gerät ist nicht angemeldet. Ausschalten und wieder einschalten.",
                 forbidden: "Keine Berechtigung – ab- und wieder anmelden.",
                 no_secret: "Schlüssel fehlen in Supabase (SETUP.md, Wochenbericht).",
+                save_failed: "Gerät konnte nicht gespeichert werden. Später nochmals versuchen.",
                 send_failed: "Google hat die Nachricht abgelehnt. Ausschalten und wieder einschalten.",
               };
               toast(

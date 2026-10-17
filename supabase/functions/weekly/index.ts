@@ -6,6 +6,8 @@
 //
 // Body: {action: "send-all"} + x-cron-secret → {sent, gone, failed}   (alle Abos)
 //       {action: "test"} (angemeldet)       → {sent}                   (nur eigene Geräte, sofort)
+//       {action: "subscribe"} (angemeldet)  → {ok}
+//       sub: {endpoint, p256dh, auth} (optional bei test/subscribe) ordnet das Abo dieses Geräts dem Nutzer zu
 import { createClient } from "npm:@supabase/supabase-js@2";
 import webpush from "npm:web-push@3.6.7";
 import { weeklyMessage, weekOf, zurichDate } from "./report.js";
@@ -80,6 +82,17 @@ Deno.serve(async (req) => {
   const { data: u } = await sb.auth.getUser(auth.replace(/^Bearer\s+/, ""));
   const uid = u?.user?.id;
   if (!uid) return json({ error: "forbidden" }, 403);
+
+  // Abo dieses Geräts dem angemeldeten Nutzer zuordnen (auch wenn es vorher einem anderen Konto auf dem Gerät gehörte)
+  const sub = body.sub as Record<string, unknown> | undefined;
+  if (sub) {
+    const endpoint = String(sub.endpoint || ""), p256dh = String(sub.p256dh || ""), key = String(sub.auth || "");
+    if (!/^https:\/\//.test(endpoint) || endpoint.length > 1000 || !p256dh || p256dh.length > 200 || !key || key.length > 100)
+      return json({ error: "bad_request" }, 400);
+    const { error } = await db.from("push_subs").upsert({ endpoint, user_id: uid, p256dh, auth: key });
+    if (error) return json({ error: "save_failed" }, 500);
+  }
+  if (body.action === "subscribe") return json({ ok: !!sub });
 
   if (body.action === "test") {
     const { data } = await db.from("push_subs").select("user_id, endpoint, p256dh, auth").eq("user_id", uid);

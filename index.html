@@ -8248,14 +8248,25 @@
               if (d.act === "push-off") await pushOff();
               if (d.act === "push-test") {
                 const { data, error } = await sb.functions.invoke("weekly", { body: { action: "test" } });
-                if (error || !data || !data.sent) throw error || new Error("not_sent");
+                if (error) {
+                  // Grund aus der Antwort der Function lesen (no_subscription, forbidden …)
+                  const j = await (error.context && error.context.json ? error.context.json().catch(() => null) : null);
+                  throw new Error((j && j.error) || error.message || "http");
+                }
+                if (!data || !data.sent) throw new Error(data && data.failed ? "send_failed" : "not_sent");
                 toast("Test gesendet – kommt gleich aufs Handy");
               }
-            } catch (_) {
+            } catch (e) {
+              const why = String((e && e.message) || e || "");
+              const MSG = {
+                no_subscription: "Dieses Gerät ist nicht angemeldet. Ausschalten und wieder einschalten.",
+                forbidden: "Keine Berechtigung – ab- und wieder anmelden.",
+                no_secret: "Schlüssel fehlen in Supabase (SETUP.md, Wochenbericht).",
+                send_failed: "Google hat die Nachricht abgelehnt. Ausschalten und wieder einschalten.",
+              };
               toast(
-                d.act === "push-test"
-                  ? "Test fehlgeschlagen. Ist die Function „weekly“ eingerichtet (SETUP.md)?"
-                  : "Hat nicht geklappt. Ist supabase/push.sql ausgeführt?",
+                MSG[why] ||
+                  (d.act === "push-test" ? "Test fehlgeschlagen" : "Einschalten fehlgeschlagen") + (why ? ` (${why.slice(0, 80)})` : ""),
                 true,
               );
             }

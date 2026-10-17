@@ -3318,6 +3318,58 @@
       .rv-notes .rv-yellow::before { background: var(--warn); }
       .rv-notes .rv-red::before { background: var(--danger); }
       .rv-focus { padding-left: 18px; }
+      /* Wochenrückblick als Dashboard */
+      .rv-of { font-size: 0.55em; color: var(--muted); font-weight: 500; }
+      .rv-hero { display: grid; grid-template-columns: auto 1fr; gap: var(--s4); align-items: center; }
+      .rv-verdict { margin: var(--s2) 0 0; font-weight: 600; font-size: 17px; line-height: 1.35; }
+      .rv-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--s1); text-align: center; }
+      .rv-day { display: grid; justify-items: center; gap: 6px; padding: var(--s2) 0; border-radius: 10px; background: var(--well); font-size: 12px; color: var(--muted); }
+      .rv-day.today { box-shadow: inset 0 0 0 1.5px var(--accent); }
+      .rv-day b { font-family: var(--f-head); font-size: 18px; color: var(--text); line-height: 1; }
+      .rv-day i, .rv-leg i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+      .rv-done i { background: var(--ok); }
+      .rv-miss i { background: var(--danger); border-radius: 2px; }
+      .rv-rest i { border: 1.5px solid var(--rest); }
+      .rv-open i { border: 1.5px dashed var(--muted); }
+      .rv-rest b, .rv-open b { color: var(--muted); }
+      .rv-leg { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s3); font-size: 12px; }
+      .rv-leg span { display: inline-flex; align-items: center; gap: 5px; }
+      .rv-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s2); margin-bottom: var(--s3); }
+      .kpi { background: var(--card); box-shadow: var(--edge); border-radius: 16px; padding: var(--s3) var(--s4); display: grid; gap: 2px; border-left: 3px solid transparent; }
+      .kpi span { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+      .kpi b { font-family: var(--f-head); font-size: 28px; line-height: 1.1; }
+      .kpi b small { font-size: 0.6em; color: var(--muted); }
+      .kpi em { font-style: normal; font-size: 12px; color: var(--muted); }
+      .kpi-green { border-left-color: var(--ok); }
+      .kpi-yellow { border-left-color: var(--warn); }
+      .kpi-red { border-left-color: var(--danger); }
+      .rv-total { display: flex; align-items: baseline; gap: var(--s2); margin-top: var(--s3); }
+      .rv-total b { font-family: var(--f-head); font-size: 44px; line-height: 1; }
+      .rv-total span { color: var(--muted); font-size: 14px; }
+      .rv-bar { position: relative; display: flex; height: 12px; border-radius: 6px; background: var(--well); margin-top: var(--s3); }
+      .rv-bar i:first-child { border-radius: 6px 0 0 6px; }
+      .rv-bar i:nth-child(3) { border-radius: 0 6px 6px 0; }
+      .rv-bar u { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--text); border-radius: 1px; }
+      .b-run { background: var(--lauf); }
+      .b-st { background: var(--station); }
+      .b-rox { background: var(--rest); }
+      .rv-leg .b-run, .rv-leg .b-st, .rv-leg .b-rox { background: none; }
+      .rv-leg .b-run i { background: var(--lauf); }
+      .rv-leg .b-st i { background: var(--station); }
+      .rv-leg .b-rox i { background: var(--rest); }
+      .rv-how summary { cursor: pointer; color: var(--muted); font-size: 13px; min-height: 32px; display: flex; align-items: center; }
+      .rv-anss { display: flex; flex-wrap: wrap; gap: var(--s2); }
+      .rv-ans { background: var(--well); border-radius: 999px; padding: 6px 12px; font-size: 13px; color: var(--muted); }
+      .rv-ans.v-g b { color: var(--ok); }
+      .rv-ans.v-y b { color: var(--warn); }
+      .rv-ans.v-r b { color: var(--danger); }
+      .rv-season { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; }
+      .rv-wk-c { min-height: 40px; border-radius: 10px; display: grid; place-items: center; font: 600 14px var(--f-head); border: 0; background: var(--well); color: var(--muted); border-bottom: 3px solid transparent; cursor: pointer; }
+      .rv-wk-c.rv-green { border-bottom-color: var(--ok); color: var(--text); }
+      .rv-wk-c.rv-yellow { border-bottom-color: var(--warn); color: var(--text); }
+      .rv-wk-c.rv-red { border-bottom-color: var(--danger); color: var(--text); }
+      .rv-wk-c.rv-future { opacity: 0.4; cursor: default; }
+      .rv-wk-c.on { box-shadow: inset 0 0 0 1.5px var(--accent); }
       .vh-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
       /* Ampel zusätzlich über die Form: gelb = Raute, rot = Quadrat (nicht nur Farbe) */
       .rv-notes .rv-yellow::before { border-radius: 1px; transform: rotate(45deg); }
@@ -3432,9 +3484,9 @@
       <button class="mi" data-v="review">
         <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg
         ><span
-          ><b>Wochen-Check</b
+          ><b>Wochenrückblick</b
           ><span class="sub"
-            >Auf Kurs für Sub-60? Prognose, Verlauf, Wochenbericht</span
+            >Auf Kurs für Sub-60? Woche, Prognose, Saison</span
           ></span
         >
       </button>
@@ -4594,25 +4646,25 @@
     <p class="mt-1">Team-Tempo T <span class="res">${isNaN(T) ? "–" : mmss(T) + "/km"}</span></p>
     <div class="hint">Sub-60 braucht im Rennen ca. 3:58/km. Abstand zwischen euch: 5–15 s.</div></div>`;
         const ST = [
-          "SkiErg 1000m",
+          "SkiErg",
           "Sled Push",
           "Sled Pull",
-          "Burpee BJ 80m",
-          "RowErg 1000m",
-          "Farmers Carry",
-          "Sandbag Lunges",
-          "Wall Balls 100",
+          "Burpees",
+          "RowErg",
+          "Farmers",
+          "Lunges",
+          "Wall Balls",
         ];
-        h += `<div class="cap">Stationen-Benchmark</div><div class="card"><table><tr><th>Station</th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th><th></th></tr>
+        h += `<div class="cap">Stationen-Benchmark</div><div class="card"><table><tr><th>Station</th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th><th>Teilen</th></tr>
     ${ST.map((s, r) => {
       const a = parseT(A.station[r]),
         b = parseT(B.station[r]);
       let rec = "";
       if (!isNaN(a) && !isNaN(b)) {
         const df = Math.abs(a - b);
-        rec = df < 15 ? "50/50" : esc(a < b ? ME : PARTNER) + " +";
+        rec = df < 15 ? "50/50" : `mehr ${esc((a < b ? ME : PARTNER).slice(0, 1))}`;
       }
-      return `<tr><td class="l">${s}</td><td>${pin(own ? `data-s="${r}|${mc}"` : "", A.station[r], `${s} ${ME}`)}</td><td>${pin("", B.station[r], `${s} ${PARTNER}`)}</td><td class="res" style="font-size:12px">${rec}</td></tr>`;
+      return `<tr><td class="l">${s}</td><td>${pin(own ? `data-s="${r}|${mc}"` : "", A.station[r], `${s} ${ME}`)}</td><td>${pin("", B.station[r], `${s} ${PARTNER}`)}</td><td class="res" style="font-size:12px;white-space:nowrap">${rec}</td></tr>`;
     }).join("")}
     </table><div class="hint">Mehr als 15–20 s Unterschied: der Schnellere übernimmt mehr. Sonst 50/50.</div></div>`;
         const tr = own ? A.trans : B.trans,
@@ -5594,6 +5646,7 @@
             : dash.ringGauge(ci ? 100 : 0, {
                 label: "Erholung",
                 value: ci ? `<small>${LVL_TXT[ci]}</small>` : "–",
+                sub: ci ? "" : "Check-in fehlt",
                 color: LVL_COL[ci] || "var(--muted)",
               });
         // Ring 2 – Belastung: Anstrengung heute (RPE 1–10)
@@ -5601,7 +5654,7 @@
         const r2 = dash.ringGauge(rpe != null ? rpe * 10 : 0, {
           label: "Belastung",
           value: rpe != null ? cnt(rpe) : "–",
-          sub: rpe != null ? "RPE heute" : "heute",
+          sub: rpe != null ? "RPE heute" : inPlan && !isSession(TODAY) ? "Ruhetag" : "noch offen",
           color: "var(--lauf)",
         });
         // Ring 3 – Woche: erledigte Einheiten dieser Woche
@@ -5623,7 +5676,6 @@
         if (inPlan) {
           const p = dayPlan(TODAY);
           const m = [
-            ["Schlaf", w.sleepH != null ? fmtWell(w, "sleepH") + " h" : null],
             ["HRV", w.hrv != null ? w.hrv + " ms" : null],
             ["Ruhepuls", w.rhr != null ? w.rhr : null],
             ["Body Battery", w.bb != null ? w.bb : null],
@@ -5651,10 +5703,13 @@
           .map((x) => (x <= T ? S.rpe[keyI(x)] : null))
           .filter((v) => v != null)
           .map(Number);
-        h += `<div class="dash-title">Diese Woche</div><div class="card"><div class="lstats l3">
-      <div><span>Laufen</span><b>${cnt(cw.runKm, 1, " km")}</b></div>
-      <div><span>Trainingszeit</span><b>${dash.hm(cw.min)}</b></div>
-      <div><span>Ø Anstrengung</span><b>${rpes.length ? cnt(rpes.reduce((a, b) => a + b, 0) / rpes.length, 1) : "–"}</b></div></div>
+        // Nur Zahlen, die es gibt: ohne Strava/Garmin-Aktivitäten keine 0,0 km
+        const ws = [
+          cw.runKm > 0 && `<div><span>Laufen</span><b>${cnt(cw.runKm, 1, " km")}</b></div>`,
+          cw.min > 0 && `<div><span>Trainingszeit</span><b>${dash.hm(cw.min)}</b></div>`,
+          `<div><span>Ø Anstrengung</span><b>${rpes.length ? cnt(rpes.reduce((a, b) => a + b, 0) / rpes.length, 1) : "–"}</b></div>`,
+        ].filter(Boolean).slice(-3);
+        h += `<div class="dash-title">Diese Woche</div><div class="card"><div class="lstats" style="grid-template-columns:repeat(${ws.length},1fr)">${ws.join("")}</div>
     <div class="sub mt-3">Anstrengung pro Tag (RPE 1–10)</div>
     ${
       !rpes.length
@@ -5693,12 +5748,6 @@
             { min: 0, max: 100 },
             "Garmin Training Readiness (0–100). Über 60 = bereit für hartes Training.",
           ],
-          sleepH: [
-            "Schlaf",
-            (v) => one(v) + " h",
-            { min: 0, max: 10 },
-            "Schlafdauer pro Nacht. Ziel: 7–9 Stunden.",
-          ],
           hrv: [
             "HRV",
             (v) => Math.round(v) + " ms",
@@ -5715,7 +5764,7 @@
         const have = Object.keys(WELL).filter((k) =>
           days.some((d) => S.garmin.well[d] && S.garmin.well[d][k] != null),
         );
-        h += `<div class="dgrid"><section><div class="dash-title">Trends · ${days.length >= 28 ? "4 Wochen" : "seit Planstart"}</div>`;
+        h += `<div class="dgrid"><section><div class="dash-title">Erholung im Verlauf</div>`;
         if (have.length) {
           const ksel = have.includes(dashWell) ? dashWell : have[0],
             [, wf, wo, wdesc] = WELL[ksel];
@@ -5746,7 +5795,7 @@
       <p class="sub mt-2">${wdesc}</p></div>`;
         } else
           h += `<div class="card"><p class="sub">${S.garmin.conn ? "Noch keine Erholungswerte. Unter Menü → Strava / Garmin synchronisieren." : "Verbinde Garmin (Menü → Strava / Garmin), dann siehst du hier Erholung, Schlaf, HRV und Ruhepuls im Verlauf."}</p></div>`;
-        h += `</section><section><div class="dash-title">Kraft</div>${liftCard()}</section></div>`;
+        h += `</section>${liftData().length ? `<section><div class="dash-title">Kraft</div>${liftCard()}</section>` : ""}</div>`;
         h += `<div class="dash-title">Schlaf</div>${sleepCard(days)}`;
 
         // Letzte Aktivitäten (3) + Weg zu allen Aktivitäten und zu den Tests
@@ -5754,7 +5803,7 @@
           .slice()
           .sort((a, b) => ((a.start || a.date) < (b.start || b.date) ? 1 : -1))
           .slice(0, 3);
-        h += `<div class="dash-title">Letzte Aktivitäten</div>`;
+        if (last.length) h += `<div class="dash-title">Letzte Aktivitäten</div>`;
         h += last.length
           ? `<div class="list">${last
               .map((a) => {
@@ -5768,7 +5817,7 @@
                 return `<div class="act"><div class="d">${DAYS[(d.getDay() + 6) % 7]}<b>${d.getDate()}</b></div><div><b>${esc(a.name || strava.SPORT_LABEL[a.group])}</b> <span class="badge ${srcCls(a)}">${srcName(a)}</span><div class="sub">${esc(strava.summary(a))}</div>${rs ? `<div class="sub mt-1">Intervalle ${esc(rs)}</div>` : ""}</div></div>`;
               })
               .join("")}</div>`
-          : `<div class="card"><p class="sub">Noch keine Aktivitäten. Verbinde Strava oder Garmin im Menü.</p></div>`;
+          : "";
         h += `<div class="list dash-links"><button class="mi" data-v="strava"><span><b>Alle Aktivitäten</b><span class="sub">Strava / Garmin</span></span><span class="chev">›</span></button>
     <button class="mi" data-v="tests"><span><b>Tests &amp; Benchmarks</b><span class="sub">Pacing-Test, Stationen, Übergaben</span></span><span class="chev">›</span></button></div>`;
         return h + `</div>`;
@@ -6091,7 +6140,7 @@
         toast("Wochenbericht ausgeschaltet");
       }
       function pushCard() {
-        let h = `<div class="card"><h3>Wochenbericht aufs Handy</h3><p class="sub mt-1">Jeden Sonntag um 18 Uhr eine Push-Nachricht mit deiner Woche: Einheiten, Anstrengung, Schlaf, Prognose und Fokus. Ein Tipp darauf öffnet den Wochen-Check.</p>`;
+        let h = `<div class="card"><div class="row between"><h3>Push am Sonntag</h3>${pushState === "on" ? `<span class="amp amp-green">Aktiv</span>` : ""}</div><p class="sub mt-1">Jeden Sonntag um 18 Uhr dein Wochenrückblick als Nachricht aufs Handy.</p>`;
         if (!(sb && USER)) return h + `<p class="sub mt-2">Nur mit Anmeldung verfügbar.</p></div>`;
         if (!PUSH_OK)
           return h + `<p class="sub mt-2">Dieser Browser kann keine Push-Nachrichten empfangen. Auf Android: in Chrome öffnen und über das Menü „App installieren“ wählen.</p></div>`;
@@ -6102,8 +6151,8 @@
         if (pushState === "denied")
           return h + `<p class="sub mt-2">Benachrichtigungen sind für diese Seite blockiert. In den Browser- bzw. App-Einstellungen unter „Benachrichtigungen“ erlauben, dann hier einschalten.</p></div>`;
         if (pushState === "on")
-          return h + `<p class="mt-2"><span class="amp amp-green">Aktiv auf diesem Gerät</span></p><div class="grid2 mt-3"><button class="btn" data-act="push-test" ${pushBusy ? "disabled" : ""}>Test senden</button><button class="btn ghost" data-act="push-off" ${pushBusy ? "disabled" : ""}>Ausschalten</button></div></div>`;
-        return h + `<div class="btns"><button class="btn primary" data-act="push-on" ${pushBusy ? "disabled" : ""}>Wochenbericht einschalten</button></div></div>`;
+          return h + `<div class="grid2 mt-3"><button class="btn" data-act="push-test" ${pushBusy ? "disabled" : ""}>Test senden</button><button class="btn ghost" data-act="push-off" ${pushBusy ? "disabled" : ""}>Ausschalten</button></div></div>`;
+        return h + `<div class="btns"><button class="btn primary" data-act="push-on" ${pushBusy ? "disabled" : ""}>Einschalten</button></div></div>`;
       }
       /* Erste Sitzung in einer neuen Planwoche (pro Gerät gemerkt): nur dann erscheint der offene Check der Vorwoche */
       const RV_FIRST = (() => {
@@ -6121,9 +6170,29 @@
         const w = rvDueW();
         if (w == null) return "";
         const r = rvData(w);
-        return `<div class="card tight"><div class="row between"><h3>Wochen-Check Woche ${w + 1}</h3><span class="amp amp-${r.level}">${LVL_LABEL[r.level]}</span></div>
-    <p class="sub mt-2">${r.done}/${r.planned} Einheiten. 1 Minute: Bist du auf Kurs für Basel?</p><button class="btn primary sm mt-3" data-act="rv-open" data-w="${w}">Wochen-Check machen →</button></div>`;
+        return `<div class="card tight"><div class="row between"><h3>Wochenrückblick Woche ${w + 1}</h3><span class="amp amp-${r.level}">${LVL_LABEL[r.level]}</span></div>
+    <p class="sub mt-2">${r.done}/${r.planned} Einheiten. 1 Minute: Bist du auf Kurs für Basel?</p><button class="btn primary sm mt-3" data-act="rv-open" data-w="${w}">Woche abschliessen →</button></div>`;
       }
+      let rvEdit = false; // Einschätzung einer abgeschlossenen Woche wieder bearbeiten
+      const RV_HEAD = {
+        green: "Auf Kurs – weiter so.",
+        yellow: "Gute Woche mit ein paar Punkten zum Beobachten.",
+        red: "Diese Woche nachsteuern.",
+      };
+      /* Tage einer Woche für den Streifen: Status, Anstrengung, Art */
+      function rvDays(w) {
+        const out = [];
+        for (let d = 0; d < 7; d++) {
+          const i = w * 7 + d,
+            p = dayPlan(i),
+            sess = !!p && isSession(i),
+            rpe = S.rpe[keyI(i)];
+          const st = !sess ? "rest" : trained(i) ? "done" : i < TODAY ? "miss" : "open";
+          out.push({ d, i, t: p ? p.t : "", st, rpe: rpe != null && rpe !== "" ? +rpe : null, today: i === TODAY });
+        }
+        return out;
+      }
+      const RV_ST = { done: "erledigt", miss: "verpasst", rest: "Ruhetag", open: "offen" };
       function vReview() {
         const cur = Math.max(0, Math.min(NWEEKS - 1, Math.floor(Math.min(TODAY, LAST) / 7)));
         const w = rvW != null ? rvW : (rvDueW() ?? cur);
@@ -6131,48 +6200,127 @@
           saved = S.review[w] || {},
           self = rvDraft && rvDraft.w === w ? rvDraft : { w, ...review.cleanSelf(saved) };
         rvDraft = self;
-        let h = `<div class="narrow">${vhead("Wochen-Check", "Jede Woche prüfen, ob du auf Kurs bist – nicht erst am Race Day.", true)}`;
+        const wi = weekInfo(w);
+        let h = `<div class="narrow">${vhead("Wochenrückblick", "", true)}`;
         h += `<div class="wk"><button data-act="rv-wk" data-d="-1" aria-label="Vorherige Woche" ${w === 0 ? "disabled" : ""}>‹</button>
-    <div><h2>Woche ${w + 1}</h2><div class="sub">${fmt(dateFromIdx(w * 7))} – ${fmt(dateFromIdx(w * 7 + 6))} · ${esc(weekInfo(w).wave)}</div></div>
+    <div><h2>Woche ${w + 1}<small class="rv-of"> / ${NWEEKS}</small></h2><div class="sub">${fmt(dateFromIdx(w * 7))} – ${fmt(dateFromIdx(w * 7 + 6))} · ${esc(wi.wave)}</div></div>
     <button data-act="rv-wk" data-d="1" aria-label="Nächste Woche" ${w >= cur ? "disabled" : ""}>›</button></div>`;
-        // 1. Zahlen der Woche
-        h += `<div class="card"><div class="row between"><h3>Die Woche</h3><span class="amp amp-${r.level}">${LVL_LABEL[r.level]}</span></div>
-    <ul class="rv-notes mt-2">${r.notes.map((n) => `<li class="rv-${n.level}"><span class="vh-only">${RV_SR[n.level]}: </span>${esc(n.text)}</li>`).join("")}${r.extraN ? `<li class="rv-green"><span class="vh-only">${RV_SR.green}: </span>${r.extraN} Zusatz-${r.extraN === 1 ? "Einheit" : "Einheiten"}${r.extraMin ? ` · ${r.extraMin}′` : ""}.</li>` : ""}</ul>
-    <div class="cap mt-3">Fokus nächste Woche</div><ul class="rv-focus mt-1">${r.focus.map((f) => `<li>${esc(f)}</li>`).join("")}</ul></div>`;
-        // 2. Rennprognose
+
+        // 1. Ergebnis: Ring (Einheiten) + Urteil + nur die Punkte, die Aufmerksamkeit brauchen
+        const warn = r.notes.filter((n) => n.level !== "green");
+        h += `<div class="card rv-hero">${dash.ringGauge(r.planned ? (r.done / r.planned) * 100 : 0, {
+          label: "Einheiten",
+          value: `${r.done}<small>/${r.planned}</small>`,
+          color: LVL_COL[r.level],
+          size: 104,
+        })}<div><span class="amp amp-${r.level}">${LVL_LABEL[r.level]}</span><p class="rv-verdict">${RV_HEAD[r.level]}</p></div></div>`;
+        if (warn.length)
+          h += `<div class="card tight"><div class="cap">Was auffällt</div><ul class="rv-notes mt-2">${warn.map((n) => `<li class="rv-${n.level}"><span class="vh-only">${RV_SR[n.level]}: </span>${esc(n.text)}</li>`).join("")}</ul></div>`;
+
+        // 2. Die Tage: was erledigt, was verpasst, wie hart
+        const days = rvDays(w);
+        h += `<div class="card tight"><div class="cap">Tage</div><div class="rv-days mt-2">${days
+          .map(
+            (x) =>
+              `<div class="rv-day rv-${x.st}${x.today ? " today" : ""}" title="${esc(x.t)}"><span>${DAYS[x.d]}</span><i aria-hidden="true"></i><b>${x.rpe != null ? x.rpe : "–"}</b><span class="vh-only">${esc(x.t || "frei")}: ${RV_ST[x.st]}${x.rpe != null ? ", RPE " + x.rpe : ""}</span></div>`,
+          )
+          .join("")}</div><div class="rv-leg sub mt-2"><span class="rv-done"><i></i>erledigt</span><span class="rv-miss"><i></i>verpasst</span><span class="rv-rest"><i></i>Ruhe</span><span>Zahl = RPE</span></div></div>`;
+
+        // 3. Kennzahlen: je eine Zahl mit ihrem Massstab
+        let slS = 0,
+          slN = 0,
+          ciN = 0,
+          ciBad = 0;
+        for (const x of days) {
+          const g = S.garmin.well[keyI(x.i)];
+          if (g && g.sleepH != null) (slS += +g.sleepH), slN++;
+          const c = S.checkin[keyI(x.i)];
+          if (c && Object.keys(c).length) {
+            ciN++;
+            if (readiness(c) === "red") ciBad++;
+          }
+        }
+        const one = (v) => (+v).toFixed(1).replace(".", ",");
+        const sl = slN ? slS / slN : null;
+        const kpi = (label, val, hint, lvl) =>
+          `<div class="kpi${lvl ? " kpi-" + lvl : ""}"><span>${label}</span><b>${val}</b><em>${hint}</em></div>`;
+        h += `<div class="rv-kpis">${kpi(
+          "Ø Anstrengung",
+          r.avgRpe != null ? one(r.avgRpe) : "–",
+          `Grenze ${one(r.rpeMax)} (${esc(wi.wave)})`,
+          r.avgRpe == null ? "" : r.avgRpe > r.rpeMax + 1 ? "red" : r.avgRpe > r.rpeMax ? "yellow" : "green",
+        )}${kpi(
+          "Ø Schlaf",
+          sl != null ? one(sl) + " h" : "–",
+          sl != null ? "Ziel 7–9 h" : S.garmin.conn ? "keine Garmin-Daten" : "Garmin verbinden",
+          sl == null ? "" : sl >= 7 ? "green" : sl >= 6.3 ? "yellow" : "red",
+        )}${kpi(
+          "Zusatz",
+          r.extraN ? `${r.extraN}×` : "0",
+          r.extraN ? `${r.extraMin}′ insgesamt` : "freiwillig",
+          "",
+        )}${kpi("Check-ins", `${ciN}<small>/7</small>`, ciBad ? `${ciBad}× schlecht` : ciN ? "ohne Warnung" : "jeden Morgen 20 s", ciBad >= 2 ? "red" : ciBad ? "yellow" : "")}</div>`;
+
+        // 4. Rennprognose: Gesamtzeit gegen das Ziel, aufgeteilt in Laufen / Stationen / Roxzone
         const fc = rvForecast(),
           weeksLeft = Math.max(1, (LAST - Math.max(0, TODAY)) / 7);
-        h += `<div class="card"><h3>Rennprognose</h3>`;
+        h += `<div class="card"><div class="row between"><h3>Rennprognose</h3>`;
         if (!fc)
-          h += `<p class="sub mt-2">Noch keine Testwerte. Trage den Lauf-Pacing-Test und den Stationen-Benchmark ein, dann rechnet die App hier deine Zeit hoch.</p><div class="btns"><button class="btn" data-v="tests">Tests eintragen →</button></div>`;
+          h += `</div><p class="sub mt-2">Noch keine Testwerte. Nach dem Lauf-Pacing-Test und dem Stationen-Benchmark rechnet die App hier deine Zielzeit hoch.</p><div class="btns"><button class="btn" data-v="tests">Tests eintragen →</button></div>`;
         else {
           const t = review.onTrack(fc.total, weeksLeft);
-          h += `<div class="lstats l3 mt-2"><div><span>Laufen 8 km</span><b>${mmss(fc.run)}</b></div><div><span>Stationen</span><b>${fc.st != null ? mmss(fc.st) : "–"}</b></div><div><span>Gesamt</span><b>${fc.total != null ? mmss(fc.total) : "–"}</b></div></div>`;
-          h += t
-            ? `<p class="mt-3"><span class="amp amp-${t.level}">${t.level === "green" ? "Sub-60 in Reichweite" : t.level === "yellow" ? "Machbar mit Fortschritt" : "Ziel prüfen"}</span> ${esc(review.trackText(fc.total, t))}</p>`
-            : `<p class="sub mt-3">Für die Gesamtzeit fehlen noch ${fc.missing} Stationszeiten.</p>`;
+          h += t ? `<span class="amp amp-${t.level}">${t.gap <= 0 ? mmss(-t.gap) + " Puffer" : mmss(t.gap) + " zu langsam"}</span></div>` : `</div>`;
+          if (fc.total) {
+            // Balken bis 70 Minuten, Strich bei 60:00
+            const MAX = 4200,
+              pc = (s) => ((s / MAX) * 100).toFixed(1);
+            h += `<div class="rv-total"><b>${mmss(fc.total)}</b><span>Ziel 60:00</span></div>
+    <div class="rv-bar" role="img" aria-label="Laufen ${mmss(fc.run)}, Stationen ${mmss(fc.st)}, Roxzone ${mmss(fc.rox)}"><i class="b-run" style="width:${pc(fc.run)}%"></i><i class="b-st" style="width:${pc(fc.st)}%"></i><i class="b-rox" style="width:${pc(fc.rox)}%"></i><u style="left:${pc(review.GOAL_S)}%"></u></div>
+    <div class="rv-leg sub mt-2"><span class="b-run"><i></i>Laufen ${mmss(fc.run)}</span><span class="b-st"><i></i>Stationen ${mmss(fc.st)}</span><span class="b-rox"><i></i>Roxzone ${mmss(fc.rox)}</span></div>`;
+            if (t && t.gap > 0) h += `<p class="sub mt-2">Ca. ${Math.ceil(t.perWeek)} s pro Woche aufholen.</p>`;
+          } else
+            h += `<div class="rv-total"><b>${mmss(fc.run)}</b><span>nur Laufen 8 km</span></div><p class="sub mt-2">Für die Gesamtzeit fehlen noch ${fc.missing} Stationszeiten.</p>`;
           // Verlauf der beim Abschliessen gespeicherten Prognosen
           const pts = [];
           for (let x = 0; x <= cur; x++)
             pts.push({ label: "W" + (x + 1), value: S.review[x] && S.review[x].fc ? S.review[x].fc / 60 : null });
           if (pts.filter((p) => p.value != null).length >= 2)
-            h += `<div class="sub mt-3">Prognose pro Wochen-Check</div>${dash.lineChart(pts, { label: "Rennprognose", fmt: (v) => mmss(v * 60), height: 120 })}`;
-          h += `<p class="sub mt-2">Grobe Schätzung: 1-km-Testpace + ${review.RUN_PENALTY} s/km, Stationen ${Math.round(review.DOUBLES_SHARE * 100)} % der Solo-Zeit (geteilt), ${mmss(review.ROXZONE)} Roxzone. Wird mit jedem neuen Test genauer.</p>`;
+            h += `<div class="sub mt-3">Prognose pro Woche</div>${dash.lineChart(pts, { label: "Rennprognose", fmt: (v) => mmss(v * 60), height: 110 })}`;
+          h += `<details class="rv-how mt-2"><summary>Wie wird gerechnet?</summary><p class="sub mt-1">1-km-Testpace + ${review.RUN_PENALTY} s/km für 8 km, Stationen ${Math.round(review.DOUBLES_SHARE * 100)} % eurer Solo-Zeiten (ihr teilt die Arbeit), ${mmss(review.ROXZONE)} Roxzone. Jeder neue Test macht die Zahl genauer.</p></details>`;
         }
         h += `</div>`;
-        // 3. Eigene Einschätzung
-        h += `<div class="card"><h3>Deine Einschätzung</h3>`;
-        for (const [k, q] of Object.entries(review.SELF))
-          h += `<div class="ci-row"><span>${q.label}</span><div class="seg" role="group" aria-label="${q.label}">${q.opts.map((o, j) => `<button class="v-${["g", "y", "r"][j]} ${self[k] === j ? "on" : ""}" data-act="rv-self" data-f="${k}" data-j="${j}" aria-pressed="${self[k] === j}">${o}</button>`).join("")}</div></div>`;
-        h += `<label class="lbl mt-3" for="rv-note">Notiz (optional)</label><textarea id="rv-note" maxlength="300" rows="2" placeholder="Was lief gut, was nicht?">${esc(self.note || "")}</textarea>
-    <div class="btns"><button class="btn primary" data-act="rv-save" data-w="${w}">${saved.at ? "Aktualisieren" : "Wochen-Check abschliessen"}</button></div>${saved.at ? `<p class="sub mt-2">Abgeschlossen am ${new Date(saved.at).toLocaleDateString("de-CH")}.</p>` : ""}</div>`;
-        // Verlauf: Ampel pro abgeschlossener Woche
-        const past = [];
-        for (let x = 0; x <= cur; x++)
-          if (S.review[x] && S.review[x].at)
-            past.push(`<button class="btn sm rv-wbtn rv-${S.review[x].level || "green"}" data-act="rv-go" data-w="${x}" aria-label="Woche ${x + 1}: ${LVL_LABEL[S.review[x].level || "green"]}">W${x + 1}</button>`);
-        if (past.length)
-          h += `<div class="card tight"><div class="cap">Bisherige Wochen</div><div class="chiprow mt-2">${past.join("")}</div></div>`;
+
+        // 5. Nächste Woche: höchstens drei konkrete Punkte
+        h += `<div class="card"><h3>Nächste Woche</h3><ul class="rv-focus mt-2">${r.focus.map((f) => `<li>${esc(f)}</li>`).join("")}</ul></div>`;
+
+        // 6. Eigene Einschätzung: offen = Formular, abgeschlossen = eine Zeile
+        if (saved.at && !rvEdit) {
+          const ans = Object.entries(review.SELF)
+            .filter(([k]) => self[k] != null)
+            .map(([k, q]) => `<span class="rv-ans v-${["g", "y", "r"][self[k]]}">${q.short}: <b>${q.opts[self[k]]}</b></span>`)
+            .join("");
+          h += `<div class="card"><div class="row between"><h3>Deine Einschätzung</h3><button class="btn ghost sm" data-act="rv-edit">Ändern</button></div>
+    <div class="rv-anss mt-2">${ans}</div>${self.note ? `<p class="sub mt-2">„${esc(self.note)}“</p>` : ""}<p class="sub mt-2">Abgeschlossen am ${new Date(saved.at).toLocaleDateString("de-CH")}.</p></div>`;
+        } else {
+          h += `<div class="card"><h3>Deine Einschätzung</h3><p class="sub mt-1">1 Minute – fliesst in Ampel und Fokus ein.</p>`;
+          for (const [k, q] of Object.entries(review.SELF))
+            h += `<div class="ci-row"><span>${q.label}</span><div class="seg" role="group" aria-label="${q.label}">${q.opts.map((o, j) => `<button class="v-${["g", "y", "r"][j]} ${self[k] === j ? "on" : ""}" data-act="rv-self" data-f="${k}" data-j="${j}" aria-pressed="${self[k] === j}">${o}</button>`).join("")}</div></div>`;
+          h += `<label class="lbl mt-3" for="rv-note">Notiz (optional)</label><textarea id="rv-note" maxlength="300" rows="2" placeholder="Was lief gut, was nicht?">${esc(self.note || "")}</textarea>
+    <div class="btns"><button class="btn primary" data-act="rv-save" data-w="${w}">${saved.at ? "Speichern" : "Woche abschliessen"}</button></div></div>`;
+        }
+
+        // 7. Saison: alle Wochen auf einen Blick (Ampel der abgeschlossenen Checks)
+        let cells = "";
+        for (let x = 0; x < NWEEKS; x++) {
+          const rv = S.review[x],
+            lv = rv && rv.at ? rv.level || "green" : "";
+          const lab = `Woche ${x + 1}: ${lv ? LVL_LABEL[lv] : x <= cur ? "kein Check" : "kommt noch"}`;
+          cells +=
+            x <= cur
+              ? `<button class="rv-wk-c ${lv ? "rv-" + lv : "rv-none"}${x === w ? " on" : ""}" data-act="rv-go" data-w="${x}" aria-label="${lab}" aria-current="${x === w}">${x + 1}</button>`
+              : `<span class="rv-wk-c rv-future" aria-label="${lab}">${x + 1}</span>`;
+        }
+        h += `<div class="card tight"><div class="cap">Saison</div><div class="rv-season mt-2">${cells}</div></div>`;
         return h + pushCard() + `</div>`;
       }
 
@@ -8217,9 +8365,14 @@
           else prompt("Backup:", txt);
           return;
         }
+        if (d.act === "rv-edit") {
+          rvEdit = true;
+          return render();
+        }
         if (d.act === "rv-open" || d.act === "rv-go") {
           rvW = +d.w;
           rvDraft = null;
+          rvEdit = false;
           if (view === "review") return render();
           return go("review");
         }
@@ -8227,6 +8380,7 @@
           const cur = Math.max(0, Math.floor(Math.min(TODAY, LAST) / 7));
           rvW = Math.max(0, Math.min(cur, (rvW ?? rvDueW() ?? cur) + +d.d));
           rvDraft = null;
+          rvEdit = false;
           return render();
         }
         if (d.act === "rv-self") {
@@ -8244,8 +8398,9 @@
           S.review[w].level = rvData(w).level;
           if (fc && fc.total) S.review[w].fc = Math.round(fc.total);
           rvDraft = null;
+          rvEdit = false;
           save();
-          toast("Wochen-Check gespeichert");
+          toast("Woche abgeschlossen");
           return render();
         }
         if (["push-on", "push-off", "push-test"].includes(d.act)) {

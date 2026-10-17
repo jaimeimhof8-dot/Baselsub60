@@ -13,9 +13,9 @@ export const DOUBLES_SHARE = 0.55; // Anteil der Solo-Stationszeit im Doubles (A
 export const ROXZONE = 300; // s für alle Wege in der Roxzone
 
 export const SELF = {
-  feel: { label: "Wie fühlst du dich?", opts: ["gut", "okay", "müde"] },
-  prog: { label: "Stärker geworden?", opts: ["ja", "etwas", "nein"] }, // kurze Wörter: drei Knöpfe passen auch auf 375 px
-  pain: { label: "Schmerzen?", opts: ["keine", "leicht", "stark"] },
+  feel: { label: "Wie fühlst du dich?", short: "Gefühl", opts: ["gut", "okay", "müde"] },
+  prog: { label: "Stärker geworden?", short: "Stärker", opts: ["ja", "etwas", "nein"] }, // kurze Wörter: drei Knöpfe passen auch auf 375 px
+  pain: { label: "Schmerzen?", short: "Schmerzen", opts: ["keine", "leicht", "stark"] },
 };
 
 const ok = (v) => typeof v === "number" && isFinite(v) && v > 0;

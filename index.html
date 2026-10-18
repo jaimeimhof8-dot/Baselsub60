@@ -62,16 +62,16 @@
         --tint: #3b5375;
         --accent: #e0bf6a;
         --on-accent: #16181a;
-        --ok: #5fb37c;
-        --warn: #d9a05b;
-        --danger: #d27b72;
-        --strava: #d4733f;
-        --garmin: #4a9fcf;
-        --kraft: #d98a5a;
-        --lauf: #7ea4d6;
-        --bike: #79b58a;
-        --station: #a590d0;
-        --sim: #cf7f78;
+        --ok: #30d158;
+        --warn: #ff9f0a;
+        --danger: #ff6961;
+        --strava: #fc6a2c;
+        --garmin: #11a9ed;
+        --kraft: #ff8a4c;
+        --lauf: #64a8ff;
+        --bike: #4cd964;
+        --station: #bf8cff;
+        --sim: #ff6b5e;
         --rest: #6d7176;
         --race: #e0bf6a;
         /* Zahlen und kleine Labels: schmale Sportschrift. Titel und Text: Systemschrift (SF Pro auf dem iPhone) */
@@ -324,7 +324,7 @@
         margin: 0 auto;
       }
       .sim-date {
-        background: rgba(217, 160, 91, 0.12);
+        background: rgba(255, 192, 77, 0.12);
         color: var(--warn);
         font-size: 13px;
         text-align: center;
@@ -601,9 +601,9 @@
         color: var(--accent);
       }
       .sban {
-        border-color: rgba(212, 115, 63, 0.45);
+        border-color: rgba(252, 106, 44, 0.45);
         background:
-          linear-gradient(rgba(212, 115, 63, 0.07), rgba(212, 115, 63, 0.07)),
+          linear-gradient(rgba(252, 106, 44, 0.07), rgba(252, 106, 44, 0.07)),
           var(--card);
       }
       .ytag {
@@ -611,7 +611,7 @@
         font-size: 11px;
         font-weight: 600;
         color: var(--warn);
-        background: rgba(217, 160, 91, 0.12);
+        background: rgba(255, 192, 77, 0.12);
         border-radius: 6px;
         padding: 1px 6px;
         margin-left: 4px;
@@ -644,8 +644,8 @@
         color: var(--accent);
       }
       .target.bad {
-        border-color: rgba(210, 123, 114, 0.4);
-        background: rgba(210, 123, 114, 0.1);
+        border-color: rgba(255, 138, 128, 0.4);
+        background: rgba(255, 138, 128, 0.1);
       }
       .target.bad b {
         color: var(--danger);
@@ -781,12 +781,12 @@
       .btn.strava {
         background: var(--strava);
         border-color: var(--strava);
-        color: var(--on-accent);
+        color: #fff;
       }
       .btn.garmin {
         background: var(--garmin);
         border-color: var(--garmin);
-        color: var(--on-accent);
+        color: #fff;
       }
       .btn.sm {
         min-height: 44px;
@@ -1747,7 +1747,7 @@
         overflow-wrap: anywhere;
       }
       .offline-bar {
-        background: rgba(210, 123, 114, 0.12);
+        background: rgba(255, 138, 128, 0.12);
         color: var(--danger);
         font-size: 13px;
         text-align: center;
@@ -1787,7 +1787,7 @@
         white-space: nowrap;
       }
       .badge.warn {
-        background: rgba(210, 123, 114, 0.15);
+        background: rgba(255, 138, 128, 0.15);
         color: var(--danger);
       }
       .badge.mv {
@@ -1795,19 +1795,19 @@
         color: var(--lauf);
       }
       .badge.ok {
-        background: rgba(95, 179, 124, 0.15);
+        background: rgba(111, 207, 134, 0.15);
         color: var(--ok);
       }
       .badge.easy {
-        background: rgba(217, 160, 91, 0.15);
+        background: rgba(255, 192, 77, 0.15);
         color: var(--warn);
       }
       .badge.strava {
-        background: rgba(212, 115, 63, 0.15);
+        background: rgba(252, 106, 44, 0.15);
         color: var(--strava);
       }
       .badge.garmin {
-        background: rgba(74, 159, 207, 0.15);
+        background: rgba(17, 169, 237, 0.15);
         color: var(--garmin);
       }
       .chips {
@@ -2090,17 +2090,17 @@
         padding: 0 var(--s1);
       }
       .seg button.on.v-g {
-        background: rgba(95, 179, 124, 0.18);
+        background: rgba(111, 207, 134, 0.18);
         border-color: var(--ok);
         color: var(--ok);
       }
       .seg button.on.v-y {
-        background: rgba(217, 160, 91, 0.18);
+        background: rgba(255, 192, 77, 0.18);
         border-color: var(--warn);
         color: var(--warn);
       }
       .seg button.on.v-r {
-        background: rgba(210, 123, 114, 0.18);
+        background: rgba(255, 138, 128, 0.18);
         border-color: var(--danger);
         color: var(--danger);
       }
@@ -2122,15 +2122,15 @@
       }
       .amp-green {
         color: var(--ok);
-        background: rgba(95, 179, 124, 0.12);
+        background: rgba(111, 207, 134, 0.12);
       }
       .amp-yellow {
         color: var(--warn);
-        background: rgba(217, 160, 91, 0.12);
+        background: rgba(255, 192, 77, 0.12);
       }
       .amp-red {
         color: var(--danger);
-        background: rgba(210, 123, 114, 0.12);
+        background: rgba(255, 138, 128, 0.12);
       }
 
       /* Vorschläge */
@@ -2161,8 +2161,8 @@
       }
       /* Dashboard: Diagramme (dataviz-Regeln: dünne Marken, zurückhaltendes Raster, Werte in Textfarbe) */
       :root {
-        --viz-1: #5a86bd;
-        --viz-2: #c4714d;
+        --viz-1: #3987e5;
+        --viz-2: #d95926;
       }
       /* Drei Ringe wie bei Whoop: Erholung, Belastung, Woche */
       .dash-rings {
@@ -2521,8 +2521,8 @@
         min-width: 0;
       }
       .sbox {
-        border: 1px solid rgba(212, 115, 63, 0.35);
-        background: rgba(212, 115, 63, 0.08);
+        border: 1px solid rgba(252, 106, 44, 0.35);
+        background: rgba(252, 106, 44, 0.08);
         border-radius: var(--r-s);
         padding: var(--s3);
         margin-top: var(--s4);
@@ -2535,8 +2535,8 @@
         margin-top: var(--s3);
       }
       .sbox.g {
-        border-color: rgba(74, 159, 207, 0.35);
-        background: rgba(74, 159, 207, 0.08);
+        border-color: rgba(17, 169, 237, 0.35);
+        background: rgba(17, 169, 237, 0.08);
       }
       .sbox.g b {
         color: var(--garmin);
@@ -3503,7 +3503,7 @@
       .rv-wbtn.rv-green::before { background: var(--ok); }
       .rv-wbtn.rv-yellow::before { background: var(--warn); border-radius: 1px; transform: rotate(45deg); }
       .rv-wbtn.rv-red::before { background: var(--danger); border-radius: 1px; }
-      :root { --sl-deep: #3f66a3; --sl-rem: #6f94c8; --sl-light: #a9bddb; --sl-awake: #c99a58; }
+      :root { --sl-deep: #2f5fb3; --sl-rem: #6c9be6; --sl-light: #b4ccf0; --sl-awake: #e0a24a; }
       .sl-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; gap: 2px; }
       .sl-bar span { display: block; min-width: 2px; }
       .sl-leg { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font-size: 0.85em; color: var(--muted); }
@@ -4292,10 +4292,10 @@
       const doneOpen = new Set();
       /* RPE-Farbe: Eisblau (1) → Grün → Gelb → Rot (10); --p = Füllung in Prozent */
       const RPE_STOPS = [
-        [0, [135, 190, 220]],
-        [0.38, [96, 170, 130]],
-        [0.72, [218, 190, 100]],
-        [1, [205, 100, 95]],
+        [0, [125, 211, 252]],
+        [0.38, [16, 185, 129]],
+        [0.72, [250, 204, 21]],
+        [1, [239, 68, 68]],
       ]; // identisch mit dem Verlauf des Balkens (.rpe-fill)
       function rpeColor(t) {
         let k = 1;

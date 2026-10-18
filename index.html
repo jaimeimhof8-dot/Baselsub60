@@ -517,6 +517,33 @@
         margin-top: var(--s3);
       }
 
+      /* Strukturierte Workout-Zeilen: Lauf und Station als Schritte untereinander (src/workout-fmt.js). Bewusst ohne Farbflächen: Hierarchie über Grösse und Gewicht, Farbe nur für die Zielzeit. */
+      .wx { display: flex; flex-direction: column; gap: var(--s3); min-width: 0; }
+      .wx-b { display: flex; flex-direction: column; gap: var(--s1); min-width: 0; }
+      .wx-l { font-family: var(--f-head); font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .wx-r { display: flex; flex-direction: column; align-items: stretch; gap: 2px; min-width: 0; }
+      .wx-s { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 0; min-width: 0; padding: 6px 0 6px 10px; border-left: 2px solid var(--line); }
+      .wx-s.stn { border-left-color: var(--muted); }
+      .wx-s.trab { opacity: 0.75; }
+      .wx-s i { font-style: normal; font-family: var(--f-head); font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+      .wx-s b { font-family: var(--f-head); font-size: 19px; line-height: 1.2; font-weight: 600; }
+      .wx-s em { font-style: normal; font-size: 13.5px; color: var(--text); }
+      .wx-s u { text-decoration: none; font-size: 13.5px; font-weight: 600; color: var(--accent); }
+      .wx-s small { flex-basis: 100%; font-size: 12.5px; color: var(--muted); }
+      .wx-a { align-self: flex-start; padding-left: 10px; color: var(--muted); font-size: 13px; line-height: 1; }
+      .wx-n { font-size: 13.5px; color: var(--muted); }
+      .wx-p { font-size: 13px; color: var(--muted); }
+      .wx-opts { display: flex; flex-direction: column; gap: var(--s3); }
+      .wx-o { display: flex; flex-direction: column; gap: var(--s1); }
+      .wx-o > i { font-style: normal; font-family: var(--f-head); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .ex-h .wx div, .ex-h .wx b, .ex-h .wx i, .ex-h .wx em, .ex-h .wx u, .ex-h .wx small { text-align: left; }
+      /* Zeitfelder je Lauf und Station */
+      .ex-v.slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); }
+      .ex.row-v.wide > .ex-v.slots { margin-left: 36px; }
+      .slot { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+      .slot span { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .ex.row-v .slot input { text-align: left; }
+
       /* Übungen */
       .exs {
         margin-top: var(--s4);
@@ -3736,6 +3763,14 @@
       import { extractTests, applyTests, isRunTest, isStationTest } from "./src/testsync.js";
       import { openItems, canCarry, makeCarry, carriedTo, carryProgress } from "./src/later.js";
       import { swapDayData } from "./src/swap.js";
+      import { fmtLine, lineSlots } from "./src/workout-fmt.js";
+      /* Lauf- und Stationszeilen als Bausteine; erkennt die Zeile nichts sicher, bleibt der Originaltext */
+      const lineHtml = (t) => fmtLine(t) || esc(t);
+      /* Lauf-Station-Zeile: je Lauf und je Station ein Zeitfeld; gespeichert wird in S.val[id], getrennt mit " / " */
+      const slotsField = (id, slots, val) => {
+        const parts = String(val || "").split(" / ");
+        return `<div class="ex-v slots">${slots.map((s, k) => `<label class="slot"><span>${esc(s.label)}</span><input type="text" data-vs="${id}" data-k="${k}" value="${esc(parts[k] || "")}" placeholder="${esc(s.goal || "Zeit")}" enterkeyhint="next" aria-label="Zeit ${esc(s.label)}${s.goal ? ", Ziel " + esc(s.goal) : ""}"></label>`).join("")}</div>`;
+      };
 
       /* ---------- Zeit ---------- */
       // ?heute=2026-10-20 simuliert ein anderes Datum (zum Testen von Umplanen/Strava vor Planstart).
@@ -4342,9 +4377,9 @@
             if (t == null) continue;
             const id = c.from + "|" + j,
               on = !!S.done[id];
-            h += `<div class="ex row-v ${on ? "is-done" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${esc(t)}</span></label>`;
+            h += `<div class="ex row-v${lineSlots(t) ? " wide" : ""} ${on ? "is-done" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${lineHtml(t)}</span></label>`;
             if (!isFiller(t))
-              h += `<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id] || "")}" placeholder="${placeholder(isLift(p.k, t) ? "kraft" : p.k, t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
+              h += lineSlots(t) ? slotsField(id, lineSlots(t), S.val[id]) : `<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id] || "")}" placeholder="${placeholder(isLift(p.k, t) ? "kraft" : p.k, t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
             h += `</div>`;
           }
           h += `</div><button class="btn ghost sm mt-3" data-act="later-undo" data-k="${esc(c.from)}">Zurück an ${esc(DAYSF[dow(oi)])}</button></div>`;
@@ -4427,10 +4462,10 @@
         p.i.forEach((t, j) => {
           const id = dk + "|" + j,
             on = !!S.done[id];
-          const wide = p.k === "lauf" && dash.parseReps(t);
+          const wide = (p.k === "lauf" && dash.parseReps(t)) || !!lineSlots(t);
           h += single
-            ? `<div class="ex ${on ? "is-done" : ""}"><div class="ex-h hold" data-hold="${i}"${on ? " data-undo" : ""} role="button" tabindex="0" aria-label="${esc(t)} – gedrückt halten, um ${on ? "wieder zu öffnen" : "abzuschliessen"}"><i class="hold-fill" aria-hidden="true"></i><span>${esc(t)}</span><em class="hold-hint" aria-hidden="true">${on ? "Halten ↺" : "Halten ✓"}</em></div>`
-            : `<div class="ex row-v${wide ? " wide" : ""} ${on ? "is-done" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${esc(t)}</span></label>`;
+            ? `<div class="ex ${on ? "is-done" : ""}"><div class="ex-h hold" data-hold="${i}"${on ? " data-undo" : ""} role="button" tabindex="0" aria-label="${esc(t)} – gedrückt halten, um ${on ? "wieder zu öffnen" : "abzuschliessen"}"><i class="hold-fill" aria-hidden="true"></i><span>${lineHtml(t)}</span><em class="hold-hint" aria-hidden="true">${on ? "Halten ↺" : "Halten ✓"}</em></div>`
+            : `<div class="ex row-v${wide ? " wide" : ""} ${on ? "is-done" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${lineHtml(t)}</span></label>`;
           if (!isFiller(t)) {
             const lift = isLift(p.k, t),
               le = lastEntry(i, t),
@@ -4443,8 +4478,8 @@
             const nx = lift && le ? nextWeight(le.v, le.rpe, t) : "",
               up = nx && parseKg(nx) !== parseKg(last) ? nx : "";
             const why = le && le.rpe != null ? `letzte RPE ${le.rpe}` : "";
-            h += `<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id] || pre)}"${pre ? ` class="pre" title="Standardgewicht aus dem Profil"` : ""} placeholder="${placeholder(lift ? "kraft" : p.k, t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
-            if (last)
+            h += lineSlots(t) ? slotsField(id, lineSlots(t), S.val[id]) : `<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id] || pre)}"${pre ? ` class="pre" title="Standardgewicht aus dem Profil"` : ""} placeholder="${placeholder(lift ? "kraft" : p.k, t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
+            if (last && !lineSlots(t))
               h += `<div class="quick"><button type="button" class="last" data-last="${id}" data-lv="${esc(last)}" aria-label="Letzten Wert ${esc(last)} übernehmen">zuletzt: ${esc(last)} ↵</button>${up ? `<button type="button" class="last up" data-last="${id}" data-lv="${esc(up)}" aria-label="Vorschlag ${esc(up)} übernehmen${why ? ", " + why : ""}">${parseKg(up) > parseKg(last) ? "↗" : "↘"} ${esc(up)}${why ? ` <small>(${why})</small>` : ""}</button>` : ""}</div>`;
           }
           h += `</div>`;
@@ -4811,7 +4846,7 @@
         let h = `<button class="day sm k-${p.k} ${i === TODAY ? "today" : ""} ${on ? "open" : ""}" data-pd="${i}" aria-expanded="${on}"><span class="d">${DAYS[dow(i)]}<b>${d.getDate()}</b></span>
     <span class="t"><b>${esc(p.t)}</b><span class="kind">${KIND[p.k]}</span></span><span class="meta">${badges ? `<span class="badges">${badges}</span>` : ""}${st}</span></button>`;
         if (on)
-          h += `<div class="pday-body">${p.i.length ? `<ul>${p.i.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}${p.n ? `<div class="hint">${esc(p.n)}</div>` : ""}
+          h += `<div class="pday-body">${p.i.length ? `<ul>${p.i.map((t) => `<li>${lineHtml(t)}</li>`).join("")}</ul>` : ""}${p.n ? `<div class="hint">${esc(p.n)}</div>` : ""}
       <button class="btn ghost sm mt-2" data-pgo="${i}">Tag öffnen →</button></div>`;
         return h;
       }
@@ -9003,6 +9038,9 @@
         }
         if (d.n !== undefined) {
           S.notes[d.n] = t.value;
+        } else if (d.vs) {
+          const fields = [...document.querySelectorAll(`input[data-vs="${d.vs}"]`)];
+          S.val[d.vs] = fields.map((x) => x.value.trim()).join(" / ").replace(/(?: \/ )+$/, "");
         } else if (d.v2) {
           S.val[d.v2] = t.value;
           t.classList.remove("pre");

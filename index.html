@@ -3366,6 +3366,7 @@
       .rv-notes .rv-yellow::before { background: var(--warn); }
       .rv-notes .rv-red::before { background: var(--danger); }
       .rv-focus { padding-left: 18px; }
+      .card.carry { border-left: 3px dashed var(--accent); }
       /* Wochenrückblick als Dashboard */
       .rv-of { font-size: 0.55em; color: var(--muted); font-weight: 500; }
       .rv-hero { display: grid; grid-template-columns: auto 1fr; gap: var(--s4); align-items: center; }
@@ -3630,6 +3631,7 @@
       import { safeMerge, countEntries, stable } from "./src/merge.js";
       import * as review from "./src/review.js";
       import { extractTests, applyTests, isRunTest, isStationTest } from "./src/testsync.js";
+      import { openItems, canCarry, makeCarry, carriedTo, carryProgress } from "./src/later.js";
       import { swapDayData } from "./src/swap.js";
 
       /* ---------- Zeit ---------- */
@@ -3674,7 +3676,8 @@
    weights: Standard-Arbeitsgewichte aus dem Profil ({übungsname: "kg"}),
    sore: Muskelkater-Meldungen ({tagIndex: {muskel: 1–10}}),
    extra: Zusatz-Einheiten neben dem Plan ({datum: [{id,type,min,rpe,note}]}), solo: Partner-Einheit allein ({datum: 1}),
-   review: Wochen-Check ({wochenIndex: {feel, prog, pain, note, at, level, fc}}, src/review.js) */
+   review: Wochen-Check ({wochenIndex: {feel, prog, pain, note, at, level, fc}}, src/review.js),
+   later: „Später fertig machen“ ({datum: {to: zielDatum, j: [Übungsindex], at}}, src/later.js) */
       const def = () => ({
         done: {},
         val: {},
@@ -3695,6 +3698,7 @@
         extra: {},
         solo: {},
         review: {},
+        later: {},
         tests: {
           lauf: { j: ["", "", "", ""], m: ["", "", "", ""] },
           station: {},
@@ -4134,6 +4138,33 @@
         return `<button class="done-bar k-${p.k}" data-act="done-open" data-i="${i}" data-day="${i}" aria-label="${esc(p.t)} erledigt – Details anzeigen"><span class="ck" aria-hidden="true">✓</span><span class="t"><b>${esc(p.t)}</b><span class="sub">Erledigt · ${info.join(" · ")}</span></span><span class="more">Details ▾</span></button>`;
       }
       function sessionCard(i) {
+        return sessionCore(i) + carryCards(i);
+      }
+      /* Angehängte Übungen anderer Tage (S.later). Abhaken und Werte zählen für die Ursprungs-Einheit. */
+      function carryCards(i) {
+        let h = "";
+        for (const c of carriedTo(S.later, keyI(i))) {
+          const oi = idxOfIso(c.from),
+            p = dayPlan(oi);
+          if (!p) continue;
+          const pr = carryProgress(c, S.done);
+          h += `<div class="card carry k-${p.k}"><div class="row between"><h3>Von ${esc(DAYSF[dow(oi)])} nachholen</h3><span class="sub">${pr.done} von ${pr.n}</span></div>
+    <p class="sub mt-1">${esc(p.t)} · ${pr.done === pr.n ? "fertig ✓" : "Rest aus " + esc(shortDay(oi))}</p><div class="exs">`;
+          for (const j of c.j) {
+            const t = p.i[j];
+            if (t == null) continue;
+            const id = c.from + "|" + j,
+              on = !!S.done[id];
+            h += `<div class="ex ${on ? "is-done" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${esc(t)}</span></label>`;
+            if (!isFiller(t))
+              h += `<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id] || "")}" placeholder="${placeholder(isLift(p.k, t) ? "kraft" : p.k, t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
+            h += `</div>`;
+          }
+          h += `</div><button class="btn ghost sm mt-3" data-act="later-undo" data-k="${esc(c.from)}">Zurück an ${esc(DAYSF[dow(oi)])}</button></div>`;
+        }
+        return h;
+      }
+      function sessionCore(i) {
         const p = dayPlan(i),
           d = dateFromIdx(i),
           dk = keyI(i),
@@ -4188,6 +4219,17 @@
           h += `<div class="row between"><span class="sub">Erledigt</span><button class="btn sm" data-act="done-close" data-i="${i}">Einklappen ▴</button></div>`;
         else if (!single)
           h += `<div class="prog"><i style="width:${n ? (done / n) * 100 : 0}%"></i></div><div class="row between"><span class="sub">${done} von ${n} erledigt</span>${done < n ? `<button type="button" class="btn sm hold" data-hold="${i}" aria-label="Gedrückt halten: alles erledigt"><i class="hold-fill" aria-hidden="true"></i><span>✓ Halten: Alles erledigt</span></button>` : `<button class="btn sm" data-act="done-close" data-i="${i}">Einklappen ▴</button>`}</div>`;
+        // Später fertig machen: offene Übungen an den nächsten Tag anhängen
+        const lc = S.later[dk];
+        if (lc) {
+          const pr = carryProgress({ from: dk, j: lc.j }, S.done),
+            ti = idxOfIso(lc.to);
+          h += `<div class="target">${pr.done === pr.n ? "Rest" : `Rest (${pr.n - pr.done} ${pr.n - pr.done === 1 ? "Übung" : "Übungen"})`} ${pr.done === pr.n ? "am" : "hängt an"} <b>${esc(shortDay(ti))}</b>${pr.done === pr.n ? " nachgeholt ✓" : "."}${pr.done === pr.n ? "" : ` <button class="btn ghost sm mt-2" data-act="later-undo" data-k="${dk}">Doch heute machen</button>`}</div>`;
+        } else {
+          const open = openItems(p, S.done, dk);
+          if (canCarry({ i, today: TODAY, last: LAST, day: p, open }))
+            h += `<button class="btn ghost sm mt-2" data-act="later" data-i="${i}">${done ? "Rest" : "Einheit"} morgen fertig machen →</button>`;
+        }
         if (p.tp) {
           const T = teamT();
           h += isNaN(T)
@@ -7833,6 +7875,23 @@
           save();
           return render();
         }
+        if (d.act === "later") {
+          const i = +d.i,
+            p = dayPlan(i),
+            dk = keyI(i),
+            open = openItems(p, S.done, dk);
+          if (!canCarry({ i, today: TODAY, last: LAST, day: p, open })) return;
+          S.later[dk] = makeCarry(keyI(i + 1), open);
+          save();
+          toast(`${open.length} ${open.length === 1 ? "Übung hängt" : "Übungen hängen"} an ${DAYSF[dow(i + 1)]}`);
+          return render();
+        }
+        if (d.act === "later-undo") {
+          delete S.later[d.k];
+          save();
+          toast("Wieder am ursprünglichen Tag");
+          return render();
+        }
         if (d.act === "solo") {
           const dk = keyI(+d.i);
           if (S.solo[dk]) delete S.solo[dk];
@@ -8692,6 +8751,7 @@
             pv.classList.remove("pre");
           }
           save();
+          if (t.closest(".carry")) return render();
           const ex = t.closest(".ex");
           if (ex) ex.classList.toggle("is-done", t.checked);
           // Fortschritt ohne Neuaufbau aktualisieren (Fokus in Eingabefeldern bleibt)

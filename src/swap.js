@@ -19,5 +19,11 @@ export function swapDayData(state, ka, kb) {
     if (a) state.solo[kb] = a;
     if (b) state.solo[ka] = b;
   }
+  if (state.later) {
+    const a = state.later[ka], b = state.later[kb];
+    delete state.later[ka]; delete state.later[kb];
+    if (a) state.later[kb] = a;
+    if (b) state.later[ka] = b;
+  }
   if (state.skip) { delete state.skip[ka]; delete state.skip[kb]; }
 }

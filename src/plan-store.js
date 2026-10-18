@@ -37,7 +37,7 @@ export function weekInfo(plan, w) {
   // Im Plan benannte Deload-Woche hat Vorrang (z. B. wegen Feiertagen vorgezogen), die Woche danach ist wieder Belastung
   const dl = b.id === "T" ? null : (plan.weeks || []).find((x) => x.start >= b.start && x.start <= b.end && /deload/i.test(x.name));
   if (dl && off > 0) wave = dl.start === start ? "Deload" : WAVE[Math.min(2, start > dl.start ? off - 1 : off)];
-  return { block: b.id, blockName: b.name, name: named ? named.name : b.name, wave };
+  return { block: b.id, blockName: b.name, name: named ? named.name : b.name, wave, ...(named && named.km ? { km: named.km } : {}) };
 }
 
 /**

@@ -3366,7 +3366,34 @@
       .rv-notes .rv-yellow::before { background: var(--warn); }
       .rv-notes .rv-red::before { background: var(--danger); }
       .rv-focus { padding-left: 18px; }
-      .card.carry { border-left: 3px dashed var(--accent); }
+      /* Einklappbare Zeile (Zusatz-Einheiten, Nachholen) */
+      .fold-h { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: var(--s3); min-height: 44px; padding: 0; background: none; border: 0; color: var(--text); font: 600 15px var(--f-body); text-align: left; cursor: pointer; }
+      .fold-h .fh-t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .fold-h > em { white-space: nowrap; }
+      .fold-h em { font-style: normal; font-weight: 500; color: var(--muted); margin-left: 6px; }
+      .fold-h i { font-style: normal; color: var(--muted); font-size: 20px; width: 24px; text-align: center; }
+      .card.carry { padding: var(--s2) var(--s4); }
+      .card.carry .exs { margin-bottom: var(--s3); }
+      .extras { border-top: 1px solid var(--line); margin-top: var(--s4); padding-top: var(--s1); }
+      /* Übung + Feld in einer Zeile (Splits bekommen die ganze Breite) */
+      .ex.row-v { display: grid; grid-template-columns: minmax(0, 1fr) 104px; column-gap: var(--s3); align-items: center; }
+      .ex.row-v > .ex-h { grid-column: 1; }
+      .ex.row-v > .ex-v { grid-column: 2; margin: 0; }
+      .ex.row-v > .quick { grid-column: 1 / -1; }
+      .ex.row-v.wide > .ex-v { grid-column: 1 / -1; margin-top: var(--s2); }
+      .ex.row-v .ex-v input { min-height: 40px; padding: 0 10px; text-align: right; }
+      .ex.row-v.wide .ex-v input { text-align: left; }
+      /* RPE: zehn Tasten statt Regler */
+      .rpe-b { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+      .rpe-b button { min-height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--well); color: var(--text); font: 600 16px var(--f-head); position: relative; }
+      .rpe-b button.tgt::after { content: ""; position: absolute; left: 30%; right: 30%; bottom: 5px; height: 2px; border-radius: 1px; background: var(--muted); }
+      .rpe-b button.on { background: var(--rc); border-color: var(--rc); color: #111; }
+      .rpe-txt { color: var(--text); font-weight: 600; }
+      .more-row .btn { flex: 1; }
+      /* Übernehmen: Auswahl der Übungen */
+      .take { margin-top: var(--s3); }
+      .take .tk { display: flex; gap: var(--s2); align-items: center; min-height: 40px; font-size: 14px; }
+      .take .tk input { width: 20px; height: 20px; flex: none; }
       /* Wochenrückblick als Dashboard */
       .rv-of { font-size: 0.55em; color: var(--muted); font-weight: 500; }
       .rv-hero { display: grid; grid-template-columns: auto 1fr; gap: var(--s4); align-items: center; }
@@ -3422,6 +3449,50 @@
       .rv-wk-c.rv-red { border-bottom-color: var(--danger); color: var(--text); }
       .rv-wk-c.rv-future { opacity: 0.4; cursor: default; }
       .rv-wk-c.on { box-shadow: inset 0 0 0 1.5px var(--accent); }
+      /* Wochenrückblick v2: neutral, Farbe nur für Status, Gelb nur für Ziel und Auswahl */
+      .rv .wk { margin-bottom: var(--s5); }
+      .rv .cap { margin: 0 0 var(--s3); }
+      .rv .cap.rv-gap { margin-top: var(--s5); }
+      .rv-hero { grid-template-columns: auto 1fr; gap: var(--s5); padding: var(--s5); }
+      .rv-hero .rv-notes { grid-column: 1 / -1; margin: 0; padding-top: var(--s4); border-top: 1px solid var(--line); }
+      .rv-st { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text); background: var(--surface2); padding: 4px 10px; border-radius: 999px; }
+      .rv-st i, .rv-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
+      .rv-st.rv-green i, .rv-dot.rv-green { background: var(--ok); }
+      .rv-st.rv-yellow i, .rv-dot.rv-yellow { background: var(--warn); transform: rotate(45deg); border-radius: 1px; }
+      .rv-st.rv-red i, .rv-dot.rv-red { background: var(--danger); border-radius: 1px; }
+      .rv .rv-days { gap: 6px; }
+      .rv .rv-day { padding: var(--s3) 0; gap: 8px; }
+      .rv .rv-done i { background: var(--text); }
+      .rv .rv-miss i { background: none; border: 1.5px solid var(--danger); }
+      .rv .rv-leg { margin-top: var(--s3); color: var(--muted); }
+      .rv .rv-kpis { gap: var(--s3); margin-bottom: var(--s4); }
+      .rv .kpi { padding: var(--s4); gap: 4px; border: 1px solid var(--line); border-left-width: 1px; }
+      .rv .kpi span { display: flex; align-items: center; gap: 6px; }
+      .rv .kpi em { line-height: 1.35; }
+      .rv-tip { margin: calc(-1 * var(--s2)) 0 var(--s4); }
+      .rv .rv-total { margin-top: var(--s4); }
+      .rv .rv-bar { margin-top: var(--s4); }
+      .rv .b-run { background: var(--text); }
+      .rv .b-st { background: #6b6e78; }
+      .rv .b-rox { background: #3a3d46; }
+      .rv .rv-bar u { background: var(--accent); width: 3px; }
+      .rv .rv-leg .b-run, .rv .rv-leg .b-st, .rv .rv-leg .b-rox, .rv .rv-leg .b-goal { background: none; }
+      .rv .rv-leg .b-run i { background: var(--text); }
+      .rv .rv-leg .b-st i { background: #6b6e78; }
+      .rv .rv-leg .b-rox i { background: #3a3d46; }
+      .rv .rv-leg .b-goal i { background: var(--accent); width: 3px; height: 12px; border-radius: 1px; }
+      .rv-tab { width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+      .rv-tab th { font-size: 12px; color: var(--muted); font-weight: 600; padding: 0 0 var(--s2); text-align: right; }
+      .rv-tab th:first-child, .rv-tab td:first-child { text-align: left; }
+      .rv-tab td { padding: 7px 0; text-align: right; border-top: 1px solid var(--line); }
+      .rv-tab td small { display: block; color: var(--muted); font-size: 12px; }
+      .rv-tab tr.rv-sep td { color: var(--text); }
+      .rv-tab tfoot td { font-weight: 700; border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: var(--s2); }
+      .rv-tab .rv-slow { color: var(--danger); }
+      .rv-tab .rv-fast { color: var(--ok); }
+      .rv .rv-how { margin-top: var(--s3); }
+      .rv .rv-wk-c.rv-green { border-bottom-color: var(--ok); }
+      .rv .rv-season { gap: 6px; }
       .vh-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
       /* Ampel zusätzlich über die Form: gelb = Raute, rot = Quadrat (nicht nur Farbe) */
       .rv-notes .rv-yellow::before { border-radius: 1px; transform: rotate(45deg); }
@@ -3928,13 +3999,11 @@
 
       function placeholder(k, t) {
         if (k === "kraft")
-          return /plank/i.test(t)
-            ? "Zeit, z. B. 50/55/50″"
-            : "Gewicht, z. B. 80 kg × 5";
+          return /plank/i.test(t) ? "Zeit" : "kg";
         if (k === "lauf")
-          return /4\s*[×x]\s*1\s*km/i.test(t) ? "4 Splits, z. B. 3:52 3:55 3:50 3:58" : "Splits, z. B. 4:12 / 4:10 …";
-        if (k === "bike") return "Dauer, Ø HF, Watt";
-        return "Zeit / Gewicht";
+          return /4\s*[×x]\s*1\s*km/i.test(t) ? "4 Splits: 3:52 3:55 …" : dash.parseReps(t) ? "Splits" : "Zeit";
+        if (k === "bike") return "Dauer";
+        return "Zeit";
       }
       /* Testtag (Pacing-/T-Test, Stationen-Benchmark): Einträge der Einheit in Profil → Tests & Benchmarks übernehmen.
    onlyEmpty = nur leere Felder füllen (Garmin/Strava); Handeinträge ersetzen den alten Wert. Gibt die Anzahl Änderungen zurück. */
@@ -4066,7 +4135,7 @@
         const ivText = p && p.i ? p.i.find((t) => dash.parseReps(t)) || "" : "";
         for (const a of acts) {
           h += `<div class="mt-1">${esc(a.name)} – ${esc(strava.summary(a))}</div>`;
-          const rs = dash.repSummary(a, ivText);
+          const rs = ivText ? dash.repSummary(a, ivText) : "";
           if (rs) h += `<div class="sub mt-1">Intervalle ${esc(rs)}</div>`;
         }
         // Steht der Tag schon im Banner oben auf „Heute“, hier nicht noch einmal fragen
@@ -4075,10 +4144,84 @@
           sel == null &&
           stravaOffers().some((o) => o.x === i);
         if (e.match && n && done < n && !inBanner)
-          h += `<button class="btn sm" data-act="strava-take" data-i="${i}">Als erledigt übernehmen</button>`;
+          h += takeOpen === i ? takePicker(i) : `<button class="btn sm" data-act="strava-take" data-i="${i}">Übernehmen</button>`;
         else if (inBanner)
           h += `<div class="sub mt-1">Übernehmen oben im Vorschlag.</div>`;
         return h + `</div>`;
+      }
+      /* Übernehmen-Auswahl: welche Übungen wurden gemacht? (Tag-Index oder null) */
+      let takeOpen = null;
+      function takePicker(i) {
+        const p = dayPlan(i),
+          dk = keyI(i),
+          had = p.i.map((_, j) => !!S.done[dk + "|" + j]),
+          any = had.some(Boolean);
+        return `<div class="take" data-take="${i}"><div class="sub">Was hast du gemacht?</div>${p.i
+          .map((t, j) => `<label class="tk"><input type="checkbox" data-tk="${j}" ${had[j] || !any ? "checked" : ""}><span>${esc(t)}</span></label>`)
+          .join("")}<div class="grid2 mt-3"><button class="btn primary sm" data-act="take-ok" data-i="${i}">Übernehmen</button><button class="btn sm" data-act="take-cancel">Abbrechen</button></div></div>`;
+      }
+      /* Aktivität an Tag i übernehmen: nur die gewählten Übungen abhaken, Werte passend zur Art der Einheit */
+      /* Die geplante Einheit eines Tages: unter den passenden Aktivitäten die längste (ein kurzer Zusatzlauf zählt nicht) */
+      function planAct(i) {
+        const p = dayPlan(i);
+        if (!p || p.k === "rest") return null;
+        return actsOf(i)
+          .filter((x) => strava.fits(p.k, x.group))
+          .sort((a, b) => (b.time || 0) - (a.time || 0))[0] || null;
+      }
+      function takeDay(i, js) {
+        const p = dayPlan(i),
+          dk = keyI(i),
+          a = planAct(i);
+        js.forEach((j) => (S.done[dk + "|" + j] = 1));
+        let msg = `${js.length === p.i.length ? "Workout erledigt" : `${js.length} von ${p.i.length} Übungen erledigt`}${a ? " – von " + srcName(a) + " übernommen" : ""}`;
+        if (a) {
+          const sum = strava.summary(a),
+            r = p.i.findIndex((t) => dash.parseReps(t));
+          if ((p.k === "lauf" || p.k === "bike") && r >= 0 && js.includes(r) && a.laps && dash.repSummary(a, p.i[r])) {
+            // Intervall-Einheit: Zeiten jeder Wiederholung in die Intervallzeile
+            S.val[dk + "|" + r] = dash.repSummary(a, p.i[r]);
+            msg = "Erledigt – Intervallzeiten übernommen";
+            if (isRunTest(p) && testsFromDay(i, true)) msg = "Erledigt – Intervallzeiten auch in den Pacing-Test übernommen";
+          } else if (p.k === "lauf" || p.k === "bike") {
+            // Lauf/Rad ohne Intervalle: nur Gesamtwerte (Distanz, Zeit, Pace, Puls) in die Hauptzeile
+            const j = js.find((x) => !isFiller(p.i[x]));
+            if (j != null && !S.val[dk + "|" + j]) S.val[dk + "|" + j] = sum;
+          } else {
+            // Kraft, Stationen, Simulation: Gesamtwerte in die Notiz – die Übungsfelder bleiben für Gewichte und Zeiten frei
+            const n = S.notes[dk] || "";
+            if (!n.includes(sum)) S.notes[dk] = (n ? n + "\n" : "") + srcName(a) + ": " + sum;
+          }
+        }
+        save();
+        toast(msg);
+      }
+      /* Aktivitäten, die zu keiner geplanten Einheit passen, als Zusatz-Einheit eintragen (id "a:<Aktivität>").
+         Gelöschte merkt sich S.dismiss, damit sie nicht wiederkommen. Gibt die Anzahl neuer Einträge zurück. */
+      const XTYPE = { run: "z2run", ride: "z2bike", row: "erg", ski: "erg", strength: "kraft" };
+      function autoExtras() {
+        let n = 0;
+        const R = rc(),
+          movedIds = new Set(R.moved.map((m) => m.act.id));
+        for (const [x, e] of Object.entries(R.byDay)) {
+          const i = +x;
+          if (i > TODAY) continue;
+          const dk = keyI(i),
+            pa = planAct(i);
+          for (const a of actsOf(i)) {
+            if (pa && a.id === pa.id) continue; // die geplante Einheit selbst
+            if (movedIds.has(a.id) || !XTYPE[a.group] || S.dismiss["xa:" + a.id]) continue;
+            const id = "a:" + a.id,
+              cur = cleanExtras(S.extra[dk]);
+            if (cur.some((z) => z.id === id)) continue;
+            const ex = makeExtra({ type: XTYPE[a.group], min: a.time ? Math.max(1, Math.round(a.time / 60)) : "", note: (a.name || srcName(a)).slice(0, 80) }, id);
+            if (ex) {
+              S.extra[dk] = addExtra(S.extra[dk], ex);
+              n++;
+            }
+          }
+        }
+        return n;
       }
       /* Strava-Treffer der letzten 3 Tage, die noch nicht übernommen sind – Ein-Klick-Vorschlag statt automatisch abhaken */
       function stravaOffers() {
@@ -4103,9 +4246,11 @@
               a,
             }) => `<div class="card tight sban"><div class="row between"><b>${srcName(a)}-Aktivität erkannt</b><span class="badge ${srcCls(a)}">${x === TODAY ? "heute" : esc(shortDay(x))}</span></div>
   <div class="mt-2">${a.name ? `<b>${esc(a.name)}</b> · ` : ""}${esc(strava.summary(a))}</div><div class="sub mt-1">Passt zu „${esc(p.t)}“. Als erledigt übernehmen?</div>
-  <div class="grid2 mt-3"><button class="btn primary sm" data-act="strava-take" data-i="${x}">Übernehmen</button><button class="btn sm" data-act="strava-no" data-i="${x}">Nein</button></div></div>`,
+  ${takeOpen === x ? takePicker(x) : `<div class="grid2 mt-3"><button class="btn primary sm" data-act="strava-take" data-i="${x}">Übernehmen</button><button class="btn sm" data-act="strava-no" data-i="${x}">Nein</button></div>`}</div>`,
           )
           .join("");
+      /* Aufgeklappte Bereiche (Notiz, Zusatz-Einheiten, Nachholen …), Schlüssel z. B. "n12", "x12", "c2026-10-15" */
+      const fold = new Set();
       /* Erledigte Einheiten, die trotzdem offen angezeigt werden sollen (nach Antippen des Balkens) */
       const doneOpen = new Set();
       /* RPE-Farbe: Eisblau (1) → Grün → Gelb → Rot (10); --p = Füllung in Prozent */
@@ -4148,14 +4293,19 @@
             p = dayPlan(oi);
           if (!p) continue;
           const pr = carryProgress(c, S.done);
-          h += `<div class="card carry k-${p.k}"><div class="row between"><h3>Von ${esc(DAYSF[dow(oi)])} nachholen</h3><span class="sub">${pr.done} von ${pr.n}</span></div>
-    <p class="sub mt-1">${esc(p.t)} · ${pr.done === pr.n ? "fertig ✓" : "Rest aus " + esc(shortDay(oi))}</p><div class="exs">`;
+          const co = fold.has("c" + c.from);
+          h += `<div class="card carry k-${p.k}"><button class="fold-h" data-act="fold" data-f="c${c.from}" aria-expanded="${co}"><span class="fh-t">↪ ${esc(DAYS[dow(oi)])}: ${esc(p.t)}</span><em>${pr.done === pr.n ? "nachgeholt ✓" : `${pr.n - pr.done} offen`}</em><i aria-hidden="true">${co ? "−" : "＋"}</i></button>`;
+          if (!co) {
+            h += `</div>`;
+            continue;
+          }
+          h += `<div class="exs">`;
           for (const j of c.j) {
             const t = p.i[j];
             if (t == null) continue;
             const id = c.from + "|" + j,
               on = !!S.done[id];
-            h += `<div class="ex ${on ? "is-done" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${esc(t)}</span></label>`;
+            h += `<div class="ex row-v ${on ? "is-done" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${esc(t)}</span></label>`;
             if (!isFiller(t))
               h += `<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id] || "")}" placeholder="${placeholder(isLift(p.k, t) ? "kraft" : p.k, t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
             h += `</div>`;
@@ -4240,9 +4390,10 @@
         p.i.forEach((t, j) => {
           const id = dk + "|" + j,
             on = !!S.done[id];
+          const wide = p.k === "lauf" && dash.parseReps(t);
           h += single
             ? `<div class="ex ${on ? "is-done" : ""}"><div class="ex-h hold" data-hold="${i}"${on ? " data-undo" : ""} role="button" tabindex="0" aria-label="${esc(t)} – gedrückt halten, um ${on ? "wieder zu öffnen" : "abzuschliessen"}"><i class="hold-fill" aria-hidden="true"></i><span>${esc(t)}</span><em class="hold-hint" aria-hidden="true">${on ? "Halten ↺" : "Halten ✓"}</em></div>`
-            : `<div class="ex ${on ? "is-done" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${esc(t)}</span></label>`;
+            : `<div class="ex row-v${wide ? " wide" : ""} ${on ? "is-done" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${esc(t)}</span></label>`;
           if (!isFiller(t)) {
             const lift = isLift(p.k, t),
               le = lastEntry(i, t),
@@ -4266,18 +4417,16 @@
         const tg = targetRpe(p.i),
           inT = (r) => tg && r >= tg[0] && r <= tg[1];
         const rv = S.rpe[dk] ? +S.rpe[dk] : 0;
-        h += `<label class="lbl" for="rpe-${i}">Wie hart war's? (RPE)${tg ? ` · <span class="tgt-l">Ziel ${tg[0] === tg[1] ? tg[0] : tg[0] + "–" + tg[1]}</span>` : ""}</label>
-    <div class="rpe-s${rv ? "" : " unset"}" data-rpe-wrap style="${rpeStyle(rv || 5)}">
-      <div class="rpe-head"><b class="rpe-n" aria-hidden="true">${rv || "–"}</b><span class="rpe-t">${rv ? esc(RPE_TXT[rv] || "") : "Schieben, um zu bewerten"}</span>${rv ? `<button type="button" class="rpe-x" data-act="rpe-clear" data-k="${dk}" aria-label="RPE löschen">✕</button>` : ""}</div>
-      <div class="rpe-track"><i class="rpe-fill" aria-hidden="true"></i><input type="range" class="rpe-range" id="rpe-${i}" data-rpe="${dk}" min="1" max="10" step="1" value="${rv || 5}" aria-valuetext="${rv ? rv + " – " + esc(RPE_TXT[rv] || "") : "noch nicht bewertet"}"></div>
-      <div class="rpe-scale" aria-hidden="true">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((r) => `<span class="${inT(r) ? "tgt" : ""}">${r}</span>`).join("")}</div>
-    </div>${tg && S.rpe[dk] > tg[1] + 1 ? `<p class="sub mt-2">Deutlich über dem Ziel – wird bei der Entlastung der nächsten harten Einheiten berücksichtigt.</p>` : ""}
-    <label class="lbl" for="n-${i}">Notiz</label><textarea id="n-${i}" data-n="${dk}" placeholder="Gefühl, Schlaf, Fuss, was auffiel …">${esc(S.notes[dk] || S.notes["n|" + dk] || "")}</textarea>`;
+        // RPE: tippen statt schieben – ein Regler verstellt sich beim Scrollen. Nochmals tippen = löschen.
+        h += `<div class="lbl">Wie hart war's? (RPE)${tg ? ` · <span class="tgt-l">Ziel ${tg[0] === tg[1] ? tg[0] : tg[0] + "–" + tg[1]}</span>` : ""}${rv ? ` · <b class="rpe-txt">${esc(RPE_TXT[rv] || "")}</b>` : ""}</div>
+    <div class="rpe-b" role="group" aria-label="Anstrengung 1 bis 10">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => `<button type="button" class="${rv === x ? "on" : ""}${inT(x) ? " tgt" : ""}" style="--rc:${rpeColor((x - 1) / 9)}" data-act="rpe-set" data-k="${dk}" data-r="${x}" aria-pressed="${rv === x}" aria-label="RPE ${x}${RPE_TXT[x] ? ", " + esc(RPE_TXT[x]) : ""}">${x}</button>`).join("")}</div>${tg && S.rpe[dk] > tg[1] + 1 ? `<p class="sub mt-2">Deutlich über dem Ziel – wird bei der Entlastung der nächsten harten Einheiten berücksichtigt.</p>` : ""}`;
+        const note = S.notes[dk] || S.notes["n|" + dk] || "",
+          nOpen = fold.has("n" + i) || !!note;
         const sl = sore.effective(S.sore, i),
           sn = Object.keys(sl).length;
-        if (coachReady())
-          h += `<button class="btn mt-3" data-act="explain" data-i="${i}">Erkläre mir das</button>`;
-        h += `<button class="btn mt-3" data-act="sore-open">${sn ? `Muskelkater: ${sn} ${sn === 1 ? "Stelle" : "Stellen"}, max ${Math.max(...Object.values(sl))}/10 – ändern` : "Muskelkater eintragen"} →</button>`;
+        h += `<div class="chips mt-3 more-row"><button class="btn sm" data-act="fold" data-f="n${i}" aria-expanded="${nOpen}">Notiz</button><button class="btn sm" data-act="sore-open">${sn ? `Muskelkater ${Math.max(...Object.values(sl))}/10` : "Muskelkater"}</button>${coachReady() ? `<button class="btn sm" data-act="explain" data-i="${i}">Erklären</button>` : ""}</div>`;
+        if (nOpen)
+          h += `<textarea id="n-${i}" class="mt-2" data-n="${dk}" aria-label="Notiz" placeholder="Gefühl, Schlaf, Fuss, was auffiel …">${esc(note)}</textarea>`;
         if (p.test)
           h += `<div class="btns"><button class="btn" data-v="tests">Testergebnisse eintragen →</button></div>`;
         return h + extrasBox(i) + `</div>`;
@@ -4314,18 +4463,20 @@
       }
       function extrasBox(i) {
         const list = cleanExtras(S.extra[keyI(i)]);
-        let h = `<div class="extras"><div class="lbl">Zusatz-Einheiten${list.length > 1 ? ` · ${extraMinutes(list)}′` : ""}</div>`;
+        const xo = fold.has("x" + i) || xOpen === i;
+        let h = `<div class="extras"><button class="fold-h" data-act="fold" data-f="x${i}" aria-expanded="${xo}"><span>Zusatz-Einheiten${list.length ? ` <em>${list.length} · ${extraMinutes(list)}′</em>` : ""}</span><i aria-hidden="true">${xo ? "−" : "＋"}</i></button>`;
         for (const e of list)
           h += `<div class="xrow"><span>${esc(extraLabel(e))}</span><button class="btn sm" data-act="x-del" data-i="${i}" data-x="${esc(e.id)}" aria-label="${esc(extraLabel(e))} entfernen">✕</button></div>`;
         // Passt heute: vorsichtige Vorschläge je nach Plan, Wochentyp, Check-in und Zusatz-Minuten der Woche
         const sugs = xSugs(i);
+        if (!xo) return h + `</div>`;
         if (xOpen !== i)
           return (
             h +
             (sugs.length && i >= TODAY
-              ? `<div class="sub mt-2">Passt heute: ${esc(sugs[0].why)}</div><div class="chips mt-2">${sugs.map((x) => `<button type="button" class="btn sm" data-act="x-sug" data-i="${i}" data-xt="${x.type}" data-min="${x.min}" title="${esc(x.why)}">＋ ${EXTRA_TYPES[x.type].label} ${x.min}′</button>`).join("")}</div>`
+              ? `<div class="chips mt-2">${sugs.map((x) => `<button type="button" class="btn sm" data-act="x-sug" data-i="${i}" data-xt="${x.type}" data-min="${x.min}" title="${esc(x.why)}">＋ ${EXTRA_TYPES[x.type].label} ${x.min}′</button>`).join("")}</div>`
               : "") +
-            `<button class="btn sm mt-2" data-act="x-open" data-i="${i}">＋ Zusatz-Einheit</button></div>`
+            `<button class="btn sm mt-2" data-act="x-open" data-i="${i}">Andere …</button></div>`
           );
         const pre = xPre || { type: Object.keys(EXTRA_TYPES)[0], min: "" };
         return (
@@ -5114,8 +5265,13 @@
         stMsg = "";
       const redirectUri = () => location.origin + location.pathname;
       /* Strava und Garmin landen in derselben Liste; dieselbe Einheit aus beiden Quellen zählt nur einmal (Garmin hat Vorrang) */
-      const mergeActs = (acts) =>
-        garmin.mergeActs(S.strava.acts, acts, STRAVA_MIN);
+      const mergeActs = (acts) => {
+        const n = garmin.mergeActs(S.strava.acts, acts, STRAVA_MIN);
+        RC = null;
+        const x = autoExtras();
+        if (x) toast(`${x} Zusatz-${x === 1 ? "Einheit" : "Einheiten"} von Garmin/Strava eingetragen`);
+        return n;
+      };
       /* Strava-Fehler in klare Handlungsanweisungen übersetzen */
       const stravaErr = (e) =>
         syncErrorText(e, { online: navigator.onLine !== false });
@@ -6137,14 +6293,13 @@
           extras = [];
         for (let i = w * 7; i < w * 7 + 7; i++)
           extras.push(...cleanExtras(S.extra[keyI(i)]));
-        const self = review.cleanSelf(S.review[w]);
         return review.weekCheck({
           days,
           wave: weekInfo(w).wave,
           load: wl[w],
           prev: wl.slice(Math.max(0, w - 3), w),
           extras,
-          self: Object.keys(self).length ? self : null,
+          self: null, // nur Daten: keine Selbsteinschätzung
         });
       }
       /* Prognose aus den aktuellen Tests (ich + Partner) */
@@ -6271,7 +6426,7 @@
         if (w == null) return "";
         const r = rvData(w);
         return `<div class="card tight"><div class="row between"><h3>Wochenrückblick Woche ${w + 1}</h3><span class="amp amp-${r.level}">${LVL_LABEL[r.level]}</span></div>
-    <p class="sub mt-2">${r.done}/${r.planned} Einheiten. 1 Minute: Bist du auf Kurs für Basel?</p><button class="btn primary sm mt-3" data-act="rv-open" data-w="${w}">Woche abschliessen →</button></div>`;
+    <p class="sub mt-2">${r.done}/${r.planned} Einheiten · Laufumfang, Prognose und Fokus der Woche.</p><button class="btn primary sm mt-3" data-act="rv-open" data-w="${w}">Ansehen →</button></div>`;
       }
       let rvEdit = false; // Einschätzung einer abgeschlossenen Woche wieder bearbeiten
       const RV_HEAD = {
@@ -6297,130 +6452,125 @@
         const cur = Math.max(0, Math.min(NWEEKS - 1, Math.floor(Math.min(TODAY, LAST) / 7)));
         const w = rvW != null ? rvW : (rvDueW() ?? cur);
         const r = rvData(w),
-          saved = S.review[w] || {},
-          self = rvDraft && rvDraft.w === w ? rvDraft : { w, ...review.cleanSelf(saved) };
-        rvDraft = self;
-        const wi = weekInfo(w);
-        let h = `<div class="narrow">${vhead("Wochenrückblick", "", true)}`;
+          wi = weekInfo(w);
+        // Nur Daten, keine Fragen: eine vergangene Woche (oder die laufende ab Samstag) gilt beim Ansehen als abgeschlossen
+        if (TODAY >= 0 && (w < cur || (w === cur && dow(TODAY) >= 5)) && !(S.review[w] && S.review[w].at)) {
+          const fc0 = rvForecast();
+          S.review[w] = { at: Date.now(), level: r.level, ...(fc0 && fc0.total ? { fc: Math.round(fc0.total) } : {}) };
+          save();
+        }
+        let h = `<div class="narrow rv">${vhead("Wochenrückblick", "", true)}`;
         h += `<div class="wk"><button data-act="rv-wk" data-d="-1" aria-label="Vorherige Woche" ${w === 0 ? "disabled" : ""}>‹</button>
     <div><h2>Woche ${w + 1}<small class="rv-of"> / ${NWEEKS}</small></h2><div class="sub">${fmt(dateFromIdx(w * 7))} – ${fmt(dateFromIdx(w * 7 + 6))} · ${esc(wi.wave)}</div></div>
     <button data-act="rv-wk" data-d="1" aria-label="Nächste Woche" ${w >= cur ? "disabled" : ""}>›</button></div>`;
 
-        // 1. Ergebnis: Ring (Einheiten) + Urteil + nur die Punkte, die Aufmerksamkeit brauchen
+        // 1. Ergebnis: Ring (Einheiten) + Urteil + Punkte, die Aufmerksamkeit brauchen
         const warn = r.notes.filter((n) => n.level !== "green");
         h += `<div class="card rv-hero">${dash.ringGauge(r.planned ? (r.done / r.planned) * 100 : 0, {
           label: "Einheiten",
           value: `${r.done}<small>/${r.planned}</small>`,
-          color: LVL_COL[r.level],
+          color: "var(--accent)",
           size: 104,
-        })}<div><span class="amp amp-${r.level}">${LVL_LABEL[r.level]}</span><p class="rv-verdict">${RV_HEAD[r.level]}</p></div></div>`;
-        if (warn.length)
-          h += `<div class="card tight"><div class="cap">Was auffällt</div><ul class="rv-notes mt-2">${warn.map((n) => `<li class="rv-${n.level}"><span class="vh-only">${RV_SR[n.level]}: </span>${esc(n.text)}</li>`).join("")}</ul></div>`;
+        })}<div><span class="rv-st rv-${r.level}"><i aria-hidden="true"></i>${LVL_LABEL[r.level]}</span><p class="rv-verdict">${RV_HEAD[r.level]}</p></div>
+    ${warn.length ? `<ul class="rv-notes">${warn.map((n) => `<li class="rv-${n.level}"><span class="vh-only">${RV_SR[n.level]}: </span>${esc(n.text)}</li>`).join("")}</ul>` : ""}</div>`;
 
-        // 2. Die Tage: was erledigt, was verpasst, wie hart
+        // 2. Die Tage
         const days = rvDays(w);
-        h += `<div class="card tight"><div class="cap">Tage</div><div class="rv-days mt-2">${days
+        h += `<div class="card"><div class="cap">Tage</div><div class="rv-days">${days
           .map(
             (x) =>
               `<div class="rv-day rv-${x.st}${x.today ? " today" : ""}" title="${esc(x.t)}"><span>${DAYS[x.d]}</span><i aria-hidden="true"></i><b>${x.rpe != null ? x.rpe : "–"}</b><span class="vh-only">${esc(x.t || "frei")}: ${RV_ST[x.st]}${x.rpe != null ? ", RPE " + x.rpe : ""}</span></div>`,
           )
-          .join("")}</div><div class="rv-leg sub mt-2"><span class="rv-done"><i></i>erledigt</span><span class="rv-miss"><i></i>verpasst</span><span class="rv-rest"><i></i>Ruhe</span><span>Zahl = RPE</span></div></div>`;
+          .join("")}</div><div class="rv-leg"><span class="rv-done"><i></i>erledigt</span><span class="rv-miss"><i></i>verpasst</span><span class="rv-rest"><i></i>Ruhe</span><span>Zahl = RPE</span></div></div>`;
 
-        // 3. Kennzahlen: je eine Zahl mit ihrem Massstab
+        // 3. Kennzahlen: Laufumfang (Strava/Garmin) gegen Plan, Anstrengung, Schlaf, Zusatz
         let slS = 0,
-          slN = 0,
-          ciN = 0,
-          ciBad = 0;
+          slN = 0;
         for (const x of days) {
           const g = S.garmin.well[keyI(x.i)];
           if (g && g.sleepH != null) (slS += +g.sleepH), slN++;
-          const c = S.checkin[keyI(x.i)];
-          if (c && Object.keys(c).length) {
-            ciN++;
-            if (readiness(c) === "red") ciBad++;
-          }
         }
         const one = (v) => (+v).toFixed(1).replace(".", ",");
         const sl = slN ? slS / slN : null;
+        const acts = Object.values(S.strava.acts),
+          wl = dash.weekly(acts, idxOfIso, w),
+          hasRuns = acts.some((a) => a.group === "run");
+        const rc = hasRuns ? review.runCheck(wl[w] ? wl[w].runKm : 0, { plan: wi.km || null, prev: w > 0 && wl[w - 1] ? wl[w - 1].runKm : null }) : null;
         const kpi = (label, val, hint, lvl) =>
-          `<div class="kpi${lvl ? " kpi-" + lvl : ""}"><span>${label}</span><b>${val}</b><em>${hint}</em></div>`;
+          `<div class="kpi"><span>${lvl ? `<i class="rv-dot rv-${lvl}" aria-hidden="true"></i>` : ""}${label}</span><b>${val}</b><em>${hint}</em></div>`;
         h += `<div class="rv-kpis">${kpi(
+          "Laufen",
+          rc ? one(rc.km) + " km" : "–",
+          !rc
+            ? "Garmin oder Strava verbinden"
+            : [rc.plan ? `Plan ${rc.plan} km` : "", rc.ramp != null ? `${rc.ramp >= 0 ? "+" : "−"}${Math.abs(Math.round(rc.ramp * 100))} % zur Vorwoche` : ""].filter(Boolean).join(" · ") || "aus Garmin/Strava",
+          rc && rc.level !== "green" ? rc.level : "",
+        )}${kpi(
           "Ø Anstrengung",
           r.avgRpe != null ? one(r.avgRpe) : "–",
           `Grenze ${one(r.rpeMax)} (${esc(wi.wave)})`,
-          r.avgRpe == null ? "" : r.avgRpe > r.rpeMax + 1 ? "red" : r.avgRpe > r.rpeMax ? "yellow" : "green",
+          r.avgRpe == null ? "" : r.avgRpe > r.rpeMax + 1 ? "red" : r.avgRpe > r.rpeMax ? "yellow" : "",
         )}${kpi(
           "Ø Schlaf",
           sl != null ? one(sl) + " h" : "–",
           sl != null ? "Ziel 7–9 h" : S.garmin.conn ? "keine Garmin-Daten" : "Garmin verbinden",
-          sl == null ? "" : sl >= 7 ? "green" : sl >= 6.3 ? "yellow" : "red",
-        )}${kpi(
-          "Zusatz",
-          r.extraN ? `${r.extraN}×` : "0",
-          r.extraN ? `${r.extraMin}′ insgesamt` : "freiwillig",
-          "",
-        )}${kpi("Check-ins", `${ciN}<small>/7</small>`, ciBad ? `${ciBad}× schlecht` : ciN ? "ohne Warnung" : "jeden Morgen 20 s", ciBad >= 2 ? "red" : ciBad ? "yellow" : "")}</div>`;
+          sl == null ? "" : sl >= 7 ? "" : sl >= 6.3 ? "yellow" : "red",
+        )}${kpi("Zusatz", r.extraN ? `${r.extraN}×` : "0", r.extraN ? `${r.extraMin}′ insgesamt` : "freiwillig", "")}</div>`;
+        if (rc && rc.ramp != null && rc.ramp > 0.2)
+          h += `<p class="sub rv-tip">Laufumfang ist um mehr als 20 % gestiegen. Sehnen passen sich langsamer an als die Ausdauer, nächste Woche nicht weiter steigern.</p>`;
 
-        // 4. Rennprognose: Gesamtzeit gegen das Ziel, aufgeteilt in Laufen / Stationen / Roxzone
+        // 4. Rennprognose: Gesamtzeit und genaue Aufschlüsselung gegen das Rennmodell
         const fc = rvForecast(),
           weeksLeft = Math.max(1, (LAST - Math.max(0, TODAY)) / 7);
         h += `<div class="card"><div class="row between"><h3>Rennprognose</h3>`;
         if (!fc)
           h += `</div><p class="sub mt-2">Noch keine Testwerte. Nach dem Lauf-Pacing-Test und dem Stationen-Benchmark rechnet die App hier deine Zielzeit hoch.</p><div class="btns"><button class="btn" data-v="tests">Tests eintragen →</button></div>`;
         else {
-          const t = review.onTrack(fc.total, weeksLeft);
-          h += t ? `<span class="amp amp-${t.level}">${t.gap <= 0 ? mmss(-t.gap) + " Puffer" : mmss(t.gap) + " zu langsam"}</span></div>` : `</div>`;
+          const t = review.onTrack(fc.total, weeksLeft),
+            bd = review.breakdown(fc);
+          h += t ? `<span class="rv-st rv-${t.level}"><i aria-hidden="true"></i>${t.gap <= 0 ? mmss(-t.gap) + " Puffer" : mmss(t.gap) + " zu langsam"}</span></div>` : `</div>`;
           if (fc.total) {
-            // Balken bis 70 Minuten, Strich bei 60:00
             const MAX = 4200,
               pc = (s) => ((s / MAX) * 100).toFixed(1);
             h += `<div class="rv-total"><b>${mmss(fc.total)}</b><span>Ziel 60:00</span></div>
     <div class="rv-bar" role="img" aria-label="Laufen ${mmss(fc.run)}, Stationen ${mmss(fc.st)}, Roxzone ${mmss(fc.rox)}"><i class="b-run" style="width:${pc(fc.run)}%"></i><i class="b-st" style="width:${pc(fc.st)}%"></i><i class="b-rox" style="width:${pc(fc.rox)}%"></i><u style="left:${pc(review.GOAL_S)}%"></u></div>
-    <div class="rv-leg sub mt-2"><span class="b-run"><i></i>Laufen ${mmss(fc.run)}</span><span class="b-st"><i></i>Stationen ${mmss(fc.st)}</span><span class="b-rox"><i></i>Roxzone ${mmss(fc.rox)}</span></div>`;
+    <div class="rv-leg"><span class="b-run"><i></i>Laufen</span><span class="b-st"><i></i>Stationen</span><span class="b-rox"><i></i>Roxzone</span><span class="b-goal"><i></i>60:00</span></div>`;
             if (t && t.gap > 0) h += `<p class="sub mt-2">Ca. ${Math.ceil(t.perWeek)} s pro Woche aufholen.</p>`;
           } else
             h += `<div class="rv-total"><b>${mmss(fc.run)}</b><span>nur Laufen 8 km</span></div><p class="sub mt-2">Für die Gesamtzeit fehlen noch ${fc.missing} Stationszeiten.</p>`;
-          // Verlauf der beim Abschliessen gespeicherten Prognosen
+          // Zeile für Zeile: Prognose, Rennmodell, Differenz
+          const sign = (d) => (d == null ? "–" : d === 0 ? "±0:00" : (d > 0 ? "+" : "−") + mmss(Math.abs(d)));
+          h += `<div class="cap rv-gap">So setzt sich die Zeit zusammen</div><table class="rv-tab"><thead><tr><th>Teil</th><th>Prognose</th><th>Modell</th><th>Diff.</th></tr></thead><tbody>${bd.rows
+            .map(
+              (x, n) =>
+                `<tr class="${n === 0 || n === 9 ? "rv-sep" : ""}"><td>${esc(x.label)}${n === 0 ? `<small>${mmss(fc.pace)}/km</small>` : ""}</td><td>${x.est != null ? mmss(x.est) : "–"}</td><td>${mmss(x.goal)}</td><td class="${x.diff == null ? "" : x.diff > 5 ? "rv-slow" : x.diff < -5 ? "rv-fast" : ""}">${sign(x.diff != null ? Math.round(x.diff) : null)}</td></tr>`,
+            )
+            .join("")}</tbody><tfoot><tr><td>Gesamt</td><td>${bd.est != null ? mmss(bd.est) : "–"}</td><td>${mmss(bd.goal)}</td><td class="${bd.diff == null ? "" : bd.diff > 0 ? "rv-slow" : "rv-fast"}">${sign(bd.diff != null ? Math.round(bd.diff) : null)}</td></tr></tfoot></table>`;
+          h += `<details class="rv-how"><summary>Wie wird gerechnet?</summary><p class="sub mt-1">Laufen: Team-Tempo T aus dem 4×1-km-Test (${mmss(fc.T)}/km) plus ${review.RUN_PENALTY} s/km, weil im Rennen nach jeder Station gelaufen wird, mal 8 km. Stationen: Mittel eurer Solo-Zeiten aus dem Benchmark, davon ${Math.round(review.DOUBLES_SHARE * 100)} %, weil ihr die Arbeit teilt und die Wechsel etwas kosten. Roxzone: ${mmss(review.ROXZONE)} für Wege und 16 Wechsel. Modell: das Rennmodell aus dem Plan (Summe ${mmss(bd.goal)}). Jeder neue Test macht die Zahl genauer.</p></details>`;
+          // Verlauf der gespeicherten Prognosen
           const pts = [];
           for (let x = 0; x <= cur; x++)
             pts.push({ label: "W" + (x + 1), value: S.review[x] && S.review[x].fc ? S.review[x].fc / 60 : null });
           if (pts.filter((p) => p.value != null).length >= 2)
-            h += `<div class="sub mt-3">Prognose pro Woche</div>${dash.lineChart(pts, { label: "Rennprognose", fmt: (v) => mmss(v * 60), height: 110 })}`;
-          h += `<details class="rv-how mt-2"><summary>Wie wird gerechnet?</summary><p class="sub mt-1">1-km-Testpace + ${review.RUN_PENALTY} s/km für 8 km, Stationen ${Math.round(review.DOUBLES_SHARE * 100)} % eurer Solo-Zeiten (ihr teilt die Arbeit), ${mmss(review.ROXZONE)} Roxzone. Jeder neue Test macht die Zahl genauer.</p></details>`;
+            h += `<div class="cap rv-gap">Prognose pro Woche</div>${dash.lineChart(pts, { label: "Rennprognose", fmt: (v) => mmss(v * 60), height: 110 })}`;
         }
         h += `</div>`;
 
-        // 5. Nächste Woche: höchstens drei konkrete Punkte
+        // 5. Nächste Woche
         h += `<div class="card"><h3>Nächste Woche</h3><ul class="rv-focus mt-2">${r.focus.map((f) => `<li>${esc(f)}</li>`).join("")}</ul></div>`;
 
-        // 6. Eigene Einschätzung: offen = Formular, abgeschlossen = eine Zeile
-        if (saved.at && !rvEdit) {
-          const ans = Object.entries(review.SELF)
-            .filter(([k]) => self[k] != null)
-            .map(([k, q]) => `<span class="rv-ans v-${["g", "y", "r"][self[k]]}">${q.short}: <b>${q.opts[self[k]]}</b></span>`)
-            .join("");
-          h += `<div class="card"><div class="row between"><h3>Deine Einschätzung</h3><button class="btn ghost sm" data-act="rv-edit">Ändern</button></div>
-    <div class="rv-anss mt-2">${ans}</div>${self.note ? `<p class="sub mt-2">„${esc(self.note)}“</p>` : ""}<p class="sub mt-2">Abgeschlossen am ${new Date(saved.at).toLocaleDateString("de-CH")}.</p></div>`;
-        } else {
-          h += `<div class="card"><h3>Deine Einschätzung</h3><p class="sub mt-1">1 Minute – fliesst in Ampel und Fokus ein.</p>`;
-          for (const [k, q] of Object.entries(review.SELF))
-            h += `<div class="ci-row"><span>${q.label}</span><div class="seg" role="group" aria-label="${q.label}">${q.opts.map((o, j) => `<button class="v-${["g", "y", "r"][j]} ${self[k] === j ? "on" : ""}" data-act="rv-self" data-f="${k}" data-j="${j}" aria-pressed="${self[k] === j}">${o}</button>`).join("")}</div></div>`;
-          h += `<label class="lbl mt-3" for="rv-note">Notiz (optional)</label><textarea id="rv-note" maxlength="300" rows="2" placeholder="Was lief gut, was nicht?">${esc(self.note || "")}</textarea>
-    <div class="btns"><button class="btn primary" data-act="rv-save" data-w="${w}">${saved.at ? "Speichern" : "Woche abschliessen"}</button></div></div>`;
-        }
-
-        // 7. Saison: alle Wochen auf einen Blick (Ampel der abgeschlossenen Checks)
+        // 6. Saison
         let cells = "";
         for (let x = 0; x < NWEEKS; x++) {
           const rv = S.review[x],
             lv = rv && rv.at ? rv.level || "green" : "";
-          const lab = `Woche ${x + 1}: ${lv ? LVL_LABEL[lv] : x <= cur ? "kein Check" : "kommt noch"}`;
+          const lab = `Woche ${x + 1}: ${lv ? LVL_LABEL[lv] : x <= cur ? "offen" : "kommt noch"}`;
           cells +=
             x <= cur
               ? `<button class="rv-wk-c ${lv ? "rv-" + lv : "rv-none"}${x === w ? " on" : ""}" data-act="rv-go" data-w="${x}" aria-label="${lab}" aria-current="${x === w}">${x + 1}</button>`
               : `<span class="rv-wk-c rv-future" aria-label="${lab}">${x + 1}</span>`;
         }
-        h += `<div class="card tight"><div class="cap">Saison</div><div class="rv-season mt-2">${cells}</div></div>`;
+        h += `<div class="card"><div class="cap">Saison</div><div class="rv-season">${cells}</div></div>`;
         return h + pushCard() + `</div>`;
       }
 
@@ -7275,6 +7425,7 @@
       }
       /* Strava im Hintergrund aktualisieren, wenn die letzte Synchronisierung über eine Stunde her ist. */
       function afterBoot() {
+        if (authed() && autoExtras()) save(); // schon gespeicherte Aktivitäten ohne passende Einheit
         if (authed() && testsBackfill()) {
           save();
           render();
@@ -7952,6 +8103,7 @@
             l = removeExtra(S.extra[dk], d.x);
           if (l.length) S.extra[dk] = l;
           else delete S.extra[dk];
+          if (String(d.x).startsWith("a:")) S.dismiss["xa:" + d.x.slice(2)] = 1; // automatisch erkannte nicht wieder anlegen
           save();
           return render();
         }
@@ -7976,6 +8128,17 @@
           return leaveCheckin(t);
         }
         if (d.act === "all-done") return completeAll(+d.i);
+        if (d.act === "rpe-set") {
+          if (+S.rpe[d.k] === +d.r) delete S.rpe[d.k];
+          else S.rpe[d.k] = +d.r;
+          save();
+          return render();
+        }
+        if (d.act === "fold") {
+          if (fold.has(d.f)) fold.delete(d.f);
+          else fold.add(d.f);
+          return render();
+        }
         if (d.act === "rpe-clear") {
           delete S.rpe[d.k];
           save();
@@ -8260,32 +8423,26 @@
         }
         if (d.act === "strava-take") {
           const i = +d.i,
-            p = dayPlan(i),
-            dk = keyI(i),
-            a = actsOf(i).find((x) => strava.fits(p.k, x.group));
-          p.i.forEach((_, j) => (S.done[dk + "|" + j] = 1));
-          const j = p.i.findIndex((t) => !isFiller(t));
-          if (a && j >= 0 && !S.val[dk + "|" + j])
-            S.val[dk + "|" + j] = strava.summary(a);
-          let msg = "Workout erledigt – von " + srcName(a) + " übernommen";
-          if (a && a.laps) {
-            // Zeile mit Intervall-Vorgabe ("4×1km") bekommt die Zeiten jeder Wiederholung statt nur der Gesamtzeit
-            const r = p.i.findIndex((t) => dash.parseReps(t)),
-              plan = r >= 0 ? p.i[r] : "",
-              rs = dash.repSummary(a, plan);
-            if (rs) {
-              const k = r >= 0 ? r : j;
-              if (k >= 0) S.val[dk + "|" + k] = rs;
-              msg = "Erledigt – Intervallzeiten übernommen";
-              // Lauf-Test: Pace jeder Wiederholung direkt in Profil → Tests (nur leere Felder, nichts überschreiben)
-              if (isRunTest(p)) {
-                if (testsFromDay(i, true))
-                  msg = "Erledigt – Intervallzeiten auch in den Pacing-Test übernommen";
-              }
-            }
+            p = dayPlan(i);
+          // Mehrere Übungen: erst auswählen, was wirklich gemacht wurde
+          if (p && p.i.length > 1) {
+            takeOpen = i;
+            return render();
           }
-          save();
-          toast(msg);
+          takeDay(i, p ? p.i.map((_, j) => j) : []);
+          return render();
+        }
+        if (d.act === "take-ok") {
+          const i = +d.i,
+            box = document.querySelector(`[data-take="${i}"]`),
+            js = box ? [...box.querySelectorAll("input[data-tk]:checked")].map((x) => +x.dataset.tk) : [];
+          takeOpen = null;
+          if (!js.length) return render();
+          takeDay(i, js);
+          return render();
+        }
+        if (d.act === "take-cancel") {
+          takeOpen = null;
           return render();
         }
         if (d.act === "st-connect" && stServer()) {

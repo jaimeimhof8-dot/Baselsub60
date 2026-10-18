@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { weekCheck, forecast, onTrack, trackText, cleanSelf, reviewDue, RUN_PENALTY, DOUBLES_SHARE, ROXZONE } from "../src/review.js";
+import * as review from "../src/review.js";
 import { suggestExtras, makeExtra, extraLabel, extraAsDay } from "../src/extras.js";
 
 const day = (k, done, o = {}) => ({ t: k + "-Einheit", k, done, ...o });
@@ -95,4 +96,24 @@ test("Wochenbericht-Push: Text aus der Kurzfassung, Erinnerung ohne Daten", asyn
   assert.match(weeklyMessage({ w: 0 }, 1, { name: "Jaime" }).body, /^Jaime, diese Woche ist noch nichts eingetragen/);
   assert.match(weeklyMessage(null, 3).body, /^Diese Woche/);
   assert.equal(zurichDate(Date.UTC(2026, 9, 18, 23, 30)), "2026-10-19"); // 00:30 in Zürich
+});
+
+test("Prognose Zeile für Zeile gegen das Rennmodell", () => {
+  const fc = review.forecast({ lauf: [232, 235, 230, 238], station: Array.from({ length: 8 }, () => [400, 420]) });
+  const b = review.breakdown(fc);
+  assert.equal(b.rows.length, 10);
+  assert.equal(b.rows[0].goal, 1920);
+  assert.equal(Math.round(b.rows[0].est), Math.round(8 * (233.75 + review.RUN_PENALTY)));
+  assert.equal(Math.round(b.rows[1].est), Math.round(410 * review.DOUBLES_SHARE));
+  assert.equal(b.goal, 1920 + 1390 + 270);
+  assert.ok(b.goal < 3600, "Rennmodell muss unter 60 Minuten liegen");
+  assert.equal(Math.round(b.diff), Math.round(fc.total - b.goal));
+  assert.equal(review.breakdown(null), null);
+});
+
+test("Laufumfang gegen Plan und Vorwoche", () => {
+  assert.equal(review.runCheck(18, { plan: 20, prev: 16 }).level, "green");
+  assert.equal(review.runCheck(22, { plan: 20, prev: 15 }).level, "yellow"); // +47 % zur Vorwoche
+  assert.equal(review.runCheck(12, { plan: 20 }).level, "yellow"); // deutlich unter Plan
+  assert.equal(review.runCheck(null), null);
 });

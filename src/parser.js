@@ -272,6 +272,9 @@ export function parsePlanText(text) {
       const start = idxFromDayMonth(+m[3], +m[4], m[5] ? +m[5] : undefined);
       ctx = { type: "week", start, weeks: 1, block: ctx ? ctx.block : null };
       meta.weeks.push({ n: +m[1], name: m[2].trim(), start });
+      // „Laufumfang etwa 20 km“ gehört zur Wochen-Überschrift: geplanter Laufumfang (Wochenrückblick vergleicht mit Strava/Garmin)
+      const km = u.match(/Laufumfang (?:etwa |ca\. )?(\d{1,3}) km/);
+      if (km) meta.weeks[meta.weeks.length - 1].km = +km[1];
       continue;
     }
     if ((m = u.match(RE_RACE))) {

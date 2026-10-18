@@ -94,7 +94,41 @@ export function forecast({ lauf = [], station = [] } = {}) {
   const per = Array.from({ length: 8 }, (_, r) => { const v = (station[r] || []).filter(ok); return v.length ? mean(v) : null; });
   const known = per.filter((v) => v != null);
   const st = known.length === 8 ? known.reduce((a, b) => a + b, 0) * DOUBLES_SHARE : null;
-  return { T, run, st, rox: ROXZONE, total: st == null ? null : run + st + ROXZONE, missing: 8 - known.length };
+  return {
+    T, pace: T + RUN_PENALTY, run, st, rox: ROXZONE, total: st == null ? null : run + st + ROXZONE, missing: 8 - known.length,
+    stations: per.map((v) => (v == null ? null : v * DOUBLES_SHARE)), // geschätzte Doubles-Zeit je Station
+  };
+}
+
+/** Rennmodell für unter 60 Minuten (Plan v9): 8 × 1 km in 4:00, Stationen geteilt, Roxzone mit 16 Wechseln */
+export const STATIONS = ["SkiErg", "Sled Push", "Sled Pull", "Burpee BJ", "RowErg", "Farmers", "Lunges", "Wall Balls"];
+export const RACE_MODEL = { run: 8 * 240, stations: [220, 150, 180, 160, 225, 80, 180, 195], rox: 270 };
+
+/**
+ * Prognose Zeile für Zeile gegen das Rennmodell: [{label, est, goal, diff}] + Summe.
+ * diff > 0 = langsamer als das Modell. Fehlende Stationswerte bleiben null.
+ */
+export function breakdown(fc, model = RACE_MODEL) {
+  if (!fc) return null;
+  const row = (label, est, goal) => ({ label, est, goal, diff: est == null ? null : est - goal });
+  const rows = [row("Laufen 8 × 1 km", fc.run, model.run)];
+  STATIONS.forEach((s, r) => rows.push(row(s, fc.stations ? fc.stations[r] : null, model.stations[r])));
+  rows.push(row("Roxzone und Wechsel", fc.rox, model.rox));
+  const goal = rows.reduce((s, x) => s + x.goal, 0);
+  return { rows, est: fc.total, goal, diff: fc.total == null ? null : fc.total - goal };
+}
+
+/**
+ * Laufumfang der Woche bewerten (Strava/Garmin): gegen den Plan und gegen die Vorwoche.
+ * Mehr als 20 % über der Vorwoche oder über dem Plan = gelb (Sehnen brauchen länger als Herz und Lunge).
+ */
+export function runCheck(km, { plan = null, prev = null } = {}) {
+  if (km == null) return null;
+  const ramp = prev > 0 ? km / prev - 1 : null;
+  let level = "green";
+  if ((ramp != null && ramp > 0.2) || (plan && km > plan * 1.2)) level = "yellow";
+  if (plan && km < plan * 0.7) level = "yellow";
+  return { km, plan, ramp, level };
 }
 
 /**

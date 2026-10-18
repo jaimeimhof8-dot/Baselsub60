@@ -60,20 +60,20 @@
         --line: rgba(255, 255, 255, 0.06);
         --edge: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
         --tint: #3b5375;
-        --accent: #ffd21f;
+        --accent: #e0bf6a;
         --on-accent: #16181a;
-        --ok: #30d158;
-        --warn: #ff9f0a;
-        --danger: #ff6961;
-        --strava: #fc6a2c;
-        --garmin: #11a9ed;
-        --kraft: #ff8a4c;
-        --lauf: #64a8ff;
-        --bike: #4cd964;
-        --station: #bf8cff;
-        --sim: #ff6b5e;
+        --ok: #5fb37c;
+        --warn: #d9a05b;
+        --danger: #d27b72;
+        --strava: #d4733f;
+        --garmin: #4a9fcf;
+        --kraft: #d98a5a;
+        --lauf: #7ea4d6;
+        --bike: #79b58a;
+        --station: #a590d0;
+        --sim: #cf7f78;
         --rest: #6d7176;
-        --race: #ffd21f;
+        --race: #e0bf6a;
         /* Zahlen und kleine Labels: schmale Sportschrift. Titel und Text: Systemschrift (SF Pro auf dem iPhone) */
         --f-head: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
         --f-title:
@@ -324,7 +324,7 @@
         margin: 0 auto;
       }
       .sim-date {
-        background: rgba(255, 192, 77, 0.12);
+        background: rgba(217, 160, 91, 0.12);
         color: var(--warn);
         font-size: 13px;
         text-align: center;
@@ -579,7 +579,7 @@
         overflow-wrap: anywhere;
       }
       button.last.up {
-        border-color: rgba(255, 210, 31, 0.45);
+        border-color: rgba(224, 191, 106, 0.45);
         color: var(--accent);
       }
       button.last small {
@@ -601,9 +601,9 @@
         color: var(--accent);
       }
       .sban {
-        border-color: rgba(252, 106, 44, 0.45);
+        border-color: rgba(212, 115, 63, 0.45);
         background:
-          linear-gradient(rgba(252, 106, 44, 0.07), rgba(252, 106, 44, 0.07)),
+          linear-gradient(rgba(212, 115, 63, 0.07), rgba(212, 115, 63, 0.07)),
           var(--card);
       }
       .ytag {
@@ -611,7 +611,7 @@
         font-size: 11px;
         font-weight: 600;
         color: var(--warn);
-        background: rgba(255, 192, 77, 0.12);
+        background: rgba(217, 160, 91, 0.12);
         border-radius: 6px;
         padding: 1px 6px;
         margin-left: 4px;
@@ -633,8 +633,8 @@
         margin-top: 0;
       }
       .target {
-        background: rgba(255, 210, 31, 0.12);
-        border: 1px solid rgba(255, 210, 31, 0.35);
+        background: rgba(224, 191, 106, 0.12);
+        border: 1px solid rgba(224, 191, 106, 0.35);
         border-radius: var(--r-s);
         padding: var(--s3);
         font-size: 14px;
@@ -644,8 +644,8 @@
         color: var(--accent);
       }
       .target.bad {
-        border-color: rgba(255, 138, 128, 0.4);
-        background: rgba(255, 138, 128, 0.1);
+        border-color: rgba(210, 123, 114, 0.4);
+        background: rgba(210, 123, 114, 0.1);
       }
       .target.bad b {
         color: var(--danger);
@@ -781,12 +781,12 @@
       .btn.strava {
         background: var(--strava);
         border-color: var(--strava);
-        color: #fff;
+        color: var(--on-accent);
       }
       .btn.garmin {
         background: var(--garmin);
         border-color: var(--garmin);
-        color: #fff;
+        color: var(--on-accent);
       }
       .btn.sm {
         min-height: 44px;
@@ -1747,7 +1747,7 @@
         overflow-wrap: anywhere;
       }
       .offline-bar {
-        background: rgba(255, 138, 128, 0.12);
+        background: rgba(210, 123, 114, 0.12);
         color: var(--danger);
         font-size: 13px;
         text-align: center;
@@ -1787,7 +1787,7 @@
         white-space: nowrap;
       }
       .badge.warn {
-        background: rgba(255, 138, 128, 0.15);
+        background: rgba(210, 123, 114, 0.15);
         color: var(--danger);
       }
       .badge.mv {
@@ -1795,19 +1795,19 @@
         color: var(--lauf);
       }
       .badge.ok {
-        background: rgba(111, 207, 134, 0.15);
+        background: rgba(95, 179, 124, 0.15);
         color: var(--ok);
       }
       .badge.easy {
-        background: rgba(255, 192, 77, 0.15);
+        background: rgba(217, 160, 91, 0.15);
         color: var(--warn);
       }
       .badge.strava {
-        background: rgba(252, 106, 44, 0.15);
+        background: rgba(212, 115, 63, 0.15);
         color: var(--strava);
       }
       .badge.garmin {
-        background: rgba(17, 169, 237, 0.15);
+        background: rgba(74, 159, 207, 0.15);
         color: var(--garmin);
       }
       .chips {
@@ -2090,17 +2090,17 @@
         padding: 0 var(--s1);
       }
       .seg button.on.v-g {
-        background: rgba(111, 207, 134, 0.18);
+        background: rgba(95, 179, 124, 0.18);
         border-color: var(--ok);
         color: var(--ok);
       }
       .seg button.on.v-y {
-        background: rgba(255, 192, 77, 0.18);
+        background: rgba(217, 160, 91, 0.18);
         border-color: var(--warn);
         color: var(--warn);
       }
       .seg button.on.v-r {
-        background: rgba(255, 138, 128, 0.18);
+        background: rgba(210, 123, 114, 0.18);
         border-color: var(--danger);
         color: var(--danger);
       }
@@ -2122,15 +2122,15 @@
       }
       .amp-green {
         color: var(--ok);
-        background: rgba(111, 207, 134, 0.12);
+        background: rgba(95, 179, 124, 0.12);
       }
       .amp-yellow {
         color: var(--warn);
-        background: rgba(255, 192, 77, 0.12);
+        background: rgba(217, 160, 91, 0.12);
       }
       .amp-red {
         color: var(--danger);
-        background: rgba(255, 138, 128, 0.12);
+        background: rgba(210, 123, 114, 0.12);
       }
 
       /* Vorschläge */
@@ -2161,8 +2161,8 @@
       }
       /* Dashboard: Diagramme (dataviz-Regeln: dünne Marken, zurückhaltendes Raster, Werte in Textfarbe) */
       :root {
-        --viz-1: #3987e5;
-        --viz-2: #d95926;
+        --viz-1: #5a86bd;
+        --viz-2: #c4714d;
       }
       /* Drei Ringe wie bei Whoop: Erholung, Belastung, Woche */
       .dash-rings {
@@ -2521,8 +2521,8 @@
         min-width: 0;
       }
       .sbox {
-        border: 1px solid rgba(252, 106, 44, 0.35);
-        background: rgba(252, 106, 44, 0.08);
+        border: 1px solid rgba(212, 115, 63, 0.35);
+        background: rgba(212, 115, 63, 0.08);
         border-radius: var(--r-s);
         padding: var(--s3);
         margin-top: var(--s4);
@@ -2535,8 +2535,8 @@
         margin-top: var(--s3);
       }
       .sbox.g {
-        border-color: rgba(17, 169, 237, 0.35);
-        background: rgba(17, 169, 237, 0.08);
+        border-color: rgba(74, 159, 207, 0.35);
+        background: rgba(74, 159, 207, 0.08);
       }
       .sbox.g b {
         color: var(--garmin);
@@ -3503,7 +3503,7 @@
       .rv-wbtn.rv-green::before { background: var(--ok); }
       .rv-wbtn.rv-yellow::before { background: var(--warn); border-radius: 1px; transform: rotate(45deg); }
       .rv-wbtn.rv-red::before { background: var(--danger); border-radius: 1px; }
-      :root { --sl-deep: #2f5fb3; --sl-rem: #6c9be6; --sl-light: #b4ccf0; --sl-awake: #e0a24a; }
+      :root { --sl-deep: #3f66a3; --sl-rem: #6f94c8; --sl-light: #a9bddb; --sl-awake: #c99a58; }
       .sl-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; gap: 2px; }
       .sl-bar span { display: block; min-width: 2px; }
       .sl-leg { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font-size: 0.85em; color: var(--muted); }
@@ -3536,6 +3536,7 @@
       .dash-fold + .card, .dash-fold + .list { margin-top: var(--s2); }
       .fold-h.in { border-top: 1px solid var(--line); margin-top: var(--s3); }
       .more-row .btn[aria-expanded="true"] { border-color: rgba(255, 255, 255, 0.4); background: var(--surface2); }
+      .carry-bar .t b { white-space: normal; }
       .more-list { display: grid; gap: var(--s2); margin-top: var(--s2); }
       .more-list .btn { width: 100%; justify-content: flex-start; }
     </style>
@@ -4174,8 +4175,11 @@
           view === "today" &&
           sel == null &&
           stravaOffers().some((o) => o.x === i);
-        if (e.match && n && done < n && !inBanner)
+        if (e.match && n && done < n && !inBanner && !S.dismiss["tk:" + i])
           h += takeOpen === i ? takePicker(i) : `<button class="btn sm" data-act="strava-take" data-i="${i}">Übernehmen</button>`;
+        else if (e.match && S.dismiss["tk:" + i])
+          // Schon übernommen (auch teilweise): kein Dauer-Vorschlag mehr, nur noch „Ändern“
+          h += takeOpen === i ? takePicker(i) : `<div class="row between mt-2"><span class="sub">✓ Übernommen</span><button class="btn ghost sm" data-act="strava-take" data-i="${i}">Ändern</button></div>`;
         else if (inBanner)
           h += `<div class="sub mt-1">Übernehmen oben im Vorschlag.</div>`;
         return h + `</div>`;
@@ -4186,9 +4190,10 @@
         const p = dayPlan(i),
           dk = keyI(i),
           had = p.i.map((_, j) => !!S.done[dk + "|" + j]),
-          any = had.some(Boolean);
+          any = had.some(Boolean),
+          carried = new Set((S.later[dk] || {}).j || []); // Übungen, die auf morgen verschoben sind, nicht vorauswählen
         return `<div class="take" data-take="${i}"><div class="sub">Was hast du gemacht?</div>${p.i
-          .map((t, j) => `<label class="tk"><input type="checkbox" data-tk="${j}" ${had[j] || !any ? "checked" : ""}><span>${esc(t)}</span></label>`)
+          .map((t, j) => `<label class="tk"><input type="checkbox" data-tk="${j}" ${had[j] || (!any && !carried.has(j)) ? "checked" : ""}><span>${esc(t)}</span></label>`)
           .join("")}<div class="grid2 mt-3"><button class="btn primary sm" data-act="take-ok" data-i="${i}">Übernehmen</button><button class="btn sm" data-act="take-cancel">Abbrechen</button></div></div>`;
       }
       /* Aktivität an Tag i übernehmen: nur die gewählten Übungen abhaken, Werte passend zur Art der Einheit */
@@ -4224,6 +4229,7 @@
             if (!n.includes(sum)) S.notes[dk] = (n ? n + "\n" : "") + srcName(a) + ": " + sum;
           }
         }
+        S.dismiss["tk:" + i] = 1; // übernommen: der Vorschlag oben verschwindet, auch bei teilweiser Übernahme
         save();
         toast(msg);
       }
@@ -4260,7 +4266,7 @@
         for (let x = Math.max(0, TODAY - 2); x <= Math.min(LAST, TODAY); x++) {
           const e = rc().byDay[x],
             p = dayPlan(x);
-          if (!e || !e.match || !p || S.dismiss["stv:" + x]) continue;
+          if (!e || !e.match || !p || S.dismiss["stv:" + x] || S.dismiss["tk:" + x]) continue;
           const { n, done } = dayStatus(x);
           if (!n || done >= n) continue;
           const a = actsOf(x).find((y) => strava.fits(p.k, y.group));
@@ -4286,10 +4292,10 @@
       const doneOpen = new Set();
       /* RPE-Farbe: Eisblau (1) → Grün → Gelb → Rot (10); --p = Füllung in Prozent */
       const RPE_STOPS = [
-        [0, [125, 211, 252]],
-        [0.38, [16, 185, 129]],
-        [0.72, [250, 204, 21]],
-        [1, [239, 68, 68]],
+        [0, [135, 190, 220]],
+        [0.38, [96, 170, 130]],
+        [0.72, [218, 190, 100]],
+        [1, [205, 100, 95]],
       ]; // identisch mit dem Verlauf des Balkens (.rpe-fill)
       function rpeColor(t) {
         let k = 1;
@@ -4353,6 +4359,12 @@
         const { n, done } = dayStatus(i);
         if (p.k !== "rest" && n && done >= n && !doneOpen.has(i))
           return doneBar(i, p);
+        // Rest auf morgen verschoben: Einheit als eine Zeile eingeklappt, Details auf Tipp
+        if (S.later[dk] && p.k !== "rest" && !fold.has("o" + i)) {
+          const lc = S.later[dk],
+            pr = carryProgress({ from: dk, j: lc.j }, S.done);
+          return `<button class="done-bar carry-bar k-${p.k}" data-act="fold" data-f="o${i}" aria-expanded="false" aria-label="${esc(p.t)}: Rest hängt an ${esc(shortDay(idxOfIso(lc.to)))} – Details anzeigen"><span class="ck" aria-hidden="true">↪</span><span class="t"><b>${esc(p.t)}</b><span class="sub">${done} von ${n} erledigt · ${pr.done === pr.n ? "Rest nachgeholt ✓" : "Rest an " + esc(shortDay(idxOfIso(lc.to)))}</span></span><span class="more">Details ▾</span></button>`;
+        }
         const badges = dayBadges(i, p, true);
         let h = `<div class="card hero k-${p.k}" data-day="${i}">
     <div class="session-h"><div class="row between"><span class="kind">${KIND[p.k]}</span><span class="sub">${DAYSF[dw]}, ${fmt(d)}</span></div>
@@ -4403,7 +4415,7 @@
         if (lc) {
           const pr = carryProgress({ from: dk, j: lc.j }, S.done),
             ti = idxOfIso(lc.to);
-          h += `<div class="target">${pr.done === pr.n ? "Rest" : `Rest (${pr.n - pr.done} ${pr.n - pr.done === 1 ? "Übung" : "Übungen"})`} ${pr.done === pr.n ? "am" : "hängt an"} <b>${esc(shortDay(ti))}</b>${pr.done === pr.n ? " nachgeholt ✓" : "."}${pr.done === pr.n ? "" : ` <button class="btn ghost sm mt-2" data-act="later-undo" data-k="${dk}">Doch heute machen</button>`}</div>`;
+          h += `<div class="target">${pr.done === pr.n ? "Rest" : `Rest (${pr.n - pr.done} ${pr.n - pr.done === 1 ? "Übung" : "Übungen"})`} ${pr.done === pr.n ? "am" : "hängt an"} <b>${esc(shortDay(ti))}</b>${pr.done === pr.n ? " nachgeholt ✓" : "."}<div class="grid2 mt-2">${pr.done === pr.n ? "<span></span>" : `<button class="btn ghost sm" data-act="later-undo" data-k="${dk}">Doch heute machen</button>`}<button class="btn ghost sm" data-act="fold" data-f="o${i}">Einklappen ▴</button></div></div>`;
         }
         if (p.tp) {
           const T = teamT();
@@ -5911,9 +5923,6 @@
           red: `Heute Erholung vor Leistung. ${esc(p.t)} nur locker oder verschieben.`,
         }[lvl];
       }
-      /* Einklappbarer Abschnittstitel im Dashboard (standardmässig zu; Zustand in der Menge fold) */
-      const dfold = (k, title, hint) =>
-        `<button class="dash-title dash-fold" data-act="fold" data-f="${k}" aria-expanded="${fold.has(k)}"><span>${title}</span>${hint ? `<em>${hint}</em>` : ""}<i aria-hidden="true">${fold.has(k) ? "−" : "＋"}</i></button>`;
       function vDashboard() {
         const T = Math.max(-1, Math.min(TODAY, LAST)),
           inPlan = TODAY >= 0 && TODAY <= LAST,
@@ -6004,11 +6013,9 @@
           `<div><span>Ø Anstrengung</span><b>${rpes.length ? cnt(rpes.reduce((a, b) => a + b, 0) / rpes.length, 1) : "–"}</b></div>`,
         ].filter(Boolean).slice(-3);
         h += `<div class="dash-title">Diese Woche</div><div class="card"><div class="lstats" style="grid-template-columns:repeat(${ws.length},1fr)">${ws.join("")}</div>
-    <button class="fold-h in" data-act="fold" data-f="dw" aria-expanded="${fold.has("dw")}"><span>Anstrengung pro Tag</span><i aria-hidden="true">${fold.has("dw") ? "−" : "＋"}</i></button>
+    <div class="sub mt-3">Anstrengung pro Tag (RPE 1–10)</div>
     ${
-      !fold.has("dw")
-        ? ""
-        : !rpes.length
+      !rpes.length
         ? `<p class="sub mt-2">Noch keine Einträge diese Woche. Nach jedem Training die Anstrengung (RPE) eintragen.</p>`
         : dash.barChart(
             wd.map((x, d) => {
@@ -6060,8 +6067,7 @@
         const have = Object.keys(WELL).filter((k) =>
           days.some((d) => S.garmin.well[d] && S.garmin.well[d][k] != null),
         );
-        h += `<div class="dgrid"><section>${dfold("dt", "Erholung im Verlauf", have.map((k) => WELL[k][0]).join(" · "))}`;
-        const hTrend = h.length; // Inhalt nur, wenn aufgeklappt
+        h += `<div class="dgrid"><section><div class="dash-title">Erholung im Verlauf</div>`;
         if (have.length) {
           const ksel = have.includes(dashWell) ? dashWell : have[0],
             [, wf, wo, wdesc] = WELL[ksel];
@@ -6092,8 +6098,7 @@
       <p class="sub mt-2">${wdesc}</p></div>`;
         } else
           h += `<div class="card"><p class="sub">${S.garmin.conn ? "Noch keine Erholungswerte. Unter Menü → Strava / Garmin synchronisieren." : "Verbinde Garmin (Menü → Strava / Garmin), dann siehst du hier Erholung, Schlaf, HRV und Ruhepuls im Verlauf."}</p></div>`;
-        if (!fold.has("dt")) h = h.slice(0, hTrend);
-        h += `</section>${liftData().length ? `<section>${dfold("dk", "Kraft", "")}${fold.has("dk") ? liftCard() : ""}</section>` : ""}</div>`;
+        h += `</section>${liftData().length ? `<section><div class="dash-title">Kraft</div>${liftCard()}</section>` : ""}</div>`;
         h += `<div class="dash-title">Schlaf</div>${sleepCard(days)}`;
 
         // Letzte Aktivitäten (3) + Weg zu allen Aktivitäten und zu den Tests
@@ -6101,8 +6106,8 @@
           .slice()
           .sort((a, b) => ((a.start || a.date) < (b.start || b.date) ? 1 : -1))
           .slice(0, 3);
-        if (last.length) h += dfold("da", "Letzte Aktivitäten", String(last.length));
-        h += last.length && fold.has("da")
+        if (last.length) h += `<div class="dash-title">Letzte Aktivitäten</div>`;
+        h += last.length
           ? `<div class="list">${last
               .map((a) => {
                 const i = idxOfIso(a.date),

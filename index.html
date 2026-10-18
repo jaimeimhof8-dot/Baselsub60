@@ -3389,7 +3389,8 @@
       .rpe-b button.tgt::after { content: ""; position: absolute; left: 30%; right: 30%; bottom: 5px; height: 2px; border-radius: 1px; background: var(--muted); }
       .rpe-b button.on { background: var(--rc); border-color: var(--rc); color: #111; }
       .rpe-txt { color: var(--text); font-weight: 600; }
-      .more-row .btn { flex: 1; }
+      .more-row { gap: var(--s2); flex-wrap: nowrap; }
+      .more-row .btn { flex: 1 1 auto; white-space: nowrap; padding: 0 var(--s2); font-size: 13.5px; }
       /* Übernehmen: Auswahl der Übungen */
       .take { margin-top: var(--s3); }
       .take .tk { display: flex; gap: var(--s2); align-items: center; min-height: 40px; font-size: 14px; }
@@ -3507,6 +3508,36 @@
       .sl-bar span { display: block; min-width: 2px; }
       .sl-leg { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font-size: 0.85em; color: var(--muted); }
       .sl-leg i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: baseline; }
+      /* ===== Abstands-System (4-px-Raster, nur diese Stufen: 4 · 8 · 12 · 16 · 24 · 32) =====
+         Seitenrand 16 · Karte innen 16, zwischen Karten 12 · Abschnittstitel 24 davor, 8 danach
+         Innerhalb einer Karte: verwandte Elemente 8, Gruppen 12–16 · Tippflächen mindestens 44 px */
+      .vh { margin-bottom: var(--s4); }
+      .card { padding: var(--s4); margin-bottom: var(--s3); }
+      .card.tight { padding: var(--s3) var(--s4); }
+      .cap { margin: var(--s4) 0 var(--s2); }
+      .lbl { margin: var(--s4) 0 var(--s2); }
+      .dash-title { margin: var(--s6) 0 var(--s2); }
+      .dash-rings { padding: var(--s4) var(--s2); }
+      .sbox, .target, .hint { margin-top: var(--s3); }
+      .session-h h1, .session-h .badges { margin-top: var(--s2); }
+      .prog { margin: var(--s3) 0 var(--s2); }
+      .exs { margin-top: var(--s3); }
+      .ex { padding: var(--s2) 0; }
+      .ex-h { min-height: 44px; align-items: center; }
+      .extras { margin-top: var(--s3); padding-top: 0; }
+      .btns { margin-top: var(--s3); }
+      .list .act, .list .mi { padding-top: var(--s3); padding-bottom: var(--s3); }
+      /* Einklappbare Bereiche: eine Zeile, Inhalt erst auf Tipp */
+      .dash-fold { display: flex; align-items: center; gap: var(--s2); width: 100%; min-height: 44px; padding: 0; background: none; border: 0; text-align: left; cursor: pointer; }
+      .dash-fold span { flex: 1; }
+      .dash-fold em { font: 500 14px var(--f-body); font-style: normal; color: var(--muted); }
+      .dash-fold i { font-style: normal; font-size: 20px; width: 24px; text-align: center; color: var(--muted); font-weight: 400; }
+      .dash-title.dash-fold { margin-top: var(--s4); }
+      .dash-fold + .card, .dash-fold + .list { margin-top: var(--s2); }
+      .fold-h.in { border-top: 1px solid var(--line); margin-top: var(--s3); }
+      .more-row .btn[aria-expanded="true"] { border-color: rgba(255, 255, 255, 0.4); background: var(--surface2); }
+      .more-list { display: grid; gap: var(--s2); margin-top: var(--s2); }
+      .more-list .btn { width: 100%; justify-content: flex-start; }
     </style>
   </head>
   <body>
@@ -4338,8 +4369,6 @@
             h +
             `<div class="hint">${esc(p.n || "Echte Erholung.")}</div>${stravaBox(i, p, 0, 0)}${extrasBox(i)}</div>`
           );
-        if (canSolo(p))
-          h += `<button class="btn sm solo-t mt-3" data-act="solo" data-i="${i}" aria-pressed="${!!p.solo}">${p.solo ? `👥 Wieder mit ${esc(PARTNER)}` : `👤 Solo – ${esc(PARTNER)} fällt aus`}</button>`;
         const hit = sore.impact(p, soreAt(i));
         if (hit.level >= 4)
           h += `<div class="target ${hit.level >= 7 ? "bad" : ""}">Muskelkater: ${sore
@@ -4375,10 +4404,6 @@
           const pr = carryProgress({ from: dk, j: lc.j }, S.done),
             ti = idxOfIso(lc.to);
           h += `<div class="target">${pr.done === pr.n ? "Rest" : `Rest (${pr.n - pr.done} ${pr.n - pr.done === 1 ? "Übung" : "Übungen"})`} ${pr.done === pr.n ? "am" : "hängt an"} <b>${esc(shortDay(ti))}</b>${pr.done === pr.n ? " nachgeholt ✓" : "."}${pr.done === pr.n ? "" : ` <button class="btn ghost sm mt-2" data-act="later-undo" data-k="${dk}">Doch heute machen</button>`}</div>`;
-        } else {
-          const open = openItems(p, S.done, dk);
-          if (canCarry({ i, today: TODAY, last: LAST, day: p, open }))
-            h += `<button class="btn ghost sm mt-2" data-act="later" data-i="${i}">${done ? "Rest" : "Einheit"} morgen fertig machen →</button>`;
         }
         if (p.tp) {
           const T = teamT();
@@ -4413,7 +4438,6 @@
           h += `</div>`;
         });
         h += `</div>`;
-        if (p.n) h += `<div class="hint">${esc(p.n)}</div>`;
         const tg = targetRpe(p.i),
           inT = (r) => tg && r >= tg[0] && r <= tg[1];
         const rv = S.rpe[dk] ? +S.rpe[dk] : 0;
@@ -4424,9 +4448,20 @@
           nOpen = fold.has("n" + i) || !!note;
         const sl = sore.effective(S.sore, i),
           sn = Object.keys(sl).length;
-        h += `<div class="chips mt-3 more-row"><button class="btn sm" data-act="fold" data-f="n${i}" aria-expanded="${nOpen}">Notiz</button><button class="btn sm" data-act="sore-open">${sn ? `Muskelkater ${Math.max(...Object.values(sl))}/10` : "Muskelkater"}</button>${coachReady() ? `<button class="btn sm" data-act="explain" data-i="${i}">Erklären</button>` : ""}</div>`;
+        // Selten gebraucht, darum hinter „Mehr“: Solo, Rest auf morgen verschieben, Erklärung
+        const more = [];
+        if (canSolo(p))
+          more.push(`<button class="btn sm ghost" data-act="solo" data-i="${i}" aria-pressed="${!!p.solo}">${p.solo ? `Wieder mit ${esc(PARTNER)}` : `Solo – ${esc(PARTNER)} fällt aus`}</button>`);
+        if (!S.later[dk] && canCarry({ i, today: TODAY, last: LAST, day: p, open: openItems(p, S.done, dk) }))
+          more.push(`<button class="btn sm ghost" data-act="later" data-i="${i}">${done ? "Rest" : "Einheit"} morgen fertig machen</button>`);
+        if (coachReady()) more.push(`<button class="btn sm ghost" data-act="explain" data-i="${i}">Erkläre mir das</button>`);
+        const hOpen = fold.has("h" + i),
+          mOpen = fold.has("m" + i);
+        h += `<div class="chips mt-3 more-row">${p.n ? `<button class="btn sm" data-act="fold" data-f="h${i}" aria-expanded="${hOpen}">Hinweis</button>` : ""}<button class="btn sm" data-act="fold" data-f="n${i}" aria-expanded="${nOpen}">Notiz</button><button class="btn sm" data-act="sore-open">${sn ? `Muskelkater ${Math.max(...Object.values(sl))}/10` : "Muskelkater"}</button>${more.length ? `<button class="btn sm" data-act="fold" data-f="m${i}" aria-expanded="${mOpen}">Mehr</button>` : ""}</div>`;
+        if (hOpen && p.n) h += `<div class="hint">${esc(p.n)}</div>`;
         if (nOpen)
           h += `<textarea id="n-${i}" class="mt-2" data-n="${dk}" aria-label="Notiz" placeholder="Gefühl, Schlaf, Fuss, was auffiel …">${esc(note)}</textarea>`;
+        if (mOpen && more.length) h += `<div class="more-list">${more.join("")}</div>`;
         if (p.test)
           h += `<div class="btns"><button class="btn" data-v="tests">Testergebnisse eintragen →</button></div>`;
         return h + extrasBox(i) + `</div>`;
@@ -5876,6 +5911,9 @@
           red: `Heute Erholung vor Leistung. ${esc(p.t)} nur locker oder verschieben.`,
         }[lvl];
       }
+      /* Einklappbarer Abschnittstitel im Dashboard (standardmässig zu; Zustand in der Menge fold) */
+      const dfold = (k, title, hint) =>
+        `<button class="dash-title dash-fold" data-act="fold" data-f="${k}" aria-expanded="${fold.has(k)}"><span>${title}</span>${hint ? `<em>${hint}</em>` : ""}<i aria-hidden="true">${fold.has(k) ? "−" : "＋"}</i></button>`;
       function vDashboard() {
         const T = Math.max(-1, Math.min(TODAY, LAST)),
           inPlan = TODAY >= 0 && TODAY <= LAST,
@@ -5966,10 +6004,12 @@
           `<div><span>Ø Anstrengung</span><b>${rpes.length ? cnt(rpes.reduce((a, b) => a + b, 0) / rpes.length, 1) : "–"}</b></div>`,
         ].filter(Boolean).slice(-3);
         h += `<div class="dash-title">Diese Woche</div><div class="card"><div class="lstats" style="grid-template-columns:repeat(${ws.length},1fr)">${ws.join("")}</div>
-    <div class="sub mt-3">Anstrengung pro Tag (RPE 1–10)</div>
+    <button class="fold-h in" data-act="fold" data-f="dw" aria-expanded="${fold.has("dw")}"><span>Anstrengung pro Tag</span><i aria-hidden="true">${fold.has("dw") ? "−" : "＋"}</i></button>
     ${
-      !rpes.length
-        ? `<p class="sub mt-2">Noch keine Einträge diese Woche. Nach jedem Training die Anstrengung (RPE) eintragen, dann entsteht hier dein Wochenbild.</p>`
+      !fold.has("dw")
+        ? ""
+        : !rpes.length
+        ? `<p class="sub mt-2">Noch keine Einträge diese Woche. Nach jedem Training die Anstrengung (RPE) eintragen.</p>`
         : dash.barChart(
             wd.map((x, d) => {
               const v = x <= T ? S.rpe[keyI(x)] : null,
@@ -6020,7 +6060,8 @@
         const have = Object.keys(WELL).filter((k) =>
           days.some((d) => S.garmin.well[d] && S.garmin.well[d][k] != null),
         );
-        h += `<div class="dgrid"><section><div class="dash-title">Erholung im Verlauf</div>`;
+        h += `<div class="dgrid"><section>${dfold("dt", "Erholung im Verlauf", have.map((k) => WELL[k][0]).join(" · "))}`;
+        const hTrend = h.length; // Inhalt nur, wenn aufgeklappt
         if (have.length) {
           const ksel = have.includes(dashWell) ? dashWell : have[0],
             [, wf, wo, wdesc] = WELL[ksel];
@@ -6051,7 +6092,8 @@
       <p class="sub mt-2">${wdesc}</p></div>`;
         } else
           h += `<div class="card"><p class="sub">${S.garmin.conn ? "Noch keine Erholungswerte. Unter Menü → Strava / Garmin synchronisieren." : "Verbinde Garmin (Menü → Strava / Garmin), dann siehst du hier Erholung, Schlaf, HRV und Ruhepuls im Verlauf."}</p></div>`;
-        h += `</section>${liftData().length ? `<section><div class="dash-title">Kraft</div>${liftCard()}</section>` : ""}</div>`;
+        if (!fold.has("dt")) h = h.slice(0, hTrend);
+        h += `</section>${liftData().length ? `<section>${dfold("dk", "Kraft", "")}${fold.has("dk") ? liftCard() : ""}</section>` : ""}</div>`;
         h += `<div class="dash-title">Schlaf</div>${sleepCard(days)}`;
 
         // Letzte Aktivitäten (3) + Weg zu allen Aktivitäten und zu den Tests
@@ -6059,8 +6101,8 @@
           .slice()
           .sort((a, b) => ((a.start || a.date) < (b.start || b.date) ? 1 : -1))
           .slice(0, 3);
-        if (last.length) h += `<div class="dash-title">Letzte Aktivitäten</div>`;
-        h += last.length
+        if (last.length) h += dfold("da", "Letzte Aktivitäten", String(last.length));
+        h += last.length && fold.has("da")
           ? `<div class="list">${last
               .map((a) => {
                 const i = idxOfIso(a.date),
@@ -6395,7 +6437,7 @@
         toast("Wochenbericht ausgeschaltet");
       }
       function pushCard() {
-        let h = `<div class="card"><div class="row between"><h3>Push am Sonntag</h3>${pushState === "on" ? `<span class="amp amp-green">Aktiv</span>` : ""}</div><p class="sub mt-1">Jeden Sonntag um 18 Uhr dein Wochenrückblick als Nachricht aufs Handy.</p>`;
+        let h = `<div class="card"><div class="row between"><h3>Push am Sonntag</h3>${pushState === "on" ? `<span class="amp amp-green">Aktiv</span>` : ""}</div>${pushState === "on" ? "" : `<p class="sub mt-1">Jeden Sonntag um 18 Uhr dein Wochenrückblick als Nachricht aufs Handy.</p>`}`;
         if (!(sb && USER)) return h + `<p class="sub mt-2">Nur mit Anmeldung verfügbar.</p></div>`;
         if (!PUSH_OK)
           return h + `<p class="sub mt-2">Dieser Browser kann keine Push-Nachrichten empfangen. Auf Android: in Chrome öffnen und über das Menü „App installieren“ wählen.</p></div>`;
@@ -6685,12 +6727,11 @@
         if (coachTab === "inj") return h + injHtml() + `</div>`;
         if (coachTab === "move") return h + moveHtml() + `</div>`;
         if (coachTab === "sore") return h + soreHtml() + `</div>`;
-        h += `<p class="sub" style="margin:0 0 var(--s4)">Beschreib, was nicht passt – z. B. „Knie zwickt seit gestern“ oder „Mittwoch habe ich keine Zeit“. Der Coach schlägt Änderungen vor, du entscheidest.</p>`;
         if (!coachReady())
           h += `<div class="note">Der Coach läuft über die Supabase-Funktion <b>coach</b> und braucht den Cloud-Login (siehe SETUP.md). Bis dahin wird die Anfrage nur vorbereitet – mit „Anfrage kopieren“ siehst du, was gesendet würde.</div>`;
         h += `<div class="chat" id="chat">`;
         if (!S.chat.length)
-          h += `<div class="msg assistant">Hoi ${esc(ME)}! Was ist los? Ich sehe deinen Plan der nächsten drei Wochen und die letzten Einträge.</div>`;
+          h += `<div class="msg assistant">Hoi ${esc(ME)}! Was ist los? Beschreib, was nicht passt, ich schlage Änderungen vor und du entscheidest.</div>`;
         S.chat.forEach((m, k) => {
           h += `<div class="msg ${m.role}">${esc(m.text)}`;
           if (m.actions && m.actions.length) {
@@ -6723,7 +6764,7 @@
         if (ccErr) h += `<div class="msg err">${esc(ccErr)}</div>`;
         h += `</div><form class="card chat-in" data-form="coach"><label class="lbl" for="cc-in" style="margin-top:0">Deine Nachricht</label>
     <div class="chips" role="group" aria-label="Art der Anfrage" style="margin-bottom:var(--s3)"><button type="button" data-act="cc-mode" data-m="" class="${ccExplain ? "" : "on"}" aria-pressed="${!ccExplain}">Plan anpassen</button><button type="button" data-act="cc-mode" data-m="explain" class="${ccExplain ? "on" : ""}" aria-pressed="${ccExplain}">Erklären</button></div>
-    <textarea id="cc-in" maxlength="${coach.MAX_MSG}" placeholder="${ccExplain ? "Was soll ich dir erklären? z. B. „Was heisst Zone 2?“" : "Was soll angepasst werden?"}" ${ccBusy ? "disabled" : ""}>${esc(ccDraft)}</textarea>
+    <textarea id="cc-in" maxlength="${coach.MAX_MSG}" placeholder="${ccExplain ? "Was soll ich dir erklären? z. B. „Was heisst Zone 2?“" : "z. B. „Knie zwickt seit gestern“ oder „Mittwoch habe ich keine Zeit“"}" ${ccBusy ? "disabled" : ""}>${esc(ccDraft)}</textarea>
     <div class="grid2 mt-3"><button type="submit" class="btn primary" ${ccBusy ? "disabled" : ""}>${coachReady() ? "Senden" : "Vorbereiten"}</button>
     ${coachReady() ? (S.chat.length ? `<button type="button" class="btn ghost" data-act="cc-clear">Verlauf löschen</button>` : "<span></span>") : `<button type="button" class="btn" data-act="cc-copy">Anfrage kopieren</button>`}</div></form>`;
         return h + `</div>`;

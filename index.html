@@ -3568,54 +3568,79 @@
       .more-list .btn { width: 100%; justify-content: flex-start; }
       /* Startseite entschlackt: Kopfzeile, gebündelte Hinweise, Details nach dem Training */
       body.focus-on { overflow: hidden; }
-      #focus { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; color: var(--text); background: radial-gradient(120% 70% at 50% -10%, #1a2030 0%, var(--bg) 62%); padding: max(16px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)); font-variant-numeric: tabular-nums; }
+      #focus { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; gap: 10px; color: var(--text); background: radial-gradient(120% 70% at 50% -10%, #1a2030 0%, var(--bg) 62%); padding: max(14px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); font-variant-numeric: tabular-nums; }
       #focus button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
       #focus .fc-top { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 12px; }
       #focus .fc-x { width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.07); font-size: 1.1rem; cursor: pointer; }
       #focus .fc-title { display: flex; flex-direction: column; align-items: center; min-width: 0; text-align: center; }
-      #focus .fc-title small { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.5; }
+      #focus .fc-title small { font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.5; }
       #focus .fc-title b { font-weight: 600; font-size: 0.95rem; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       #focus .fc-count { text-align: right; opacity: 0.55; font-size: 0.9rem; }
-      #focus .fc-segs { display: flex; gap: 4px; margin: 16px 0 6px; }
-      #focus .fc-segs i { flex: 1; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.13); transition: background 0.25s; }
-      #focus .fc-segs i.d { background: var(--accent); }
-      #focus .fc-segs i.c { background: #fff; }
-      #focus .fc-main { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 22px; overflow-y: auto; padding: 8px 0; }
+      /* Übersicht: immer im Bild, scrollt von selbst zur aktuellen Übung */
+      #focus .fc-mini { list-style: none; margin: 0; padding: 0; flex: 0 1 auto; max-height: 34vh; overflow-y: auto; display: grid; gap: 4px; scrollbar-width: none; }
+      #focus .fc-mini::-webkit-scrollbar { display: none; }
+      #focus .fc-mini button { width: 100%; display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 10px; text-align: left; padding: 7px 10px; min-height: 38px; border-radius: 12px; border: 1px solid transparent; background: rgba(255, 255, 255, 0.04); cursor: pointer; font-size: 0.92rem; }
+      #focus .fc-mini i { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 0.74rem; background: rgba(255, 255, 255, 0.1); }
+      #focus .fc-mini span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      #focus .fc-mini em { font-style: normal; opacity: 0.65; font-size: 0.82rem; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+      #focus .fc-mini .d { opacity: 0.5; }
+      #focus .fc-mini .d i { background: var(--accent); color: #16130a; }
+      #focus .fc-mini .d span { text-decoration: line-through; text-decoration-color: rgba(255, 255, 255, 0.3); }
+      #focus .fc-mini .n { opacity: 1; border-color: var(--accent); background: rgba(224, 191, 106, 0.12); font-weight: 650; }
+      #focus .fc-mini .n i { background: #fff; color: #111; }
+      #focus .fc-mini .c { box-shadow: inset 3px 0 0 #fff; }
+      #focus .fc-mini b { font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 2px 7px; border-radius: 999px; background: var(--accent); color: #16130a; }
+      #focus .fc-main { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 16px; overflow-y: auto; padding: 6px 0; }
       #focus .fc-main.go-next { animation: fcInNext 0.28s ease-out; }
       #focus .fc-main.go-prev { animation: fcInPrev 0.28s ease-out; }
-      #focus .fc-name { margin: 0; font-size: clamp(2rem, 9vw, 3.3rem); line-height: 1.04; letter-spacing: -0.025em; font-weight: 700; }
-      #focus .fc-name.fc-line { font-size: clamp(1.4rem, 6vw, 2.2rem); font-weight: 650; letter-spacing: -0.015em; line-height: 1.2; }
+      #focus .fc-name { margin: 0; font-size: clamp(1.8rem, 8vw, 2.8rem); line-height: 1.04; letter-spacing: -0.025em; font-weight: 700; }
+      #focus .fc-name.fc-line { font-size: clamp(1.3rem, 5.5vw, 2rem); font-weight: 650; letter-spacing: -0.015em; line-height: 1.2; }
       #focus .fc-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-      #focus .fc-chips span { padding: 8px 15px; border-radius: 999px; background: rgba(255, 255, 255, 0.07); font-weight: 600; font-size: 1.05rem; }
+      #focus .fc-chips span { padding: 7px 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.07); font-weight: 600; font-size: 1rem; }
       #focus .fc-chips span.a { background: var(--accent); color: #16130a; }
-      #focus .fc-field { border-radius: 26px; background: rgba(255, 255, 255, 0.055); border: 1px solid rgba(255, 255, 255, 0.07); padding: 14px; }
-      #focus .fc-field.step { display: grid; grid-template-columns: 62px 1fr 62px; align-items: center; gap: 8px; }
-      #focus .fc-field.step button { height: 62px; border-radius: 18px; border: 0; background: rgba(255, 255, 255, 0.09); font-size: 2rem; font-weight: 500; line-height: 1; cursor: pointer; }
+      #focus .fc-field { border-radius: 24px; background: rgba(255, 255, 255, 0.055); border: 1px solid rgba(255, 255, 255, 0.07); padding: 12px; }
+      #focus .fc-field.step { display: grid; grid-template-columns: 58px 1fr 58px; align-items: center; gap: 8px; }
+      #focus .fc-field.step button { height: 58px; border-radius: 16px; border: 0; background: rgba(255, 255, 255, 0.09); font-size: 1.9rem; font-weight: 500; line-height: 1; cursor: pointer; }
       #focus .fc-field.step button:active { background: rgba(255, 255, 255, 0.16); }
       #focus .fc-val { display: flex; flex-direction: column; align-items: center; min-width: 0; }
-      #focus .fc-val small { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; margin-top: 2px; }
-      #focus .fc-in { width: 100%; border: 0; background: transparent; color: inherit; text-align: center; font-size: clamp(2.2rem, 11vw, 3.2rem); font-weight: 700; letter-spacing: -0.02em; outline: none; padding: 4px 0; }
+      #focus .fc-val small { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; margin-top: 2px; }
+      #focus .fc-in { width: 100%; border: 0; background: transparent; color: inherit; text-align: center; font-size: clamp(2rem, 10vw, 2.9rem); font-weight: 700; letter-spacing: -0.02em; outline: none; padding: 2px 0; }
       #focus .fc-in.pre { color: var(--accent); }
       #focus .fc-in::placeholder { opacity: 0.3; }
-      #focus .fc-field.slots { padding: 16px; }
-      #focus .fc-last { align-self: flex-start; padding: 10px 16px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.14); background: transparent; opacity: 0.85; font-size: 0.92rem; cursor: pointer; }
-      #focus .fc-nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-top: 14px; }
+      #focus .fc-field.slots { padding: 14px; }
+      #focus .fc-last { align-self: flex-start; padding: 9px 15px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.14); background: transparent; opacity: 0.85; font-size: 0.9rem; cursor: pointer; }
+      /* Timer: nur bei Übungen mit Zeitvorgabe */
+      #focus .fc-timer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-radius: 22px; background: rgba(255, 255, 255, 0.055); border: 1px solid rgba(255, 255, 255, 0.07); }
+      #focus .fc-timer[data-ph="work"] { border-color: var(--accent); }
+      #focus .fc-timer[data-ph="rest"] { border-color: #5b9bd5; }
+      #focus .fc-timer[data-ph="done"] { border-color: #6cc08b; background: rgba(108, 192, 139, 0.12); }
+      #focus .fc-time { font-size: clamp(2.2rem, 11vw, 3.1rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+      #focus .fc-tlabel { opacity: 0.6; font-size: 0.82rem; margin-top: 4px; }
+      #focus .fc-tbtn { display: flex; gap: 8px; }
+      #focus .fc-tbtn button { height: 50px; padding: 0 20px; border-radius: 15px; border: 0; background: rgba(255, 255, 255, 0.09); font-size: 1rem; font-weight: 650; cursor: pointer; }
+      #focus .fc-tbtn button.go { background: var(--accent); color: #16130a; }
+      #focus .fc-tbtn button.stop { background: #e5604f; color: #fff; }
+      /* Als Nächstes: ein Tipp springt hin */
+      #focus .fc-upnext { width: 100%; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; text-align: left; padding: 11px 16px; border-radius: 16px; border: 1px dashed rgba(255, 255, 255, 0.22); background: transparent; cursor: pointer; }
+      #focus .fc-upnext small { font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.55; }
+      #focus .fc-upnext b { font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      #focus .fc-upnext span { opacity: 0.6; font-size: 1.4rem; line-height: 1; }
+      #focus .fc-nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-top: 2px; }
       #focus .fc-nav.fin { grid-template-columns: 1fr; }
-      #focus .fc-side { width: 58px; height: 58px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.07); font-size: 2rem; line-height: 1; justify-self: start; cursor: pointer; }
+      #focus .fc-side { width: 54px; height: 54px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, 0.07); font-size: 1.9rem; line-height: 1; justify-self: start; cursor: pointer; }
       #focus .fc-side.r { justify-self: end; }
       #focus .fc-side:disabled { opacity: 0.25; cursor: default; }
-      #focus .fc-ok { width: 98px; height: 98px; border-radius: 50%; border: 3px solid var(--accent); background: var(--accent); color: #16130a; display: grid; place-items: center; box-shadow: 0 10px 34px rgba(224, 191, 106, 0.3); cursor: pointer; transition: background 0.2s, color 0.2s, box-shadow 0.2s; }
+      #focus .fc-ok { width: 92px; height: 92px; border-radius: 50%; border: 3px solid var(--accent); background: var(--accent); color: #16130a; display: grid; place-items: center; box-shadow: 0 10px 34px rgba(224, 191, 106, 0.3); cursor: pointer; transition: background 0.2s, color 0.2s, box-shadow 0.2s; }
       #focus .fc-ok.on { background: transparent; color: var(--accent); box-shadow: none; }
       #focus .fc-ok.pop { animation: fcPop 0.35s ease-out; }
-      #focus .fc-hint { margin: 12px 0 0; text-align: center; font-size: 0.82rem; opacity: 0.45; }
       #focus .fc-fin { align-items: center; text-align: center; }
-      #focus .fc-big { width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #16130a; box-shadow: 0 10px 34px rgba(224, 191, 106, 0.3); }
-      #focus .fc-sub { margin: -8px 0 0; opacity: 0.6; }
-      #focus .fc-lbl { opacity: 0.75; margin-top: 8px; }
+      #focus .fc-big { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #16130a; box-shadow: 0 10px 34px rgba(224, 191, 106, 0.3); }
+      #focus .fc-sub { margin: -6px 0 0; opacity: 0.6; }
+      #focus .fc-lbl { opacity: 0.75; margin-top: 6px; }
       #focus .fc-rpe { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; max-width: 420px; }
-      #focus .fc-rpe button { height: 52px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.06); font-size: 1.15rem; font-weight: 650; cursor: pointer; }
+      #focus .fc-rpe button { height: 50px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.06); font-size: 1.1rem; font-weight: 650; cursor: pointer; }
       #focus .fc-rpe button.on { background: var(--rc); border-color: var(--rc); color: #111; }
-      #focus .fc-fertig { height: 64px; border-radius: 20px; border: 0; background: var(--accent); color: #16130a; font-size: 1.2rem; font-weight: 700; cursor: pointer; }
+      #focus .fc-fertig { height: 62px; border-radius: 20px; border: 0; background: var(--accent); color: #16130a; font-size: 1.2rem; font-weight: 700; cursor: pointer; }
       @keyframes fcPop { 0% { transform: scale(1); } 40% { transform: scale(0.9); } 100% { transform: scale(1); } }
       @keyframes fcInNext { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
       @keyframes fcInPrev { from { opacity: 0; transform: translateX(-26px); } to { opacity: 1; transform: none; } }
@@ -3790,7 +3815,7 @@
       import * as strava from "./src/strava.js";
       import * as garmin from "./src/garmin.js";
       import * as ingest from "./src/ingest.js";
-      import { atPlace, nextOpen, GYM_RADIUS } from "./src/focus.js";
+      import { atPlace, nextOpen, GYM_RADIUS, timedSpec, timerPhase } from "./src/focus.js";
       import * as dash from "./src/dashboard.js";
       import {
         callServer,
@@ -7578,10 +7603,11 @@
             .catch(() => render());
         }, 300);
       }
-      /* ---------- Fokusmodus: eine Übung pro Bildschirm, grosser Haken. Startet von Hand oder am Trainingsort (GPS). ---------- */
+      /* ---------- Fokusmodus: eine Übung pro Bildschirm, grosser Haken, Übersicht immer im Bild. Startet von Hand oder am Trainingsort (GPS). ---------- */
       let focusI = null, // Tag-Index, solange der Modus offen ist
         focusJ = 0, // Zeile
-        focusFin = false; // Abschluss-Bildschirm (alles erledigt)
+        focusFin = false, // Abschluss-Bildschirm (alles erledigt)
+        fcLock = null; // Bildschirm wach halten
       const gymGet = () => {
         try {
           return JSON.parse(lsGet("hx:gym") || "null");
@@ -7590,7 +7616,76 @@
         }
       };
       const FC_CHECK = `<svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
-      /* Planzeile "Back Squat 3×5 @75% RPE 7" → Name und Kennzahlen als Chips */
+      /* Kurzname einer Planzeile für Übersicht und Vorschau */
+      const fcLabel = (p, j) => (isLift(p.k, p.i[j]) ? exLabel(p.i[j]) : String(p.i[j]).replace(/\s+/g, " ").slice(0, 60));
+
+      /* Timer nur für Übungen mit Zeitvorgabe im Plan (1 Minute Sled Push, EMOM, AMRAP, Plank 3×50″ …), siehe src/focus.js timedSpec.
+         Läuft rückwärts, wechselt selbst zwischen Arbeit und Pause und piept beim Wechsel. */
+      let fcT = { run: false, t0: 0, acc: 0, iv: null, last: "", spec: null };
+      const fcElapsed = () => fcT.acc + (fcT.run ? Date.now() - fcT.t0 : 0);
+      let fcAudio = null;
+      function fcBeep(long) {
+        try {
+          fcAudio = fcAudio || new (window.AudioContext || window.webkitAudioContext)();
+          const o = fcAudio.createOscillator(), g = fcAudio.createGain();
+          o.frequency.value = long ? 660 : 920;
+          g.gain.value = 0.18;
+          o.connect(g);
+          g.connect(fcAudio.destination);
+          o.start();
+          o.stop(fcAudio.currentTime + (long ? 0.55 : 0.18));
+          if (navigator.vibrate) navigator.vibrate(long ? [220, 90, 220] : 90);
+        } catch (_) {}
+      }
+      function fcTimerReset() {
+        clearInterval(fcT.iv);
+        fcT = { run: false, t0: 0, acc: 0, iv: null, last: "", spec: null };
+      }
+      /* Anzeige des Timers: {time, label, ph ("work"|"rest"|"done"|"idle"), key} */
+      function fcView(spec) {
+        const ph = timerPhase(spec, fcElapsed() / 1000);
+        const mm = (s) => mmss(Math.max(0, Math.ceil(s)));
+        if (ph.done) return { time: "0:00", label: "Zeit!", ph: "done", key: "done" };
+        const rounds = spec.rounds > 1 ? ` · Runde ${ph.round + 1}/${spec.rounds}` : "";
+        return { time: mm(ph.left), label: (ph.rest ? "Pause" : spec.label) + rounds, ph: ph.rest ? "rest" : "work", key: ph.round + (ph.rest ? "r" : "w") };
+      }
+      function fcTick() {
+        const spec = fcT.spec;
+        if (!spec) return;
+        const v = fcView(spec);
+        const e = document.getElementById("fc-time"), l = document.getElementById("fc-tlabel"), box = document.querySelector("#focus .fc-timer");
+        if (e) e.textContent = v.time;
+        if (l) l.textContent = v.label;
+        if (box) box.dataset.ph = v.ph;
+        if (v.key !== fcT.last) {
+          if (fcT.last) fcBeep(v.ph === "done");
+          fcT.last = v.key;
+        }
+        if (v.ph === "done") {
+          fcT.acc = fcElapsed();
+          fcT.run = false;
+          clearInterval(fcT.iv);
+          focusRender();
+        }
+      }
+      function fcTimerToggle() {
+        const p = dayPlan(focusI), spec = timedSpec(p.i[focusJ], p.k);
+        if (!spec) return;
+        if (!fcT.run) {
+          if (fcT.spec !== spec && !(fcT.spec && fcT.spec.work === spec.work && fcT.spec.rounds === spec.rounds)) fcTimerReset();
+          fcT.spec = spec;
+          fcT.run = true;
+          fcT.t0 = Date.now();
+          fcBeep(false); // der erste Piep entsperrt auch den Ton auf dem Handy
+          fcT.iv = setInterval(fcTick, 250);
+        } else {
+          fcT.acc = fcElapsed();
+          fcT.run = false;
+          clearInterval(fcT.iv);
+        }
+        focusRender();
+      }
+      /* Planzeile "Back Squat 3×5 @75% RPE 7" → Chips mit den Kennzahlen */
       function fcChips(t) {
         const rest = String(t).slice(exLabel(t).length);
         const parts = rest.match(/\d+\s*[×x]\s*\d+(?:[.,]\d+)?\s*(?:km|m|′|min)?|@\s*\d+\s*%|RPE\s*\d+(?:\s*[–-]\s*\d+)?|\d+\s*kg/gi) || [];
@@ -7600,7 +7695,8 @@
         const p = dayPlan(focusI);
         if (!p) return focusClose();
         const dk = keyI(focusI), n = p.i.length;
-        const nd = p.i.filter((_, x) => S.done[dk + "|" + x]).length;
+        const isDone = (x) => !!S.done[dk + "|" + x];
+        const nd = p.i.filter((_, x) => isDone(x)).length;
         let el = document.getElementById("focus");
         if (!el) {
           el = document.createElement("div");
@@ -7611,17 +7707,24 @@
           document.body.appendChild(el);
           document.body.classList.add("focus-on");
         }
-        const segs = p.i.map((_, x) => `<i class="${S.done[dk + "|" + x] ? "d" : ""}${!focusFin && x === focusJ ? " c" : ""}"></i>`).join("");
-        const top = `<div class="fc-top"><button type="button" class="fc-x" data-fc="close" aria-label="Fokusmodus beenden">✕</button><div class="fc-title"><small>${esc(KIND[p.k] || "")}</small><b>${esc(p.t)}</b></div><span class="fc-count">${nd}/${n}</span></div><div class="fc-segs" aria-hidden="true">${segs}</div>`;
+        const dran = nextOpen(n, isDone, 0); // erste offene Übung = was als Nächstes zu tun ist
+        const top = `<div class="fc-top"><button type="button" class="fc-x" data-fc="close" aria-label="Fokusmodus beenden">✕</button><div class="fc-title"><small>${esc(KIND[p.k] || "")}</small><b>${esc(p.t)}</b></div><span class="fc-count">${nd}/${n}</span></div>`;
+        /* Übersicht aller Übungen: immer im Bild. Grün/Haken = erledigt, «dran» = die nächste offene, Balken = diese Übung wird gerade angezeigt */
+        const mini = `<ol class="fc-mini" aria-label="Alle Übungen">${p.i
+          .map((t2, x) => {
+            const d = isDone(x), v = S.val[dk + "|" + x] || (d ? "" : preWeight(p, t2));
+            return `<li><button type="button" class="${d ? "d" : ""}${x === dran && !focusFin ? " n" : ""}${x === focusJ && !focusFin ? " c" : ""}" data-fc="go" data-j="${x}"><i aria-hidden="true">${d ? "✓" : x + 1}</i><span>${esc(fcLabel(p, x))}</span><em>${esc(v)}${x === dran && !focusFin ? "<b>dran</b>" : ""}</em></button></li>`;
+          })
+          .join("")}</ol>`;
         if (focusFin) {
           const rv = S.rpe[dk] ? +S.rpe[dk] : 0;
-          el.innerHTML = `${top}<div class="fc-main fc-fin"><div class="fc-big">${FC_CHECK}</div><h1 class="fc-name">Workout erledigt</h1><p class="fc-sub">${nd} von ${n} Übungen abgehakt</p>
+          el.innerHTML = `${top}${mini}<div class="fc-main fc-fin"><div class="fc-big">${FC_CHECK}</div><h1 class="fc-name">Workout erledigt</h1><p class="fc-sub">${nd} von ${n} Übungen abgehakt</p>
     <div class="fc-lbl">Wie hart war's?${rv ? ` · <b>${esc(RPE_TXT[rv] || "")}</b>` : ""}</div>
     <div class="fc-rpe" role="group" aria-label="Anstrengung 1 bis 10">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => `<button type="button" class="${rv === x ? "on" : ""}" style="--rc:${rpeColor((x - 1) / 9)}" data-fc="rpe" data-r="${x}" aria-pressed="${rv === x}">${x}</button>`).join("")}</div></div>
     <div class="fc-nav fin"><button type="button" class="fc-fertig" data-fc="close">Fertig</button></div>`;
           return;
         }
-        const t = p.i[focusJ], id = dk + "|" + focusJ, on = !!S.done[id], lift = isLift(p.k, t), filler = isFiller(t);
+        const t = p.i[focusJ], id = dk + "|" + focusJ, on = isDone(focusJ), lift = isLift(p.k, t), filler = isFiller(t);
         const pre = !S.val[id] ? preWeight(p, t) : "",
           val = S.val[id] || pre;
         const le = lift ? lastEntry(focusI, t) : null;
@@ -7633,10 +7736,22 @@
           else if (lift) field = `<div class="fc-field step"><button type="button" data-fc="dec" aria-label="2,5 Kilo weniger">−</button><div class="fc-val">${input}<small>${pre ? "geplant" : "Gewicht"}</small></div><button type="button" data-fc="inc" aria-label="2,5 Kilo mehr">+</button></div>`;
           else field = `<div class="fc-field"><div class="fc-val">${input}<small>Zeit oder Wert</small></div></div>`;
         }
+        // Timer nur, wenn der Plan eine Zeit vorgibt
+        const spec = timedSpec(t, p.k);
+        let timer = "";
+        if (spec) {
+          const v = fcT.spec && fcT.spec.work === spec.work && fcT.spec.rounds === spec.rounds ? fcView(spec) : { time: mmss(spec.work), label: spec.label + (spec.rounds > 1 ? ` · ${spec.rounds} Runden` : ""), ph: "idle" };
+          const started = fcT.spec && fcElapsed() > 0;
+          timer = `<div class="fc-timer" data-ph="${v.ph}"><div><div class="fc-time" id="fc-time">${v.time}</div><div class="fc-tlabel" id="fc-tlabel">${esc(v.label)}</div></div><div class="fc-tbtn"><button type="button" class="${fcT.run ? "stop" : "go"}" data-fc="tstart">${fcT.run ? "Pause" : started && v.ph !== "done" ? "Weiter" : "Start"}</button>${started && !fcT.run ? `<button type="button" data-fc="treset">Neu</button>` : ""}</div></div>`;
+        }
         const last = le && le.v ? `<button type="button" class="fc-last" data-fc="last" data-v="${esc(le.v)}">zuletzt ${esc(le.v)} · übernehmen</button>` : "";
-        el.innerHTML = `${top}<div class="fc-main${dir ? " go-" + dir : ""}">${title}${field}${last}</div>
-    <div class="fc-nav"><button type="button" class="fc-side" data-fc="prev" ${focusJ === 0 ? "disabled" : ""} aria-label="Vorherige Übung">‹</button><button type="button" class="fc-ok${on ? " on" : ""}" data-fc="done" aria-label="${on ? "Erledigt, nochmals tippen zum Rückgängig" : "Übung erledigt"}">${FC_CHECK}</button><button type="button" class="fc-side r" data-fc="next" ${focusJ === n - 1 ? "disabled" : ""} aria-label="Nächste Übung">›</button></div>
-    <p class="fc-hint">${on ? "Erledigt · nochmals tippen macht es rückgängig" : "Tippen, wenn die Übung fertig ist"}</p>`;
+        // Wer das Weiterklicken vergessen hat: hier steht, was als Nächstes dran ist, ein Tipp springt hin
+        const nxt = on || dran !== focusJ ? dran : nextOpen(n, (x) => isDone(x) || x === focusJ, focusJ + 1);
+        const upnext = nxt >= 0 && nxt !== focusJ ? `<button type="button" class="fc-upnext" data-fc="go" data-j="${nxt}"><small>${on ? "Als Nächstes" : "Danach"}</small><b>${esc(fcLabel(p, nxt))}</b><span aria-hidden="true">›</span></button>` : "";
+        el.innerHTML = `${top}${mini}<div class="fc-main${dir ? " go-" + dir : ""}">${title}${field}${timer}${last}</div>${upnext}
+    <div class="fc-nav"><button type="button" class="fc-side" data-fc="prev" ${focusJ === 0 ? "disabled" : ""} aria-label="Vorherige Übung">‹</button><button type="button" class="fc-ok${on ? " on" : ""}" data-fc="done" aria-label="${on ? "Erledigt, nochmals tippen zum Rückgängig" : "Übung erledigt"}">${FC_CHECK}</button><button type="button" class="fc-side r" data-fc="next" ${focusJ === n - 1 ? "disabled" : ""} aria-label="Nächste Übung">›</button></div>`;
+        const cur = el.querySelector(".fc-mini .n, .fc-mini .c");
+        if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: "nearest" });
       }
       function focusOpen(i) {
         const p = dayPlan(i);
@@ -7644,6 +7759,10 @@
         const dk = keyI(i), j = nextOpen(p.i.length, (x) => !!S.done[dk + "|" + x], 0);
         focusI = i;
         focusFin = false;
+        fcTimerReset();
+        try {
+          navigator.wakeLock && navigator.wakeLock.request("screen").then((l) => (fcLock = l)).catch(() => {});
+        } catch (_) {}
         focusJ = j < 0 ? 0 : j;
         lsSet("hx:focus-day", dk); // pro Tag nur einmal von selbst starten, auch wenn man ihn beendet
         focusRender();
@@ -7651,6 +7770,11 @@
       function focusClose() {
         focusI = null;
         focusFin = false;
+        fcTimerReset();
+        try {
+          if (fcLock) fcLock.release();
+        } catch (_) {}
+        fcLock = null;
         const el = document.getElementById("focus");
         if (el) el.remove();
         document.body.classList.remove("focus-on");
@@ -7678,6 +7802,7 @@
         setTimeout(() => {
           if (focusI !== at || focusJ !== from) return; // inzwischen weitergeschaltet oder geschlossen
           const nx = nextOpen(p.i.length, (x) => !!S.done[dk + "|" + x], focusJ + 1);
+          fcTimerReset();
           if (nx < 0) focusFin = true;
           else focusJ = nx;
           focusRender(nx < 0 ? "" : "next");
@@ -7751,15 +7876,26 @@
           save();
           return focusRender();
         }
+        if (a === "go") {
+          if (+b.dataset.j !== focusJ || focusFin) fcTimerReset();
+          focusJ = +b.dataset.j;
+          focusFin = false;
+          return focusRender("next");
+        }
+        if (a === "tstart") return fcTimerToggle();
+        if (a === "treset") {
+          fcTimerReset();
+          return focusRender();
+        }
         if (a === "rpe") {
           const dk = keyI(focusI);
-          S.rpe[dk] = S.rpe[dk] === +b.dataset.r ? undefined : +b.dataset.r;
-          if (S.rpe[dk] === undefined) delete S.rpe[dk];
+          if (S.rpe[dk] === +b.dataset.r) delete S.rpe[dk];
+          else S.rpe[dk] = +b.dataset.r;
           save();
           return focusRender();
         }
-        if (a === "prev" && focusJ > 0) (focusJ--, focusRender("prev"));
-        if (a === "next" && focusJ < p.i.length - 1) (focusJ++, focusRender("next"));
+        if (a === "prev" && focusJ > 0) (fcTimerReset(), focusJ--, focusRender("prev"));
+        if (a === "next" && focusJ < p.i.length - 1) (fcTimerReset(), focusJ++, focusRender("next"));
       });
       document.addEventListener("keydown", (e) => e.key === "Escape" && focusI != null && focusClose());
       document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && gpsCheck());

@@ -3,14 +3,13 @@
 // Gespeicherte Form (S.review): {wochenIndex: {feel, prog, pain, note, at, level, fc}} – fc = Prognose in Sekunden zum Zeitpunkt des Checks.
 // Reine Funktionen, ohne DOM.
 import { mmss } from "./util.js";
+import { buildForecast, K, DRIFT, levelOf } from "./forecast.js";
+import { DOUBLES_SHARE } from "./divisions.js";
+export { DOUBLES_SHARE, DRIFT, levelOf, K };
 
 export const GOAL_S = 3600;
 /** Obergrenze der mittleren Anstrengung (RPE) je Wochentyp – darüber war die Woche härter als geplant. */
 export const RPE_MAX = { Test: 8.5, moderat: 6.5, hart: 7.5, Spitzenreiz: 8.5, Deload: 5.5, Taper: 6 };
-/** Annahmen der Prognose (bewusst sichtbar, siehe forecastText) */
-export const RUN_PENALTY = 20; // s/km langsamer als im 1-km-Test (8 km, nach Stationen)
-export const DOUBLES_SHARE = 0.55; // Anteil der Solo-Stationszeit im Doubles (Arbeit wird geteilt, Wechsel kosten)
-export const ROXZONE = 300; // s für alle Wege in der Roxzone
 
 export const SELF = {
   feel: { label: "Wie fühlst du dich?", short: "Gefühl", opts: ["gut", "okay", "müde"] },
@@ -82,23 +81,8 @@ export function weekCheck({ days = [], wave = "moderat", load = null, prev = [],
   return { level, planned: sessions.length, done, missedKey, avgRpe, rpeMax, reds, yellows, runRamp, extraN: extras.length, extraMin, notes, focus: [...new Set(focus)].slice(0, 3) };
 }
 
-/**
- * Grobe Rennprognose (Doubles) aus den Testwerten in Sekunden.
- * lauf: 1-km-Testzeiten (beide Partner), station: 8× [ich, Partner] Solo-Stationszeiten.
- * @returns null ohne Laufwerte, sonst {T, run, st (null, falls Stationen fehlen), rox, total (null, falls unvollständig), missing}
- */
-export function forecast({ lauf = [], station = [] } = {}) {
-  const runs = lauf.filter(ok);
-  if (!runs.length) return null;
-  const T = mean(runs), run = 8 * (T + RUN_PENALTY);
-  const per = Array.from({ length: 8 }, (_, r) => { const v = (station[r] || []).filter(ok); return v.length ? mean(v) : null; });
-  const known = per.filter((v) => v != null);
-  const st = known.length === 8 ? known.reduce((a, b) => a + b, 0) * DOUBLES_SHARE : null;
-  return {
-    T, pace: T + RUN_PENALTY, run, st, rox: ROXZONE, total: st == null ? null : run + st + ROXZONE, missing: 8 - known.length,
-    stations: per.map((v) => (v == null ? null : v * DOUBLES_SHARE)), // geschätzte Doubles-Zeit je Station
-  };
-}
+/** Rennprognose mit Spanne, siehe src/forecast.js (buildForecast). */
+export const forecast = (opts) => buildForecast(opts);
 
 /** Rennmodell für unter 60 Minuten (Plan v9): 8 × 1 km in 4:00, Stationen geteilt, Roxzone mit 16 Wechseln */
 export const STATIONS = ["SkiErg", "Sled Push", "Sled Pull", "Burpee BJ", "RowErg", "Farmers", "Lunges", "Wall Balls"];
@@ -110,9 +94,9 @@ export const RACE_MODEL = { run: 8 * 240, stations: [220, 150, 180, 160, 225, 80
  */
 export function breakdown(fc, model = RACE_MODEL) {
   if (!fc) return null;
-  const row = (label, est, goal) => ({ label, est, goal, diff: est == null ? null : est - goal });
+  const row = (label, est, goal, src = "bench") => ({ label, est, goal, src, diff: est == null ? null : est - goal });
   const rows = [row("Laufen 8 × 1 km", fc.run, model.run)];
-  STATIONS.forEach((s, r) => rows.push(row(s, fc.stations ? fc.stations[r] : null, model.stations[r])));
+  STATIONS.forEach((s, r) => rows.push(row(s, fc.stations ? fc.stations[r] : null, model.stations[r], fc.sources ? fc.sources[r] : "bench")));
   rows.push(row("Roxzone und Wechsel", fc.rox, model.rox));
   const goal = rows.reduce((s, x) => s + x.goal, 0);
   return { rows, est: fc.total, goal, diff: fc.total == null ? null : fc.total - goal };

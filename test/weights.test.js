@@ -45,3 +45,23 @@ test("Gewicht auch für feste Kraftübungen an Stationstagen", () => {
   assert.ok(!isLift("station", "Sled Push 50 m"));
   assert.ok(!isLift("lauf", "4×1 km @ R"));
 });
+
+test("Geplantes Gewicht: Plantext vor Division vor Profil", async () => {
+  const { plannedWeight } = await import("../src/weights.js");
+  const w = { "back squat": "80" };
+  assert.equal(plannedWeight("Back Squat 3×5", { lift: true, weights: w }), "80 kg");
+  assert.equal(plannedWeight("Back Squat 3×5 @ 90 kg", { lift: true, weights: w }), "90 kg");
+  assert.equal(plannedWeight("Back Squat Topsatz", { lift: true, weights: w }), "");
+  assert.equal(plannedWeight("Bench Press 3×6", { lift: true, weights: w }), "");
+});
+
+test("Stationen: Wettkampfgewicht der Division, Standard Men Pro, nie an Testtagen", async () => {
+  const { plannedWeight } = await import("../src/weights.js");
+  assert.equal(plannedWeight("Sled Push", {}), "202 kg");
+  assert.equal(plannedWeight("Sled Pull", {}), "153 kg");
+  assert.equal(plannedWeight("Farmers Carry", {}), "2×32 kg");
+  assert.equal(plannedWeight("100 Wall Balls", {}), "9 kg");
+  assert.equal(plannedWeight("Sled Push", { division: { gender: "w", cat: "open" } }), "102 kg");
+  assert.equal(plannedWeight("Sled Push", { test: true }), "");
+  assert.equal(plannedWeight("3 Runden im Wechsel: 400m Ski, 10 Sled Push moderat", {}), "");
+});

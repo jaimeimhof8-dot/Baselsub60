@@ -16,6 +16,9 @@ export function typeOf(typeKey) {
   return { type: k || "other", group: "other" };
 }
 
+/** Zählt als Training? (gleiche Regel wie src/ingest.js: nicht "other", mindestens 12 Minuten) */
+export const relevant = (a) => !!a && a.group !== "other" && (+a.time || 0) >= 12 * 60;
+
 const day = (s) => { const m = String(s || "").match(/^(\d{4}-\d{2}-\d{2})/); return m ? m[1] : null; };
 const round = (v) => (v == null || isNaN(+v) ? null : Math.round(+v));
 
@@ -27,7 +30,7 @@ export function normalizeAct(g) {
     id: "g" + g.activityId, name: g.activityName || "", type: t.type, group: t.group,
     date: day(local), start: local.slice(0, 16) || null,
     dist: Math.round(+g.distance || 0), time: Math.round(+g.movingDuration || +g.duration || 0),
-    hr: g.averageHR ? Math.round(g.averageHR) : null, watts: g.avgPower ? Math.round(g.avgPower) : null, src: "garmin",
+    hr: g.averageHR ? Math.round(g.averageHR) : null, maxHr: g.maxHR ? Math.round(g.maxHR) : null, kcal: g.calories ? Math.round(g.calories) : null, watts: g.avgPower ? Math.round(g.avgPower) : null, src: "garmin",
   };
 }
 

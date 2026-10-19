@@ -25,7 +25,12 @@ const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 const admin = () => createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
 
-type Sub = { user_id: string; endpoint: string; p256dh: string; auth: string };
+type Sub = { user_id: string; endpoint: string; p256dh: string; auth: string; fail_count?: number };
+
+const MAX_FAILS = 5; // so viele Fehlversuche in Folge, dann gilt das Abo als tot und wird entfernt
+const CHUNK = 10; // Geräte gleichzeitig
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const zurichHour = () => +new Date().toLocaleString("en-GB", { timeZone: "Europe/Zurich", hour: "2-digit", hour12: false });
 
 /** Nachricht für einen Nutzer aus seinem Plan-Stand und Namen */
 async function messageFor(db: ReturnType<typeof admin>, uid: string) {
@@ -37,21 +42,45 @@ async function messageFor(db: ReturnType<typeof admin>, uid: string) {
   return weeklyMessage((ps?.data as Record<string, unknown> | null)?.wsnap ?? null, week, { name: m?.name || "" });
 }
 
+/** Eine Nachricht senden; bei Drosselung (429), Serverfehlern (5xx) und Netzfehlern bis zu 2 Mal mit Wartezeit wiederholen */
+async function deliver(s: Sub, msg: unknown) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, JSON.stringify(msg), { TTL: 6 * 3600 });
+      return { ok: true as const };
+    } catch (e) {
+      const code = (e as { statusCode?: number }).statusCode;
+      if (code === 404 || code === 410) return { ok: false as const, gone: true, error: String(code) };
+      const retry = (!code || code === 429 || code >= 500) && attempt < 2;
+      if (!retry) return { ok: false as const, gone: false, error: String(code ?? (e as Error).message).slice(0, 200) };
+      await sleep(1000 * 2 ** attempt);
+    }
+  }
+}
+
 async function sendTo(db: ReturnType<typeof admin>, subs: Sub[]) {
   let sent = 0, gone = 0, failed = 0;
   const cache = new Map<string, unknown>();
-  for (const s of subs) {
-    if (!cache.has(s.user_id)) cache.set(s.user_id, await messageFor(db, s.user_id));
-    try {
-      await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, JSON.stringify(cache.get(s.user_id)), { TTL: 6 * 3600 });
-      sent++;
-    } catch (e) {
-      const code = (e as { statusCode?: number }).statusCode;
-      // Abo abgelaufen oder im Browser entfernt: aufräumen
-      if (code === 404 || code === 410) { await db.from("push_subs").delete().eq("endpoint", s.endpoint); gone++; }
-      else failed++;
-    }
+  for (const s of subs) if (!cache.has(s.user_id)) cache.set(s.user_id, await messageFor(db, s.user_id));
+  for (let i = 0; i < subs.length; i += CHUNK) {
+    await Promise.all(subs.slice(i, i + CHUNK).map(async (s) => {
+      const r = await deliver(s, cache.get(s.user_id));
+      if (r.ok) {
+        sent++;
+        // Gesundheit des Abos festhalten (Spalten aus supabase/push-health.sql; fehlen sie noch, ist das nur ein ignorierter Fehler)
+        await db.from("push_subs").update({ last_ok: new Date().toISOString(), fail_count: 0, last_error: null }).eq("endpoint", s.endpoint);
+      } else if (r.gone || (s.fail_count ?? 0) + 1 >= MAX_FAILS) {
+        // Abo abgelaufen, im Browser entfernt oder dauerhaft kaputt: aufräumen
+        await db.from("push_subs").delete().eq("endpoint", s.endpoint);
+        gone++;
+      } else {
+        failed++;
+        console.error("push failed", s.endpoint.slice(0, 60), r.error);
+        await db.from("push_subs").update({ fail_count: (s.fail_count ?? 0) + 1, last_error: r.error }).eq("endpoint", s.endpoint);
+      }
+    }));
   }
+  console.log("push run", JSON.stringify({ sent, gone, failed, subs: subs.length }));
   return { sent, gone, failed };
 }
 
@@ -68,7 +97,9 @@ Deno.serve(async (req) => {
 
   if (body.action === "send-all") {
     if (!CRON || req.headers.get("x-cron-secret") !== CRON) return json({ error: "forbidden" }, 403);
-    const { data } = await db.from("push_subs").select("user_id, endpoint, p256dh, auth");
+    // Der Cron läuft um 16 und 17 Uhr UTC (Sommer- und Winterzeit); gesendet wird nur um 18 Uhr Zürcher Zeit (force: true umgeht das)
+    if (!body.force && zurichHour() !== 18) return json({ skipped: true });
+    const { data } = await db.from("push_subs").select("*");
     return json(await sendTo(db, (data || []) as Sub[]));
   }
 

@@ -1,6 +1,7 @@
 // Standard-Arbeitsgewichte (Profil). Reine Funktionen, ohne DOM.
 // Gespeicherte Form (S.weights): {übungsname (exName): "80"} – Wert in kg, als Text wie eingegeben.
 import { exName } from "./util.js";
+import { stationWeight } from "./divisions.js";
 
 /** Übungen, die immer im Profil stehen. Gilt nur für Krafteinheiten (Stationen werden auf Zeit gemessen). */
 export const BASE_EXERCISES = ["Back Squat", "Front Squat", "Bulgarian Split Squat", "Deadlift", "Bench Press", "Shoulder Press", "Pull-ups"];
@@ -45,6 +46,20 @@ export function cleanWeight(v) {
 export function defaultWeight(text, weights) {
   const w = weights && weights[exName(text)];
   return w ? `${w} kg` : "";
+}
+
+/**
+ * Geplantes Gewicht für das Eingabefeld: (1) "NN kg" im Plantext, (2) Wettkampfgewicht der Division bei Stationen
+ * (nicht an Testtagen, dort steht die Zeit im Feld), (3) Profil-Standardgewicht bei Kraftübungen. Sonst "".
+ * @param {string} text Planzeile
+ * @param {{lift?:boolean, test?:boolean, weights?:object, division?:object}} o
+ */
+export function plannedWeight(text, { lift = false, test = false, weights, division } = {}) {
+  if (/Topsatz/.test(text)) return "";
+  const m = String(text).replace(",", ".").match(/(?:^|\s)@?\s*(\d{1,3}(?:\.\d+)?)\s*kg\b/i);
+  if (m && lift) return `${+m[1]} kg`;
+  if (!test) { const s = stationWeight(text, division); if (s) return s; }
+  return lift ? defaultWeight(text, weights) : "";
 }
 
 /** Gewicht aus einem Eintrag lesen: "82,5 kg × 5" → 82.5, "80/85/85" → 85 (schwerster Satz), sonst NaN. */

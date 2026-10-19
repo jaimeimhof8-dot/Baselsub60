@@ -91,3 +91,15 @@ test("findSlot meidet hart-auf-hart, nimmt sonst Fallback", () => {
   assert.equal(findSlot(c, 8, 13, 13), 13);
   assert.equal(findSlot(c, 8, 9, 10), null); // keine Ruhetage
 });
+
+test("Gestrichene Einheit (Heute nicht) wird nicht zum Nachholen vorgeschlagen", async () => {
+  const { suggest } = await import("../src/adapt.js");
+  const mk = (off) => ({
+    today: 3, last: 20,
+    plan: (i) => (i === 2 ? { t: "Lauf", k: "lauf", i: ["x"] } : { t: "Frei", k: "rest", i: [] }),
+    status: () => ({ n: 1, done: 0 }), skipped: () => false, off, rpe: () => undefined,
+    checkin: () => undefined, strava: () => undefined, moved: [], dismissed: {},
+  });
+  assert.ok(suggest(mk(() => false)).some((s) => s.id === "miss:2"));
+  assert.ok(!suggest(mk((i) => i === 2)).some((s) => /:2$/.test(s.id)));
+});

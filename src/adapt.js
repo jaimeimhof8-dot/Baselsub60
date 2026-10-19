@@ -6,6 +6,7 @@
 //   plan(i)     -> Tagesplan inkl. Umplanungen ({t,k,inj,easy,back,…}) oder null
 //   status(i)   -> {n, done}         abgehakte Übungen
 //   skipped(i)  -> bool              als ausgefallen markiert
+//   off(i)      -> bool              "Heute nicht": gestrichen, wird weder nachgeholt noch umgeplant (optional)
 //   rpe(i)      -> Zahl | undefined
 //   checkin(i)  -> {sleep,sore,energy,pain} mit "g"|"y"|"r" | undefined
 //   strava(i)   -> {match: bool} | undefined
@@ -174,6 +175,7 @@ export function suggest(ctx) {
   for (let d = Math.max(0, T - 3); d < T; d++) {
     const p = ctx.plan(d);
     if (!isHard(p) || isDone(ctx, d) || taken.has(d)) continue;
+    if (ctx.off && ctx.off(d)) continue; // "Heute nicht": bewusst gestrichen, nichts nachholen
     const slot = findSlot(ctx, d, T, T + 3, taken);
     if (slot == null) {
       if (ctx.skipped(d)) add({ id: `drop:${d}`, type: "info", day: d, title: `${p.t} nicht nachholen`,

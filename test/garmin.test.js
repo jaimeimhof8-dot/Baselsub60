@@ -12,7 +12,7 @@ const RUN = { activityId: 20567, activityName: "Thun Intervalle", startTimeLocal
 
 test("Garmin-Aktivität normalisieren (gleiche Form wie Strava)", () => {
   assert.deepEqual(normalizeAct(RUN), { id: "g20567", name: "Thun Intervalle", type: "Run", group: "run", date: "2026-10-12",
-    start: "2026-10-12T18:01", dist: 8653, time: 2810, hr: 161, watts: 391, src: "garmin" });
+    start: "2026-10-12T18:01", dist: 8653, time: 2810, hr: 161, maxHr: null, kcal: null, watts: 391, src: "garmin" });
 });
 
 test("Garmin-Sportarten auf die Gruppen der App abbilden", () => {
@@ -157,4 +157,19 @@ test("Schlaf: Phasen, Zeiten und Nachtwerte, nur wenn vorhanden", () => {
     sleepStartTimestampLocal: Date.UTC(2026, 9, 15, 22, 40), sleepEndTimestampLocal: Date.UTC(2026, 9, 16, 6, 25),
     averageRespirationValue: 14.37, averageSpO2Value: 95.6, avgSleepStress: 18.24, sleepScores: { overall: { value: 81 } } } }] });
   assert.deepEqual(well["2026-10-16"], { sleepH: 7.5, sleepScore: 81, deep: 90, light: 240, rem: 120, awake: 15, bed: "22:40", wake: "06:25", resp: 14.4, spo2: 96, sleepStress: 18.2, restless: 41 });
+});
+
+test("Eingangsfilter: Walking und Einheiten unter 12 Minuten werden nicht aufgenommen", async () => {
+  const { relevant } = await import("../src/ingest.js");
+  const { relevant: serverRelevant } = await import("../supabase/functions/garmin/reduce.js");
+  const run = { id: "g1", group: "run", date: "2026-10-20", time: 30 * 60 };
+  const short = { ...run, id: "g2", time: 5 * 60 };
+  const walk = { ...run, id: "g3", group: "other" };
+  for (const [a, ok] of [[run, true], [short, false], [walk, false]]) {
+    assert.equal(relevant(a), ok);
+    assert.equal(serverRelevant(a), ok); // Server und Client müssen gleich entscheiden
+  }
+  const store = {};
+  assert.equal(mergeActs(store, [run, short, walk]), 1);
+  assert.deepEqual(Object.keys(store), ["g1"]);
 });

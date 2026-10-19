@@ -65,7 +65,7 @@ test("Diagramme: SVG mit Hover-Zielen, ohne Daten leer", () => {
 
 test("Runden bleiben erhalten, wenn ein neuer Abruf keine mitliefert", () => {
   const store = { "g1": { id: "g1", src: "garmin", group: "run", date: "2026-10-12", laps: LAPS } };
-  mergeActs(store, [{ id: "g1", src: "garmin", group: "run", date: "2026-10-12", name: "neu" }]);
+  mergeActs(store, [{ id: "g1", src: "garmin", group: "run", date: "2026-10-12", time: 1800, name: "neu" }]);
   assert.equal(store.g1.name, "neu");
   assert.equal(store.g1.laps.length, 12);
 });

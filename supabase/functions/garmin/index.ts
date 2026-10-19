@@ -13,7 +13,7 @@
 //       {action: "disconnect"}                   → {ok}
 //       {action: "refresh-all"} + x-cron-secret  → {refreshed, failed}
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { normalizeAct, normalizeLaps, reduceWell } from "./reduce.js";
+import { normalizeAct, normalizeLaps, reduceWell, relevant } from "./reduce.js";
 
 const KEY = Deno.env.get("GARMIN_TOKEN_KEY") ?? "";
 const CRON = Deno.env.get("GARMIN_CRON_SECRET") ?? "";
@@ -142,7 +142,7 @@ async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string,
     const page = await api(ctx, "/activitylist-service/activities/search/activities",
       { startDate: from, endDate: to, start: String(start), limit: "100" }) as Record<string, unknown>[] | null;
     if (!Array.isArray(page) || !page.length) break;
-    acts.push(...page.map(normalizeAct).filter((a) => a.date));
+    acts.push(...page.map(normalizeAct).filter((a) => a.date && relevant(a)));
     if (page.length < 100) break;
   }
 

@@ -1,6 +1,7 @@
 // Garmin (inoffiziell, über die Edge Function "garmin"): Token-Datei prüfen, Aktivitäten mit Strava zusammenführen,
 // Erholungswerte bewerten. Rein funktional – Netzwerk (invoke) wird übergeben, damit alles ohne Browser testbar ist.
 // Die Garmin-Antworten werden schon auf dem Server reduziert (supabase/functions/garmin/reduce.js).
+import { relevant } from "./ingest.js";
 
 export const MSG = {
   notDeployed: "Garmin ist auf dem Server noch nicht eingerichtet (Edge Function „garmin“, siehe SETUP.md).",
@@ -79,7 +80,7 @@ export function sameAct(a, b) {
 export function mergeActs(store, list, minDate = "") {
   let n = 0;
   for (const a of list) {
-    if (!a || !a.date || a.date < minDate) continue;
+    if (!a || !a.date || a.date < minDate || !relevant(a)) continue;
     // Bereits geladene Runden behalten, wenn die neue Version keine mitbringt
     if (store[a.id]) { store[a.id] = !a.laps && store[a.id].laps ? { ...a, laps: store[a.id].laps } : a; continue; }
     const dups = Object.values(store).filter((x) => sameAct(x, a));

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { weekCheck, forecast, onTrack, trackText, cleanSelf, reviewDue, RUN_PENALTY, DOUBLES_SHARE, ROXZONE } from "../src/review.js";
+import { weekCheck, forecast, onTrack, trackText, cleanSelf, reviewDue, DOUBLES_SHARE, K } from "../src/review.js";
 import * as review from "../src/review.js";
 import { suggestExtras, makeExtra, extraLabel, extraAsDay } from "../src/extras.js";
 
@@ -29,15 +29,33 @@ test("Wochen-Check: zu hart für Deload, Laufumfang-Sprung und Schmerzen", () =>
   assert.ok(r.notes.some((n) => /Schmerzen/.test(n.text)));
 });
 
-test("Prognose aus Tests, nur mit allen Stationen komplett", () => {
+test("Prognose: Compromised Running, Drift ab Lauf 5, Fallback statt fehlender Stationen", () => {
   assert.equal(forecast({ lauf: [NaN] }), null);
   const half = forecast({ lauf: [230, 250], station: [[300, 320]] });
   assert.equal(half.T, 240);
-  assert.equal(half.run, 8 * (240 + RUN_PENALTY));
-  assert.equal(half.total, null);
+  assert.equal(half.level, "schnell");
+  assert.deepEqual(half.paces.slice(0, 4), [255, 255, 255, 255]); // +15 s/km
+  assert.deepEqual(half.paces.slice(4), [258, 261, 264, 267]); // ab Lauf 5 progressiv langsamer
+  assert.equal(half.run, 4 * 255 + 258 + 261 + 264 + 267);
   assert.equal(half.missing, 7);
+  assert.deepEqual(half.sources, ["bench", ...Array(7).fill("fallback")]);
+  assert.ok(half.total > 0 && half.st > 0, "nie 0:00, auch ohne Benchmarks");
+  assert.ok(half.stations.every((v) => v > 0));
   const full = forecast({ lauf: [240], station: Array.from({ length: 8 }, () => [200, null]) });
-  assert.equal(full.total, 8 * (240 + RUN_PENALTY) + 1600 * DOUBLES_SHARE + ROXZONE);
+  assert.equal(full.missing, 0);
+  assert.equal(full.total, full.run + 1600 * K.mitte + 255);
+});
+
+test("Prognose: Basis-Pace hat Vorrang, Niveau steuert Roxzone und Division die Fallbacks", () => {
+  const f = forecast({ lauf: [200], base: 300 });
+  assert.equal(f.T, 300);
+  assert.equal(f.rox, 360);
+  assert.equal(f.paces[0], 325);
+  assert.equal(forecast({ base: 270 }).rox, 315);
+  const pro = forecast({ base: 270 }), open = forecast({ base: 270, division: { gender: "w", cat: "open", mode: "doubles" } });
+  assert.notEqual(pro.st, open.st);
+  const solo = forecast({ base: 270, division: { mode: "solo" } });
+  assert.ok(solo.st > pro.st);
 });
 
 test("Auf Kurs: Rückstand pro Restwoche", () => {
@@ -103,8 +121,8 @@ test("Prognose Zeile für Zeile gegen das Rennmodell", () => {
   const b = review.breakdown(fc);
   assert.equal(b.rows.length, 10);
   assert.equal(b.rows[0].goal, 1920);
-  assert.equal(Math.round(b.rows[0].est), Math.round(8 * (233.75 + review.RUN_PENALTY)));
-  assert.equal(Math.round(b.rows[1].est), Math.round(410 * review.DOUBLES_SHARE));
+  assert.equal(Math.round(b.rows[0].est), Math.round(review.forecast({ lauf: [232, 235, 230, 238] }).run));
+  assert.equal(Math.round(b.rows[1].est), Math.round(410 * review.K.mitte));
   assert.equal(b.goal, 1920 + 1390 + 270);
   assert.ok(b.goal < 3600, "Rennmodell muss unter 60 Minuten liegen");
   assert.equal(Math.round(b.diff), Math.round(fc.total - b.goal));
@@ -116,4 +134,13 @@ test("Laufumfang gegen Plan und Vorwoche", () => {
   assert.equal(review.runCheck(22, { plan: 20, prev: 15 }).level, "yellow"); // +47 % zur Vorwoche
   assert.equal(review.runCheck(12, { plan: 20 }).level, "yellow"); // deutlich unter Plan
   assert.equal(review.runCheck(null), null);
+});
+
+test("Prognose ist plausibel: Test-Pace 4:05 ergibt etwa das echte Rennen von St. Gallen 2026 (1:03:21)", () => {
+  const f = forecast({ lauf: [245, 245, 245, 245] });
+  assert.ok(Math.abs(f.total - 3801) < 120, "Gesamtzeit " + f.total);
+  assert.equal(Math.round(f.st), 1443); // Stationen 24:03 aus dem Rennen
+  const quick = forecast({ lauf: [237] }); // GPS-Wert des Pacing-Tests vom 13.10.
+  assert.ok(quick.total > 3660 && quick.total < 3800, "3:57-Test: " + quick.total); // 61–63 Minuten, nicht unter 60
+  assert.ok(quick.run / 8 > 237 + 10 && quick.run / 8 < 237 + 30, "Renn-Pace 10–30 s/km über Test-Pace");
 });

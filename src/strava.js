@@ -126,6 +126,8 @@ export function summary(a) {
   if (a.group === "run" && a.dist > 200 && a.time) { const pace = a.time / (a.dist / 1000); p.push(Math.floor(pace / 60) + ":" + pad(Math.round(pace % 60)) + "/km"); }
   if (a.watts) p.push(a.watts + " W");
   if (a.hr) p.push("Ø " + a.hr + " bpm");
+  if (a.maxHr) p.push("max " + a.maxHr + " bpm");
+  if (a.kcal) p.push(a.kcal + " kcal");
   return p.join(" · ");
 }
 

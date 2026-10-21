@@ -585,9 +585,9 @@
       .ex.is-skipped .ex-v { opacity: 0.45; }
       .ex-x {
         flex: none;
-        min-width: 44px;
+        min-width: 36px;
         min-height: 44px;
-        margin: -8px -8px -8px 0;
+        margin: 0;
         padding: 0;
         border: 0;
         background: none;
@@ -3426,7 +3426,8 @@
       .card.carry .exs { margin-bottom: var(--s3); }
       .extras { border-top: 1px solid var(--line); margin-top: var(--s4); padding-top: var(--s1); }
       /* Übung + Feld in einer Zeile (Splits bekommen die ganze Breite) */
-      .ex.row-v { display: grid; grid-template-columns: minmax(0, 1fr) 104px; column-gap: var(--s3); align-items: center; }
+      .ex.row-v { display: grid; grid-template-columns: minmax(0, 1fr) 104px 36px; column-gap: var(--s2); align-items: center; }
+      .ex.row-v > .ex-x { grid-column: 3; grid-row: 1; margin: 0; min-width: 36px; }
       .ex.row-v > .ex-h { grid-column: 1; }
       .ex.row-v > .ex-v { grid-column: 2; margin: 0; }
       .ex.row-v > .quick { grid-column: 1 / -1; }
@@ -3634,6 +3635,17 @@
       #focus .fc-last { align-self: flex-start; padding: 9px 15px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.14); background: transparent; opacity: 0.85; font-size: 0.9rem; cursor: pointer; }
       /* Timer: nur bei Übungen mit Zeitvorgabe */
       #focus .fc-timer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-radius: 22px; background: rgba(255, 255, 255, 0.055); border: 1px solid rgba(255, 255, 255, 0.07); }
+      #focus .fc-run { display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 22px; background: rgba(255, 255, 255, 0.055); border: 1px solid rgba(255, 255, 255, 0.07); text-align: center; }
+      #focus .fc-run[data-ph="work"] { border-color: var(--accent); }
+      #focus .fc-run[data-ph="rest"] { border-color: #5b9bd5; }
+      #focus .fc-run[data-ph="done"] { border-color: #6cc08b; background: rgba(108, 192, 139, 0.12); }
+      #focus .fc-rl { font-weight: 650; opacity: 0.85; }
+      #focus .fc-rt { font-size: clamp(3rem, 16vw, 4.6rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+      #focus .fc-rg, #focus .fc-rn { opacity: 0.65; font-size: 0.9rem; }
+      #focus .fc-live { min-height: 1.2em; font-size: 0.95rem; font-variant-numeric: tabular-nums; opacity: 0.8; }
+      #focus .fc-rb { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
+      #focus .fc-rb button { height: 56px; padding: 0 22px; border-radius: 16px; border: 0; background: rgba(255, 255, 255, 0.09); color: inherit; font-size: 1.05rem; font-weight: 650; cursor: pointer; }
+      #focus .fc-rb button.go { background: var(--accent); color: #16130a; flex: 1 1 60%; }
       #focus .fc-timer[data-ph="work"] { border-color: var(--accent); }
       #focus .fc-timer[data-ph="rest"] { border-color: #5b9bd5; }
       #focus .fc-timer[data-ph="done"] { border-color: #6cc08b; background: rgba(108, 192, 139, 0.12); }
@@ -3882,6 +3894,8 @@
       import { normTime } from "./src/timeinput.js";
       import { repSummary } from "./src/laps.js";
       import { planSteps } from "./src/garmin-workout.js";
+      import { flatten, targetSec, phaseTitle, phaseGoal, splitSummary } from "./src/run-timer.js";
+      import { FTMS_SERVICE, TREADMILL_DATA, parseTreadmill, buildTreadmill } from "./src/ftms.js";
       /* Lauf- und Stationszeilen als Bausteine; erkennt die Zeile nichts sicher, bleibt der Originaltext */
       const lineHtml = (t) => fmtLine(t) || esc(t);
       /* Übung auslassen (✗): bleibt sichtbar, durchgestrichen, zählt nicht als „nicht gemacht“. Nochmal tippen = wieder offen. */
@@ -4544,7 +4558,7 @@
             const id = c.from + "|" + j,
               on = !!S.done[id],
               sk = !!S.xs[id];
-            h += `<div class="ex row-v${lineSlots(t) ? " wide" : ""} ${on ? "is-done" : ""}${sk ? " is-skipped" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${lineHtml(t)}</span>${skipBtn(id, t, sk)}</label>`;
+            h += `<div class="ex row-v${lineSlots(t) ? " wide" : ""} ${on ? "is-done" : ""}${sk ? " is-skipped" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${lineHtml(t)}</span></label>${skipBtn(id, t, sk)}`;
             if (!isFiller(t))
               h += lineSlots(t) ? slotsField(id, lineSlots(t), S.val[id]) : `<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id] || "")}" placeholder="${placeholder(isLift(p.k, t) ? "kraft" : p.k, t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
             h += `</div>`;
@@ -4656,7 +4670,7 @@
           const wide = (p.k === "lauf" && dash.parseReps(t)) || !!lineSlots(t);
           h += single
             ? `<div class="ex ${on ? "is-done" : ""}"><div class="ex-h hold" data-hold="${i}"${on ? " data-undo" : ""} role="button" tabindex="0" aria-label="${esc(t)} – gedrückt halten, um ${on ? "wieder zu öffnen" : "abzuschliessen"}"><i class="hold-fill" aria-hidden="true"></i><span>${lineHtml(t)}</span><em class="hold-hint" aria-hidden="true">${on ? "Halten ↺" : "Halten ✓"}</em></div>`
-            : `<div class="ex row-v${wide ? " wide" : ""} ${on ? "is-done" : ""}${sk ? " is-skipped" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${lineHtml(t)}</span>${skipBtn(id, t, sk)}</label>`;
+            : `<div class="ex row-v${wide ? " wide" : ""} ${on ? "is-done" : ""}${sk ? " is-skipped" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${lineHtml(t)}</span></label>${skipBtn(id, t, sk)}`;
           if (!isFiller(t)) {
             const lift = isLift(p.k, t),
               le = lastEntry(i, t),
@@ -7685,6 +7699,128 @@
       function fcTimerReset() {
         clearInterval(fcT.iv);
         fcT = { run: false, t0: 0, acc: 0, iv: null, last: "", spec: null };
+        fcRReset();
+      }
+
+      /* ---------- Lauf-Timer: Einlaufen, Intervalle, Trabpausen, Auslaufen als Abschnitte (src/run-timer.js) ----------
+         Zeit läuft pro Abschnitt hoch, "Nächster Schritt" hält die Zeit fest, am Ende kommen die Zeiten in die Zeile.
+         Mit Bluetooth-Laufband (FTMS) wechselt ein Abschnitt mit Distanz von selbst, wenn die Distanz erreicht ist. */
+      let fcR = null, // {id, ph, idx, log, run, t0, acc, iv, beeped, base}
+        fcBT = { dev: null, live: null, simIv: null };
+      const BTSIM = (location.search.match(/[?&]sim=?(\d*)/) || [])[1]; /* ?sim=14: Laufband-Simulator mit 14 km/h, zum Testen ohne Gerät */
+      const runPhases = (p, j) => (p.k === "lauf" ? flatten(planSteps({ k: "lauf", i: [p.i[j]] }).steps) : []);
+      const rSec = () => (fcR ? (fcR.acc + (fcR.run ? Date.now() - fcR.t0 : 0)) / 1000 : 0);
+      function fcRReset() {
+        if (fcR) clearInterval(fcR.iv);
+        fcR = null;
+      }
+      const liveText = () => {
+        const l = fcBT.live;
+        if (!l || l.kmh == null) return fcBT.dev ? "Laufband verbunden, warte auf Daten" : "";
+        return [fcBT.simIv ? "Test" : "", `${l.kmh.toFixed(1).replace(".", ",")} km/h`, l.pace ? `${mmss(l.pace)}/km` : "", l.distM != null ? `${l.distM} m` : ""].filter(Boolean).join(" · ");
+      };
+      /* Daten vom Laufband (echt oder Simulator) übernehmen */
+      function fcBTFeed(dv) {
+        fcBT.live = parseTreadmill(dv);
+        const lv = document.getElementById("fc-live");
+        if (lv) lv.textContent = liveText();
+      }
+      function fcBTSim() {
+        if (fcBT.simIv) {
+          clearInterval(fcBT.simIv);
+          fcBT = { dev: null, live: null, simIv: null };
+          return focusRender();
+        }
+        const kmh = +BTSIM || 14;
+        let dist = 0;
+        fcBT.dev = { sim: true };
+        fcBT.simIv = setInterval(() => {
+          dist += (kmh / 3.6) * 0.25;
+          fcBTFeed(new DataView(buildTreadmill(kmh, dist).buffer));
+        }, 250);
+        toast("Laufband-Simulator an");
+        focusRender();
+      }
+      function fcRTick() {
+        if (!fcR) return;
+        const ph = fcR.ph[fcR.idx];
+        if (!ph) return;
+        const e = document.getElementById("fc-rt");
+        if (e) e.textContent = mmss(Math.floor(rSec()));
+        const lv = document.getElementById("fc-live");
+        if (lv) lv.textContent = liveText();
+        const t = targetSec(ph);
+        if (t && !fcR.beeped && rSec() >= t) {
+          fcR.beeped = true;
+          fcBeep(false); // Zielzeit des Abschnitts erreicht
+        }
+        const d = fcBT.live && fcBT.live.distM;
+        if (fcR.run && ph.dist && !ph.lap && d != null && fcR.base != null && d - fcR.base >= ph.dist) fcRNext();
+      }
+      function fcRNext() {
+        const p = dayPlan(focusI), ph = runPhases(p, focusJ), id = keyI(focusI) + "|" + focusJ;
+        if (!ph.length) return;
+        if (!fcR || fcR.id !== id) fcR = { id, ph, idx: 0, log: [], run: false, t0: 0, acc: 0, iv: null, beeped: false, base: null };
+        if (!fcR.run) {
+          fcR.run = true;
+          fcR.t0 = Date.now();
+          fcR.base = fcBT.live && fcBT.live.distM != null ? fcBT.live.distM : null;
+          fcBeep(false); // der erste Ton entsperrt auch den Ton auf dem Handy
+          fcR.iv = setInterval(fcRTick, 250);
+          return focusRender();
+        }
+        fcR.log[fcR.idx] = Math.round(rSec());
+        fcR.idx++;
+        if (fcR.idx >= ph.length) {
+          clearInterval(fcR.iv);
+          fcR.run = false;
+          const sum = splitSummary(ph, fcR.log);
+          if (sum && !S.val[id]) {
+            S.val[id] = sum;
+            save();
+            toast("Zeiten eingetragen");
+          } else if (sum) toast("Vorhandener Eintrag bleibt, Zeiten: " + sum);
+          fcBeep(true);
+        } else {
+          fcR.acc = 0;
+          fcR.t0 = Date.now();
+          fcR.beeped = false;
+          fcR.base = fcBT.live && fcBT.live.distM != null ? fcBT.live.distM : null;
+          fcBeep(true);
+        }
+        focusRender();
+      }
+      async function fcBTConnect() {
+        if (!navigator.bluetooth) return toast("Bluetooth geht nur in Chrome auf Android", true);
+        try {
+          const dev = await navigator.bluetooth.requestDevice({ filters: [{ services: [FTMS_SERVICE] }] });
+          const srv = await dev.gatt.connect();
+          const chr = await (await srv.getPrimaryService(FTMS_SERVICE)).getCharacteristic(TREADMILL_DATA);
+          chr.addEventListener("characteristicvaluechanged", (ev) => fcBTFeed(ev.target.value));
+          await chr.startNotifications();
+          dev.addEventListener("gattserverdisconnected", () => {
+            fcBT = { dev: null, live: null, simIv: null };
+            if (focusI != null) focusRender();
+          });
+          fcBT.dev = dev;
+          toast("Laufband verbunden");
+        } catch (e) {
+          toast(e && e.name === "NotFoundError" ? "Kein Laufband gefunden. Es muss Bluetooth-Fitness (FTMS) senden." : "Laufband nicht verbunden", true);
+        }
+        if (focusI != null) focusRender();
+      }
+      /* Anzeige des Lauf-Timers für die aktuelle Zeile */
+      function fcRHtml(ph, id) {
+        const r = fcR && fcR.id === id ? fcR : null;
+        const idx = r ? r.idx : 0, fin = !!r && idx >= ph.length, cur = ph[Math.min(idx, ph.length - 1)], nxt = ph[idx + 1];
+        const started = !!r && (r.run || r.idx > 0 || r.acc > 0);
+        const label = fin ? "" : !r || !r.run ? "Start" : idx === ph.length - 1 ? "Fertig" : "Nächster Schritt";
+        const kind = fin ? "done" : !r || !r.run ? "idle" : cur.kind === "recovery" ? "rest" : "work";
+        const bt = BTSIM != null ? `<button type="button" data-fc="btsim">${fcBT.simIv ? "Simulator aus" : "Laufband simulieren"}</button>` : navigator.bluetooth ? `<button type="button" data-fc="bt">${fcBT.dev ? "Laufband ✓" : "Laufband verbinden"}</button>` : "";
+        return `<div class="fc-run" data-ph="${kind}"><div class="fc-rl" id="fc-rl">${fin ? "Alle Abschnitte gelaufen ✓" : esc(phaseTitle(cur))}</div>
+    <div class="fc-rt" id="fc-rt">${fin ? "" : mmss(Math.floor(rSec()))}</div><div class="fc-rg">${fin ? "" : esc(phaseGoal(cur))}</div>
+    ${nxt && !fin ? `<div class="fc-rn">Danach: ${esc(phaseTitle(nxt))} · ${esc(phaseGoal(nxt))}</div>` : ""}<div class="fc-live" id="fc-live">${esc(liveText())}</div>
+    <div class="fc-rb">${fin ? "" : `<button type="button" class="go" data-fc="rnext">${label}</button>`}${started ? `<button type="button" data-fc="rreset">Neu</button>` : ""}${bt}</div></div>`;
       }
       /* Anzeige des Timers: {time, label, ph ("work"|"rest"|"done"|"idle"), key} */
       function fcView(spec) {
@@ -7782,8 +7918,9 @@
           else field = `<div class="fc-field"><div class="fc-val">${input}<small>Zeit oder Wert</small></div></div>`;
         }
         // Timer nur, wenn der Plan eine Zeit vorgibt
-        const spec = timedSpec(t, p.k);
-        let timer = "";
+        const runPh = runPhases(p, focusJ);
+        const spec = runPh.length ? null : timedSpec(t, p.k);
+        let timer = runPh.length ? fcRHtml(runPh, id) : "";
         if (spec) {
           const v = fcT.spec && fcT.spec.work === spec.work && fcT.spec.rounds === spec.rounds ? fcView(spec) : { time: mmss(spec.work), label: spec.label + (spec.rounds > 1 ? ` · ${spec.rounds} Runden` : ""), ph: "idle" };
           const started = fcT.spec && fcElapsed() > 0;
@@ -7813,6 +7950,10 @@
         focusRender();
       }
       function focusClose() {
+        if (fcBT.simIv) {
+          clearInterval(fcBT.simIv);
+          fcBT = { dev: null, live: null, simIv: null };
+        }
         focusI = null;
         focusFin = false;
         fcTimerReset();
@@ -7928,6 +8069,13 @@
           return focusRender("next");
         }
         if (a === "tstart") return fcTimerToggle();
+        if (a === "rnext") return fcRNext();
+        if (a === "rreset") {
+          fcRReset();
+          return focusRender();
+        }
+        if (a === "bt") return fcBTConnect();
+        if (a === "btsim") return fcBTSim();
         if (a === "treset") {
           fcTimerReset();
           return focusRender();

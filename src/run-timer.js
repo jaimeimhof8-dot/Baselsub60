@@ -1,0 +1,52 @@
+// Lauf-Timer für den Fokusmodus: die Schritte einer Planzeile (src/garmin-workout.js planSteps) als Abfolge von Abschnitten,
+// je Abschnitt die gelaufene Zeit festhalten und daraus den Eintrag für die Zeile bauen. Reine Funktionen, ohne DOM.
+import { mmss } from "./util.js";
+
+const KIND_LABEL = { warmup: "Einlaufen", cooldown: "Auslaufen", interval: "Intervall", recovery: "Trabpause" };
+
+/** Schritte (mit Wiederholungsgruppen) zu einer flachen Abfolge: [{kind, dist?, pace?, lap?, round?, rounds?}] */
+export function flatten(steps) {
+  const out = [];
+  for (const s of steps || []) {
+    if (s.kind === "repeat") for (let r = 1; r <= s.n; r++) for (const c of s.steps) out.push({ ...c, round: r, rounds: s.n });
+    else out.push({ ...s });
+  }
+  // Nummerierung der Intervalle über die ganze Einheit (Intervall 2/3), Wiederholungsgruppen sind schon aufgelöst
+  const total = out.filter((p) => p.kind === "interval").length;
+  let k = 0;
+  return out.map((p) => (p.kind === "interval" ? { ...p, nr: ++k, of: total } : p));
+}
+
+export const distLabel = (m) => (m >= 1000 ? `${(m / 1000).toString().replace(".", ",")} km` : `${m} m`);
+
+/** Zielzeit in Sekunden (Distanz × Pace) oder null, wenn der Abschnitt keine feste Distanz und Pace hat. */
+export const targetSec = (p) => (p && p.dist && p.pace ? Math.round((p.dist / 1000) * p.pace) : null);
+
+/** Titel des Abschnitts: "Intervall 2/3", "Trabpause", "Einlaufen" */
+export function phaseTitle(p) {
+  if (!p) return "";
+  return p.kind === "interval" && p.of > 1 ? `Intervall ${p.nr}/${p.of}` : KIND_LABEL[p.kind] || "Lauf";
+}
+
+/** Zweite Zeile: "1,5 km @ 4:10/km · Ziel 6:15" bzw. "Runden-Taste drücken" */
+export function phaseGoal(p) {
+  if (!p) return "";
+  if (p.lap) return "weiter mit Tipp auf „Nächster Schritt“";
+  const t = targetSec(p);
+  return [p.pace ? `${distLabel(p.dist)} @ ${mmss(p.pace)}/km` : distLabel(p.dist), t ? `Ziel ${mmss(t)}` : ""].filter(Boolean).join(" · ");
+}
+
+/** Eintrag für die Zeile aus den gelaufenen Zeiten (log: Sekunden je Abschnitt, gleiche Reihenfolge wie phases).
+ * Trabpausen zählen nicht. "3×1,5 km: 6:12 · 6:10 · 6:18 (Ø 4:09/km)".
+ * @returns {string} leer, wenn nichts Auswertbares gelaufen wurde */
+export function splitSummary(phases, log) {
+  const w = [];
+  (phases || []).forEach((p, i) => {
+    if (p.kind !== "recovery" && p.dist && log[i] > 0) w.push({ d: p.dist, t: log[i] });
+  });
+  if (!w.length) return "";
+  const dist = w.reduce((s, x) => s + x.d, 0), time = w.reduce((s, x) => s + x.t, 0);
+  const same = w.every((x) => x.d === w[0].d);
+  const head = w.length > 1 && same ? `${w.length}×${distLabel(w[0].d)}` : distLabel(dist);
+  return `${head}: ${w.map((x) => mmss(x.t)).join(" · ")} (Ø ${mmss(time / (dist / 1000))}/km)`;
+}

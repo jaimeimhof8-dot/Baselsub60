@@ -18,6 +18,7 @@
 // }
 import { impact, summarize, overloadText } from "./soreness.js";
 import { overloadWithExtras } from "./extras.js";
+import { isEasyRun } from "./util.js";
 // Vorschlag = {id, type: "swap"|"easy"|"alt", day, to?, title, why, extra?: true (durch Zusatz-Einheiten ausgelöst)}
 
 export const CHECKIN_FIELDS = [
@@ -25,7 +26,7 @@ export const CHECKIN_FIELDS = [
 ];
 const PTS = { g: 0, y: 1, r: 2 };
 const HARD = ["kraft", "lauf", "station", "sim"];
-const isHard = (p) => !!p && HARD.includes(p.k) && !p.inj;
+const isHard = (p) => !!p && HARD.includes(p.k) && !p.inj && !isEasyRun(p);
 const DOW_FRI = 4;
 
 /** Ampel aus dem Check-in: "green" | "yellow" | "red" | null (unvollständig). */
@@ -51,6 +52,23 @@ const isDone = (ctx, i) => {
 function hardNeighbour(ctx, from, to) {
   const after = (x) => (x === to ? ctx.plan(from) : x === from ? ctx.plan(to) : ctx.plan(x));
   return isHard(after(to - 1)) || isHard(after(to + 1));
+}
+
+/** Nach einem Tausch: liegt an einem der Tage `days` jetzt hart direkt auf hart, wird der spätere der beiden zum Entlasten vorgeschlagen.
+ *  Ohne Problem leer. Erledigte, ausgefallene, schon entlastete und vergangene Tage bleiben unberührt. */
+export function swapFixes(ctx, days) {
+  const out = [], seen = new Set();
+  for (const d of days) for (const a of [d - 1, d]) {
+    const b = a + 1;
+    if (seen.has(b) || a < 0 || b > ctx.last || b < ctx.today) continue;
+    const pa = ctx.plan(a), pb = ctx.plan(b);
+    if (!isHard(pa) || !isHard(pb) || pa.easy || pb.easy || pb.back) continue;
+    if (isDone(ctx, b) || (ctx.skipped && ctx.skipped(b)) || (ctx.off && ctx.off(b))) continue;
+    seen.add(b);
+    out.push({ id: `swapfix:${b}`, type: "easy", day: b, from: a, titleFrom: pa.t, title: `${pb.t} entlasten`,
+      why: `„${pa.t}“ und „${pb.t}“ liegen jetzt direkt hintereinander.` });
+  }
+  return out.sort((x, y) => x.day - y.day);
 }
 
 /** Nächster freier, nicht fixer Ruhetag ab `start` (bis `end`), möglichst ohne hart-auf-hart. */

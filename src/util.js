@@ -10,7 +10,9 @@ export const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => (
 export const exName = (t) => String(t).split(/\s\d|\s@|\s–|,|\sRPE\b/i)[0].trim().toLowerCase().replace(/s$/, "");
 
 export const isTraining = (d) => !!d && d.k !== "rest";
-export const isHard = (d) => !!d && HARD_KINDS.includes(d.k);
+/** Lockerer Dauerlauf (Zone 2): zählt trotz Art "lauf" nicht als harte Einheit. Intervall- und Testläufe bleiben hart. */
+export const isEasyRun = (d) => !!d && d.k === "lauf" && /^(lockerer lauf|lauf zone 2)\b/i.test(d.t || "");
+export const isHard = (d) => !!d && HARD_KINDS.includes(d.k) && !isEasyRun(d);
 
 /** Inhaltlicher Vergleich zweier Tage (ohne Metadaten wie src/why). */
 export function sameDay(a, b) {

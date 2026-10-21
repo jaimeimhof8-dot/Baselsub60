@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readiness, suggest, isFixedRest, findSlot } from "../src/adapt.js";
+import { readiness, suggest, isFixedRest, findSlot, swapFixes } from "../src/adapt.js";
 
 // Standardwoche: Mo Kraft, Di Lauf, Mi Bike, Do Station, Fr Ruhe (fix), Sa Bike, So Ruhe
 const WEEK = [["Kraft 1", "kraft"], ["Intervall", "lauf"], ["Zone 2", "bike"], ["Kraft 2", "station"], ["Ruhetag", "rest"], ["Lange Fahrt", "bike"], ["Ruhetag", "rest"]];
@@ -102,4 +102,40 @@ test("Gestrichene Einheit (Heute nicht) wird nicht zum Nachholen vorgeschlagen",
   });
   assert.ok(suggest(mk(() => false)).some((s) => s.id === "miss:2"));
   assert.ok(!suggest(mk((i) => i === 2)).some((s) => /:2$/.test(s.id)));
+});
+
+test("Tausch ohne hart auf hart -> kein Eingriff", () => {
+  assert.deepEqual(swapFixes(ctx(), [9]), []);
+});
+
+test("Tausch mit hart auf hart -> spätere Einheit zum Entlasten", () => {
+  const c = ctx();
+  c.sched[9] = { t: "Lauf", k: "lauf" }; c.sched[10] = { t: "Bike", k: "bike" };
+  const f = swapFixes(c, [9, 10]);
+  assert.equal(f.length, 1);
+  assert.equal(f[0].type, "easy"); assert.equal(f[0].day, 9);
+});
+
+test("Tausch: erledigte, entlastete, ausgefallene und vergangene Tage bleiben unberührt", () => {
+  const mk = (over = {}) => { const c = ctx(over); c.sched[9] = { t: "Lauf", k: "lauf" }; c.sched[10] = { t: "Bike", k: "bike" }; return c; };
+  assert.equal(swapFixes(mk(), [9]).length, 1);
+  assert.deepEqual(swapFixes(mk({ status: (i) => ({ n: 1, done: i === 9 ? 1 : 0 }) }), [9]), []);
+  assert.deepEqual(swapFixes(mk({ skipped: (i) => i === 9 }), [9]), []);
+  const e = mk(); e.sched[9].easy = 1;
+  assert.deepEqual(swapFixes(e, [9]), []);
+  assert.deepEqual(swapFixes(mk({ today: 10 }), [9]), []);
+});
+
+test("lockerer Lauf und Lauf Zone 2 sind nie hart, Intervalle schon", () => {
+  const c = ctx();
+  c.sched[9] = { t: "Lockerer Lauf", k: "lauf" }; c.sched[10] = { t: "Lauf Zone 2", k: "lauf" };
+  assert.deepEqual(swapFixes(c, [9, 10]), []);
+  c.sched[9] = { t: "Extensive Schwelle Intervall", k: "lauf" };
+  assert.equal(swapFixes(c, [9]).length, 1);
+});
+
+test("Tausch: entlastete Einheit zählt nicht als hart (kein Eingriff)", () => {
+  const c = ctx();
+  c.sched[9] = { t: "Lauf", k: "lauf", easy: 1 }; c.sched[10] = { t: "Kraft", k: "kraft" };
+  assert.deepEqual(swapFixes(c, [9, 10]), []);
 });

@@ -3829,6 +3829,7 @@
         parseT,
         avg,
         exName,
+        isEasyRun,
       } from "./src/util.js";
       import {
         activePlan,
@@ -3843,6 +3844,7 @@
       import { fileToText } from "./src/pdf-import.js";
       import {
         suggest,
+        swapFixes,
         readiness,
         isFixedRest,
         CHECKIN_FIELDS,
@@ -4030,7 +4032,7 @@
       /* ---------- Helfer ---------- */
       const $ = (s) => document.querySelector(s);
       const HARD = ["kraft", "lauf", "station", "sim"];
-      const isHardP = (p) => !!p && HARD.includes(p.k);
+      const isHardP = (p) => !!p && HARD.includes(p.k) && !isEasyRun(p);
 
       /* ---------- Gemeinsame Planänderungen (Tabelle shared_edits, siehe supabase/shared_edits.sql) ---------- */
       let TEAM_EDITS = {}; // {tagIndex: {data: {t,k,i,n}, by, at}}
@@ -4167,12 +4169,15 @@
         if (!o.inj && S.solo[keyI(i)] && canSolo(p)) p = soloize(p, PARTNER);
         return p;
       }
-      /* Einheiten von Tag i und j tauschen. Abgehakte Übungen, Werte und der Solo-Schalter wandern mit der Einheit mit. */
+      /* Einheiten von Tag i und j tauschen. Abgehakte Übungen, Werte, der Solo-Schalter und „Entlastet“ wandern mit der Einheit mit
+         (Verletzung und Comeback hängen am Datum und bleiben). */
       function swapDays(i, j) {
         const a = srcOf(i),
-          b = srcOf(j);
-        setE(i, { src: b });
-        setE(j, { src: a });
+          b = srcOf(j),
+          ea = S.sched[i] && S.sched[i].easy,
+          eb = S.sched[j] && S.sched[j].easy;
+        setE(i, { src: b, easy: eb ? 1 : null });
+        setE(j, { src: a, easy: ea ? 1 : null });
         swapDayData(S, keyI(i), keyI(j));
       }
       function restoreDay(i) {
@@ -4184,13 +4189,17 @@
           if (x !== i && srcOf(x) === i) return swapDays(i, x);
         setE(i, { src: null });
       }
-      /* Wäre nach dem Tausch an Tag j hart auf hart? */
-      function hardWarn(i, j) {
+      /* Tage, die nach dem Tausch von i und j hart neben einer getauschten harten Einheit liegen (für das Abzeichen in der Liste) */
+      function hardClash(i, j) {
         const after = (x) =>
           x === i ? dayPlan(j) : x === j ? dayPlan(i) : dayPlan(x);
-        return (
-          isHardP(after(j)) && (isHardP(after(j - 1)) || isHardP(after(j + 1)))
-        );
+        const hard = (p) => isHardP(p) && !p.easy; // entlastete Einheit zählt nicht als hart
+        const out = [];
+        for (const d of [i, j])
+          if (hard(after(d)))
+            for (const n of [d - 1, d + 1])
+              if (hard(after(n)) && !out.includes(n)) out.push(n);
+        return out.sort((a, b) => a - b);
       }
       function applyInjury(start, days, mode) {
         const end = Math.min(LAST, start + days - 1);
@@ -5220,11 +5229,43 @@
       }
 
       let moveFrom = null,
+        swapUndo = null, // {i, j, skip}: letzter Tausch von Hand, damit „Tausch rückgängig“ auch die Ausfall-Markierungen zurückbringt
+        swapPair = null, // zuletzt von Hand getauschte Tage: danach nur bei hart auf hart ein Entlasten-Hinweis
         prevView = "today",
         injStart = null,
         injDays = 3,
         injMode = "alt";
 
+      /* Nach einem Tausch von Hand: nur bei hart auf hart ein Vorschlag, den späteren Tag zu entlasten. Sonst nichts. */
+      function swapFixes_() {
+        if (!swapPair) return [];
+        return swapFixes(
+          {
+            today: TODAY,
+            last: LAST,
+            plan: dayPlan,
+            status: dayStatus,
+            skipped: (i) => !!S.skip[keyI(i)],
+            off: (i) => !!S.off[keyI(i)],
+            rpe: (i) => S.rpe[keyI(i)] ?? undefined,
+            strava: (i) => rc().byDay[i],
+          },
+          swapPair,
+        );
+      }
+      function swapFixHtml() {
+        const fx = swapFixes_();
+        const undo = swapUndo
+          ? `<button class="btn ghost sm" style="margin-bottom:var(--s3)" data-act="swap-undo">Letzten Tausch rückgängig (${esc(shortDay(swapUndo.i))} ↔ ${esc(shortDay(swapUndo.j))})</button>`
+          : "";
+        if (!fx.length) return undo;
+        return undo + `<div class="card tight"><b>Hart auf hart</b>${fx
+          .map(
+            (f) =>
+              `<div class="mt-3"><p class="sub">${esc(shortDay(f.from))}: „${esc(f.titleFrom)}“ und ${esc(shortDay(f.day))}: „${esc(dayPlan(f.day).t)}“ liegen jetzt direkt hintereinander.</p><button class="btn primary sm mt-2" data-act="swapfix" data-i="${f.day}">${esc(shortDay(f.day))} entlasten</button></div>`,
+          )
+          .join("")}<button class="btn ghost sm mt-3" data-act="swapfix-no">Alles so lassen</button><p class="sub mt-3">Entlasten heisst: ca. 75 % Volumen, RPE max. 6.</p></div>`;
+      }
       /* Reiter „Umplanen“ im Coach: Tag wählen, dann tauschen, ausfallen lassen, Übungen anpassen */
       function moveHtml() {
         if (moveFrom == null)
@@ -5235,7 +5276,7 @@
           rest = p.k === "rest";
         const from = Math.max(Math.floor(i / 7) * 7, TODAY, 0),
           to = Math.min(LAST, Math.max(Math.floor(i / 7) * 7 + 13, from + 6));
-        let h = `<div class="cap" style="margin-top:0">Welcher Tag?</div><div class="wk"><button data-act="mv-day" data-d="-1" ${i <= 0 ? "disabled" : ""} aria-label="Einen Tag früher">‹</button>
+        let h = swapFixHtml() + `<div class="cap" style="margin-top:0">Welcher Tag?</div><div class="wk"><button data-act="mv-day" data-d="-1" ${i <= 0 ? "disabled" : ""} aria-label="Einen Tag früher">‹</button>
       <div><h3>${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))}</h3>${i === TODAY ? `<div class="sub">heute</div>` : `<button class="btn ghost sm" data-act="mv-today" style="margin-top:2px">zu heute</button>`}</div>
       <button data-act="mv-day" data-d="1" ${i >= LAST ? "disabled" : ""} aria-label="Einen Tag später">›</button></div>
     <div class="card tight k-${p.k}"><span class="kind">${KIND[p.k]}</span><h3 class="mt-1">${esc(p.t)}</h3>${dayBadges(i, p) ? `<div class="badges mt-2">${dayBadges(i, p)}</div>` : ""}</div>`;
@@ -5259,7 +5300,7 @@
       <button class="btn ${S.skip[dk] ? "" : "primary"}" data-act="skip">${S.skip[dk] ? "Doch nicht ausgefallen" : "Als ausgefallen markieren"}</button>`;
         }
         h += `<div class="cap">${rest ? "Diese Einheit hierher holen" : "Tauschen mit"}</div>
-    <p class="sub" style="margin:calc(-1 * var(--s1)) 0 var(--s3)">Die Einheiten tauschen den Tag. ${rest ? "" : "Freie Tage sind am besten."}</p><div class="list">`;
+    <p class="sub" style="margin:calc(-1 * var(--s1)) 0 var(--s3)">Die Einheiten tauschen den Tag. ${rest ? "" : "Freie Tage sind am besten."} „Hart auf hart“ heisst: Danach lägen zwei harte Einheiten direkt hintereinander (der genannte Tag ist der Nachbar). Das geht, ist aber nicht ideal.</p><div class="list">`;
         let any = false;
         for (let j = from; j <= to; j++) {
           if (j === i) continue;
@@ -5273,15 +5314,18 @@
                 ? `<span class="badge">fixer Ruhetag</span>`
                 : `<span class="badge ok">frei</span>`,
             );
-          if (hardWarn(i, j) || hardWarn(j, i))
-            tags.push(`<span class="badge warn">hart auf hart</span>`);
+          const clash = hardClash(i, j);
+          if (clash.length)
+            tags.push(
+              `<span class="badge warn">hart auf hart · ${clash.map((n) => `${DAYS[dow(n)]} ${dateFromIdx(n).getDate()}.`).join(", ")}</span>`,
+            );
           any = true;
           h += `<button class="day k-${q.k}" data-swap="${j}"><span class="d">${DAYS[dow(j)]}<b>${dateFromIdx(j).getDate()}</b></span>
       <span class="t"><b>${esc(q.t)}</b><span class="kind">${KIND[q.k]}</span></span><span class="meta"><span class="badges">${tags.join("")}</span></span></button>`;
         }
         if (!any)
           h += `<p class="sub" style="padding:var(--s4) 0">Keine passenden Tage in Reichweite.</p>`;
-        h += `</div><p class="sub">„Hart auf hart“ = zwei harte Einheiten direkt hintereinander. Geht, aber besser vermeiden.</p>`;
+        h += `</div>`;
         h += `<div class="cap">Verletzt oder krank?</div><button class="btn" data-act="inj-from">Ab diesem Tag anpassen →</button>`;
         if (S.sched[i])
           h += `<div class="cap">Änderung rückgängig</div><button class="btn" data-act="restore">Original wiederherstellen</button>`;
@@ -8840,6 +8884,31 @@
           toast("Einheit entlastet: ca. 75 % Volumen, RPE max. 6");
           return render();
         }
+        if (d.act === "swapfix") {
+          setE(+d.i, { easy: 1 });
+          if (swapUndo) swapUndo.eased.push(+d.i);
+          save();
+          toast("Einheit entlastet: ca. 75 % Volumen, RPE max. 6");
+          return render();
+        }
+        if (d.act === "swapfix-no") {
+          swapPair = null;
+          return render();
+        }
+        if (d.act === "swap-undo" && swapUndo) {
+          const { i, j, skip, eased } = swapUndo;
+          eased.forEach((x) => setE(x, { easy: null })); // Entlastung aus der Karte zuerst weg, damit sie nicht an der Einheit hängen bleibt
+          swapDays(i, j);
+          [i, j].forEach((x, n) => {
+            if (skip[n]) S.skip[keyI(x)] = 1;
+            else delete S.skip[keyI(x)];
+          });
+          swapUndo = swapPair = null;
+          moveFrom = i;
+          save();
+          toast("Tausch rückgängig");
+          return render();
+        }
         if (d.act === "strava-no") {
           S.dismiss["stv:" + d.i] = 1;
           save();
@@ -9179,7 +9248,10 @@
             j = +d.swap,
             pulled = dayPlan(i).k === "rest",
             to = pulled ? i : j;
+          const skipBefore = [!!S.skip[keyI(i)], !!S.skip[keyI(j)]];
           swapDays(i, j);
+          swapPair = [i, j];
+          swapUndo = { i, j, skip: skipBefore, eased: [] };
           save();
           moveFrom = to;
           render();

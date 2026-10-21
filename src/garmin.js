@@ -32,7 +32,7 @@ export function loginErrorText(status, code) {
 export function errorText(status, code) {
   if (status === 404 && !code) return MSG.notDeployed;
   return { no_secret: MSG.noSecret, forbidden: MSG.forbidden, bad_tokens: MSG.badTokens, relogin: MSG.relogin,
-    rate: MSG.rate, not_connected: MSG.notConnected }[code] || MSG.down;
+    rate: MSG.rate, not_connected: MSG.notConnected, bad_request: "Der Server kennt diese Garmin-Funktion noch nicht. Edge Function neu deployen: supabase functions deploy garmin --no-verify-jwt.", bad_workout: "Das Workout konnte nicht in das Garmin-Format umgesetzt werden." }[code] || MSG.down;
 }
 
 /** Edge Function aufrufen (invoke wie supabase-js functions.invoke). Offline → TypeError, sonst Error mit {code, status}. */

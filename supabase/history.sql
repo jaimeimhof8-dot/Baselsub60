@@ -20,7 +20,7 @@ language sql immutable set search_path = public as $$
   select coalesce(sum(case when jsonb_typeof(d -> k) = 'object' then (select count(*) from jsonb_object_keys(d -> k)) else 0 end), 0)::int
     + case when jsonb_typeof(d -> 'strava' -> 'acts') = 'object' then (select count(*) from jsonb_object_keys(d -> 'strava' -> 'acts'))::int else 0 end
     + case when jsonb_typeof(d -> 'plan') = 'object' then 1 else 0 end
-  from unnest(array['done','val','rpe','notes','sched','skip','edit','checkin','dismiss','weights','sore','extra','solo','onb','review','later']) k;
+  from unnest(array['done','xs','val','rpe','notes','sched','skip','edit','checkin','dismiss','weights','sore','extra','solo','onb','review','later']) k;
 $$;
 
 create or replace function public.plan_state_snapshot() returns trigger

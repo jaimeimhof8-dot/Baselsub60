@@ -91,3 +91,11 @@ test("countEntries zählt Listen, Aktivitäten, Tests und Plan", () => {
   assert.equal(countEntries(null), 0);
   assert.equal(countEntries({ done: { a: 1 }, strava: { acts: { x: {} } }, tests: { lauf: { j: ["3:50", ""] }, trans: ["", "6"] }, plan: { days: {} } }), 5);
 });
+
+test("Ausgelassene Übungen (xs) beider Geräte bleiben erhalten", () => {
+  const base = st({ xs: {}, _t: 10 });
+  const phone = st({ xs: { "2026-10-12|2": 1 }, _t: 20 });
+  const laptop = st({ xs: { "2026-10-13|0": 1 }, _t: 30 });
+  const m = mergeState(base, phone, laptop);
+  assert.deepEqual(Object.keys(m.xs).sort(), ["2026-10-12|2", "2026-10-13|0"]);
+});

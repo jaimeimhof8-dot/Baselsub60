@@ -10,10 +10,12 @@
 // Body: {action: "connect", tokens: {di_token, di_refresh_token, di_client_id}} → {connected, name}
 //       {action: "status"}                       → {connected, name, refreshExp, lastError}
 //       {action: "sync", from, to}               → {acts: [...], well: {datum: {...}}, name}
+//       {action: "push-workout", name, steps, date?} → {workoutId, scheduled}  (Lauf-Workout in Garmin Connect anlegen, optional auf den Tag legen)
 //       {action: "disconnect"}                   → {ok}
 //       {action: "refresh-all"} + x-cron-secret  → {refreshed, failed}
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { normalizeAct, normalizeLaps, reduceWell, relevant } from "./reduce.js";
+import { buildWorkout } from "./workout.js";
 
 const KEY = Deno.env.get("GARMIN_TOKEN_KEY") ?? "";
 const CRON = Deno.env.get("GARMIN_CRON_SECRET") ?? "";
@@ -100,6 +102,21 @@ async function api(ctx: { tok: Tok; dirty: boolean }, path: string, params?: Rec
     if (r.status === 204 || r.status === 404) return null;
     if (!r.ok) throw fail("garmin_down", r.status);
     return await r.json();
+  }
+}
+/** POST auf connectapi (JSON); bei 401 einmal erneuern. */
+async function apiPost(ctx: { tok: Tok; dirty: boolean }, path: string, payload: unknown) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let r: Response;
+    try {
+      r = await fetch(API + path, { method: "POST", body: JSON.stringify(payload),
+        headers: { ...NATIVE, Authorization: "Bearer " + ctx.tok.access, Accept: "application/json", "Content-Type": "application/json" } });
+    } catch (_) { throw fail("garmin_down"); }
+    if (r.status === 401 && attempt === 0) { ctx.tok = await refresh(ctx.tok); ctx.dirty = true; continue; }
+    if (r.status === 401 || r.status === 403) throw fail("relogin", r.status);
+    if (r.status === 429) throw fail("rate", 429);
+    if (!r.ok) throw fail("garmin_down", r.status);
+    return r.status === 204 ? null : await r.json().catch(() => null);
   }
 }
 /** Einzelne Erholungs-Abfrage: Fehler nicht abbrechen lassen, aber in diag festhalten (Status bzw. leer). */
@@ -260,6 +277,30 @@ Deno.serve(async (req) => {
         // Neue Tokens auch bei Fehlern sichern, sonst ist das rotierte Refresh-Token verloren
         if (ctx.dirty) await store(db, uid, ctx.tok, (e as { code?: string }).code || "error").catch(() => {});
         else await db.from("garmin_tokens").update({ last_error: (e as { code?: string }).code || "error" }).eq("user_id", uid);
+        throw e;
+      }
+    }
+    if (body.action === "push-workout") {
+      if (!row) return json({ error: "not_connected" }, 400);
+      let workout;
+      try { workout = buildWorkout(body.name as string, body.steps as unknown[]); }
+      catch (_) { return json({ error: "bad_workout" }, 400); }
+      const ctx = { tok: row.tok, dirty: false };
+      try {
+        const made = await apiPost(ctx, "/workout-service/workout", workout) as { workoutId?: number } | null;
+        if (!made?.workoutId) throw fail("garmin_down");
+        let scheduled = false, scheduleError: string | null = null;
+        if (isDate(body.date)) {
+          try { await apiPost(ctx, `/workout-service/schedule/${made.workoutId}`, { date: body.date }); scheduled = true; }
+          catch (e) {
+            if ((e as { code?: string }).code === "relogin") throw e;
+            scheduleError = String((e as { status?: number }).status || (e as { code?: string }).code || "fehler");
+          }
+        }
+        if (ctx.dirty) await store(db, uid, ctx.tok);
+        return json({ workoutId: made.workoutId, scheduled, scheduleError, date: isDate(body.date) ? body.date : null });
+      } catch (e) {
+        if (ctx.dirty) await store(db, uid, ctx.tok, (e as { code?: string }).code || "error").catch(() => {});
         throw e;
       }
     }

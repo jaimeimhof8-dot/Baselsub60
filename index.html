@@ -577,6 +577,29 @@
         color: var(--muted);
         text-decoration: line-through;
       }
+      .ex.is-skipped .ex-h span {
+        color: var(--muted);
+        text-decoration: line-through;
+        opacity: 0.6;
+      }
+      .ex.is-skipped .ex-v { opacity: 0.45; }
+      .ex-x {
+        flex: none;
+        min-width: 44px;
+        min-height: 44px;
+        margin: -8px -8px -8px 0;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        opacity: 0.55;
+      }
+      .ex-x.on { opacity: 1; color: var(--accent); }
+      .watch-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); min-height: 44px; margin-top: var(--s1, 4px); font-size: 13.5px; color: var(--muted); }
+      .lnk { background: none; border: 0; padding: 0; min-height: 44px; color: var(--muted); font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
       .ex-v {
         display: flex;
         gap: var(--s2);
@@ -3856,12 +3879,18 @@
       import { openItems, canCarry, makeCarry, carriedTo, carryProgress } from "./src/later.js";
       import { swapDayData } from "./src/swap.js";
       import { fmtLine, lineSlots } from "./src/workout-fmt.js";
+      import { normTime } from "./src/timeinput.js";
+      import { repSummary } from "./src/laps.js";
+      import { planSteps } from "./src/garmin-workout.js";
       /* Lauf- und Stationszeilen als Bausteine; erkennt die Zeile nichts sicher, bleibt der Originaltext */
       const lineHtml = (t) => fmtLine(t) || esc(t);
+      /* Übung auslassen (✗): bleibt sichtbar, durchgestrichen, zählt nicht als „nicht gemacht“. Nochmal tippen = wieder offen. */
+      const skipBtn = (id, t, on) =>
+        `<button type="button" class="ex-x${on ? " on" : ""}" data-act="x-ex" data-k="${id}" aria-pressed="${on}" aria-label="${on ? "Auslassen rückgängig: " : "Auslassen: "}${esc(t)}">✗</button>`;
       /* Lauf-Station-Zeile: je Lauf und je Station ein Zeitfeld; gespeichert wird in S.val[id], getrennt mit " / " */
       const slotsField = (id, slots, val) => {
         const parts = String(val || "").split(" / ");
-        return `<div class="ex-v slots">${slots.map((s, k) => `<label class="slot"><span>${esc(s.label)}</span><input type="text" data-vs="${id}" data-k="${k}" value="${esc(parts[k] || "")}" placeholder="${esc(s.goal || "Zeit")}" enterkeyhint="next" aria-label="Zeit ${esc(s.label)}${s.goal ? ", Ziel " + esc(s.goal) : ""}"></label>`).join("")}</div>`;
+        return `<div class="ex-v slots">${slots.map((s, k) => `<label class="slot"><span>${esc(s.label)}</span><input type="text" inputmode="numeric" data-vs="${id}" data-k="${k}" value="${esc(parts[k] || "")}" placeholder="${esc(s.goal || "Zeit")}" enterkeyhint="next" aria-label="Zeit ${esc(s.label)}${s.goal ? ", Ziel " + esc(s.goal) : ""}"></label>`).join("")}</div>`;
       };
 
       /* ---------- Zeit ---------- */
@@ -3910,6 +3939,7 @@
    later: „Später fertig machen“ ({datum: {to: zielDatum, j: [Übungsindex], at}}, src/later.js) */
       const def = () => ({
         done: {},
+        xs: {},
         val: {},
         rpe: {},
         notes: {},
@@ -4222,7 +4252,7 @@
         if (!p || !p.i.length) return { n: 0, done: 0 };
         return {
           n: p.i.length,
-          done: p.i.filter((_, j) => S.done[dk + "|" + j]).length,
+          done: p.i.filter((_, j) => S.done[dk + "|" + j] || S.xs[dk + "|" + j]).length,
         };
       }
 
@@ -4316,7 +4346,7 @@
         const ivText = p && p.i ? p.i.find((t) => dash.parseReps(t)) || "" : "";
         for (const a of acts) {
           h += `<div class="mt-1">${esc(a.name)} – ${esc(strava.summary(a))}</div>`;
-          const rs = ivText ? dash.repSummary(a, ivText) : "";
+          const rs = ivText ? repSummary(a, ivText) : "";
           if (rs) h += `<div class="sub mt-1">Intervalle ${esc(rs)}</div>`;
         }
         // Steht der Tag schon im Banner oben auf „Heute“, hier nicht noch einmal fragen
@@ -4363,9 +4393,9 @@
         if (a) {
           const sum = strava.summary(a),
             r = p.i.findIndex((t) => dash.parseReps(t));
-          if ((p.k === "lauf" || p.k === "bike") && r >= 0 && js.includes(r) && a.laps && dash.repSummary(a, p.i[r])) {
+          if ((p.k === "lauf" || p.k === "bike") && r >= 0 && js.includes(r) && a.laps && repSummary(a, p.i[r])) {
             // Intervall-Einheit: Zeiten jeder Wiederholung in die Intervallzeile
-            S.val[dk + "|" + r] = dash.repSummary(a, p.i[r]);
+            S.val[dk + "|" + r] = repSummary(a, p.i[r]);
             msg = "Erledigt – Intervallzeiten übernommen";
             if (isRunTest(p) && testsFromDay(i, true)) msg = "Erledigt – Intervallzeiten auch in den Pacing-Test übernommen";
           } else if (p.k === "lauf" || p.k === "bike") {
@@ -4512,14 +4542,29 @@
             const t = p.i[j];
             if (t == null) continue;
             const id = c.from + "|" + j,
-              on = !!S.done[id];
-            h += `<div class="ex row-v${lineSlots(t) ? " wide" : ""} ${on ? "is-done" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${lineHtml(t)}</span></label>`;
+              on = !!S.done[id],
+              sk = !!S.xs[id];
+            h += `<div class="ex row-v${lineSlots(t) ? " wide" : ""} ${on ? "is-done" : ""}${sk ? " is-skipped" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${lineHtml(t)}</span>${skipBtn(id, t, sk)}</label>`;
             if (!isFiller(t))
               h += lineSlots(t) ? slotsField(id, lineSlots(t), S.val[id]) : `<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id] || "")}" placeholder="${placeholder(isLift(p.k, t) ? "kraft" : p.k, t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
             h += `</div>`;
           }
           h += `</div><button class="btn ghost sm mt-3" data-act="later-undo" data-k="${esc(c.from)}">Zurück an ${esc(DAYSF[dow(oi)])}</button></div>`;
         }
+        return h;
+      }
+      /* Aktionen unter dem Kopf einer Einheit, an jedem Trainingstag gleich aufgebaut:
+         Fokusmodus, solange etwas offen ist; „Auf Uhr senden“ nur bei Lauf-Einheiten mit erkannten Schritten, ab heute, mit Garmin verbunden */
+      const gmSent = new Map(); /* Tage, deren Workout in dieser Sitzung an Garmin Connect ging → ob es eingeplant wurde */
+      /* Android: öffnet die Garmin-Connect-App (sie synchronisiert die Uhr beim Öffnen), sonst die Workout-Seite im Browser */
+      const GC_OPEN = "intent://launch#Intent;package=com.garmin.android.apps.connectmobile;S.browser_fallback_url=" + encodeURIComponent("https://connect.garmin.com/modern/workouts") + ";end";
+      function dayActions(i, p, done, n) {
+        let h = "";
+        if (done < n) h += `<div class="btns"><button class="btn primary" data-fc="start" data-i="${i}">Fokusmodus starten</button></div>`;
+        if (done < n && i >= TODAY && gmOn() && p.k === "lauf" && planSteps(p).steps.length)
+          h += gmSent.has(i)
+            ? `<div class="watch-row"><span>${gmSent.get(i) ? "✓ Auf der Uhr eingeplant" : "In Garmin angelegt, nicht eingeplant"}</span><a class="lnk" href="${GC_OPEN}">Connect öffnen</a></div>`
+            : `<div class="watch-row"><button type="button" class="lnk" data-act="gm-push" data-i="${i}">Auf Uhr senden</button></div>`;
         return h;
       }
       function sessionCore(i) {
@@ -4602,16 +4647,16 @@
             ? `<div class="target">Noch kein Team-Tempo T. Trag zuerst den Pacing-Test ein (Menü → Profil).</div>`
             : `<div class="target">Team-Tempo T = ${mmss(T)}/km · Ziel heute <b>${mmss(T + p.tp[0])}–${mmss(T + p.tp[1])}/km</b></div>`;
         }
-        if (i === TODAY && done < n)
-          h += `<div class="btns"><button class="btn primary" data-fc="start" data-i="${i}">Fokusmodus starten</button></div>`;
+        h += dayActions(i, p, done, n);
         h += `<div class="exs">`;
         p.i.forEach((t, j) => {
           const id = dk + "|" + j,
-            on = !!S.done[id];
+            on = !!S.done[id],
+            sk = !!S.xs[id];
           const wide = (p.k === "lauf" && dash.parseReps(t)) || !!lineSlots(t);
           h += single
             ? `<div class="ex ${on ? "is-done" : ""}"><div class="ex-h hold" data-hold="${i}"${on ? " data-undo" : ""} role="button" tabindex="0" aria-label="${esc(t)} – gedrückt halten, um ${on ? "wieder zu öffnen" : "abzuschliessen"}"><i class="hold-fill" aria-hidden="true"></i><span>${lineHtml(t)}</span><em class="hold-hint" aria-hidden="true">${on ? "Halten ↺" : "Halten ✓"}</em></div>`
-            : `<div class="ex row-v${wide ? " wide" : ""} ${on ? "is-done" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${lineHtml(t)}</span></label>`;
+            : `<div class="ex row-v${wide ? " wide" : ""} ${on ? "is-done" : ""}${sk ? " is-skipped" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${lineHtml(t)}</span>${skipBtn(id, t, sk)}</label>`;
           if (!isFiller(t)) {
             const lift = isLift(p.k, t),
               le = lastEntry(i, t),
@@ -6382,7 +6427,7 @@
               .map((a) => {
                 const i = idxOfIso(a.date),
                   p = i >= 0 && i <= LAST ? dayPlan(i) : null,
-                  rs = dash.repSummary(
+                  rs = repSummary(
                     a,
                     p && p.i ? p.i.find((t) => dash.parseReps(t)) || "" : "",
                   ),
@@ -8680,11 +8725,21 @@
           const i = +d.i,
             p = dayPlan(i),
             dk = keyI(i),
-            open = openItems(p, S.done, dk);
+            open = openItems(p, { ...S.done, ...S.xs }, dk);
           if (!canCarry({ i, today: TODAY, last: LAST, day: p, open })) return;
           S.later[dk] = makeCarry(keyI(i + 1), open);
           save();
           toast(`${open.length} ${open.length === 1 ? "Übung hängt" : "Übungen hängen"} an ${DAYSF[dow(i + 1)]}`);
+          return render();
+        }
+        if (d.act === "x-ex") {
+          if (S.xs[d.k]) delete S.xs[d.k];
+          else {
+            S.xs[d.k] = 1;
+            delete S.done[d.k];
+          }
+          save();
+          toast(S.xs[d.k] ? "Übung ausgelassen" : "Übung wieder offen");
           return render();
         }
         if (d.act === "later-undo") {
@@ -9164,6 +9219,20 @@
         }
         if (d.act === "st-sync") return stravaSync(false);
         if (d.act === "gm-sync") return garminSync(false);
+        if (d.act === "gm-push") {
+          const i = +d.i, p = dayPlan(i), { steps, skipped } = planSteps(p);
+          if (!steps.length || t.disabled) return;
+          t.disabled = true;
+          try {
+            const r = await gmInvoke({ action: "push-workout", name: `HYROX ${p.t}`.slice(0, 80), date: isoI(i), steps });
+            gmSent.set(i, !!r.scheduled);
+            toast(`${r.scheduled ? "Für " + shortDay(i) + " im Garmin-Kalender eingeplant" : "In Garmin Connect angelegt, aber NICHT eingeplant (Garmin-Antwort: " + (r.scheduleError || "unbekannt") + ")"} – Uhr synchronisieren${skipped.length ? " · " + skipped.length + " Zeile(n) nicht übertragen" : ""}`);
+          } catch (e) {
+            toast(gmErr(e));
+          }
+          t.disabled = false;
+          return render();
+        }
         // Fehlende ältere Einheiten nachholen: Zeitstempel vergessen, dann holt der Sync alles ab Planstart
         if (d.act === "st-full") {
           S.strava.at = 0;
@@ -9544,6 +9613,16 @@
         },
         true,
       );
+      /* Zeitfelder: "352" → "3:52" (Handy-Ziffernblock hat keinen Doppelpunkt); danach über den Input-Handler speichern */
+      document.addEventListener("change", (e) => {
+        const t = e.target;
+        if (!t.matches || !t.matches("input[data-vs],input[data-sim],input[data-l],input[data-s]")) return;
+        const n = normTime(t.value);
+        if (n !== t.value.trim()) {
+          t.value = n;
+          t.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      });
       document.addEventListener("change", async (e) => {
         const t = e.target;
         if (t.dataset.sz) {
@@ -9582,8 +9661,12 @@
           return render();
         }
         if (t.dataset.c) {
-          if (t.checked) S.done[t.dataset.c] = 1;
-          else delete S.done[t.dataset.c];
+          if (t.checked) {
+            S.done[t.dataset.c] = 1;
+            delete S.xs[t.dataset.c];
+            const sx = t.closest(".ex");
+            if (sx) sx.classList.remove("is-skipped");
+          } else delete S.done[t.dataset.c];
           ciOpen = false;
           // Geplantes Gewicht beim Abhaken als Wert übernehmen (aus dem Plan, nicht aus dem DOM)
           if (t.checked && !S.val[t.dataset.c]) {

@@ -5,7 +5,7 @@
 // Reine Funktionen, ohne DOM.
 
 /** Felder, die pro Eintrag zusammengeführt werden ({schlüssel: wert}). Alles andere zählt als Ganzes. */
-export const MAP_FIELDS = ["done", "val", "rpe", "notes", "sched", "skip", "edit", "checkin", "dismiss", "weights", "sore", "extra", "solo", "onb", "review", "later", "off", "simres"];
+export const MAP_FIELDS = ["done", "xs", "val", "rpe", "notes", "sched", "skip", "edit", "checkin", "dismiss", "weights", "sore", "extra", "solo", "onb", "review", "later", "off", "simres"];
 
 const isObj = (o) => !!o && typeof o === "object" && !Array.isArray(o);
 

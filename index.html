@@ -3646,6 +3646,68 @@
       #focus .fc-rb { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
       #focus .fc-rb button { height: 56px; padding: 0 22px; border-radius: 16px; border: 0; background: rgba(255, 255, 255, 0.09); color: inherit; font-size: 1.05rem; font-weight: 650; cursor: pointer; }
       #focus .fc-rb button.go { background: var(--accent); color: #16130a; flex: 1 1 60%; }
+      /* Lauf-Dashboard: Tempo im Ring, große Distanz, Puls, Rundenzeit, fertige Runden. Quer: Ring weg, Kacheln nebeneinander */
+      #focus.fc-dash .fc-mini, #focus.fc-dash .fc-name, #focus.fc-dash .fc-upnext, #focus.fc-dash .fc-last { display: none; }
+      #focus .fc-run.fcd { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "head head" "ring ring" "dist dist" "hr lap" "done done" "btn btn"; gap: 10px; padding: 14px; text-align: left; }
+      #focus .fcd-head { grid-area: head; display: flex; flex-direction: column; gap: 2px; }
+      #focus .fcd-ring { grid-area: ring; position: relative; width: min(160px, 42vw); aspect-ratio: 1; margin: 0 auto; }
+      #focus .fcd-ring svg { width: 100%; height: 100%; display: block; }
+      #focus .fcd-ring circle { fill: none; stroke-width: 14; }
+      #focus .fcd-ring .bg { stroke: rgba(255, 255, 255, 0.08); }
+      #focus .fcd-ring .arc { stroke: var(--accent); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 130px 130px; }
+      #focus .fcd-c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      #focus .fcd-c small, #focus .fcd-card small { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.55; }
+      #focus .fcd-c b { font-family: var(--f-head); font-weight: 700; font-size: clamp(3rem, 17vw, 4.2rem); line-height: 0.95; color: var(--lauf); }
+      #focus .fcd-c span { opacity: 0.6; font-size: 0.85rem; }
+      #focus .fcd-card { background: rgba(255, 255, 255, 0.055); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 18px; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+      #focus .fcd-card > div { display: flex; align-items: baseline; gap: 8px; }
+      #focus .fcd-card b { font-family: var(--f-head); font-weight: 700; line-height: 1; font-size: 3rem; }
+      #focus .fcd-card span { opacity: 0.6; font-size: 0.85rem; white-space: nowrap; }
+      #focus .fcd-tempo { display: none; grid-area: tempo; }
+      #focus .fcd-tempo b { color: var(--lauf); }
+      #focus .fcd-dist { grid-area: dist; }
+      #focus .fcd-dist b { font-size: 4.2rem; color: var(--accent); }
+      #focus .fcd-card i { display: block; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.1); margin-top: 4px; }
+      #focus .fcd-card u { display: block; height: 6px; border-radius: 3px; background: var(--accent); text-decoration: none; }
+      #focus .fcd-hr { grid-area: hr; }
+      #focus .fcd-hr b { color: #ff8f88; }
+      #focus .fcd-lap { grid-area: lap; }
+      #focus .fcd-done { grid-area: done; display: grid; gap: 6px; min-height: 0; }
+      #focus .fcd-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); font-size: 0.9rem; }
+      #focus .fcd-row em { font-style: normal; opacity: 0.6; margin-left: auto; }
+      #focus .fcd-row b { font-family: var(--f-head); font-weight: 700; font-size: 1.6rem; line-height: 1; min-width: 3.2rem; text-align: right; }
+      #focus .fcd-hr b, #focus .fcd-lap b { font-size: 2.7rem; }
+      #focus .fcd-head .fc-rn { display: none; }
+      #focus .fcd-done .fcd-row:nth-last-child(n + 3) { display: none; } /* hochkant nur die letzten zwei Runden, quer alle */
+      #focus .fcd .fc-rb button { height: 46px; padding: 0 18px; }
+      #focus .fcd .fc-rb button.go { height: 56px; }
+      #focus .fcd .fc-rb { grid-area: btn; margin-top: 0; }
+      #focus.fc-dash .fc-main { justify-content: flex-start; }
+      #focus.fc-dash .fc-run { order: 1; }
+      #focus.fc-dash .fc-field { order: 2; } /* Dashboard zuerst, das Eingabefeld für den Wert liegt darunter */
+      @media (orientation: landscape) and (max-height: 520px) {
+        #focus.fc-dash .fc-field, #focus.fc-dash .fc-top .fc-count { display: none; }
+        #focus.fc-dash { display: grid; grid-template-columns: 1fr 64px; grid-template-rows: auto minmax(0, 1fr); column-gap: 10px; row-gap: 6px; }
+        #focus.fc-dash .fc-top { grid-column: 1; grid-template-columns: 44px 1fr; }
+        #focus.fc-dash .fc-main { grid-column: 1; grid-row: 2; justify-content: stretch; padding: 0; overflow: hidden; }
+        #focus.fc-dash .fc-nav { grid-column: 2; grid-row: 1 / span 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; margin: 0; }
+        #focus.fc-dash .fc-ok { width: 56px; height: 56px; box-shadow: none; }
+        #focus.fc-dash .fc-ok svg { width: 26px; height: 26px; }
+        #focus.fc-dash .fc-side { width: 44px; height: 44px; font-size: 1.5rem; }
+        #focus .fc-run.fcd { grid-template-columns: 1fr 1fr 220px; grid-template-rows: auto 1fr 1fr; grid-template-areas: "head head head" "tempo dist done" "hr lap btn"; gap: 8px; padding: 8px; height: 100%; box-sizing: border-box; }
+        #focus .fcd-head { flex-direction: row; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+        #focus .fcd-done .fcd-row:nth-last-child(n + 3) { display: flex; }
+        #focus .fcd-ring { display: none; }
+        #focus .fcd-tempo { display: flex; justify-content: center; }
+        #focus .fcd-tempo b, #focus .fcd-dist b { font-size: 4.6rem; }
+        #focus .fcd-card { padding: 6px 12px; }
+        #focus .fcd-card b { font-size: 3.4rem; }
+        #focus .fcd-done { overflow-y: auto; align-content: start; gap: 4px; }
+        #focus .fcd-row { padding: 6px 10px; }
+        #focus .fcd .fc-rb { flex-wrap: wrap; align-content: flex-end; gap: 6px; }
+        #focus .fcd .fc-rb button { height: 36px; padding: 0 10px; font-size: 0.82rem; border-radius: 12px; }
+        #focus .fcd .fc-rb button.go { height: 48px; flex: 1 1 100%; font-size: 1rem; }
+      }
       #focus .fc-timer[data-ph="work"] { border-color: var(--accent); }
       #focus .fc-timer[data-ph="rest"] { border-color: #5b9bd5; }
       #focus .fc-timer[data-ph="done"] { border-color: #6cc08b; background: rgba(108, 192, 139, 0.12); }
@@ -3896,7 +3958,7 @@
       import { normTime } from "./src/timeinput.js";
       import { repSummary } from "./src/laps.js";
       import { planSteps } from "./src/garmin-workout.js";
-      import { flatten, targetSec, phaseTitle, phaseGoal, splitSummary } from "./src/run-timer.js";
+      import { flatten, targetSec, phaseTitle, phaseGoal, splitSummary, dashboard as runDash } from "./src/run-timer.js";
       import { FTMS_SERVICE, TREADMILL_DATA, parseTreadmill, buildTreadmill, HEART_RATE_SERVICE, HEART_RATE_MEASUREMENT, parseHeartRate, buildHeartRate } from "./src/ftms.js";
       /* Lauf- und Stationszeilen als Bausteine; erkennt die Zeile nichts sicher, bleibt der Originaltext */
       const lineHtml = (t) => fmtLine(t) || esc(t);
@@ -7751,6 +7813,7 @@
          Mit Bluetooth-Laufband (FTMS) wechselt ein Abschnitt mit Distanz von selbst, wenn die Distanz erreicht ist. */
       let fcR = null, // {id, ph, idx, log, run, t0, acc, iv, beeped, base}
         fcBT = { dev: null, live: null, simIv: null };
+      let fcRCtx = null; // {ph, id} der Lauf-Zeile, die das Dashboard gerade zeigt
       let fcHR = { dev: null, bpm: null }; // Puls-Sensor (Brustgurt oder Uhr mit „Herzfrequenz senden“) per Bluetooth
       const BTSIM = (location.search.match(/[?&]sim=?(\d*)/) || [])[1]; /* ?sim=14: Laufband-Simulator mit 14 km/h, zum Testen ohne Gerät */
       const runPhases = (p, j) => (p.k === "lauf" ? flatten(planSteps({ k: "lauf", i: [p.i[j]] }).steps) : []);
@@ -7759,17 +7822,35 @@
         if (fcR) clearInterval(fcR.iv);
         fcR = null;
       }
-      const liveText = () => {
-        const l = fcBT.live;
-        const bt = !l || l.kmh == null ? (fcBT.dev ? "Laufband verbunden, warte auf Daten" : "") : [fcBT.simIv ? "Test" : "", `${l.kmh.toFixed(1).replace(".", ",")} km/h`, l.pace ? `${mmss(l.pace)}/km` : "", l.distM != null ? `${l.distM} m` : ""].filter(Boolean).join(" · ");
-        const hr = fcHR.dev ? (fcHR.bpm != null ? `♥ ${fcHR.bpm}` : "Puls verbunden, warte auf Daten") : "";
-        return [bt, hr].filter(Boolean).join(" · ");
-      };
+      /* Anzeigewerte der Lauf-Zeile aus dem aktuellen Stand (Laufband, Puls, Timer) */
+      function fcdVals(ph, id) {
+        const r = fcR && fcR.id === id ? fcR : null;
+        return runDash({ ph, idx: r ? r.idx : 0, log: r ? r.log : [], secs: r ? rSec() : 0, running: !!r && r.run, base: r ? r.base : null, live: fcBT.live, bpm: fcHR.bpm });
+      }
+      /* Zahlen im Dashboard live nachführen, ohne die Ansicht neu aufzubauen */
+      function fcRPaint() {
+        if (!fcRCtx || !document.getElementById("fcd")) return;
+        const v = fcdVals(fcRCtx.ph, fcRCtx.id);
+        const set = (k, t) => {
+          const e = document.getElementById(k);
+          if (e && e.textContent !== t) e.textContent = t;
+        };
+        set("fcd-pace", v.pace);
+        set("fcd-pace2", v.pace);
+        set("fcd-dist", v.dist);
+        set("fcd-dgoal", v.dgoal);
+        set("fcd-hr", v.hr);
+        set("fc-rt", v.rt);
+        set("fcd-lgoal", v.lgoal);
+        const arc = document.getElementById("fcd-arc");
+        if (arc) arc.setAttribute("stroke-dasharray", `${(v.prog * 728.85).toFixed(1)} 728.85`);
+        const bar = document.getElementById("fcd-bar");
+        if (bar) bar.style.width = v.barPct + "%";
+      }
       /* Daten vom Laufband (echt oder Simulator) übernehmen */
       function fcBTFeed(dv) {
         fcBT.live = parseTreadmill(dv);
-        const lv = document.getElementById("fc-live");
-        if (lv) lv.textContent = liveText();
+        fcRPaint();
       }
       function fcBTSim() {
         if (fcBT.simIv) {
@@ -7794,10 +7875,7 @@
         if (!fcR) return;
         const ph = fcR.ph[fcR.idx];
         if (!ph) return;
-        const e = document.getElementById("fc-rt");
-        if (e) e.textContent = mmss(Math.floor(rSec()));
-        const lv = document.getElementById("fc-live");
-        if (lv) lv.textContent = liveText();
+        fcRPaint();
         const t = targetSec(ph);
         if (t && !fcR.beeped && rSec() >= t) {
           fcR.beeped = true;
@@ -7883,8 +7961,7 @@
           chr.addEventListener("characteristicvaluechanged", (ev) => {
             if (fcHR.dev !== dev) return;
             fcHR.bpm = parseHeartRate(ev.target.value);
-            const lv = document.getElementById("fc-live");
-            if (lv) lv.textContent = liveText();
+            fcRPaint();
           });
           fcHR = { dev, bpm: null };
           await chr.startNotifications();
@@ -7906,9 +7983,17 @@
         const label = fin ? "" : !r || !r.run ? "Start" : idx === ph.length - 1 ? "Fertig" : "Nächster Schritt";
         const kind = fin ? "done" : !r || !r.run ? "idle" : cur.kind === "recovery" ? "rest" : "work";
         const bt = BTSIM != null ? `<button type="button" data-fc="btsim">${fcBT.simIv ? "Simulator aus" : "Laufband simulieren"}</button>` : navigator.bluetooth ? `<button type="button" data-fc="bt">${fcBT.dev ? "Laufband ✓" : "Laufband verbinden"}</button><button type="button" data-fc="hr">${fcHR.dev ? "Puls ✓" : "Puls verbinden"}</button>` : "";
-        return `<div class="fc-run" data-ph="${kind}"><div class="fc-rl" id="fc-rl">${fin ? "Alle Abschnitte gelaufen ✓" : esc(phaseTitle(cur))}</div>
-    <div class="fc-rt" id="fc-rt">${fin ? "" : mmss(Math.floor(rSec()))}</div><div class="fc-rg">${fin ? "" : esc(phaseGoal(cur))}</div>
-    ${nxt && !fin ? `<div class="fc-rn">Danach: ${esc(phaseTitle(nxt))} · ${esc(phaseGoal(nxt))}</div>` : ""}<div class="fc-live" id="fc-live">${esc(liveText())}</div>
+        fcRCtx = { ph, id };
+        const v = fcdVals(ph, id);
+        const laps = v.laps.map((l) => `<div class="fcd-row"><span>${esc(l.title)}</span><em>${esc(l.pace ? l.pace + "/km" : "")}</em><b>${esc(l.time)}</b></div>`).join("");
+        return `<div class="fc-run fcd" id="fcd" data-ph="${kind}"><div class="fcd-head"><div class="fc-rl" id="fc-rl">${fin ? "Alle Abschnitte gelaufen ✓" : esc(phaseTitle(cur))}</div><div class="fc-rg">${fin ? "" : esc(phaseGoal(cur))}</div>${nxt && !fin ? `<div class="fc-rn">Danach: ${esc(phaseTitle(nxt))} · ${esc(phaseGoal(nxt))}</div>` : ""}</div>
+    <div class="fcd-ring" role="img" aria-label="Fortschritt im Abschnitt"><svg viewBox="0 0 260 260" aria-hidden="true"><circle class="bg" cx="130" cy="130" r="116"></circle><circle class="arc" id="fcd-arc" cx="130" cy="130" r="116" stroke-dasharray="${(v.prog * 728.85).toFixed(1)} 728.85"></circle></svg>
+      <div class="fcd-c"><small>Tempo</small><b id="fcd-pace">${v.pace}</b><span>/km</span></div></div>
+    <div class="fcd-card fcd-tempo"><small>Tempo</small><div><b id="fcd-pace2">${v.pace}</b><span>/km</span></div></div>
+    <div class="fcd-card fcd-dist"><small>Distanz</small><div><b id="fcd-dist">${v.dist}</b><span id="fcd-dgoal">${esc(v.dgoal)}</span></div><i><u id="fcd-bar" style="width:${v.barPct}%"></u></i></div>
+    <div class="fcd-card fcd-hr"><small>Puls</small><div><b id="fcd-hr">${v.hr}</b><span>bpm</span></div></div>
+    <div class="fcd-card fcd-lap"><small>Runde</small><div><b id="fc-rt">${v.rt}</b><span id="fcd-lgoal">${esc(v.lgoal)}</span></div></div>
+    <div class="fcd-done" aria-label="Fertige Runden">${laps}</div>
     <div class="fc-rb">${fin ? "" : `<button type="button" class="go" data-fc="rnext">${label}</button>`}${started ? `<button type="button" data-fc="rreset">Neu</button>` : ""}${bt}</div></div>`;
       }
       /* Anzeige des Timers: {time, label, ph ("work"|"rest"|"done"|"idle"), key} */
@@ -7978,6 +8063,7 @@
           document.body.classList.add("focus-on");
         }
         const dran = nextOpen(n, isDone, 0); // erste offene Übung = was als Nächstes zu tun ist
+        el.classList.toggle("fc-dash", !focusFin && runPhases(p, focusJ).length > 0); // Lauf-Zeile: Dashboard statt Übungsliste
         const top = `<div class="fc-top"><button type="button" class="fc-x" data-fc="close" aria-label="Fokusmodus beenden">✕</button><div class="fc-title"><small>${esc(KIND[p.k] || "")}</small><b>${esc(p.t)}</b></div><span class="fc-count">${nd}/${n}</span></div>`;
         /* Übersicht aller Übungen: immer im Bild. Grün/Haken = erledigt, «dran» = die nächste offene, Balken = diese Übung wird gerade angezeigt */
         const mini = `<ol class="fc-mini" aria-label="Alle Übungen">${p.i
@@ -8047,6 +8133,7 @@
           if (fcHR.dev && fcHR.dev.gatt) fcHR.dev.gatt.disconnect(); // Puls-Sensor freigeben, sonst bleibt die Uhr gekoppelt
         } catch (_) {}
         fcHR = { dev: null, bpm: null };
+        fcRCtx = null;
         focusI = null;
         focusFin = false;
         fcTimerReset();

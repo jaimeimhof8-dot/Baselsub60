@@ -36,6 +36,35 @@ export function phaseGoal(p) {
   return [p.pace ? `${distLabel(p.dist)} @ ${mmss(p.pace)}/km` : distLabel(p.dist), t ? `Ziel ${mmss(t)}` : ""].filter(Boolean).join(" · ");
 }
 
+/**
+ * Anzeigewerte des Lauf-Dashboards im Fokusmodus: Tempo, Distanz im Abschnitt, Fortschritt, Puls, Rundenzeit, fertige Runden.
+ * @param {{ph: object[], idx?: number, log?: number[], secs?: number, running?: boolean, base?: number|null, live?: {pace?: number|null, distM?: number|null}|null, bpm?: number|null}} a
+ *   idx: aktueller Abschnitt, secs: Zeit im Abschnitt, base: Laufband-Distanz beim Start des Abschnitts, live: Laufband-Daten, bpm: Puls
+ */
+export function dashboard({ ph, idx = 0, log = [], secs = 0, running = false, base = null, live = null, bpm = null }) {
+  const fin = idx >= ph.length;
+  const cur = ph[Math.min(idx, ph.length - 1)] || null;
+  const km = (m) => (m / 1000).toFixed(2).replace(".", ",");
+  const tgt = cur && cur.dist && !cur.lap ? cur.dist : 0;
+  const ts = targetSec(cur);
+  const dm = live && live.distM != null ? (running && base != null ? Math.max(0, live.distM - base) : 0) : null;
+  const known = tgt > 0 && dm != null;
+  const prog = known ? dm / tgt : ts && running ? secs / ts : 0;
+  return {
+    fin,
+    cur,
+    pace: live && live.pace ? mmss(live.pace) : "–:––",
+    dist: dm == null ? "–" : km(dm),
+    dgoal: !tgt ? "km" : dm == null ? `Ziel ${km(tgt)} km` : `km von ${km(tgt)}`,
+    barPct: known ? Math.min(100, Math.round((dm / tgt) * 100)) : 0,
+    prog: Math.max(0, Math.min(1, prog)),
+    hr: bpm != null ? String(bpm) : "–",
+    rt: fin ? "✓" : mmss(Math.floor(secs)),
+    lgoal: ts ? `Ziel ${mmss(ts)}` : "",
+    laps: ph.slice(0, Math.min(idx, ph.length)).map((p, i) => ({ title: phaseTitle(p), time: mmss(log[i] || 0), pace: p.dist && log[i] > 0 ? mmss(Math.round(log[i] / (p.dist / 1000))) : "" })).slice(-4),
+  };
+}
+
 /** Eintrag für die Zeile aus den gelaufenen Zeiten (log: Sekunden je Abschnitt, gleiche Reihenfolge wie phases).
  * Trabpausen zählen nicht. "3×1,5 km: 6:12 · 6:10 · 6:18 (Ø 4:09/km)".
  * @returns {string} leer, wenn nichts Auswertbares gelaufen wurde */

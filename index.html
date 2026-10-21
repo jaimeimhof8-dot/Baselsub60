@@ -7861,24 +7861,39 @@
       /* Puls-Sensor verbinden: Standard-Pulsdienst, z. B. Garmin-Uhr mit „Herzfrequenz senden“ oder Brustgurt */
       async function fcHRConnect() {
         if (!navigator.bluetooth) return toast("Bluetooth geht nur in Chrome auf Android", true);
+        if (fcHR.dev) {
+          // Zweiter Tipp auf „Puls ✓“: Sensor trennen, damit nie zwei Sensoren gleichzeitig schreiben
+          try {
+            if (fcHR.dev.gatt) fcHR.dev.gatt.disconnect();
+          } catch (_) {}
+          fcHR = { dev: null, bpm: null };
+          return focusRender();
+        }
+        let dev = null;
         try {
-          const dev = await navigator.bluetooth.requestDevice({ filters: [{ services: [HEART_RATE_SERVICE] }] });
-          const srv = await dev.gatt.connect();
-          const chr = await (await srv.getPrimaryService(HEART_RATE_SERVICE)).getCharacteristic(HEART_RATE_MEASUREMENT);
-          chr.addEventListener("characteristicvaluechanged", (ev) => {
-            fcHR.bpm = parseHeartRate(ev.target.value);
-            const lv = document.getElementById("fc-live");
-            if (lv) lv.textContent = liveText();
-          });
-          await chr.startNotifications();
+          dev = await navigator.bluetooth.requestDevice({ filters: [{ services: [HEART_RATE_SERVICE] }] });
           dev.addEventListener("gattserverdisconnected", () => {
             if (fcHR.dev !== dev) return;
             fcHR = { dev: null, bpm: null };
             if (focusI != null) focusRender();
           });
+          const srv = await dev.gatt.connect();
+          const chr = await (await srv.getPrimaryService(HEART_RATE_SERVICE)).getCharacteristic(HEART_RATE_MEASUREMENT);
+          if (focusI == null) return dev.gatt.disconnect(); // Fokusmodus wurde während des Verbindens beendet
+          chr.addEventListener("characteristicvaluechanged", (ev) => {
+            if (fcHR.dev !== dev) return;
+            fcHR.bpm = parseHeartRate(ev.target.value);
+            const lv = document.getElementById("fc-live");
+            if (lv) lv.textContent = liveText();
+          });
           fcHR = { dev, bpm: null };
+          await chr.startNotifications();
           toast("Puls verbunden");
         } catch (e) {
+          try {
+            if (dev && dev.gatt) dev.gatt.disconnect(); // halb verbunden: nicht offen lassen
+          } catch (_) {}
+          if (fcHR.dev === dev) fcHR = { dev: null, bpm: null };
           toast(e && e.name === "NotFoundError" ? "Kein Puls-Sensor gefunden. Die Uhr muss „Herzfrequenz senden“ an haben." : "Puls nicht verbunden", true);
         }
         if (focusI != null) focusRender();

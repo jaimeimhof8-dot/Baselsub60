@@ -3897,7 +3897,7 @@
       import { repSummary } from "./src/laps.js";
       import { planSteps } from "./src/garmin-workout.js";
       import { flatten, targetSec, phaseTitle, phaseGoal, splitSummary } from "./src/run-timer.js";
-      import { FTMS_SERVICE, TREADMILL_DATA, parseTreadmill, buildTreadmill } from "./src/ftms.js";
+      import { FTMS_SERVICE, TREADMILL_DATA, parseTreadmill, buildTreadmill, HEART_RATE_SERVICE, HEART_RATE_MEASUREMENT, parseHeartRate, buildHeartRate } from "./src/ftms.js";
       /* Lauf- und Stationszeilen als Bausteine; erkennt die Zeile nichts sicher, bleibt der Originaltext */
       const lineHtml = (t) => fmtLine(t) || esc(t);
       /* Übung auslassen (✗): bleibt sichtbar, durchgestrichen, zählt nicht als „nicht gemacht“. Nochmal tippen = wieder offen. */
@@ -7751,6 +7751,7 @@
          Mit Bluetooth-Laufband (FTMS) wechselt ein Abschnitt mit Distanz von selbst, wenn die Distanz erreicht ist. */
       let fcR = null, // {id, ph, idx, log, run, t0, acc, iv, beeped, base}
         fcBT = { dev: null, live: null, simIv: null };
+      let fcHR = { dev: null, bpm: null }; // Puls-Sensor (Brustgurt oder Uhr mit „Herzfrequenz senden“) per Bluetooth
       const BTSIM = (location.search.match(/[?&]sim=?(\d*)/) || [])[1]; /* ?sim=14: Laufband-Simulator mit 14 km/h, zum Testen ohne Gerät */
       const runPhases = (p, j) => (p.k === "lauf" ? flatten(planSteps({ k: "lauf", i: [p.i[j]] }).steps) : []);
       const rSec = () => (fcR ? (fcR.acc + (fcR.run ? Date.now() - fcR.t0 : 0)) / 1000 : 0);
@@ -7760,8 +7761,9 @@
       }
       const liveText = () => {
         const l = fcBT.live;
-        if (!l || l.kmh == null) return fcBT.dev ? "Laufband verbunden, warte auf Daten" : "";
-        return [fcBT.simIv ? "Test" : "", `${l.kmh.toFixed(1).replace(".", ",")} km/h`, l.pace ? `${mmss(l.pace)}/km` : "", l.distM != null ? `${l.distM} m` : ""].filter(Boolean).join(" · ");
+        const bt = !l || l.kmh == null ? (fcBT.dev ? "Laufband verbunden, warte auf Daten" : "") : [fcBT.simIv ? "Test" : "", `${l.kmh.toFixed(1).replace(".", ",")} km/h`, l.pace ? `${mmss(l.pace)}/km` : "", l.distM != null ? `${l.distM} m` : ""].filter(Boolean).join(" · ");
+        const hr = fcHR.dev ? (fcHR.bpm != null ? `♥ ${fcHR.bpm}` : "Puls verbunden, warte auf Daten") : "";
+        return [bt, hr].filter(Boolean).join(" · ");
       };
       /* Daten vom Laufband (echt oder Simulator) übernehmen */
       function fcBTFeed(dv) {
@@ -7773,13 +7775,16 @@
         if (fcBT.simIv) {
           clearInterval(fcBT.simIv);
           fcBT = { dev: null, live: null, simIv: null };
+          fcHR = { dev: null, bpm: null };
           return focusRender();
         }
         const kmh = +BTSIM || 14;
         let dist = 0;
         fcBT.dev = { sim: true };
+        fcHR = { dev: { sim: true }, bpm: null };
         fcBT.simIv = setInterval(() => {
           dist += (kmh / 3.6) * 0.25;
+          fcHR.bpm = parseHeartRate(new DataView(buildHeartRate(150 + 20 * Math.sin(dist / 120)).buffer));
           fcBTFeed(new DataView(buildTreadmill(kmh, dist).buffer));
         }, 250);
         toast("Laufband-Simulator an");
@@ -7853,6 +7858,31 @@
         }
         if (focusI != null) focusRender();
       }
+      /* Puls-Sensor verbinden: Standard-Pulsdienst, z. B. Garmin-Uhr mit „Herzfrequenz senden“ oder Brustgurt */
+      async function fcHRConnect() {
+        if (!navigator.bluetooth) return toast("Bluetooth geht nur in Chrome auf Android", true);
+        try {
+          const dev = await navigator.bluetooth.requestDevice({ filters: [{ services: [HEART_RATE_SERVICE] }] });
+          const srv = await dev.gatt.connect();
+          const chr = await (await srv.getPrimaryService(HEART_RATE_SERVICE)).getCharacteristic(HEART_RATE_MEASUREMENT);
+          chr.addEventListener("characteristicvaluechanged", (ev) => {
+            fcHR.bpm = parseHeartRate(ev.target.value);
+            const lv = document.getElementById("fc-live");
+            if (lv) lv.textContent = liveText();
+          });
+          await chr.startNotifications();
+          dev.addEventListener("gattserverdisconnected", () => {
+            if (fcHR.dev !== dev) return;
+            fcHR = { dev: null, bpm: null };
+            if (focusI != null) focusRender();
+          });
+          fcHR = { dev, bpm: null };
+          toast("Puls verbunden");
+        } catch (e) {
+          toast(e && e.name === "NotFoundError" ? "Kein Puls-Sensor gefunden. Die Uhr muss „Herzfrequenz senden“ an haben." : "Puls nicht verbunden", true);
+        }
+        if (focusI != null) focusRender();
+      }
       /* Anzeige des Lauf-Timers für die aktuelle Zeile */
       function fcRHtml(ph, id) {
         const r = fcR && fcR.id === id ? fcR : null;
@@ -7860,7 +7890,7 @@
         const started = !!r && (r.run || r.idx > 0 || r.acc > 0);
         const label = fin ? "" : !r || !r.run ? "Start" : idx === ph.length - 1 ? "Fertig" : "Nächster Schritt";
         const kind = fin ? "done" : !r || !r.run ? "idle" : cur.kind === "recovery" ? "rest" : "work";
-        const bt = BTSIM != null ? `<button type="button" data-fc="btsim">${fcBT.simIv ? "Simulator aus" : "Laufband simulieren"}</button>` : navigator.bluetooth ? `<button type="button" data-fc="bt">${fcBT.dev ? "Laufband ✓" : "Laufband verbinden"}</button>` : "";
+        const bt = BTSIM != null ? `<button type="button" data-fc="btsim">${fcBT.simIv ? "Simulator aus" : "Laufband simulieren"}</button>` : navigator.bluetooth ? `<button type="button" data-fc="bt">${fcBT.dev ? "Laufband ✓" : "Laufband verbinden"}</button><button type="button" data-fc="hr">${fcHR.dev ? "Puls ✓" : "Puls verbinden"}</button>` : "";
         return `<div class="fc-run" data-ph="${kind}"><div class="fc-rl" id="fc-rl">${fin ? "Alle Abschnitte gelaufen ✓" : esc(phaseTitle(cur))}</div>
     <div class="fc-rt" id="fc-rt">${fin ? "" : mmss(Math.floor(rSec()))}</div><div class="fc-rg">${fin ? "" : esc(phaseGoal(cur))}</div>
     ${nxt && !fin ? `<div class="fc-rn">Danach: ${esc(phaseTitle(nxt))} · ${esc(phaseGoal(nxt))}</div>` : ""}<div class="fc-live" id="fc-live">${esc(liveText())}</div>
@@ -7998,6 +8028,10 @@
           clearInterval(fcBT.simIv);
           fcBT = { dev: null, live: null, simIv: null };
         }
+        try {
+          if (fcHR.dev && fcHR.dev.gatt) fcHR.dev.gatt.disconnect(); // Puls-Sensor freigeben, sonst bleibt die Uhr gekoppelt
+        } catch (_) {}
+        fcHR = { dev: null, bpm: null };
         focusI = null;
         focusFin = false;
         fcTimerReset();
@@ -8120,6 +8154,7 @@
         }
         if (a === "bt") return fcBTConnect();
         if (a === "btsim") return fcBTSim();
+        if (a === "hr") return fcHRConnect();
         if (a === "treset") {
           fcTimerReset();
           return focusRender();

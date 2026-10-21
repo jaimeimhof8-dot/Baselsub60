@@ -90,3 +90,22 @@ test("Dashboard: Distanz stößt nie unter null, vor dem Start steht 0,00", () =
   assert.equal(dashboard({ ph, running: true, base: 500, live: { distM: 400 } }).dist, "0,00");
   assert.equal(dashboard({ ph, running: false, live: { distM: 900 } }).dist, "0,00");
 });
+
+test("Dashboard: Laufband erst nach „Start“ verbunden, Fortschritt läuft über die Zeit statt bei 0 zu hängen", () => {
+  const ph = flatten(planSteps(day).steps);
+  const d = dashboard({ ph, idx: 0, secs: 187.5, running: true, base: null, live: { pace: 247, distM: 500 } });
+  assert.equal(d.dist, "–");
+  assert.equal(d.dgoal, "Ziel 1,50 km");
+  assert.equal(d.barPct, 0);
+  assert.ok(Math.abs(d.prog - 0.5) < 0.001);
+});
+
+test("Dashboard: nach dem letzten Abschnitt sind Ring und Balken voll und die Gesamtstrecke steht da", () => {
+  const ph = flatten(planSteps(day).steps);
+  const d = dashboard({ ph, idx: ph.length, log: [372, 80, 370, 79, 378], live: null });
+  assert.equal(d.prog, 1);
+  assert.equal(d.barPct, 100);
+  assert.equal(d.dist, "4,90");
+  assert.equal(d.dgoal, "km gesamt");
+  assert.equal(d.lgoal, "");
+});

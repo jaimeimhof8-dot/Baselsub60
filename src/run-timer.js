@@ -45,23 +45,32 @@ export function dashboard({ ph, idx = 0, log = [], secs = 0, running = false, ba
   const fin = idx >= ph.length;
   const cur = ph[Math.min(idx, ph.length - 1)] || null;
   const km = (m) => (m / 1000).toFixed(2).replace(".", ",");
+  const pace = live && live.pace ? mmss(live.pace) : "–:––";
+  const hr = bpm != null ? String(bpm) : "–";
+  const laps = ph.slice(0, Math.min(idx, ph.length)).map((p, i) => ({ title: phaseTitle(p), time: mmss(log[i] || 0), pace: p.dist && log[i] > 0 ? mmss(Math.round(log[i] / (p.dist / 1000))) : "" })).slice(-4);
+  if (fin) {
+    // Nach dem letzten Abschnitt: Ring und Balken voll, Distanz = geplante Gesamtstrecke, keine Zielzeit mehr
+    const total = ph.reduce((s, p) => s + (p.dist || 0), 0);
+    return { fin, cur, pace, dist: total ? km(total) : "–", dgoal: total ? "km gesamt" : "km", barPct: 100, prog: 1, hr, rt: "✓", lgoal: "", laps };
+  }
   const tgt = cur && cur.dist && !cur.lap ? cur.dist : 0;
   const ts = targetSec(cur);
-  const dm = live && live.distM != null ? (running && base != null ? Math.max(0, live.distM - base) : 0) : null;
+  // Läuft der Abschnitt ohne Startwert (Laufband erst nach „Start“ verbunden), ist die Strecke unbekannt: Fortschritt über die Zeit
+  const dm = live && live.distM != null ? (!running ? 0 : base != null ? Math.max(0, live.distM - base) : null) : null;
   const known = tgt > 0 && dm != null;
   const prog = known ? dm / tgt : ts && running ? secs / ts : 0;
   return {
     fin,
     cur,
-    pace: live && live.pace ? mmss(live.pace) : "–:––",
+    pace,
     dist: dm == null ? "–" : km(dm),
     dgoal: !tgt ? "km" : dm == null ? `Ziel ${km(tgt)} km` : `km von ${km(tgt)}`,
     barPct: known ? Math.min(100, Math.round((dm / tgt) * 100)) : 0,
     prog: Math.max(0, Math.min(1, prog)),
-    hr: bpm != null ? String(bpm) : "–",
-    rt: fin ? "✓" : mmss(Math.floor(secs)),
+    hr,
+    rt: mmss(Math.floor(secs)),
     lgoal: ts ? `Ziel ${mmss(ts)}` : "",
-    laps: ph.slice(0, Math.min(idx, ph.length)).map((p, i) => ({ title: phaseTitle(p), time: mmss(log[i] || 0), pace: p.dist && log[i] > 0 ? mmss(Math.round(log[i] / (p.dist / 1000))) : "" })).slice(-4),
+    laps,
   };
 }
 

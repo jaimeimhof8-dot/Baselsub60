@@ -4675,6 +4675,7 @@
           sub: (m ? rest.slice(m[0].length) : rest).trim().replace(/\s+(RPE\b)/i, " · $1").replace(/^[·\s,]+/, ""),
         };
       }
+      const SR_DONE = `<span class="sr-only">erledigt</span>`;
       const CK_SVG = `<svg class="ck" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
       /* Übersichtszeile einer Übung: Nummer, Name + Zusatz, Satz×Wdh rechts; erledigt = grau mit Haken */
       function roRow(p, t, j, dk) {
@@ -4683,10 +4684,11 @@
           sk = !!S.xs[id],
           ix = String(j + 1).padStart(2, "0"),
           ck = on ? CK_SVG : "";
-        if (!isLift(p.k, t) || lineSlots(t)) return `<div class="r wide${on ? " done" : ""}${sk ? " skip" : ""}" role="listitem"><span class="ix">${ix}</span><div class="nm">${lineHtml(t)}</div>${ck}</div>`;
+        const wv = S.val[id] ? `<div class="m">${esc(S.val[id])}</div>` : "";
+        if (!isLift(p.k, t) || lineSlots(t)) return `<div class="r wide${on ? " done" : ""}${sk ? " skip" : ""}" role="listitem"><span class="ix">${ix}</span><div><div class="nm">${lineHtml(t)}</div>${wv}</div>${ck}${on ? SR_DONE : ""}</div>`;
         const { nm, spec, sub } = exParts(t),
           v = S.val[id] || "";
-        return `<div class="r${on ? " done" : ""}${sk ? " skip" : ""}" role="listitem"><span class="ix">${ix}</span><div><div class="nm">${esc(nm)}</div>${sub || v ? `<div class="m">${[v, esc(sub)].filter(Boolean).join(" · ")}</div>` : ""}</div><span class="num sr">${esc(spec)}${ck}</span></div>`;
+        return `<div class="r${on ? " done" : ""}${sk ? " skip" : ""}" role="listitem"><span class="ix">${ix}</span><div><div class="nm">${esc(nm)}</div>${sub || v ? `<div class="m">${[esc(v), esc(sub)].filter(Boolean).join(" · ")}</div>` : ""}</div><span class="num sr">${esc(spec)}${ck}${on ? SR_DONE : ""}</span></div>`;
       }
       function sessionCore(i) {
         const p = dayPlan(i),
@@ -4975,9 +4977,8 @@
           c = S.checkin[k] || {},
           r = readiness(c);
         if (!ciOpen) {
-          if (!r) return qline("Check-in", "offen · 20 Sek.", `data-act="ci-edit"`);
-          if (r === "green") return qline("Check-in", "grün", `data-act="ci-edit"`, "ok");
-          return qline("Check-in", { yellow: "gelb", red: "rot" }[r], `data-act="ci-edit"`, "warn " + r) + `<div class="qwarn ${r}">${READY_TXT[r]}</div>`;
+          if (!r || r === "green") return qline("Check-in", "offen · 20 Sek.", `data-act="ci-edit" aria-expanded="false"`);
+          return qline("Check-in", { yellow: "gelb", red: "rot" }[r], `data-act="ci-edit" aria-expanded="false"`, "warn " + r) + `<div class="qwarn ${r}" role="status">${READY_TXT[r]}</div>`;
         }
         let h = `<div class="card tight"><div class="row between"><h3>Check-in heute</h3><span class="sub">${r ? { green: "Grün", yellow: "Gelb", red: "Rot" }[r] : "ca. 20 Sekunden"}</span></div>`;
         h += `<div class="mt-2">`;
@@ -5078,7 +5079,9 @@
         const session =
           `<div class="sub wmeta">Woche ${Math.floor(i / 7) + 1} · ${blockLabel(info.block)} · ${esc(info.wave)}</div>` +
           (dayPlan(i) ? sessionCard(i) : "");
-        if (!rail) return intro + session + daily + strip;
+        // Check-in-Warnung (gelb/rot) steht über der Einheit, sonst bleibt es eine leise Zeile darunter
+        const ciWarn = i === TODAY && !ciOpen && ["yellow", "red"].includes(readiness(S.checkin[keyI(i)] || {}));
+        if (!rail) return ciWarn ? intro + daily + session + strip : intro + session + daily + strip;
         const nav = `<nav class="rail" aria-label="Diese Woche">${strip}</nav>`;
         // Tablet: Check-in/Vorschläge über der Einheit. Desktop: in einer dritten Spalte rechts.
         if (!WIDE())
@@ -5392,7 +5395,7 @@
           h += `<div class="cap">Übungen ändern</div>
       <button class="btn" data-edit="${i}">Übungen anpassen →</button>`;
           h += `<div class="cap">Keine Zeit gehabt?</div>
-      <button class="btn ${S.skip[dk] ? "" : "primary"}" data-act="skip">${S.skip[dk] ? "Doch nicht ausgefallen" : "Als ausgefallen markieren"}</button>`;
+      <button class="btn" data-act="skip">${S.skip[dk] ? "Doch nicht ausgefallen" : "Als ausgefallen markieren"}</button>`;
         }
         h += `<div class="cap">${rest ? "Diese Einheit hierher holen" : "Tauschen mit"}</div>
     <p class="sub" style="margin:calc(-1 * var(--s1)) 0 var(--s3)">Die Einheiten tauschen den Tag. ${rest ? "" : "Freie Tage sind am besten."} „Hart auf hart“ heisst: Danach lägen zwei harte Einheiten direkt hintereinander (der genannte Tag ist der Nachbar). Das geht, ist aber nicht ideal.</p><div class="list">`;
@@ -6138,7 +6141,7 @@
               .join(" · ")}</p>`
           : "";
       function garminCard() {
-        let h = `<div class="card"><div class="acct"><span class="av" style="background:var(--garmin);color:#fff">G</span><div><b>Garmin</b><div class="sub">Aktivitäten, HRV, Schlaf, Body Battery, Readiness</div></div></div>`;
+        let h = `<div class="card"><div class="acct"><span class="av">G</span><div><b>Garmin</b><div class="sub">Aktivitäten, HRV, Schlaf, Body Battery, Readiness</div></div></div>`;
         if (!(sb && USER))
           return (
             h +
@@ -6186,13 +6189,13 @@
         h += garminCard();
         h += `<div class="card">`;
         if (tok) {
-          h += `<div class="row between"><div class="acct"><span class="av" style="background:var(--strava);color:#fff">S</span><div><b>Verbunden${tok.athlete ? " als " + esc(tok.athlete) : ""}</b><div class="sub">${S.strava.at ? "Zuletzt synchronisiert " + new Date(S.strava.at).toLocaleString("de-CH", { dateStyle: "short", timeStyle: "short" }) : "Noch nicht synchronisiert"}</div></div></div></div>
+          h += `<div class="row between"><div class="acct"><span class="av">S</span><div><b>Verbunden${tok.athlete ? " als " + esc(tok.athlete) : ""}</b><div class="sub">${S.strava.at ? "Zuletzt synchronisiert " + new Date(S.strava.at).toLocaleString("de-CH", { dateStyle: "short", timeStyle: "short" }) : "Noch nicht synchronisiert"}</div></div></div></div>
       ${stMsg ? `<p class="sub mt-3">${esc(stMsg)}</p>` : ""}
       <div class="grid2 mt-4"><button class="btn strava" data-act="st-sync" ${stBusy ? "disabled" : ""}>${stBusy ? "Lädt …" : "Jetzt synchronisieren"}</button><button class="btn" data-act="st-off">Trennen</button></div>
       <button class="btn ghost sm mt-2" data-act="st-full" ${stBusy ? "disabled" : ""}>Alles neu laden (ab Planstart)</button>`;
         } else
           h +=
-            `<div class="acct" style="margin-bottom:var(--s3)"><span class="av" style="background:var(--strava);color:#fff">S</span><div><b>Strava</b></div></div>` +
+            `<div class="acct" style="margin-bottom:var(--s3)"><span class="av">S</span><div><b>Strava</b></div></div>` +
             stConnectForm();
         h += `</div><div class="card tight"><b>Strava ohne Verbindung: Datei importieren</b><p class="sub mt-1">Strava → Einstellungen → Mein Konto → „Account-Daten herunterladen“. Aus dem ZIP die Datei <b>activities.csv</b> wählen.</p>
     <div class="btns"><label class="btn file">activities.csv auswählen<input type="file" accept=".csv,.json,text/csv,application/json" data-file="strava"></label></div></div>`;
@@ -8111,7 +8114,7 @@
             v = S.val[dk + "|" + x] || (d ? "" : preWeight(p, t2)),
             pt = lift ? exParts(t2) : { nm: fcLabel(p, x), spec: "", sub: "" },
             sub = [v, pt.sub].filter(Boolean).join(" · ");
-          return `<li class="${d ? "d" : ""}${cur ? " c" : ""}"><button type="button" class="fo-r" data-fc="go" data-j="${x}" ${cur ? 'aria-current="true"' : ""}><span class="ix">${String(x + 1).padStart(2, "0")}</span><span class="fo-t"><b>${esc(pt.nm)}</b>${sub ? `<small>${esc(sub)}</small>` : ""}</span><span class="num sr">${esc(pt.spec)}</span>${d ? CK_SVG : ""}</button>${cur ? panel : ""}</li>`;
+          return `<li class="${d ? "d" : ""}${cur ? " c" : ""}"><button type="button" class="fo-r" data-fc="go" data-j="${x}" ${cur ? 'aria-current="true"' : ""}><span class="ix">${String(x + 1).padStart(2, "0")}</span><span class="fo-t"><b>${esc(pt.nm)}</b>${sub ? `<small>${esc(sub)}</small>` : ""}</span><span class="num sr">${esc(pt.spec)}</span>${d ? CK_SVG + SR_DONE : ""}</button>${cur ? panel : ""}</li>`;
         };
         const mini = (panel) => `<ol class="fc-ov" aria-label="Alle Übungen">${p.i.map((t2, x) => fcRow(t2, x, panel)).join("")}</ol>`;
         if (focusFin) {

@@ -1924,3 +1924,318 @@ th input,
     padding-top: var(--s10, 56px);
   }
 }
+
+/* ======================= Nachbesserungen aus der unabhängigen Prüfung ======================= */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+:root {
+  --rest: #80848a;
+}
+
+/* Gold nur für die Hauptaktion: kleine Primär-Tasten sind umrandet */
+.btn.primary.sm,
+.sug .btn.primary,
+.grid2 .btn.primary.sm {
+  background: none;
+  border: 1.5px solid var(--text);
+  color: var(--text);
+  font-family: var(--f-body);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0;
+  text-transform: none;
+  min-height: 48px;
+}
+#focus .fc-tbtn button.go {
+  background: none;
+  border-color: var(--text);
+  color: var(--text);
+}
+/* RPE-Wahl neutral statt Verlaufsfarben */
+#focus .fc-rpe button.on,
+.rpe-b button.on {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--text);
+  color: var(--text);
+}
+.rpe-b button {
+  border: 1.5px solid var(--outline);
+  background: none;
+}
+.hold-fill {
+  background: rgba(255, 255, 255, 0.18);
+}
+.hold,
+.btn.hold {
+  background: none;
+}
+
+/* Erledigt-Leiste: Sportfarbe nur als Balken links, Haken grau */
+.done-bar {
+  border-left: 4px solid var(--kc, var(--muted));
+  border-radius: 0;
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
+  padding-left: var(--s3);
+}
+.done-bar .ck {
+  background: none;
+  color: var(--muted);
+  width: 24px;
+  height: 24px;
+  border-radius: 0;
+}
+.done-bar .more {
+  color: var(--muted);
+}
+.target.bad,
+.target {
+  background: none;
+}
+
+/* Marken-Avatare neutral */
+.av,
+.onb .av {
+  background: none;
+  color: var(--text);
+  border: 1.5px solid var(--outline);
+}
+
+/* Rückblick: Status als Text mit Punkt, nur ein grosser Titel pro Seite */
+.rv-st {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: 14px;
+}
+.vh ~ .wk h2,
+.vh + .wk h2,
+.vh[style] h2 {
+  font-size: 32px;
+}
+.vh[style] {
+  border-top: 1px solid var(--hair);
+}
+
+/* Wochen-Rail ab Tablet: Auswahl-Balken überdeckt die Zahl nicht */
+.strip.v button {
+  padding-left: 12px;
+}
+.strip.v button.today,
+.strip.v button.sel {
+  box-shadow: inset 3px 0 0 var(--text);
+}
+.strip {
+  gap: 4px;
+}
+
+/* Tippflächen ≥ 44 px, Kontrast */
+.lchips button {
+  min-height: 44px;
+}
+.ex.row-v {
+  grid-template-columns: minmax(0, 1fr) 104px 44px;
+}
+.ex.row-v .ex-v input {
+  min-height: 44px;
+}
+.ex-x {
+  opacity: 1;
+  color: var(--muted);
+}
+.ex-x.on {
+  color: var(--text);
+}
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+#focus .fc-in::placeholder {
+  opacity: 1;
+  color: rgba(255, 255, 255, 0.45);
+}
+details.after > summary,
+details.hints > summary {
+  justify-content: space-between;
+}
+details.after > summary::after,
+details.hints > summary::after {
+  margin-left: auto;
+}
+details.hints > summary em {
+  margin-left: auto;
+  margin-right: var(--s2);
+}
+
+/* Lauf-Dashboard fertig: dann ist "Übung erledigt" die Hauptaktion */
+#focus:has(#fcd[data-ph="done"]) .fc-nav .fc-ok:not(.on) {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+
+/* Kleine Telefone hochkant: alles Wichtige ohne Scrollen */
+@media (orientation: portrait) and (max-height: 760px) {
+  #focus {
+    gap: var(--s2);
+  }
+  #focus .fc-top {
+    min-height: 44px;
+  }
+  #focus .fc-run.fcd {
+    gap: var(--s2) 0;
+  }
+  #focus .fcd-head .fc-rn {
+    display: none;
+  }
+  #focus .fcd-card.fcd-lap b {
+    font-size: clamp(72px, 26vw, 100px);
+  }
+  #focus .fcd-card b {
+    font-size: 36px;
+  }
+  #focus .fcd-card {
+    padding-top: var(--s2);
+    padding-bottom: var(--s2);
+  }
+  #focus .fcd .fc-rb button.go,
+  #focus .fc-rb button.go {
+    height: 64px;
+    font-size: 28px;
+  }
+  #focus .fcd-tools button {
+    height: 44px;
+  }
+  #focus.fc-dash .fc-field {
+    display: none;
+  }
+  #focus.fc-dash .fc-nav .fc-ok,
+  #focus.fc-dash .fc-side {
+    height: 48px;
+  }
+  #focus .fc-nav.ov .fc-ok {
+    height: 64px;
+    font-size: 28px;
+  }
+}
+@media (orientation: portrait) and (max-height: 620px) {
+  #focus .fcd-done {
+    display: none;
+  }
+  #focus .fcd-head .fc-rg {
+    display: none;
+  }
+}
+
+/* Lauf-Dashboard quer: Werkzeuge und letzte Runden bleiben erreichbar */
+@media (orientation: landscape) and (max-height: 520px) {
+  #focus .fc-run.fcd {
+    grid-template-areas: "head tools" "lap tempo" "lap dist" "done hr" "btn btn";
+  }
+  #focus .fcd-tools {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-self: start;
+    gap: 6px;
+  }
+  #focus .fcd-tools button {
+    height: 44px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+  #focus .fcd-done {
+    display: grid;
+    align-content: end;
+    gap: 0;
+    overflow: hidden;
+  }
+  #focus .fcd-done .fcd-row {
+    padding: 3px 0;
+    font-size: 13px;
+  }
+  #focus .fcd-done .fcd-row b {
+    font-size: 20px;
+  }
+  #focus .fcd-done .fcd-row:nth-last-child(n + 3) {
+    display: none;
+  }
+  #focus.fc-dash .fc-nav .fc-ok {
+    width: 56px;
+  }
+  #focus:has(#fcd[data-ph="done"]) .fc-nav .fc-ok:not(.on) {
+    height: 56px;
+  }
+  #focus .fcd-card {
+    border-bottom: 1px solid var(--hair);
+  }
+}
+
+@media (orientation: portrait) and (max-height: 700px) {
+  #focus .fcd-done {
+    display: none;
+  }
+  #focus .fcd-card.fcd-lap b {
+    font-size: clamp(64px, 22vw, 84px);
+  }
+}
+@media (orientation: portrait) and (max-height: 620px) {
+  #focus .fc-seg {
+    display: none;
+  }
+  #focus .fcd-tools {
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+  #focus .fcd-tools button {
+    padding: 0 8px;
+    font-size: 12px;
+  }
+  #focus .fcd-head {
+    padding-top: var(--s2);
+  }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  #focus .fcd-card.fcd-lap b {
+    font-size: clamp(64px, 30vh, 170px);
+  }
+}
+@media (orientation: landscape) and (max-height: 400px) {
+  #focus .fcd-card.fcd-tempo b,
+  #focus .fcd-card.fcd-dist b,
+  #focus .fcd-card.fcd-hr b {
+    font-size: clamp(28px, 10vh, 38px);
+    line-height: 1;
+  }
+  #focus .fcd-card {
+    padding: 2px 0;
+  }
+  #focus .fcd-card.fcd-lap b {
+    font-size: clamp(60px, 27vh, 100px);
+  }
+  #focus .fcd-card.fcd-lap {
+    padding: 0;
+  }
+}
+
+.day .t {
+  min-width: 0;
+}
+.day .meta {
+  max-width: 120px;
+}
+.day.sm .meta .badges {
+  display: none;
+}
+.pw-h h3 {
+  white-space: nowrap;
+}
+.pw-h .sub {
+  min-width: 0;
+}

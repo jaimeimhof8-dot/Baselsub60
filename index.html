@@ -4967,7 +4967,8 @@
         energy: ["hoch", "mittel", "tief"],
         pain: ["keine", "leicht", "stark"],
       };
-      let ciOpen = false;
+      let ciOpen = false,
+        ciTop = false;
       const QCHEV = `<svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
       /* Leise Zeile: Punkt, Name, Wert rechts, Pfeil. Laut wird nur die Warnung (gelb/rot). */
       const qline = (label, val, attrs, cls) =>
@@ -5080,7 +5081,10 @@
           `<div class="sub wmeta">Woche ${Math.floor(i / 7) + 1} · ${blockLabel(info.block)} · ${esc(info.wave)}</div>` +
           (dayPlan(i) ? sessionCard(i) : "");
         // Check-in-Warnung (gelb/rot) steht über der Einheit, sonst bleibt es eine leise Zeile darunter
-        const ciWarn = i === TODAY && !ciOpen && ["yellow", "red"].includes(readiness(S.checkin[keyI(i)] || {}));
+        // Beim Ausfüllen bleibt die Reihenfolge wie beim Öffnen (ciTop), damit das Formular dort erscheint, wo getippt wurde
+        const warnNow = i === TODAY && ["yellow", "red"].includes(readiness(S.checkin[keyI(i)] || {}));
+        if (!ciOpen) ciTop = warnNow;
+        const ciWarn = i === TODAY && (ciOpen ? ciTop : warnNow);
         if (!rail) return ciWarn ? intro + daily + session + strip : intro + session + daily + strip;
         const nav = `<nav class="rail" aria-label="Diese Woche">${strip}</nav>`;
         // Tablet: Check-in/Vorschläge über der Einheit. Desktop: in einer dritten Spalte rechts.

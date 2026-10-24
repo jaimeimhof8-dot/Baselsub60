@@ -3763,6 +3763,35 @@
       details.hints[open] > summary::after, details.after[open] > summary::after { content: " ▴"; }
       details.hints > summary em { font-style: normal; padding: 1px 8px; border-radius: 999px; background: rgba(127,127,127,.2); margin-left: 4px; }
       .ex-h input[type="checkbox"] { width: 28px; height: 28px; }
+
+      /* ===== Feinschliff (Okt 2026): fünf Schriftstufen 12 / 14 / 16 / 20 / 28 und Abstände 8 / 16 / 24 =====
+         Gleiche Optik wie vorher, nur ruhiger: weniger halbe Schriftgrössen, klare Hauptaktion auf „Heute“. */
+      .lbl, .cap, .stat span, .ring-t span, .lstats span, .extras .lbl, .kpi span, .strip .dn { font-size: 12px; }
+      h1 { font-size: 28px; }
+      h3 { font-size: 16px; }
+      .kind, .btn.sm, .more-row .btn, .wx-n, .wx-p { font-size: 14px; }
+      .btn, .fold-h, details.hints > summary, details.after > summary, .ex-h span, .extras .fold-h span { font-size: 16px; }
+      .ex-x, .strip .dd, .stat b { font-size: 20px; }
+      .wmeta { margin: var(--s2) 0 var(--s4); }
+      main > .card, main > .narrow > .card, main > details.hints { margin-bottom: var(--s5); }
+      .card.hero { padding: var(--s4) var(--s4) var(--s5); }
+      .session-h h1 { margin-top: var(--s2); }
+      .prog { height: 4px; margin: var(--s4) 0 var(--s2); }
+      .btns { margin-top: var(--s4); }
+      .btn.hold { background: transparent; border: 1px solid rgba(255, 255, 255, 0.18); }
+      /* Übungszeilen: Name über Details, nichts bricht mehr mitten im Satz um */
+      .ex.row-v { grid-template-columns: minmax(0, 1fr) 84px 32px; min-height: 64px; }
+      .ex.row-v .ex-v input { padding: 0 var(--s2); }
+      .ex-t { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+      .ex-t b { font-weight: 600; font-size: 16px; line-height: 1.3; }
+      .ex-t small { font-size: 14px; color: var(--muted); line-height: 1.35; }
+      .ex.is-done .ex-t b, .ex.is-done .ex-t small { color: var(--muted); }
+      .ci-mini .grid2 .btn { padding: 0 var(--s2); white-space: nowrap; }
+      /* Fokusmodus */
+      #focus .fc-mini button { font-size: 0.95rem; }
+      #focus .fc-mini em { font-size: 0.875rem; }
+      #focus .fc-main { gap: 24px; }
+      #focus .fc-upnext { border-style: solid; border-color: rgba(255, 255, 255, 0.1); }
     </style>
   </head>
   <body>
@@ -4722,6 +4751,8 @@
             .join(
               "; ",
             )}.${oi.byExtra && oi.runs.length ? `<div class="xcause">Ausgelöst durch Zusatz-Einheit: ${oi.runs.map((r) => `${esc(r.label)} (${esc(shortDay(r.d))})`).join(", ")}</div>` : ""}${p.easy ? " Die Einheit ist bereits entlastet." : `<div class="grid2 mt-3"><button class="btn sm" data-act="ol-easy" data-i="${i}">Entlasten</button><button class="btn sm" data-move="${i}">Verschieben …</button></div>`}</div>`;
+        // Hauptaktion zuerst: Fokusmodus direkt unter dem Kopf der Einheit, Fortschritt und Details darunter
+        h += dayActions(i, p, done, n);
         // Eine einzige Aufgabe: keine Fortschrittsleiste, keine Checkbox – die Zeile selbst ist der Hold-Button
         const single = n === 1,
           undo = single && done >= n;
@@ -4742,7 +4773,6 @@
             ? `<div class="target">Noch kein Team-Tempo T. Trag zuerst den Pacing-Test ein (Menü → Profil).</div>`
             : `<div class="target">Team-Tempo T = ${mmss(T)}/km · Ziel heute <b>${mmss(T + p.tp[0])}–${mmss(T + p.tp[1])}/km</b></div>`;
         }
-        h += dayActions(i, p, done, n);
         h += `<div class="exs">`;
         p.i.forEach((t, j) => {
           const id = dk + "|" + j,
@@ -4751,7 +4781,7 @@
           const wide = (p.k === "lauf" && dash.parseReps(t)) || !!lineSlots(t);
           h += single
             ? `<div class="ex ${on ? "is-done" : ""}"><div class="ex-h hold" data-hold="${i}"${on ? " data-undo" : ""} role="button" tabindex="0" aria-label="${esc(t)} – gedrückt halten, um ${on ? "wieder zu öffnen" : "abzuschliessen"}"><i class="hold-fill" aria-hidden="true"></i><span>${lineHtml(t)}</span><em class="hold-hint" aria-hidden="true">${on ? "Halten ↺" : "Halten ✓"}</em></div>`
-            : `<div class="ex row-v${wide ? " wide" : ""} ${on ? "is-done" : ""}${sk ? " is-skipped" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${lineHtml(t)}</span></label>${skipBtn(id, t, sk)}`;
+            : `<div class="ex row-v${wide ? " wide" : ""} ${on ? "is-done" : ""}${sk ? " is-skipped" : ""}"><label class="ex-h"><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span>${exLine(p, t)}</span></label>${skipBtn(id, t, sk)}`;
           if (!isFiller(t)) {
             const lift = isLift(p.k, t),
               le = lastEntry(i, t),
@@ -4949,8 +4979,8 @@
           Object.keys(S.val).some(
             (x) => x.startsWith(k + "|") && String(S.val[x]).trim(),
           );
-        if (started && !ciOpen)
-          return `<div class="card tight ci-mini"><div class="row between"><h3>Check-in heute</h3><button class="btn ghost sm" data-act="ci-edit">Ausfüllen</button></div></div>`;
+        if (!ciOpen)
+          return `<div class="card tight ci-mini"><div class="row between"><h3>Check-in heute</h3><span class="sub">ca. 20 Sekunden</span></div><div class="grid2 mt-3"><button class="btn sm" data-act="ci-ok" data-k="${k}">✓ Keine Beschwerden</button><button class="btn sm" data-act="ci-edit">Ausfüllen</button></div></div>`;
         h += `<div class="mt-2">`;
         // Ein Tipp für einen unauffälligen Tag – unterscheidet „alles gut“ von „vergessen“
         if (r !== "green")
@@ -5045,7 +5075,7 @@
         }
         strip += `</div>`;
         const session =
-          `<div class="sub" style="margin-bottom:var(--s3)">Woche ${Math.floor(i / 7) + 1} · ${blockLabel(info.block)} · ${esc(info.wave)}</div>` +
+          `<div class="sub wmeta">Woche ${Math.floor(i / 7) + 1} · ${blockLabel(info.block)} · ${esc(info.wave)}</div>` +
           (dayPlan(i) ? sessionCard(i) : "");
         if (!rail) return intro + daily + session + strip;
         const nav = `<nav class="rail" aria-label="Diese Woche">${strip}</nav>`;
@@ -7725,6 +7755,22 @@
           ? n
           : String(t).split(",")[0].trim();
       };
+      /* Planzeile "Bulgarian Split Squat 3×8 je Seite RPE 7" → Name, "3×8 · je Seite · RPE 7" (Satz×Wdh zuerst) */
+      const EX_SPEC = /^\d+\s*[×x]\s*\d+(?:[.,]\d+)?\s*(?:km|m|′|min|″|")?/i;
+      function exParts(t) {
+        const nm = exLabel(t),
+          rest = String(t).slice(nm.length).trim(),
+          m = rest.match(EX_SPEC),
+          spec = m ? m[0].replace(/\s+/g, "") : "",
+          sub = (m ? rest.slice(m[0].length) : rest).trim().replace(/\s+(RPE\b)/i, " · $1").replace(/^[·\s,]+/, "");
+        return { nm, detail: [spec, sub].filter(Boolean).join(" · ").replace(/RPE\s+/g, "RPE\u00a0") };
+      }
+      /* Zeilentext in der Übungsliste: Kraftübungen zweizeilig (Name / Details), alles andere wie bisher */
+      function exLine(p, t) {
+        if (!isLift(p.k, t) || lineSlots(t)) return lineHtml(t);
+        const { nm, detail } = exParts(t);
+        return `<span class="ex-t"><b>${esc(nm)}</b>${detail ? `<small>${esc(detail)}</small>` : ""}</span>`;
+      }
       /* Abschluss-Animation: Fortschritt wird grün, Inhalt blendet aus, die Karte schrumpft auf Balkenhöhe,
    danach erscheint der Balken. Ohne Animation, wenn das System „Bewegung reduzieren“ eingestellt hat. */
       function closeCard(i) {

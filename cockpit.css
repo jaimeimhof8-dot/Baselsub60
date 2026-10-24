@@ -2239,3 +2239,251 @@ details.hints > summary em {
 .pw-h .sub {
   min-width: 0;
 }
+
+/* ======================= Kommentar-Runde (24.10.) ======================= */
+/* Farbakzente mit Regel: Grün = erledigt/gut, Amber = Aufmerksamkeit, Rot = Warnung, Sportfarben für Sport und ihre Kennzahlen */
+:root {
+  --ok: #30d158;
+  --d-rec: #30d158;
+  --d-load: #ff9f0a;
+  --d-week: #2dd4bf;
+  --d-sleep: #8b8cff;
+  --d-heart: #ff6b81;
+}
+/* Erledigt-Haken grün */
+.tab .ck,
+#focus .fo-r .ck,
+.done-bar .ck,
+.wk .ok,
+.status.done {
+  color: var(--ok);
+}
+.day .status {
+  color: var(--warn);
+}
+.day .status.done {
+  color: var(--ok);
+}
+.tab .r.done .ck {
+  color: var(--ok);
+}
+/* Heute: Check-in offen = Amber-Punkt, Hinweis-Zähler Amber, Zahl rechts neben dem Pfeil */
+.qline .qdot {
+  display: none;
+}
+.qline.dot .qdot,
+.qline.warn .qdot {
+  display: block;
+  background: var(--warn);
+}
+.qline.warn.red .qdot {
+  background: var(--danger);
+}
+.qline.ok .qdot {
+  background: var(--ok);
+}
+details.hints > summary em {
+  margin-left: auto;
+  margin-right: 0;
+  color: var(--warn);
+  font-weight: 600;
+}
+details.hints > summary::after,
+details.after > summary::after {
+  margin-left: var(--s2);
+}
+details.after > summary::after {
+  margin-left: auto;
+}
+.qline .qdot ~ span {
+  flex: 1;
+}
+/* Check-in-Formular: ohne Umrandung, Auswahl farbig (gut grün, mittel gelb, schlecht rot) */
+.ci-row .seg button,
+.ci-row .seg button:active {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  border-radius: 8px;
+  font-weight: 500;
+}
+.ci-row .seg button.on {
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+}
+.ci-row .seg button.on.v-g {
+  color: var(--ok);
+  background: rgba(48, 209, 88, 0.14);
+}
+.ci-row .seg button.on.v-y {
+  color: var(--warn);
+  background: rgba(255, 159, 10, 0.14);
+}
+.ci-row .seg button.on.v-r {
+  color: var(--danger);
+  background: rgba(255, 105, 97, 0.14);
+}
+.ci-row {
+  padding: var(--s1) 0;
+}
+.ci-foot {
+  margin-top: var(--s3);
+}
+.ci-foot .qline:last-child {
+  border-bottom: 1px solid var(--hair);
+}
+.ci-txt {
+  margin-top: var(--s3);
+}
+.progrow.end {
+  justify-content: flex-end;
+}
+/* Heute/Woche: heutiger Tag in der Sportfarbe */
+.day.today .d b,
+.strip button.today .dd,
+.strip button.sel .dd {
+  color: var(--kc, var(--text));
+}
+.day.today .meta::after {
+  color: var(--kc, var(--text));
+}
+/* Dashboard: Kennzahlen und Abschnitte mit Datenfarbe */
+.ring-t b {
+  color: var(--ring, var(--text));
+}
+.dash-title.t-week { --tc: var(--d-week); }
+.dash-title.t-rec { --tc: var(--d-rec); }
+.dash-title.t-kraft { --tc: var(--kraft); }
+.dash-title.t-sleep { --tc: var(--d-sleep); }
+.dash-title[class*="t-"] {
+  color: var(--tc);
+  border-top: 2px solid var(--tc);
+}
+.lstats .m-lauf b {
+  color: var(--lauf);
+}
+.lstats .m-load b {
+  color: var(--d-load);
+}
+.viz .ax text,
+.viz .ax {
+  fill: var(--muted);
+}
+.lchips button.on {
+  border-color: var(--tc, var(--text));
+}
+/* Rückblick: Status farbig */
+.kpi-green b { color: var(--ok); }
+.kpi-yellow b { color: var(--warn); }
+.kpi-red b { color: var(--danger); }
+.rv-day.rv-done { border-top-color: var(--ok); }
+.rv-day.rv-miss { border-top-color: var(--danger); }
+.rv-day.rv-rest { border-top-color: var(--rest); }
+.rv-st.rv-green { color: var(--ok); }
+.rv-st.rv-yellow { color: var(--warn); }
+.rv-st.rv-red { color: var(--danger); }
+.rv-verdict { color: var(--text); }
+.amp-green { color: var(--ok); }
+.amp-yellow { color: var(--warn); }
+.amp-red { color: var(--danger); }
+
+/* ---------- Lauf-Dashboard hochkant: eine Spalte, jede Zahl in einer Zeile ---------- */
+#focus .fcd-tempo b { color: var(--lauf); }
+#focus .fcd-hr b { color: var(--d-heart); }
+#focus .fcd-dist u { background: var(--lauf); }
+@media (orientation: portrait) and (min-height: 761px) {
+  #focus .fc-run.fcd {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "head" "lap" "tempo" "dist" "hr" "done" "btn" "tools";
+    gap: 0;
+  }
+  #focus .fcd-head {
+    margin-bottom: var(--s3);
+  }
+  #focus .fcd-card.fcd-lap {
+    margin-bottom: var(--s2);
+  }
+  #focus .fcd-card.fcd-lap b {
+    font-size: clamp(88px, 28vw, 112px);
+  }
+  #focus .fcd-card.fcd-tempo,
+  #focus .fcd-card.fcd-dist,
+  #focus .fcd-card.fcd-hr {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    border: 0;
+    border-top: 1px solid var(--hair);
+    padding: var(--s2) 0;
+    gap: 0;
+  }
+  #focus .fcd-card.fcd-hr {
+    border-bottom: 1px solid var(--hair);
+  }
+  #focus .fcd-card.fcd-tempo b,
+  #focus .fcd-card.fcd-dist b,
+  #focus .fcd-card.fcd-hr b {
+    font-size: 40px;
+  }
+  #focus .fcd-card > div {
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+  }
+  #focus .fcd-card i {
+    flex: 1 1 100%;
+    margin-top: var(--s1);
+  }
+  #focus .fcd-done {
+    margin-top: var(--s2);
+  }
+  #focus .fcd .fc-rb {
+    margin-top: var(--s3);
+  }
+  #focus .fcd .fc-rb button.go {
+    height: 64px;
+    font-size: 28px;
+  }
+  #focus .fcd-tools {
+    margin-top: var(--s2);
+  }
+}
+/* Querformat: Beschriftung der Tasten rechts (Zurück · Fertig · Weiter) */
+@media (orientation: landscape) and (max-height: 520px) {
+  #focus.fc-dash .fc-nav .fc-ok,
+  #focus.fc-dash .fc-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 64px;
+    height: 56px;
+    line-height: 1;
+    padding: 0;
+  }
+  #focus.fc-dash .fc-side {
+    font-size: 20px;
+  }
+  #focus.fc-dash .fc-nav .fc-ok::after,
+  #focus.fc-dash .fc-side::after {
+    font-family: var(--f-body);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  #focus.fc-dash .fc-nav .fc-ok::after { content: "Fertig"; color: var(--text); }
+  #focus.fc-dash .fc-side:not(.r)::after { content: "Zurück"; }
+  #focus.fc-dash .fc-side.r::after { content: "Weiter"; }
+  #focus:has(#fcd[data-ph="done"]) .fc-nav .fc-ok:not(.on)::after { color: var(--ink); }
+}
+.kpi[data-k="Laufen"] b { color: var(--lauf); }
+.kpi[data-k^="Ø Anstrengung"] b { color: var(--d-load); }
+.kpi[data-k^="Ø Schlaf"] b { color: var(--d-sleep); }
+.kpi[data-k="Zusatz"] b { color: var(--text); }
+#focus .fcd-card.fcd-lap > div {
+  justify-content: flex-start;
+}

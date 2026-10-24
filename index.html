@@ -3840,6 +3840,13 @@
         </button>
       </div>
       <div class="cap">Training</div>
+      <button class="mi" data-act="ci-menu">
+        <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg
+        ><span
+          ><b>Check-in</b
+          ><span class="sub" id="ci-sub">Schlaf, Muskelkater, Energie, Schmerzen</span></span
+        >
+      </button>
       <button class="mi" data-v="review">
         <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6" /></svg
         ><span
@@ -4756,10 +4763,8 @@
         let progRow = "";
         if (undo)
           progRow = `<div class="progrow"><span class="sub">Erledigt</span><span class="row"><button type="button" class="btn sm hold" data-hold="${i}" data-undo aria-label="Gedrückt halten: wieder öffnen"><i class="hold-fill" aria-hidden="true"></i><span>Öffnen · halten</span></button><button class="btn sm" data-act="done-close" data-i="${i}" aria-label="Einklappen">▴</button></span></div>`;
-        else if (single)
-          progRow = `<div class="progrow"><span class="sub">Noch offen</span><button type="button" class="btn sm hold" data-hold="${i}" aria-label="Gedrückt halten: erledigt"><i class="hold-fill" aria-hidden="true"></i><span>Erledigt · halten</span></button></div>`;
-        else
-          progRow = `<div class="progrow"><span class="sub"><b class="num">${done}/${n}</b> erledigt</span>${done < n ? `<button type="button" class="btn sm hold" data-hold="${i}" aria-label="Gedrückt halten: alles erledigt"><i class="hold-fill" aria-hidden="true"></i><span>Alles erledigt · halten</span></button>` : `<button class="btn sm" data-act="done-close" data-i="${i}">Einklappen ▴</button>`}</div>`;
+        else if (!single)
+          progRow = done < n ? `<div class="progrow end"><button type="button" class="btn sm hold" data-hold="${i}" aria-label="Gedrückt halten: alles erledigt"><i class="hold-fill" aria-hidden="true"></i><span>Alles erledigt · halten</span></button></div>` : `<div class="progrow end"><button class="btn sm" data-act="done-close" data-i="${i}">Einklappen ▴</button></div>`;
         // Später fertig machen: offene Übungen an den nächsten Tag anhängen
         const lc = S.later[dk];
         if (lc) {
@@ -4777,7 +4782,7 @@
         const edit = fold.has("e" + i);
         if (!edit) {
           // Übersicht: Nummer, Name, Satz×Wdh – Gewichte und Haken gibt es im Fokusmodus (oder hinter „eintragen“)
-          h += `<div class="tab" role="list">${p.i.map((t, j) => roRow(p, t, j, dk)).join("")}</div>${progRow}${qline("Gewichte und Haken eintragen", "", `data-act="fold" data-f="e${i}" aria-expanded="false"`)}`;
+          h += `<div class="tab" role="list">${p.i.map((t, j) => roRow(p, t, j, dk)).join("")}</div>${undo || done >= n ? progRow : ""}${qline("Gewichte und Haken eintragen", "", `data-act="fold" data-f="e${i}" aria-expanded="false"`)}`;
         } else {
           h += progRow;
         h += `<div class="exs">`;
@@ -4968,7 +4973,7 @@
         pain: ["keine", "leicht", "stark"],
       };
       let ciOpen = false,
-        ciTop = false;
+        ciWant = false; // Menü → Check-in: Startseite mit offenem Formular
       const QCHEV = `<svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
       /* Leise Zeile: Punkt, Name, Wert rechts, Pfeil. Laut wird nur die Warnung (gelb/rot). */
       const qline = (label, val, attrs, cls) =>
@@ -4978,7 +4983,7 @@
           c = S.checkin[k] || {},
           r = readiness(c);
         if (!ciOpen) {
-          if (!r || r === "green") return qline("Check-in", "offen · 20 Sek.", `data-act="ci-edit" aria-expanded="false"`);
+          if (!r || r === "green") return qline("Check-in", "offen · 20 Sek.", `data-act="ci-edit" aria-expanded="false"`, "dot");
           return qline("Check-in", { yellow: "gelb", red: "rot" }[r], `data-act="ci-edit" aria-expanded="false"`, "warn " + r) + `<div class="qwarn ${r}" role="status">${READY_TXT[r]}</div>`;
         }
         let h = `<div class="card tight"><div class="row between"><h3>Check-in heute</h3><span class="sub">${r ? { green: "Grün", yellow: "Gelb", red: "Rot" }[r] : "ca. 20 Sekunden"}</span></div>`;
@@ -4989,10 +4994,9 @@
         for (const [f, label] of CHECKIN_FIELDS) {
           h += `<div class="ci-row"><span>${label}</span><div class="seg" role="group" aria-label="${label}">${["g", "y", "r"].map((v, j) => `<button class="v-${v} ${c[f] === v ? "on" : ""}" data-ci="${k}|${f}|${v}" aria-pressed="${c[f] === v}">${CI_LABELS[f][j]}</button>`).join("")}</div></div>`;
         }
-        h += `</div><button class="btn ghost sm mt-2" data-act="sore-open">Muskelkater genau eintragen →</button>`;
-        if (r)
-          h += `<p class="sub mt-2">${READY_TXT[r]}</p>`;
-        return h + `<button class="btn ghost sm mt-3" data-act="ci-done">${r ? "Fertig" : "Schliessen"}</button></div>`;
+        h += `</div>`;
+        if (r) h += `<p class="sub ci-txt">${READY_TXT[r]}</p>`;
+        return h + `<div class="ci-foot">${qline("Muskelkater genau eintragen", "", `data-act="sore-open"`)}${qline(r ? "Fertig" : "Schliessen", "", `data-act="ci-done"`)}</div></div>`;
       }
       /* Check-in gehört auf die Startseite, solange er offen ist (oder gerade bearbeitet wird) */
       const ciPending = (i) => ciOpen || !readiness(S.checkin[keyI(i)] || {});
@@ -5044,6 +5048,7 @@
         const i = sel != null ? sel : Math.max(0, Math.min(LAST, TODAY));
         const info = weekInfo(Math.floor(i / 7));
         let intro = "",
+          ciPart = "",
           daily = "",
           strip = "";
         if (TODAY < 0 && sel == null)
@@ -5057,12 +5062,13 @@
         if (sel == null) hints += stravaBanner();
         if (i === TODAY && TODAY >= 0 && TODAY <= LAST) {
           hints += recFirstOpen(i) ? recoveryCard(i) : "";
-          daily += ciShow(i) ? checkinCard(i) : "";
+          ciPart = ciShow(i) ? checkinCard(i) : "";
         }
         if (sel == null) hints += reviewCard();
         hints += sugCard();
         const hn = (hints.match(/class="card/g) || []).length;
-        if (hn) daily += `<details class="hints"><summary>Hinweise <em>${hn}</em></summary>${hints}</details>`;
+        const hintPart = hn ? `<details class="hints"><summary>Hinweise <em>${hn}</em></summary>${hints}</details>` : "";
+        daily = ciPart + hintPart;
         const w0 = Math.floor(i / 7) * 7,
           rail = MID();
         // Handy: Leiste quer unter der Einheit. Ab Tablet: hochkant als Seitenleiste links.
@@ -5080,12 +5086,8 @@
         const session =
           `<div class="sub wmeta">Woche ${Math.floor(i / 7) + 1} · ${blockLabel(info.block)} · ${esc(info.wave)}</div>` +
           (dayPlan(i) ? sessionCard(i) : "");
-        // Check-in-Warnung (gelb/rot) steht über der Einheit, sonst bleibt es eine leise Zeile darunter
-        // Beim Ausfüllen bleibt die Reihenfolge wie beim Öffnen (ciTop), damit das Formular dort erscheint, wo getippt wurde
-        const warnNow = i === TODAY && ["yellow", "red"].includes(readiness(S.checkin[keyI(i)] || {}));
-        if (!ciOpen) ciTop = warnNow;
-        const ciWarn = i === TODAY && (ciOpen ? ciTop : warnNow);
-        if (!rail) return ciWarn ? intro + daily + session + strip : intro + session + daily + strip;
+        // Check-in steht oben, solange er offen ist oder warnt (danach nur noch im Menü); Hinweise bleiben unter der Einheit
+        if (!rail) return intro + ciPart + session + hintPart + strip;
         const nav = `<nav class="rail" aria-label="Diese Woche">${strip}</nav>`;
         // Tablet: Check-in/Vorschläge über der Einheit. Desktop: in einer dritten Spalte rechts.
         if (!WIDE())
@@ -6284,6 +6286,7 @@
                 fmt: (v) => Math.round(v) + " kg",
                 label: "Gewichtsverlauf " + cur.label,
                 height: 130,
+                color: "var(--kraft)",
               })
             : `<p class="sub mt-2">Erst ein Eintrag. Ab dem zweiten entsteht hier die Kurve.</p>`;
         return `<div class="card" id="dc-lift">${dchips(
@@ -6433,7 +6436,7 @@
           label: "Belastung",
           value: rpe != null ? cnt(rpe) : "–",
           sub: rpe != null ? "RPE heute" : inPlan && !isSession(TODAY) ? "Ruhetag" : "noch offen",
-          color: "var(--lauf)",
+          color: "var(--d-load)",
         });
         // Ring 3 – Woche: erledigte Einheiten dieser Woche
         let wPlan = 0,
@@ -6446,7 +6449,7 @@
         const r3 = dash.ringGauge(wPlan ? (wDone / wPlan) * 100 : 0, {
           label: "Woche",
           value: `${cnt(wDone)}<small>/${wPlan}</small>`,
-          color: "var(--accent)",
+          color: "var(--d-week)",
         });
         h += `<div class="card dash-rings">${r1}${r2}${r3}</div>`;
 
@@ -6483,11 +6486,11 @@
           .map(Number);
         // Nur Zahlen, die es gibt: ohne Strava/Garmin-Aktivitäten keine 0,0 km
         const ws = [
-          cw.runKm > 0 && `<div><span>Laufen</span><b>${cnt(cw.runKm, 1, " km")}</b></div>`,
+          cw.runKm > 0 && `<div class="m-lauf"><span>Laufen</span><b>${cnt(cw.runKm, 1, " km")}</b></div>`,
           cw.min > 0 && `<div><span>Trainingszeit</span><b>${dash.hm(cw.min)}</b></div>`,
-          `<div><span>Ø Anstrengung</span><b>${rpes.length ? cnt(rpes.reduce((a, b) => a + b, 0) / rpes.length, 1) : "–"}</b></div>`,
+          `<div class="m-load"><span>Ø Anstrengung</span><b>${rpes.length ? cnt(rpes.reduce((a, b) => a + b, 0) / rpes.length, 1) : "–"}</b></div>`,
         ].filter(Boolean).slice(-3);
-        h += `<div class="dash-title">Diese Woche</div><div class="card"><div class="lstats" style="grid-template-columns:repeat(${ws.length},1fr)">${ws.join("")}</div>
+        h += `<div class="dash-title t-week">Diese Woche</div><div class="card"><div class="lstats" style="grid-template-columns:repeat(${ws.length},1fr)">${ws.join("")}</div>
     <div class="sub mt-3">Anstrengung pro Tag (RPE 1–10)</div>
     ${
       !rpes.length
@@ -6507,6 +6510,7 @@
               label: "Anstrengung pro Tag",
               fmt: (v) => Math.round(v) + "",
               height: 110,
+              color: "var(--d-load)",
             },
           )
     }</div>`;
@@ -6542,7 +6546,7 @@
         const have = Object.keys(WELL).filter((k) =>
           days.some((d) => S.garmin.well[d] && S.garmin.well[d][k] != null),
         );
-        h += `<div class="dgrid"><section><div class="dash-title">Erholung im Verlauf</div>`;
+        h += `<div class="dgrid"><section><div class="dash-title t-rec">Erholung im Verlauf</div>`;
         if (have.length) {
           const ksel = have.includes(dashWell) ? dashWell : have[0],
             [, wf, wo, wdesc] = WELL[ksel];
@@ -6568,13 +6572,13 @@
           value: vals[i],
           tip: `${dmy(d)}: ${vals[i] == null ? "keine Daten" : wf(vals[i])}`,
         })),
-        { fmt: wf, label: WELL[ksel][0], height: 120, ...wo },
+        { fmt: wf, label: WELL[ksel][0], height: 120, color: { readiness: "var(--d-rec)", hrv: "var(--d-sleep)", rhr: "var(--d-heart)" }[ksel], ...wo },
       )}
       <p class="sub mt-2">${wdesc}</p></div>`;
         } else
           h += `<div class="card"><p class="sub">${S.garmin.conn ? "Noch keine Erholungswerte. Unter Menü → Strava / Garmin synchronisieren." : "Verbinde Garmin (Menü → Strava / Garmin), dann siehst du hier Erholung, Schlaf, HRV und Ruhepuls im Verlauf."}</p></div>`;
-        h += `</section>${liftData().length ? `<section><div class="dash-title">Kraft</div>${liftCard()}</section>` : ""}</div>`;
-        h += `<div class="dash-title">Schlaf</div>${sleepCard(days)}`;
+        h += `</section>${liftData().length ? `<section><div class="dash-title t-kraft">Kraft</div>${liftCard()}</section>` : ""}</div>`;
+        h += `<div class="dash-title t-sleep">Schlaf</div>${sleepCard(days)}`;
 
         // Letzte Aktivitäten (3) + Weg zu allen Aktivitäten und zu den Tests
         const last = acts
@@ -6655,7 +6659,7 @@
             hi: d === last,
             tip: `${dmy(d)}: ${W[d] && W[d].sleepH != null ? one(W[d].sleepH) + " h" + (W[d].sleepScore != null ? " · Score " + W[d].sleepScore : "") : "keine Daten"}`,
           })),
-          { label: "Schlafdauer", fmt: (v) => Math.round(v) + " h", height: 120 },
+          { label: "Schlafdauer", fmt: (v) => Math.round(v) + " h", height: 120, color: "var(--d-sleep)" },
         )}`;
         if (nights.length > 7)
           h += `<p class="sub mt-2">Ø seit Planstart: ${a("sleepH", nights, (v) => one(v) + " h")} · Score ${a("sleepScore", nights, (v) => Math.round(v))}</p>`;
@@ -7012,7 +7016,7 @@
           hasRuns = acts.some((a) => a.group === "run");
         const rc = hasRuns ? review.runCheck(wl[w] ? wl[w].runKm : 0, { plan: wi.km || null, prev: w > 0 && wl[w - 1] ? wl[w - 1].runKm : null }) : null;
         const kpi = (label, val, hint, lvl) =>
-          `<div class="kpi"><span>${lvl ? `<i class="rv-dot rv-${lvl}" aria-hidden="true"></i>` : ""}${label}</span><b>${val}</b><em>${hint}</em></div>`;
+          `<div class="kpi" data-k="${esc(label)}"><span>${lvl ? `<i class="rv-dot rv-${lvl}" aria-hidden="true"></i>` : ""}${label}</span><b>${val}</b><em>${hint}</em></div>`;
         h += `<div class="rv-kpis">${kpi(
           "Laufen",
           rc ? one(rc.km) + " km" : "–",
@@ -8725,6 +8729,13 @@
         document
           .querySelectorAll("[data-partner]")
           .forEach((x) => (x.textContent = PARTNER));
+        {
+          const cs = $("#ci-sub");
+          if (cs) {
+            const r = TODAY >= 0 && TODAY <= LAST ? readiness(S.checkin[keyI(TODAY)] || {}) : null;
+            cs.textContent = r ? `Heute: ${{ green: "grün", yellow: "gelb", red: "rot" }[r]} · ändern` : "Heute noch offen · 20 Sekunden";
+          }
+        }
         $("#acct").innerHTML = acctHtml(true);
         hideSplash();
         const al = $("#acct .acct-link");
@@ -8936,7 +8947,8 @@
           kind = how || (TABS.includes(v) ? "tab" : "push");
         const apply = () => {
           view = v;
-          ciOpen = false;
+          ciOpen = ciWant && v === "today";
+          ciWant = false;
           if (v === "today") sel = null;
           menu(false);
           render();
@@ -9795,6 +9807,10 @@
             n.scrollIntoView({ block: "center", behavior: "smooth" });
           }
           return;
+        }
+        if (d.act === "ci-menu") {
+          ciWant = true;
+          return go("today");
         }
         if (d.act === "menu") return menu(true);
         if (d.act === "close") return menu(false);

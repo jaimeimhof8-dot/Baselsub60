@@ -1073,6 +1073,47 @@
       .wk .sub {
         margin-top: var(--s1);
       }
+      /* Wochen-Regal: zwei Wochen als Bretter mit je 7 Fächern */
+      .shelf-nav { margin-bottom: var(--s2); }
+      .shelf-nav h3 { margin: 0; }
+      .shelf-help { margin: var(--s2) 0 var(--s3); }
+      .drag-info { min-height: 22px; font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: var(--s2); }
+      .board { margin-bottom: var(--s4); }
+      .board-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s1) var(--s2); margin-bottom: var(--s2); }
+      .board-h span { color: var(--muted); }
+      .board-h small { color: var(--muted); font-size: 12px; margin-left: auto; }
+      .fachreihe { list-style: none; margin: 0; padding: var(--s2); display: grid; grid-template-columns: 1fr; gap: var(--s2); background: var(--well); border: 1px solid var(--line); border-bottom: 0; border-radius: var(--r-m) var(--r-m) 0 0; }
+      .plank { height: 8px; border-radius: 0 0 var(--r-m) var(--r-m); background: linear-gradient(#2c303c, #1b1e29); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4); }
+      .fach { display: flex; gap: var(--s2); align-items: stretch; min-width: 0; border-radius: var(--r-s); border: 1px dashed transparent; padding: 2px; }
+      .fach .sl-h { flex: none; width: 44px; display: flex; flex-direction: column; justify-content: center; font-size: 12px; font-weight: 600; color: var(--muted); line-height: 1.15; }
+      .fach .sl-h b { display: block; font-size: 19px; color: var(--text); font-variant-numeric: tabular-nums; }
+      .fach.today .sl-h b { color: var(--accent); }
+      .sl-card { position: relative; flex: 1; min-width: 0; text-align: left; display: flex; flex-direction: column; gap: var(--s1); padding: var(--s3) 48px var(--s3) 18px; min-height: 64px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-s); color: var(--text); font: inherit; cursor: grab; user-select: none; -webkit-user-select: none; overflow: hidden; }
+      .sl-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--kc); }
+      .sl-card > b { font-weight: 600; font-size: 14px; overflow-wrap: break-word; hyphens: auto; }
+      .sl-card .badges { display: flex; flex-wrap: wrap; gap: var(--s1); }
+      .fach.k-rest .sl-card { background: transparent; border-style: dashed; }
+      .fach.sel .sl-card { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+      .fach.lock .sl-card { opacity: 0.45; cursor: pointer; padding-right: var(--s3); }
+      .grip { position: absolute; right: 0; top: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 20px; touch-action: none; cursor: grab; }
+      .badge.team { background: rgba(224, 191, 106, 0.15); color: var(--accent); }
+      .fach.over { border-color: var(--ok); background: rgba(48, 209, 88, 0.08); }
+      .fach.nope { border-color: var(--danger); background: rgba(255, 105, 97, 0.07); }
+      .sl-card.lifted { opacity: 0.3; }
+      .sl-card.ghost { position: fixed; left: 0; top: 0; z-index: 100; pointer-events: none; opacity: 0.95; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55); cursor: grabbing; }
+      body.dragging { user-select: none; -webkit-user-select: none; cursor: grabbing; }
+      .fach.flash .sl-card { animation: shelf-flash 0.9s var(--ease); }
+      @keyframes shelf-flash { 0% { box-shadow: 0 0 0 3px var(--accent); } 100% { box-shadow: 0 0 0 0 transparent; } }
+      @media (min-width: 600px) {
+        .fachreihe { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+        .fach { flex-direction: column; }
+        .fach .sl-h { width: auto; flex-direction: row; align-items: baseline; justify-content: space-between; gap: var(--s1); }
+        .fach .sl-h b { display: inline; font-size: 16px; margin-left: 2px; }
+        .sl-card { min-height: 112px; padding: 26px var(--s2) var(--s2) 12px; }
+        .fach.lock .sl-card { padding-right: var(--s2); padding-top: var(--s2); }
+        .grip { width: 40px; height: 26px; font-size: 16px; }
+      }
+      @media (prefers-reduced-motion: reduce) { .fach.flash .sl-card { animation: none; } }
       .wsum {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -3964,6 +4005,7 @@
       import { extractTests, applyTests, isRunTest, isStationTest } from "./src/testsync.js";
       import { openItems, canCarry, makeCarry, carriedTo, carryProgress } from "./src/later.js";
       import { swapDayData } from "./src/swap.js";
+      import { lockReason, canDrop, shelfStart } from "./src/shelf.js";
       import { fmtLine, lineSlots } from "./src/workout-fmt.js";
       import { normTime } from "./src/timeinput.js";
       import { repSummary } from "./src/laps.js";
@@ -5301,6 +5343,11 @@
       }
 
       let moveFrom = null,
+        shelfWk = null, // erste der zwei im Regal gezeigten Wochen
+        shelfFlash = null, // zuletzt getauschte Fächer (kurzes Aufleuchten)
+        drag = null, // laufende Zieh-Geste im Regal
+        dragEnd = 0,
+        renderHeld = false, // Neuaufbau, der während des Ziehens zurückgestellt wurde
         swapUndo = null, // {i, j, skip}: letzter Tausch von Hand, damit „Tausch rückgängig“ auch die Ausfall-Markierungen zurückbringt
         swapPair = null, // zuletzt von Hand getauschte Tage: danach nur bei hart auf hart ein Entlasten-Hinweis
         prevView = "today",
@@ -5338,7 +5385,62 @@
           )
           .join("")}<button class="btn ghost sm mt-3" data-act="swapfix-no">Alles so lassen</button><p class="sub mt-3">Entlasten heisst: ca. 75 % Volumen, RPE max. 6.</p></div>`;
       }
-      /* Reiter „Umplanen“ im Coach: Tag wählen, dann tauschen, ausfallen lassen, Übungen anpassen */
+      /* ---------- Wochen-Regal ----------
+         Zwei Wochen als Regalbretter mit je 7 Fächern. Karte ziehen (Maus überall, Touch am Griff) oder antippen;
+         Loslassen auf einem anderen Fach tauscht die beiden Einheiten (swapDays). Gesperrt: Vergangenheit, Verletzung, Renntag. */
+      const shelfToday = () => Math.max(0, TODAY);
+      const shelfOk = (a, b) => canDrop(a, b, dayPlan, shelfToday());
+      /* Tausch von Hand: Einheiten tauschen, Rückgängig-Zustand und „hart auf hart“-Vorschlag merken */
+      function doSwap(i, j) {
+        const pulled = dayPlan(i).k === "rest",
+          to = pulled ? i : j;
+        const skipBefore = [!!S.skip[keyI(i)], !!S.skip[keyI(j)]];
+        swapDays(i, j);
+        swapPair = [i, j];
+        swapUndo = { i, j, skip: skipBefore, eased: [], sig: [srcOf(i), srcOf(j)] };
+        save();
+        moveFrom = to;
+        const wk = Math.floor(to / 7);
+        if (shelfWk != null && (wk < shelfWk || wk > shelfWk + 1)) shelfWk = shelfStart(wk, NWEEKS);
+        shelfFlash = [i, j];
+        renderHeld = false;
+        render();
+        shelfFlash = null;
+        toast(`${dayPlan(to).t} → ${shortDay(to)}`);
+      }
+      function slotHtml(i) {
+        const p = dayPlan(i);
+        if (!p) return `<li class="fach lock"></li>`;
+        const why = lockReason(p, i, shelfToday()),
+          rest = p.k === "rest",
+          { n, done } = dayStatus(i),
+          tags = [];
+        const st = rest ? "" : n && done === n ? `<span class="status done">✓</span>` : done ? `<span class="status">${done}/${n}</span>` : "";
+        if (rest) tags.push(isFixedRest(p, i) ? `<span class="badge">fix</span>` : `<span class="badge ok">frei</span>`);
+        else if (p.joint && !p.solo && !p.race) tags.push(`<span class="badge team">Team</span>`);
+        if (p.moved != null) tags.push(`<span class="badge mv">Verschoben</span>`);
+        if (p.easy) tags.push(`<span class="badge easy">Entlastet</span>`);
+        if (p.inj) tags.push(`<span class="badge warn">Verletzt</span>`);
+        if (S.skip[keyI(i)]) tags.push(`<span class="badge warn">Ausgefallen</span>`);
+        const cls = ["fach", "k-" + p.k, i === TODAY ? "today" : "", i === moveFrom ? "sel" : "", why ? "lock" : "", shelfFlash && shelfFlash.includes(i) ? "flash" : ""].filter(Boolean).join(" ");
+        return `<li class="${cls}" data-slot="${i}"><div class="sl-h"><span>${DAYS[dow(i)]} <b>${dateFromIdx(i).getDate()}</b></span>${st}</div>
+    <button type="button" id="fc-${i}" class="sl-card" data-shelf="${i}" ${why ? "" : `data-drag="${i}"`} aria-pressed="${i === moveFrom}" aria-label="${DAYSF[dow(i)]} ${fmt(dateFromIdx(i))}: ${esc(p.t)}, ${KIND[p.k]}${why ? ", gesperrt" : ", verschiebbar"}${tags.length ? ", " + tags.map((t) => t.replace(/<[^>]+>/g, "")).join(", ") : ""}">${why ? "" : `<span class="grip" aria-hidden="true">⠿</span>`}<b>${esc(p.t)}</b><span class="kind">${KIND[p.k]}</span>${tags.length ? `<span class="badges">${tags.join("")}</span>` : ""}</button></li>`;
+      }
+      function shelfHtml() {
+        const w0 = shelfWk;
+        const range = (w) => `${fmt(dateFromIdx(w * 7))} – ${fmt(dateFromIdx(w * 7 + 6))}`;
+        const board = (w) => {
+          let s = "";
+          for (let x = w * 7; x < w * 7 + 7; x++) s += slotHtml(x);
+          return `<div class="board"><div class="board-h"><b>Woche ${w + 1}</b> <span>${esc(weekInfo(w).name)}</span><small>${range(w)}</small></div><ul class="fachreihe">${s}</ul><div class="plank"></div></div>`;
+        };
+        return `<div class="wk shelf-nav"><button id="shelf-wk-prev" data-act="shelf-wk" data-d="-1" ${w0 <= 0 ? "disabled" : ""} aria-label="Eine Woche zurück">‹</button>
+      <div><h3>Woche ${w0 + 1} und ${w0 + 2}</h3><button class="btn ghost sm" data-act="shelf-today" style="margin-top:2px">zu heute</button></div>
+      <button id="shelf-wk-next" data-act="shelf-wk" data-d="1" ${w0 >= NWEEKS - 2 ? "disabled" : ""} aria-label="Eine Woche vor">›</button></div>
+    <p class="sub shelf-help">Karte ziehen und auf einem anderen Fach loslassen: die beiden Einheiten tauschen den Tag. Am Handy am Griff ⠿ ziehen. Antippen wählt den Tag aus. Graue Fächer sind gesperrt (Vergangenheit, Verletzung, Renntag).</p>
+    <div id="drag-info" class="drag-info" role="status" aria-live="polite"></div>${board(w0)}${board(w0 + 1)}`;
+      }
+      /* Reiter „Umplanen“ im Coach: Regal zum Tauschen, darunter der gewählte Tag (Übungen anpassen, ausfallen lassen, verletzt) */
       function moveHtml() {
         if (moveFrom == null)
           moveFrom = Math.max(0, Math.min(LAST, sel != null ? sel : TODAY));
@@ -5346,12 +5448,9 @@
           p = dayPlan(i),
           dk = keyI(i),
           rest = p.k === "rest";
-        const from = Math.max(Math.floor(i / 7) * 7, TODAY, 0),
-          to = Math.min(LAST, Math.max(Math.floor(i / 7) * 7 + 13, from + 6));
-        let h = swapFixHtml() + `<div class="cap" style="margin-top:0">Welcher Tag?</div><div class="wk"><button data-act="mv-day" data-d="-1" ${i <= 0 ? "disabled" : ""} aria-label="Einen Tag früher">‹</button>
-      <div><h3>${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))}</h3>${i === TODAY ? `<div class="sub">heute</div>` : `<button class="btn ghost sm" data-act="mv-today" style="margin-top:2px">zu heute</button>`}</div>
-      <button data-act="mv-day" data-d="1" ${i >= LAST ? "disabled" : ""} aria-label="Einen Tag später">›</button></div>
-    <div class="card tight k-${p.k}"><span class="kind">${KIND[p.k]}</span><h3 class="mt-1">${esc(p.t)}</h3>${dayBadges(i, p) ? `<div class="badges mt-2">${dayBadges(i, p)}</div>` : ""}</div>`;
+        if (shelfWk == null) shelfWk = shelfStart(Math.floor(i / 7), NWEEKS);
+        let h = shelfHtml() + swapFixHtml();
+        h += `<div class="cap">Ausgewählter Tag</div><div class="card tight k-${p.k}"><span class="kind">${KIND[p.k]}</span><h3 class="mt-1">${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))}: ${esc(p.t)}</h3>${dayBadges(i, p) ? `<div class="badges mt-2">${dayBadges(i, p)}</div>` : ""}</div>`;
         if (p.race)
           return (
             h +
@@ -5371,33 +5470,9 @@
           h += `<div class="cap">Keine Zeit gehabt?</div>
       <button class="btn ${S.skip[dk] ? "" : "primary"}" data-act="skip">${S.skip[dk] ? "Doch nicht ausgefallen" : "Als ausgefallen markieren"}</button>`;
         }
-        h += `<div class="cap">${rest ? "Diese Einheit hierher holen" : "Tauschen mit"}</div>
-    <p class="sub" style="margin:calc(-1 * var(--s1)) 0 var(--s3)">Die Einheiten tauschen den Tag. ${rest ? "" : "Freie Tage sind am besten."} „Hart auf hart“ heisst: Danach lägen zwei harte Einheiten direkt hintereinander (der genannte Tag ist der Nachbar). Das geht, ist aber nicht ideal.</p><div class="list">`;
-        let any = false;
-        for (let j = from; j <= to; j++) {
-          if (j === i) continue;
-          const q = dayPlan(j);
-          if (!q || q.inj || q.race) continue;
-          if (rest && q.k === "rest") continue;
-          const tags = [];
-          if (!rest && q.k === "rest")
-            tags.push(
-              isFixedRest(q, j)
-                ? `<span class="badge">fixer Ruhetag</span>`
-                : `<span class="badge ok">frei</span>`,
-            );
-          const clash = hardClash(i, j);
-          if (clash.length)
-            tags.push(
-              `<span class="badge warn">hart auf hart · ${clash.map((n) => `${DAYS[dow(n)]} ${dateFromIdx(n).getDate()}.`).join(", ")}</span>`,
-            );
-          any = true;
-          h += `<button class="day k-${q.k}" data-swap="${j}"><span class="d">${DAYS[dow(j)]}<b>${dateFromIdx(j).getDate()}</b></span>
-      <span class="t"><b>${esc(q.t)}</b><span class="kind">${KIND[q.k]}</span></span><span class="meta"><span class="badges">${tags.join("")}</span></span></button>`;
-        }
-        if (!any)
-          h += `<p class="sub" style="padding:var(--s4) 0">Keine passenden Tage in Reichweite.</p>`;
-        h += `</div>`;
+        h += `<div class="cap">Ohne Ziehen verschieben</div>
+    <div class="btns"><button id="shelf-step-prev" class="btn" data-act="shelf-step" data-d="-1" ${shelfOk(i, i - 1) ? "" : "disabled"}>${rest ? "‹ Einheit von gestern hierher" : "‹ Einen Tag früher"}</button><button id="shelf-step-next" class="btn" data-act="shelf-step" data-d="1" ${shelfOk(i, i + 1) ? "" : "disabled"}>${rest ? "Einheit von morgen hierher ›" : "Einen Tag später ›"}</button></div>
+    <p class="sub mt-2">„Hart auf hart“ heisst: Danach lägen zwei harte Einheiten direkt hintereinander. Das geht, ist aber nicht ideal; nach dem Tausch bietet die App an, den späteren Tag zu entlasten.</p>`;
         h += `<div class="cap">Verletzt oder krank?</div><button class="btn" data-act="inj-from">Ab diesem Tag anpassen →</button>`;
         if (S.sched[i])
           h += `<div class="cap">Änderung rückgängig</div><button class="btn" data-act="restore">Original wiederherstellen</button>`;
@@ -8638,6 +8713,7 @@
         review: vReview,
       };
       function render() {
+        if (drag && drag.on) return void (renderHeld = true); // während des Ziehens nicht neu aufbauen
         RC = null;
         if (!authed() && view !== "shared") view = "login";
         const left = Math.ceil((RACE - midnight(NOW)) / dayMs);
@@ -8972,8 +9048,116 @@
         }
       });
 
+      /* Regal: Karten ziehen. Maus überall, Touch nur am Griff (sonst liesse sich die Seite nicht mehr scrollen). */
+      const slotAt = (x, y) => {
+        const el = document.elementFromPoint(x, y),
+          s = el && el.closest(".fach[data-slot]");
+        return s ? +s.dataset.slot : null;
+      };
+      function dragInfo(from, to) {
+        if (to == null || to === from) return "";
+        if (!shelfOk(from, to)) return "Hier geht kein Tausch.";
+        const q = dayPlan(to),
+          clash = hardClash(from, to),
+          bits = [`${shortDay(from)} ↔ ${shortDay(to)}`];
+        if (q.k === "rest" && isFixedRest(q, to)) bits.push("fixer Ruhetag wird belegt");
+        if (clash.length) bits.push("hart auf hart: " + clash.map(shortDay).join(", "));
+        return bits.join(" · ");
+      }
+      function dragUpdate() {
+        if (!drag || !drag.on) return;
+        drag.ghost.style.transform = `translate(${drag.x - drag.dx}px, ${drag.y - drag.dy}px)`;
+        const to = slotAt(drag.x, drag.y);
+        if (to === drag.to) return;
+        drag.to = to;
+        document.querySelectorAll(".fach.over,.fach.nope").forEach((el) => el.classList.remove("over", "nope"));
+        if (to != null && to !== drag.from) {
+          const el = document.querySelector(`.fach[data-slot="${to}"]`);
+          if (el) el.classList.add(shelfOk(drag.from, to) ? "over" : "nope");
+        }
+        const info = $("#drag-info");
+        if (info) info.textContent = dragInfo(drag.from, to);
+      }
+      function dragStop(commit) {
+        if (!drag) return;
+        const { on, from, to, ghost, raf } = drag;
+        cancelAnimationFrame(raf);
+        if (ghost) ghost.remove();
+        document.body.classList.remove("dragging");
+        document.querySelectorAll(".fach.over,.fach.nope,.sl-card.lifted").forEach((el) => el.classList.remove("over", "nope", "lifted"));
+        const info = $("#drag-info");
+        if (info) info.textContent = "";
+        drag = null;
+        if (!on) return;
+        dragEnd = Date.now();
+        if (commit && to != null && shelfOk(from, to)) return doSwap(from, to);
+        if (renderHeld) {
+          renderHeld = false;
+          render();
+        }
+      }
+      document.addEventListener("pointerdown", (e) => {
+        let card = e.target.closest && e.target.closest(".sl-card[data-drag]");
+        if (!card) return;
+        if (drag) {
+          dragStop(false); // übrig gebliebene Geste (verlorenes pointerup) zuerst beenden; das kann neu aufbauen
+          card = document.getElementById("fc-" + card.dataset.drag) || card;
+        }
+        if (e.pointerType === "mouse" ? e.button !== 0 : !e.target.closest(".grip")) return;
+        drag = { from: +card.dataset.drag, id: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, on: false, to: null, card, ghost: null, raf: 0, dx: 0, dy: 0 };
+      });
+      document.addEventListener(
+        "pointermove",
+        (e) => {
+          if (!drag || e.pointerId !== drag.id) return;
+          drag.x = e.clientX;
+          drag.y = e.clientY;
+          if (!drag.on) {
+            if (Math.hypot(drag.x - drag.x0, drag.y - drag.y0) < 6) return;
+            const r = drag.card.getBoundingClientRect(),
+              g = drag.card.cloneNode(true);
+            g.classList.add("ghost");
+            g.removeAttribute("data-drag");
+            g.removeAttribute("data-shelf");
+            g.setAttribute("aria-hidden", "true");
+            g.style.setProperty("--kc", getComputedStyle(drag.card).getPropertyValue("--kc"));
+            g.style.width = r.width + "px";
+            g.style.height = r.height + "px";
+            drag.dx = drag.x0 - r.left;
+            drag.dy = drag.y0 - r.top;
+            document.body.appendChild(g);
+            drag.ghost = g;
+            drag.on = true;
+            drag.card.classList.add("lifted");
+            document.body.classList.add("dragging");
+            const loop = () => {
+              if (!drag || !drag.on) return;
+              if (drag.y < 70) scrollBy(0, -14);
+              else if (drag.y > innerHeight - 70) scrollBy(0, 14);
+              dragUpdate();
+              drag.raf = requestAnimationFrame(loop);
+            };
+            drag.raf = requestAnimationFrame(loop);
+          }
+          e.preventDefault();
+          dragUpdate();
+        },
+        { passive: false },
+      );
+      document.addEventListener("pointerup", (e) => {
+        if (!drag || e.pointerId !== drag.id) return;
+        if (drag.on) drag.to = slotAt(e.clientX, e.clientY);
+        dragStop(true);
+      });
+      document.addEventListener("pointercancel", () => dragStop(false));
+      addEventListener("blur", () => dragStop(false));
+      document.addEventListener("visibilitychange", () => document.hidden && dragStop(false));
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") dragStop(false);
+      });
+
       const CLICK =
-        "[data-v],[data-last],[data-wk],[data-open],[data-sel],[data-r],[data-act],[data-back],[data-move],[data-swap],[data-injs],[data-injd],[data-injm],[data-edit],[data-ci],[data-sug],[data-sug-no],[data-who],[data-imp-all],[data-pb],[data-pd],[data-pgo]";
+        "[data-v],[data-last],[data-wk],[data-open],[data-sel],[data-r],[data-act],[data-back],[data-move],[data-shelf],[data-injs],[data-injd],[data-injm],[data-edit],[data-ci],[data-sug],[data-sug-no],[data-who],[data-imp-all],[data-pb],[data-pd],[data-pgo]";
       document.addEventListener("click", async (e) => {
         const t = e.target.closest(CLICK);
         if (!t) return;
@@ -9015,20 +9199,33 @@
           return go(view === "edit" && editBack ? editBack : prevView, "back");
         if (d.move !== undefined) {
           moveFrom = +d.move;
+          shelfWk = null;
           return go("move");
+        }
+        if (d.shelf !== undefined) {
+          if (Date.now() - dragEnd < 350) return; // Klick direkt nach dem Ziehen ignorieren
+          moveFrom = +d.shelf;
+          return render();
         }
         if (d.edit !== undefined) {
           editFrom = +d.edit;
           editBack = view === "coach" ? "coach" : null;
           return go("edit");
         }
-        if (d.act === "mv-day") {
-          moveFrom = Math.max(0, Math.min(LAST, moveFrom + +d.d));
+        if (d.act === "shelf-wk") {
+          shelfWk = Math.max(0, Math.min(NWEEKS - 2, shelfWk + +d.d));
           return render();
         }
-        if (d.act === "mv-today") {
+        if (d.act === "shelf-today") {
           moveFrom = Math.max(0, Math.min(LAST, TODAY));
+          shelfWk = shelfStart(Math.floor(moveFrom / 7), NWEEKS);
           return render();
+        }
+        if (d.act === "shelf-step") {
+          const i = moveFrom,
+            j = i + +d.d;
+          if (shelfOk(i, j)) doSwap(i, j);
+          return;
         }
         if (d.act === "ol-easy") {
           setE(+d.i, { easy: 1 });
@@ -9045,6 +9242,11 @@
         }
         if (d.act === "swapfix-no") {
           swapPair = null;
+          return render();
+        }
+        if (d.act === "swap-undo" && swapUndo && (srcOf(swapUndo.i) !== swapUndo.sig[0] || srcOf(swapUndo.j) !== swapUndo.sig[1])) {
+          swapUndo = swapPair = null; // der Plan hat sich seit dem Tausch geändert
+          toast("Der Plan wurde seither geändert, Rückgängig geht nicht mehr", true);
           return render();
         }
         if (d.act === "swap-undo" && swapUndo) {
@@ -9394,20 +9596,6 @@
             await sb.auth.signOut();
           })();
           return;
-        }
-        if (d.swap !== undefined) {
-          const i = moveFrom,
-            j = +d.swap,
-            pulled = dayPlan(i).k === "rest",
-            to = pulled ? i : j;
-          const skipBefore = [!!S.skip[keyI(i)], !!S.skip[keyI(j)]];
-          swapDays(i, j);
-          swapPair = [i, j];
-          swapUndo = { i, j, skip: skipBefore, eased: [] };
-          save();
-          moveFrom = to;
-          render();
-          return toast(`${dayPlan(to).t} → ${shortDay(to)}`);
         }
         if (d.injs) {
           injStart = Math.max(0, Math.min(LAST, injStart + +d.injs));

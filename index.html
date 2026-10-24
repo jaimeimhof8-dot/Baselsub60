@@ -3764,6 +3764,7 @@
       details.hints > summary em { font-style: normal; padding: 1px 8px; border-radius: 999px; background: rgba(127,127,127,.2); margin-left: 4px; }
       .ex-h input[type="checkbox"] { width: 28px; height: 28px; }
     </style>
+    <link rel="stylesheet" href="cockpit.css" />
   </head>
   <body>
     <div id="splash" role="status" aria-label="App wird geladen">
@@ -4655,12 +4656,37 @@
       const GC_OPEN = "intent://launch#Intent;package=com.garmin.android.apps.connectmobile;S.browser_fallback_url=" + encodeURIComponent("https://connect.garmin.com/modern/workouts") + ";end";
       function dayActions(i, p, done, n) {
         let h = "";
-        if (done < n) h += `<div class="btns"><button class="btn primary" data-fc="start" data-i="${i}">Fokusmodus starten</button></div>`;
+        if (done < n) h += `<div class="btns"><button class="btn primary go" data-fc="start" data-i="${i}" aria-label="Fokusmodus starten"><span>Start</span><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>`;
         if (done < n && i >= TODAY && gmOn() && p.k === "lauf" && planSteps(p).steps.length)
           h += gmSent.has(i)
             ? `<div class="watch-row"><span>${gmSent.get(i) ? "✓ Auf der Uhr eingeplant" : "In Garmin angelegt, nicht eingeplant"}</span><a class="lnk" href="${GC_OPEN}">Connect öffnen</a></div>`
             : `<div class="watch-row"><button type="button" class="lnk" data-act="gm-push" data-i="${i}">Auf Uhr senden</button></div>`;
         return h;
+      }
+      /* Planzeile "Bulgarian Split Squat 3×8 je Seite RPE 7" → Name, Satz×Wdh, Zusatz */
+      const RO_SPEC = /^\d+\s*[×x]\s*\d+(?:[.,]\d+)?\s*(?:km|m|′|min|″|")?/i;
+      function exParts(t) {
+        const nm = exLabel(t),
+          rest = String(t).slice(nm.length).trim(),
+          m = rest.match(RO_SPEC);
+        return {
+          nm,
+          spec: m ? m[0].replace(/\s+/g, "") : "",
+          sub: (m ? rest.slice(m[0].length) : rest).trim().replace(/\s+(RPE\b)/i, " · $1").replace(/^[·\s,]+/, ""),
+        };
+      }
+      const CK_SVG = `<svg class="ck" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+      /* Übersichtszeile einer Übung: Nummer, Name + Zusatz, Satz×Wdh rechts; erledigt = grau mit Haken */
+      function roRow(p, t, j, dk) {
+        const id = dk + "|" + j,
+          on = !!S.done[id],
+          sk = !!S.xs[id],
+          ix = String(j + 1).padStart(2, "0"),
+          ck = on ? CK_SVG : "";
+        if (!isLift(p.k, t) || lineSlots(t)) return `<div class="r wide${on ? " done" : ""}${sk ? " skip" : ""}" role="listitem"><span class="ix">${ix}</span><div class="nm">${lineHtml(t)}</div>${ck}</div>`;
+        const { nm, spec, sub } = exParts(t),
+          v = S.val[id] || "";
+        return `<div class="r${on ? " done" : ""}${sk ? " skip" : ""}" role="listitem"><span class="ix">${ix}</span><div><div class="nm">${esc(nm)}</div>${sub || v ? `<div class="m">${[v, esc(sub)].filter(Boolean).join(" · ")}</div>` : ""}</div><span class="num sr">${esc(spec)}${ck}</span></div>`;
       }
       function sessionCore(i) {
         const p = dayPlan(i),
@@ -4725,10 +4751,13 @@
         // Eine einzige Aufgabe: keine Fortschrittsleiste, keine Checkbox – die Zeile selbst ist der Hold-Button
         const single = n === 1,
           undo = single && done >= n;
+        let progRow = "";
         if (undo)
-          h += `<div class="row between"><span class="sub">Erledigt</span><button class="btn sm" data-act="done-close" data-i="${i}">Einklappen ▴</button></div>`;
-        else if (!single)
-          h += `<div class="prog"><i style="width:${n ? (done / n) * 100 : 0}%"></i></div><div class="row between"><span class="sub">${done} von ${n} erledigt</span>${done < n ? `<button type="button" class="btn sm hold" data-hold="${i}" aria-label="Gedrückt halten: alles erledigt"><i class="hold-fill" aria-hidden="true"></i><span>✓ Halten: Alles erledigt</span></button>` : `<button class="btn sm" data-act="done-close" data-i="${i}">Einklappen ▴</button>`}</div>`;
+          progRow = `<div class="progrow"><span class="sub">Erledigt</span><span class="row"><button type="button" class="btn sm hold" data-hold="${i}" data-undo aria-label="Gedrückt halten: wieder öffnen"><i class="hold-fill" aria-hidden="true"></i><span>Öffnen · halten</span></button><button class="btn sm" data-act="done-close" data-i="${i}" aria-label="Einklappen">▴</button></span></div>`;
+        else if (single)
+          progRow = `<div class="progrow"><span class="sub">Noch offen</span><button type="button" class="btn sm hold" data-hold="${i}" aria-label="Gedrückt halten: erledigt"><i class="hold-fill" aria-hidden="true"></i><span>Erledigt · halten</span></button></div>`;
+        else
+          progRow = `<div class="progrow"><span class="sub"><b class="num">${done}/${n}</b> erledigt</span>${done < n ? `<button type="button" class="btn sm hold" data-hold="${i}" aria-label="Gedrückt halten: alles erledigt"><i class="hold-fill" aria-hidden="true"></i><span>Alles erledigt · halten</span></button>` : `<button class="btn sm" data-act="done-close" data-i="${i}">Einklappen ▴</button>`}</div>`;
         // Später fertig machen: offene Übungen an den nächsten Tag anhängen
         const lc = S.later[dk];
         if (lc) {
@@ -4743,6 +4772,12 @@
             : `<div class="target">Team-Tempo T = ${mmss(T)}/km · Ziel heute <b>${mmss(T + p.tp[0])}–${mmss(T + p.tp[1])}/km</b></div>`;
         }
         h += dayActions(i, p, done, n);
+        const edit = fold.has("e" + i);
+        if (!edit) {
+          // Übersicht: Nummer, Name, Satz×Wdh – Gewichte und Haken gibt es im Fokusmodus (oder hinter „eintragen“)
+          h += `<div class="tab" role="list">${p.i.map((t, j) => roRow(p, t, j, dk)).join("")}</div>${progRow}${qline("Gewichte und Haken eintragen", "", `data-act="fold" data-f="e${i}" aria-expanded="false"`)}`;
+        } else {
+          h += progRow;
         h += `<div class="exs">`;
         p.i.forEach((t, j) => {
           const id = dk + "|" + j,
@@ -4768,6 +4803,8 @@
           h += `</div>`;
         });
         h += `</div>`;
+          h += qline("Eintragen schliessen", "", `data-act="fold" data-f="e${i}" aria-expanded="true"`);
+        }
         // Während des Trainings nur Übung, Wert und Haken. RPE, Notiz und Zusätze erst danach (offen, sobald alles erledigt ist).
         h += `<details class="after"${done >= n ? " open" : ""}><summary>Nach dem Training: RPE, Notiz, Mehr</summary>${stravaBox(i, p, n, done)}`;
         const tg = targetRpe(p.i),
@@ -4929,28 +4966,20 @@
         pain: ["keine", "leicht", "stark"],
       };
       let ciOpen = false;
+      const QCHEV = `<svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
+      /* Leise Zeile: Punkt, Name, Wert rechts, Pfeil. Laut wird nur die Warnung (gelb/rot). */
+      const qline = (label, val, attrs, cls) =>
+        `<button type="button" class="qline${cls ? " " + cls : ""}" ${attrs}><i class="qdot" aria-hidden="true"></i><span>${label}</span><em>${val}</em>${QCHEV}</button>`;
       function checkinCard(i) {
         const k = keyI(i),
           c = S.checkin[k] || {},
           r = readiness(c);
-        const amp = r
-          ? `<span class="amp amp-${r}">${{ green: "Grün", yellow: "Gelb", red: "Rot" }[r]}</span>`
-          : `<span class="sub">ca. 20 Sekunden</span>`;
-        let h = `<div class="card tight"><div class="row between"><h3>Check-in heute</h3>${amp}</div>`;
-        if (r && !ciOpen)
-          return (
-            h +
-            `<p class="sub mt-2">${READY_TXT[r]}</p><button class="btn ghost sm mt-3" data-act="ci-edit">Check-in ändern</button></div>`
-          );
-        // Training läuft schon (abgehakt, Wert, RPE oder Notiz): Check-in nur als eine Zeile, damit die Einheit oben steht
-        const started =
-          trained(i) ||
-          !!String(S.notes[k] || "").trim() ||
-          Object.keys(S.val).some(
-            (x) => x.startsWith(k + "|") && String(S.val[x]).trim(),
-          );
-        if (started && !ciOpen)
-          return `<div class="card tight ci-mini"><div class="row between"><h3>Check-in heute</h3><button class="btn ghost sm" data-act="ci-edit">Ausfüllen</button></div></div>`;
+        if (!ciOpen) {
+          if (!r) return qline("Check-in", "offen · 20 Sek.", `data-act="ci-edit"`);
+          if (r === "green") return qline("Check-in", "grün", `data-act="ci-edit"`, "ok");
+          return qline("Check-in", { yellow: "gelb", red: "rot" }[r], `data-act="ci-edit"`, "warn " + r) + `<div class="qwarn ${r}">${READY_TXT[r]}</div>`;
+        }
+        let h = `<div class="card tight"><div class="row between"><h3>Check-in heute</h3><span class="sub">${r ? { green: "Grün", yellow: "Gelb", red: "Rot" }[r] : "ca. 20 Sekunden"}</span></div>`;
         h += `<div class="mt-2">`;
         // Ein Tipp für einen unauffälligen Tag – unterscheidet „alles gut“ von „vergessen“
         if (r !== "green")
@@ -4960,11 +4989,13 @@
         }
         h += `</div><button class="btn ghost sm mt-2" data-act="sore-open">Muskelkater genau eintragen →</button>`;
         if (r)
-          h += `<p class="sub mt-2">${READY_TXT[r]}</p><button class="btn ghost sm mt-3" data-act="ci-done">Fertig</button>`;
-        return h + `</div>`;
+          h += `<p class="sub mt-2">${READY_TXT[r]}</p>`;
+        return h + `<button class="btn ghost sm mt-3" data-act="ci-done">${r ? "Fertig" : "Schliessen"}</button></div>`;
       }
       /* Check-in gehört auf die Startseite, solange er offen ist (oder gerade bearbeitet wird) */
       const ciPending = (i) => ciOpen || !readiness(S.checkin[keyI(i)] || {});
+      /* Startseite: Check-in-Zeile, solange er offen ist oder eine Warnung (gelb/rot) vorliegt; bei Grün still */
+      const ciShow = (i) => ciOpen || readiness(S.checkin[keyI(i)] || {}) !== "green";
       /* Garmin-Erholung auf der Startseite: nur in der ersten Sitzung des Tages, in der Werte da sind.
    Gemerkt pro Gerät; beim nächsten Öffnen der App am selben Tag steht sie nur noch im Dashboard. */
       let recDay = null;
@@ -5024,7 +5055,7 @@
         if (sel == null) hints += stravaBanner();
         if (i === TODAY && TODAY >= 0 && TODAY <= LAST) {
           hints += recFirstOpen(i) ? recoveryCard(i) : "";
-          daily += ciPending(i) ? checkinCard(i) : "";
+          daily += ciShow(i) ? checkinCard(i) : "";
         }
         if (sel == null) hints += reviewCard();
         hints += sugCard();
@@ -5045,9 +5076,9 @@
         }
         strip += `</div>`;
         const session =
-          `<div class="sub" style="margin-bottom:var(--s3)">Woche ${Math.floor(i / 7) + 1} · ${blockLabel(info.block)} · ${esc(info.wave)}</div>` +
+          `<div class="sub wmeta">Woche ${Math.floor(i / 7) + 1} · ${blockLabel(info.block)} · ${esc(info.wave)}</div>` +
           (dayPlan(i) ? sessionCard(i) : "");
-        if (!rail) return intro + daily + session + strip;
+        if (!rail) return intro + session + daily + strip;
         const nav = `<nav class="rail" aria-label="Diese Woche">${strip}</nav>`;
         // Tablet: Check-in/Vorschläge über der Einheit. Desktop: in einer dritten Spalte rechts.
         if (!WIDE())
@@ -5057,8 +5088,7 @@
 
       function weekSummary(w) {
         let plan = 0,
-          ok = 0,
-          rp = [];
+          ok = 0;
         for (let d = 0; d < 7; d++) {
           const i = w * 7 + d,
             p = dayPlan(i);
@@ -5067,21 +5097,14 @@
           plan++;
           // gleiche Regel wie Dashboard und Wochenrückblick: trainiert = abgehakt, RPE oder passende Aktivität
           if (trained(i)) ok++;
-          const r = S.rpe[keyI(i)];
-          if (r != null) rp.push(+r);
         }
-        const ar = rp.length
-          ? (rp.reduce((a, b) => a + b, 0) / rp.length)
-              .toFixed(1)
-              .replace(".", ",")
-          : "–";
         const xs = [];
         for (let d = 0; d < 7; d++)
           xs.push(...cleanExtras(S.extra[keyI(w * 7 + d)]));
         const xLine = xs.length
           ? `<div class="sub xsum">＋ ${xs.length} Zusatz-${xs.length === 1 ? "Einheit" : "Einheiten"}${extraMinutes(xs) ? ` · ${extraMinutes(xs)}′` : ""}</div>`
           : "";
-        return `<div class="wsum"><div class="stat"><b>${ok}/${plan}</b><span>Einheiten</span></div><div class="stat"><b>${ar}</b><span>Ø RPE</span></div><div class="stat"><b>${
+        return `<div class="wsum"><div class="stat"><b>${ok}/${plan}</b><span>Einheiten</span></div><div class="stat"><b>${
           Object.values(S.strava.acts).filter((a) => {
             const x = idxOfIso(a.date);
             return x >= w * 7 && x < w * 7 + 7;
@@ -5169,7 +5192,7 @@
           }
           const nw = Math.floor(end / 7) - Math.floor(s / 7) + 1;
           h += `<button class="blk ${cur === b.id ? "cur" : ""}" data-pb="${esc(b.id)}" aria-expanded="${on}"><span class="tag">${esc(b.id)}</span>
-      <span class="t"><b>${esc(per(b.name))}</b><span class="sub">${fmt(dateFromIdx(s))} – ${fmt(dateFromIdx(end))} · ${nw} ${nw === 1 ? "Woche" : "Wochen"} · ${ok}/${plan} erledigt</span></span><span class="chev" aria-hidden="true">›</span></button>`;
+      <span class="t"><b>${esc(per(b.name))}</b><span class="sub">${fmt(dateFromIdx(s))} – ${fmt(dateFromIdx(end))} · ${nw} ${nw === 1 ? "Woche" : "Wochen"}</span></span><span class="num cnt" aria-label="${ok} von ${plan} erledigt">${ok}/${plan}</span><span class="chev" aria-hidden="true">›</span></button>`;
           if (!on) return;
           h += `<div class="blk-body">`;
           for (let w = Math.floor(s / 7); w <= Math.floor(end / 7); w++) {
@@ -6944,7 +6967,7 @@
           S.review[w] = { at: Date.now(), level: r.level, ...(fc0 && fc0.total ? { fc: Math.round(fc0.total) } : {}) };
           save();
         }
-        let h = `<div class="narrow rv">${vhead("Wochenrückblick", "", true)}`;
+        let h = `<div class="narrow rv">${vhead("Rückblick", "", true)}`;
         h += `<div class="wk"><button data-act="rv-wk" data-d="-1" aria-label="Vorherige Woche" ${w === 0 ? "disabled" : ""}>‹</button>
     <div><h2>Woche ${w + 1}<small class="rv-of"> / ${NWEEKS}</small></h2><div class="sub">${fmt(dateFromIdx(w * 7))} – ${fmt(dateFromIdx(w * 7 + 6))} · ${esc(wi.wave)}</div></div>
     <button data-act="rv-wk" data-d="1" aria-label="Nächste Woche" ${w >= cur ? "disabled" : ""}>›</button></div>`;
@@ -8076,19 +8099,24 @@
           document.body.appendChild(el);
           document.body.classList.add("focus-on");
         }
+        el.dataset.k = p.k; // Sportfarbe für Linie, Segmente und Balken
         const dran = nextOpen(n, isDone, 0); // erste offene Übung = was als Nächstes zu tun ist
         el.classList.toggle("fc-dash", !focusFin && runPhases(p, focusJ).length > 0); // Lauf-Zeile: Dashboard statt Übungsliste
-        const top = `<div class="fc-top"><button type="button" class="fc-x" data-fc="close" aria-label="Fokusmodus beenden">✕</button><div class="fc-title"><small>${esc(KIND[p.k] || "")}</small><b>${esc(p.t)}</b></div><span class="fc-count">${nd}/${n}</span></div>`;
-        /* Übersicht aller Übungen: immer im Bild. Grün/Haken = erledigt, «dran» = die nächste offene, Balken = diese Übung wird gerade angezeigt */
-        const mini = `<ol class="fc-mini" aria-label="Alle Übungen">${p.i
-          .map((t2, x) => {
-            const d = isDone(x), v = S.val[dk + "|" + x] || (d ? "" : preWeight(p, t2));
-            return `<li><button type="button" class="${d ? "d" : ""}${x === dran && !focusFin ? " n" : ""}${x === focusJ && !focusFin ? " c" : ""}" data-fc="go" data-j="${x}"><i aria-hidden="true">${d ? "✓" : x + 1}</i><span>${esc(fcLabel(p, x))}</span><em>${esc(v)}${x === dran && !focusFin ? "<b>dran</b>" : ""}</em></button></li>`;
-          })
-          .join("")}</ol>`;
+        const top = `<div class="fc-top"><button type="button" class="fc-x" data-fc="close" aria-label="Fokusmodus beenden">✕</button><div class="fc-title"><small>${esc(KIND[p.k] || "")}</small><b>${esc(p.t)}</b></div><span class="fc-count">${nd}/${n}</span></div><div class="fc-seg" aria-hidden="true">${p.i.map((_, x) => `<i class="${isDone(x) ? "d" : x === focusJ && !focusFin ? "n" : ""}"></i>`).join("")}</div>`;
+        /* Gesamtübersicht: alle Übungen als Tabelle. Erledigt = grau mit Haken, aktuelle Übung aufgeklappt (Gewicht, Zeitfelder, Timer). */
+        const fcRow = (t2, x, panel) => {
+          const d = isDone(x),
+            cur = x === focusJ && !focusFin,
+            lift = isLift(p.k, t2) && !lineSlots(t2),
+            v = S.val[dk + "|" + x] || (d ? "" : preWeight(p, t2)),
+            pt = lift ? exParts(t2) : { nm: fcLabel(p, x), spec: "", sub: "" },
+            sub = [v, pt.sub].filter(Boolean).join(" · ");
+          return `<li class="${d ? "d" : ""}${cur ? " c" : ""}"><button type="button" class="fo-r" data-fc="go" data-j="${x}" ${cur ? 'aria-current="true"' : ""}><span class="ix">${String(x + 1).padStart(2, "0")}</span><span class="fo-t"><b>${esc(pt.nm)}</b>${sub ? `<small>${esc(sub)}</small>` : ""}</span><span class="num sr">${esc(pt.spec)}</span>${d ? CK_SVG : ""}</button>${cur ? panel : ""}</li>`;
+        };
+        const mini = (panel) => `<ol class="fc-ov" aria-label="Alle Übungen">${p.i.map((t2, x) => fcRow(t2, x, panel)).join("")}</ol>`;
         if (focusFin) {
           const rv = S.rpe[dk] ? +S.rpe[dk] : 0;
-          el.innerHTML = `${top}${mini}<div class="fc-main fc-fin"><div class="fc-big">${FC_CHECK}</div><h1 class="fc-name">Workout erledigt</h1><p class="fc-sub">${nd} von ${n} Übungen abgehakt</p>
+          el.innerHTML = `${top}<div class="fc-main fc-fin"><div class="fc-big">${FC_CHECK}</div><h1 class="fc-name">Workout erledigt</h1><p class="fc-sub">${nd} von ${n} Übungen abgehakt</p>
     <div class="fc-lbl">Wie hart war's?${rv ? ` · <b>${esc(RPE_TXT[rv] || "")}</b>` : ""}</div>
     <div class="fc-rpe" role="group" aria-label="Anstrengung 1 bis 10">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => `<button type="button" class="${rv === x ? "on" : ""}" style="--rc:${rpeColor((x - 1) / 9)}" data-fc="rpe" data-r="${x}" aria-pressed="${rv === x}">${x}</button>`).join("")}</div></div>
     <div class="fc-nav fin"><button type="button" class="fc-fertig" data-fc="close">Fertig</button></div>`;
@@ -8119,10 +8147,19 @@
         // Wer das Weiterklicken vergessen hat: hier steht, was als Nächstes dran ist, ein Tipp springt hin
         const nxt = on || dran !== focusJ ? dran : nextOpen(n, (x) => isDone(x) || x === focusJ, focusJ + 1);
         const upnext = nxt >= 0 && nxt !== focusJ ? `<button type="button" class="fc-upnext" data-fc="go" data-j="${nxt}"><small>${on ? "Als Nächstes" : "Danach"}</small><b>${esc(fcLabel(p, nxt))}</b><span aria-hidden="true">›</span></button>` : "";
-        // Lauf-Dashboard steht vor dem Eingabefeld, auch in der Tab-Reihenfolge
-        el.innerHTML = `${top}${mini}<div class="fc-main${dir ? " go-" + dir : ""}">${title}${runPh.length ? timer + field : field + timer}${last}</div>${upnext}
-    <div class="fc-nav"><button type="button" class="fc-side" data-fc="prev" ${focusJ === 0 ? "disabled" : ""} aria-label="Vorherige Übung">‹</button><button type="button" class="fc-ok${on ? " on" : ""}" data-fc="done" aria-label="${on ? "Erledigt, nochmals tippen zum Rückgängig" : "Übung erledigt"}">${FC_CHECK}</button><button type="button" class="fc-side r" data-fc="next" ${focusJ === n - 1 ? "disabled" : ""} aria-label="Nächste Übung">›</button></div>`;
-        const cur = el.querySelector(".fc-mini .n, .fc-mini .c");
+        if (runPh.length) {
+          // Lauf-Dashboard steht vor dem Eingabefeld, auch in der Tab-Reihenfolge
+          el.innerHTML = `${top}<div class="fc-main${dir ? " go-" + dir : ""}">${title}${timer + field}${last}</div>${upnext}
+    <div class="fc-nav"><button type="button" class="fc-side" data-fc="prev" ${focusJ === 0 ? "disabled" : ""} aria-label="Vorherige Übung">‹</button><button type="button" class="fc-ok${on ? " on" : ""}" data-fc="done" aria-label="${on ? "Erledigt, nochmals tippen zum Rückgängig" : "Übung erledigt"}">${on ? "Erledigt" : "Übung erledigt"}</button><button type="button" class="fc-side r" data-fc="next" ${focusJ === n - 1 ? "disabled" : ""} aria-label="Nächste Übung">›</button></div>`;
+        } else {
+          // Gesamtübersicht: die aktuelle Übung klappt in der Tabelle auf, darunter eine einzige gold Taste
+          const full = lift && !lineSlots(t) ? "" : lineHtml(t) !== esc(fcLabel(p, focusJ)) ? `<div class="fo-line">${lineHtml(t)}</div>` : "";
+          const inner = full + field + timer + last;
+          const panel = inner ? `<div class="fo-pan${dir ? " go-" + dir : ""}">${inner}</div>` : "";
+          el.innerHTML = `${top}${mini(panel)}
+    <div class="fc-nav ov"><button type="button" class="fc-ok${on ? " on" : ""}" data-fc="done" aria-label="${on ? "Erledigt, nochmals tippen zum Rückgängig" : "Übung erledigt"}">${on ? "Erledigt · rückgängig" : "Übung erledigt"}</button></div>`;
+        }
+        const cur = el.querySelector(".fc-ov li.c");
         if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: "nearest" });
       }
       function focusOpen(i) {

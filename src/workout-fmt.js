@@ -10,7 +10,7 @@ const STRIDE = /^Steigerungen (\d+)×(\d+(?:,\d+)?) m @ (\d+:\d\d)\/km \((\d+:\d
 const STN_NAMES = "SkiErg|RowErg|Sled Push|Sled Pull|Burpee Broad Jumps|Farmers Carry|Sandbag Lunges|Wall Balls";
 const STN = new RegExp(`^(?:(\\d+) )?(${STN_NAMES})(.*)$`);
 const LABEL = /^((?:Abschnitt \d+: )?(?:Run \d+|Runde \d+ frisch ohne Station|Runden? \d+(?:[–-]\d+)?(?: und \d+)?(?: mit Jimoh)?|\d+ Runden mit Jimoh)): (.*)$/;
-const PAUSE = /,\s*(\d+) Min Pause$/;
+const PAUSE = /,\s*(\d+ (?:Min|s)) Pause$/;
 
 /** Teilt an sep, aber nur außerhalb von Klammern. */
 function splitTop(s, sep) {
@@ -165,7 +165,7 @@ export function fmtLine(text) {
     }
     if (!recognised) return null;
     const out = `<div class="wx">${blocks
-      .map((b) => `<div class="wx-b">${b.label ? `<div class="wx-l">${esc(b.label)}</div>` : ""}<div class="wx-r">${b.steps.join("")}</div>${b.pause ? `<div class="wx-p">Pause ${esc(b.pause)} Min</div>` : ""}</div>`)
+      .map((b) => `<div class="wx-b">${b.label ? `<div class="wx-l">${esc(b.label)}</div>` : ""}<div class="wx-r">${b.steps.join("")}</div>${b.pause ? `<div class="wx-p">Pause ${esc(b.pause)}</div>` : ""}</div>`)
       .join("")}</div>`;
     // Keine Zahl darf verloren gehen
     if (digits(visible(out)) !== digits(text)) return null;

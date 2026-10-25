@@ -1,4 +1,4 @@
-const C = "hyrox-v81";
+const C = "hyrox-v82";
 const SRC = ["dates", "util", "plan-data", "plan-store", "parser", "pdftext", "pdf-import", "adapt", "strava", "share", "backup", "coach", "weights", "divisions", "ingest", "focus", "forecast", "profile", "structure", "plan-later", "soreness", "validate", "strava-auth", "garmin", "dashboard", "solo", "extras", "merge", "swap", "shelf", "review", "testsync", "later", "workout-fmt", "timeinput", "laps", "garmin-workout", "run-timer", "ftms"].map(f => "./src/" + f + ".js");
 const FILES = ["./", "./index.html", "./config.js", "./manifest.json", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png", ...SRC];
 self.addEventListener("install", e => { e.waitUntil(caches.open(C).then(c => c.addAll(FILES))); self.skipWaiting(); });

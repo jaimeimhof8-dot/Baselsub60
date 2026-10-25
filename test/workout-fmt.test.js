@@ -101,3 +101,16 @@ test("Mittwochs-Runde mit zwei Durchgängen hat vier Felder, Station vor Lauf", 
 test("Zeilen mit einem Wert brauchen kein Mehrfachfeld", () => {
   for (const l of ["Runde 1 frisch ohne Station: 1 km @ 4:02/km (4:02) als Referenz.", "4×1 km @ 4:05/km (4:05), Trabpause 3×200 m @ 6:30/km (1:18).", "5 km Zone 2 @ 5:20/km (26:40), Puls 135–150 bpm.", "SkiErg 1000 m @ 1:52/500 m (Ziel 3:44).", "Back Squat 3×6, Pause 150 s."]) assert.equal(lineSlots(l), null, l);
 });
+
+test("Ghost-Runde mit Satzpause in Sekunden und Station mit Nebenangaben", () => {
+  const l = "Runde 2: Sled Push 25 m mit 200 kg (150 kg Platten, Ziel 1:20, 2 Bahnen je 12,5 m, 20 s Standzeit vor der letzten Bahn als Ghost-Partner, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause";
+  const h = fmtLine(l);
+  assert.ok(h, "Zeile wird erkannt");
+  const t = text(h);
+  assert.ok(t.includes("Pause 90 s"));
+  assert.ok(t.includes("Ghost-Partner"));
+  assert.ok(t.indexOf("Sled Push") < t.indexOf("1 km"), "erst Station, dann Lauf");
+  const s = lineSlots(l);
+  assert.equal(s.length, 2);
+  assert.ok(fmtLine("Runde 3: Sled Pull 12,5 m mit 155 kg (105 kg Platten, Ziel 0:49, 1 Bahn, 20 s Standzeit vor der Bahn als Ghost-Partner, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause"));
+});

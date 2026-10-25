@@ -3644,7 +3644,7 @@
       /* Übersicht: immer im Bild, scrollt von selbst zur aktuellen Übung */
       #focus .fc-mini { list-style: none; margin: 0; padding: 0; flex: 0 1 auto; max-height: 34vh; overflow-y: auto; display: grid; gap: 4px; scrollbar-width: none; }
       #focus .fc-mini::-webkit-scrollbar { display: none; }
-      #focus .fc-mini button { width: 100%; display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 10px; text-align: left; padding: 7px 10px; min-height: 38px; border-radius: 12px; border: 1px solid transparent; background: rgba(255, 255, 255, 0.04); cursor: pointer; font-size: 0.92rem; }
+      #focus .fc-mini button { width: 100%; display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 10px; text-align: left; padding: 7px 10px; min-height: 44px; border-radius: 12px; border: 1px solid transparent; background: rgba(255, 255, 255, 0.04); cursor: pointer; font-size: 0.92rem; }
       #focus .fc-mini i { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 0.74rem; background: rgba(255, 255, 255, 0.1); }
       #focus .fc-mini span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       #focus .fc-mini em { font-style: normal; opacity: 0.65; font-size: 0.82rem; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
@@ -3804,6 +3804,424 @@
       details.hints[open] > summary::after, details.after[open] > summary::after { content: " ▴"; }
       details.hints > summary em { font-style: normal; padding: 1px 8px; border-radius: 999px; background: rgba(127,127,127,.2); margin-left: 4px; }
       .ex-h input[type="checkbox"] { width: 28px; height: 28px; }
+
+      /* ================= Sub-60-Design (Oktober 2026) =================
+         Ruhig und eindeutig: Titel in schmaler Sportschrift, Gold nur für die eine Hauptaktion und den heutigen Tag,
+         runde Knöpfe, Haarlinien statt Rahmen, genug Luft zwischen den Blöcken. */
+      .vh {
+        padding-right: 56px; /* Platz für den Menü-Knopf */
+        margin-bottom: var(--s6);
+      }
+      .kick {
+        font-size: 11px;
+        line-height: 14px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: var(--s1);
+      }
+      .vh h2 {
+        font-family: var(--f-head);
+        font-weight: 700;
+        font-size: 34px;
+        line-height: 1.06;
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
+      }
+      .vh .sub {
+        margin-top: var(--s1);
+      }
+      .status.miss {
+        color: var(--danger);
+      }
+      /* Handy: kein grosser Countdown oben, er steht als Zeile im Kopf von „Heute“ */
+      @media (max-width: 599px) {
+        .cd {
+          display: none;
+        }
+        .top {
+          min-height: 0;
+        }
+        .sess-sub {
+          display: none;
+        }
+      }
+      @media (min-width: 600px) {
+        .today-h {
+          display: none;
+        }
+        .vh {
+          padding-right: 0;
+        }
+      }
+      /* Einheit von heute: ruhige Karte mit Goldrahmen statt Farbverlauf */
+      .card.hero {
+        background: var(--card);
+        border-color: var(--line);
+      }
+      .card.hero.is-today {
+        border-color: transparent;
+        box-shadow:
+          var(--edge),
+          inset 0 0 0 1.5px var(--accent);
+      }
+      /* Reiter (Coach, Profil): Segment-Schalter, der gewählte Reiter ist hell statt Gold */
+      .cc-tabs {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(0, 1fr);
+        grid-template-columns: none;
+        gap: 4px;
+        padding: 4px;
+        border-radius: 999px;
+        background: var(--well);
+        margin-bottom: var(--s5);
+      }
+      .cc-tabs button {
+        height: 44px;
+        padding: 0 4px;
+        border: 0;
+        border-radius: 999px;
+        background: none;
+        color: var(--muted);
+        font-weight: 500;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      .cc-tabs button.on {
+        background: var(--text);
+        color: var(--bg);
+        font-weight: 600;
+      }
+      .chat-in .chips button.on {
+        background: var(--text);
+        color: var(--bg);
+        border-color: var(--text);
+      }
+      /* Hinweis „offline“: leise, ohne Alarmfarbe */
+      .offline-bar,
+      .net-off {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--s2);
+        min-height: 44px;
+        padding: var(--s2) var(--s4);
+        background: var(--well);
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.35;
+      }
+      .offline-bar {
+        margin: var(--s2) var(--s4) 0;
+        border-radius: var(--r-m);
+      }
+      .net-off {
+        border-radius: var(--r-m);
+        margin: 0 0 var(--s4);
+        justify-content: flex-start;
+      }
+      /* Woche */
+      .wkwrap {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s4);
+        margin-bottom: var(--s6);
+      }
+      .wkwrap .vh {
+        margin-bottom: 0;
+      }
+      .wk-nav {
+        display: flex;
+        gap: var(--s2);
+      }
+      .wk-nav button {
+        flex: 1;
+        height: 44px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--text);
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 0 var(--s3);
+      }
+      .wk-nav button:disabled {
+        opacity: 0.4;
+      }
+      .wk-sum {
+        display: flex;
+        align-items: center;
+        gap: var(--s5);
+        margin-bottom: var(--s5);
+      }
+      .wk-ring {
+        position: relative;
+        width: 96px;
+        height: 96px;
+        flex: none;
+      }
+      .wk-ring svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+      .wk-ring circle {
+        fill: none;
+        stroke-width: 10;
+      }
+      .wk-ring-t {
+        stroke: var(--surface2);
+      }
+      .wk-ring-b {
+        stroke: var(--accent);
+        stroke-linecap: round;
+      }
+      .wk-ring > div {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .wk-ring b {
+        font-family: var(--f-head);
+        font-size: 28px;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+      .wk-ring span {
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .wk-side {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: var(--s3);
+      }
+      .wk-side > div:not(.xsum) {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+      .wk-side > div span {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .wk-side > div b {
+        font-family: var(--f-head);
+        font-size: 24px;
+        line-height: 1;
+      }
+      .wk-side .xsum {
+        margin: 0;
+      }
+      .list {
+        margin-bottom: var(--s5);
+      }
+      .day {
+        min-height: 68px;
+      }
+      @media (min-width: 600px) {
+        .wkwrap {
+          flex-direction: row;
+          align-items: flex-end;
+          justify-content: space-between;
+        }
+        .wk-nav button {
+          flex: none;
+          width: 44px;
+          padding: 0;
+          font-size: 22px;
+        }
+        .wk-lbl {
+          display: none;
+        }
+      }
+      @media (min-width: 900px) {
+        .wk-cards {
+          display: grid;
+          grid-template-columns: repeat(7, minmax(0, 1fr));
+          gap: var(--s3);
+          align-items: stretch;
+          margin-bottom: var(--s6);
+        }
+        .wd .status {
+          margin-top: auto;
+        }
+        .wd {
+          display: flex;
+          flex-direction: column;
+          gap: var(--s2);
+          padding: var(--s4);
+          min-width: 0;
+          border-radius: var(--r-l);
+          background: var(--card);
+          border: 1px solid var(--line);
+          box-shadow: var(--edge);
+          color: var(--text);
+          text-align: left;
+        }
+        .wd-h {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--muted);
+        }
+        .wd-h b {
+          font-family: var(--f-head);
+          font-size: 24px;
+          color: var(--text);
+        }
+        .wd-bar {
+          display: block;
+          height: 3px;
+          border-radius: 2px;
+          background: var(--kc, var(--rest));
+        }
+        .wd-t {
+          min-height: 2.5em;
+          font-weight: 600;
+          font-size: 15px;
+          line-height: 1.25;
+          overflow-wrap: anywhere;
+        }
+        .wd.today .wd-h {
+          color: var(--accent);
+        }
+        .wd.today {
+          background: var(--well);
+          box-shadow:
+            var(--edge),
+            inset 0 0 0 1.5px var(--accent);
+        }
+        .wd.sel:not(.today) {
+          box-shadow:
+            var(--edge),
+            inset 0 0 0 1.5px var(--text);
+        }
+        .cols.week {
+          grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+        }
+        .wk-tiles {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: var(--s2);
+          margin: var(--s3) 0;
+        }
+        .wk-tiles > div {
+          background: var(--well);
+          border-radius: var(--r-m);
+          padding: var(--s3) var(--s4);
+        }
+        .wk-tiles span {
+          display: block;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--muted);
+        }
+        .wk-tiles b {
+          font-family: var(--f-head);
+          font-size: 26px;
+          line-height: 1.1;
+        }
+      }
+      /* Menü: schlichte Liste mit Haarlinien, ohne Beschreibungen */
+      .mi {
+        min-height: 56px;
+      }
+      .mi svg {
+        stroke: var(--muted);
+      }
+      .drawer .mi .sub {
+        display: none;
+      }
+      .mi.on svg {
+        stroke: var(--accent);
+      }
+      /* Konto im Menü: eine Zeile, Anmelden/Abmelden als schlichter Text darunter (keine zweite Karte) */
+      #acct .btns {
+        margin-top: var(--s1);
+      }
+      #acct .btn {
+        background: none;
+        border: 0;
+        box-shadow: none;
+        justify-content: flex-start;
+        padding: 0 var(--s1);
+        color: var(--muted);
+        font-weight: 600;
+      }
+      /* Hinweis mit „Rückgängig“ */
+      #toast.has-undo {
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        gap: var(--s2);
+        padding-right: var(--s2);
+      }
+      .toast-undo {
+        min-height: 44px;
+        padding: 0 var(--s3);
+        border: 0;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.12);
+        color: inherit;
+        font-weight: 600;
+        font-size: 14px;
+      }
+      /* Der Fokus-Knopf leuchtet nur leise */
+      #focus .fc-ok,
+      #focus .fc-big {
+        box-shadow: 0 4px 14px rgba(224, 191, 106, 0.14);
+      }
+      /* Feinschliff nach der Bildschirmprüfung: Tippflächen ab 44 px, Gold nur für Hauptaktion und heutigen Tag */
+      .ex.row-v { grid-template-columns: minmax(0, 1fr) 104px 44px; }
+      .ex-x, .ex.row-v > .ex-x { min-width: 44px; }
+      .ex.row-v .ex-v input { min-height: 44px; }
+      .rv-season { grid-template-columns: repeat(6, 1fr); }
+      @media (min-width: 600px) {
+        .rv-season { grid-template-columns: repeat(9, 1fr); }
+      }
+      .chips button.on {
+        background: var(--text);
+        color: var(--bg);
+        border-color: var(--text);
+      }
+      .opt.on {
+        border-color: var(--text);
+        box-shadow: inset 0 0 0 1px var(--text);
+      }
+      .blk:not(.cur) .tag { color: var(--text); }
+      .badge.team { background: rgba(255, 255, 255, 0.08); color: var(--muted); }
+      .res { color: var(--text); }
+      .tabs button.on svg { stroke: var(--text); }
+      @media (max-width: 380px) {
+        .cc-tabs button { font-size: 12px; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; }
+      }
+      th { overflow-wrap: normal; word-break: keep-all; }
+      /* Umplanen am Desktop: Wörter in den schmalen Fächern nie mitten im Wort trennen */
+      @media (min-width: 600px) {
+        .sl-card { padding: 26px 4px var(--s2) 10px; }
+        .sl-card > b { font-size: 12.5px; }
+      }
+      .shelf-nav h3 { margin-bottom: var(--s2); }
+      @media (min-width: 900px) {
+        .narrow:has(.board) { max-width: 940px; }
+      }
     </style>
   </head>
   <body>
@@ -4719,7 +5137,7 @@
           return `<button class="done-bar carry-bar k-${p.k}" data-act="fold" data-f="o${i}" aria-expanded="false" aria-label="${esc(p.t)}: Rest hängt an ${esc(shortDay(idxOfIso(lc.to)))} – Details anzeigen"><span class="ck" aria-hidden="true">↪</span><span class="t"><b>${esc(p.t)}</b><span class="sub">${done} von ${n} erledigt · ${pr.done === pr.n ? "Rest nachgeholt ✓" : "Rest an " + esc(shortDay(idxOfIso(lc.to)))}</span></span><span class="more">Details ▾</span></button>`;
         }
         const badges = dayBadges(i, p, true);
-        let h = `<div class="card hero k-${p.k}" data-day="${i}">
+        let h = `<div class="card hero k-${p.k}${i === TODAY ? " is-today" : ""}" data-day="${i}">
     <div class="session-h"><div class="row between"><span class="kind">${KIND[p.k]}</span><span class="sub">${DAYSF[dw]}, ${fmt(d)}</span></div>
     <h1>${esc(p.t)}</h1>${badges ? `<div class="badges">${badges}</div>` : ""}</div>`;
         if (p.moved != null)
@@ -4935,11 +5353,15 @@
         const st =
           p.k === "rest"
             ? ""
-            : n && done === n
-              ? `<span class="status done">✓ Erledigt</span>`
-              : done
-                ? `<span class="status">${done}/${n}</span>`
-                : "";
+            : S.off[keyI(i)] && !trained(i)
+              ? `<span class="status">Gestrichen</span>`
+              : n && done === n
+                ? `<span class="status done">✓ Erledigt</span>`
+                : done
+                  ? `<span class="status">${done}/${n}</span>`
+                  : i < TODAY && !trained(i)
+                    ? `<span class="status miss">✕ Verpasst</span>`
+                    : `<span class="status">Geplant</span>`;
         const badges = dayBadges(i, p);
         return `<button class="day k-${p.k} ${i === TODAY ? "today" : ""} ${openDay === i ? "open" : ""}" data-open="${i}" aria-expanded="${openDay === i}"><span class="d">${DAYS[dw]}<b>${d.getDate()}</b></span>
     <span class="t"><b>${esc(p.t)}</b><span class="kind">${KIND[p.k]}</span></span><span class="meta">${badges ? `<span class="badges">${badges}</span>` : ""}${st}</span></button>`;
@@ -4996,7 +5418,7 @@
         h += `<div class="mt-2">`;
         // Ein Tipp für einen unauffälligen Tag – unterscheidet „alles gut“ von „vergessen“
         if (r !== "green")
-          h += `<button class="btn primary sm" style="width:100%;margin-bottom:var(--s2)" data-act="ci-ok" data-k="${k}">✓ Keine Beschwerden</button>`;
+          h += `<button class="btn sm" style="width:100%;margin-bottom:var(--s2)" data-act="ci-ok" data-k="${k}">✓ Keine Beschwerden</button>`;
         for (const [f, label] of CHECKIN_FIELDS) {
           h += `<div class="ci-row"><span>${label}</span><div class="seg" role="group" aria-label="${label}">${["g", "y", "r"].map((v, j) => `<button class="v-${v} ${c[f] === v ? "on" : ""}" data-ci="${k}|${f}|${v}" aria-pressed="${c[f] === v}">${CI_LABELS[f][j]}</button>`).join("")}</div></div>`;
         }
@@ -5046,8 +5468,9 @@
         sel = null;
       const WIDE = () => matchMedia("(min-width:900px)").matches; // = CSS-Breakpoint für zwei Spalten
       const MID = () => matchMedia("(min-width:600px)").matches; // = CSS-Breakpoint für die Wochenleiste links
-      const vhead = (title, sub, back) =>
-        `${back ? `<button class="back" data-back>‹ Zurück</button>` : ""}<div class="vh"><h2>${title}</h2>${sub ? `<div class="sub">${sub}</div>` : ""}</div>`;
+      /* Seitenkopf: kleine Zeile (kick) über dem Titel, Untertitel darunter */
+      const vhead = (title, sub, back, kick) =>
+        `${back ? `<button class="back" data-back>‹ Zurück</button>` : ""}<div class="vh">${kick ? `<div class="kick">${kick}</div>` : ""}<h2>${title}</h2>${sub ? `<div class="sub">${sub}</div>` : ""}</div>`;
 
       function vToday() {
         const i = sel != null ? sel : Math.max(0, Math.min(LAST, TODAY));
@@ -5087,9 +5510,12 @@
         }
         strip += `</div>`;
         const session =
-          `<div class="sub" style="margin-bottom:var(--s3)">Woche ${Math.floor(i / 7) + 1} · ${blockLabel(info.block)} · ${esc(info.wave)}</div>` +
+          `<div class="sub sess-sub" style="margin-bottom:var(--s3)">Woche ${Math.floor(i / 7) + 1} · ${blockLabel(info.block)} · ${esc(info.wave)}</div>` +
           (dayPlan(i) ? sessionCard(i) : "");
-        if (!rail) return intro + daily + session + strip;
+        // Handy: Seitenkopf mit Datum, Titel und einer Zeile Countdown. Ab Tablet steht der Countdown oben in der Leiste.
+        const left = Math.ceil((RACE - midnight(NOW)) / dayMs);
+        const head = `<div class="vh today-h"><div class="kick">${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))}</div><h2>${i === TODAY ? "Heute" : DAYSF[dow(i)]}</h2><div class="sub">${left > 0 ? `Noch ${left} ${left === 1 ? "Tag" : "Tage"} bis Basel · ` : ""}Woche ${Math.floor(i / 7) + 1} · ${blockLabel(info.block)}</div></div>`;
+        if (!rail) return head + intro + daily + session + strip;
         const nav = `<nav class="rail" aria-label="Diese Woche">${strip}</nav>`;
         // Tablet: Check-in/Vorschläge über der Einheit. Desktop: in einer dritten Spalte rechts.
         if (!WIDE())
@@ -5097,7 +5523,8 @@
         return `${intro}<div class="cols today${daily ? "" : " two"}">${nav}<div>${session}</div>${daily ? `<div class="side">${daily}</div>` : ""}</div>`;
       }
 
-      function weekSummary(w) {
+      /* Wochenzahlen für den Ring (Handy) und die Wochenbilanz (Desktop) */
+      function weekStats(w) {
         let plan = 0,
           ok = 0,
           rp = [];
@@ -5123,39 +5550,69 @@
         const xLine = xs.length
           ? `<div class="sub xsum">＋ ${xs.length} Zusatz-${xs.length === 1 ? "Einheit" : "Einheiten"}${extraMinutes(xs) ? ` · ${extraMinutes(xs)}′` : ""}</div>`
           : "";
-        return `<div class="wsum"><div class="stat"><b>${ok}/${plan}</b><span>Einheiten</span></div><div class="stat"><b>${ar}</b><span>Ø RPE</span></div><div class="stat"><b>${
-          Object.values(S.strava.acts).filter((a) => {
-            const x = idxOfIso(a.date);
-            return x >= w * 7 && x < w * 7 + 7;
-          }).length
-        }</b><span>Aktivitäten</span></div></div>${xLine}`;
+        const na = Object.values(S.strava.acts).filter((a) => {
+          const x = idxOfIso(a.date);
+          return x >= w * 7 && x < w * 7 + 7;
+        }).length;
+        return { plan, ok, ar, na, xLine };
+      }
+      /* Handy: Ring mit den erledigten Einheiten, daneben die beiden anderen Zahlen */
+      function weekSummary(w) {
+        const { plan, ok, ar, na, xLine } = weekStats(w),
+          C = 2 * Math.PI * 46,
+          off = plan ? C * (1 - ok / plan) : C;
+        return `<section class="card wk-sum" aria-label="Wochenfortschritt"><div class="wk-ring"><svg viewBox="0 0 104 104" role="img" aria-label="${ok} von ${plan} Einheiten erledigt"><circle class="wk-ring-t" cx="52" cy="52" r="46"></circle><circle class="wk-ring-b" cx="52" cy="52" r="46" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"${ok > 0 ? "" : " style=\"display:none\""}></circle></svg><div><b>${ok}/${plan}</b><span>Einheiten</span></div></div><div class="wk-side"><div><span>Ø RPE</span><b>${ar}</b></div><div><span>Aktivitäten</span><b>${na}</b></div>${xLine}</div></section>`;
+      }
+      /* Desktop: Wochenbilanz neben der gewählten Einheit */
+      function weekBilanz(w) {
+        const { plan, ok, ar, na, xLine } = weekStats(w);
+        return `<section class="card wk-bil"><h3>Wochenbilanz</h3><div class="wk-tiles"><div><span>Einheiten</span><b>${ok}/${plan}</b></div><div><span>Ø RPE</span><b>${ar}</b></div><div><span>Aktivitäten</span><b>${na}</b></div></div>${xLine}<button class="btn ghost sm" data-v="review">Zum Wochenrückblick →</button></section>`;
+      }
+      /* Desktop: ein Tag als kurze Karte, antippen wählt ihn für die Ansicht darunter */
+      function weekCard(i, selI) {
+        const p = dayPlan(i),
+          d = dateFromIdx(i),
+          { n, done } = dayStatus(i);
+        const stt =
+          p.k === "rest"
+            ? `<span class="status">Erholung</span>`
+            : S.off[keyI(i)] && !trained(i)
+              ? `<span class="status">Gestrichen</span>`
+              : n && done === n
+                ? `<span class="status done">✓ Erledigt</span>`
+                : done
+                  ? `<span class="status">${done}/${n}</span>`
+                  : i < TODAY && !trained(i)
+                    ? `<span class="status miss">✕ Verpasst</span>`
+                    : `<span class="status">Geplant</span>`;
+        return `<button class="wd k-${p.k}${i === TODAY ? " today" : ""}${i === selI ? " sel" : ""}" data-open="${i}" aria-pressed="${i === selI}" aria-label="${DAYSF[dow(i)]} ${fmt(d)}: ${esc(p.t)}"><span class="wd-h"><span>${DAYS[dow(i)]}${i === TODAY ? " · Heute" : ""}</span><b>${d.getDate()}</b></span><i class="wd-bar" aria-hidden="true"></i><span class="wd-t">${esc(p.t)}</span>${stt}</button>`;
       }
       function vWeek() {
         const info = weekInfo(wk),
           wide = WIDE();
-        let h = `<div class="wk"><button data-wk="-1" aria-label="Vorherige Woche" ${wk === 0 ? "disabled" : ""}>‹</button>
-    <div><h2>Woche ${wk + 1}</h2><div class="sub">${fmt(dateFromIdx(wk * 7))} – ${fmt(dateFromIdx(wk * 7 + 6))}</div></div>
-    <button data-wk="1" aria-label="Nächste Woche" ${wk === NWEEKS - 1 ? "disabled" : ""}>›</button></div>
-    <div class="chiprow"><span class="badge">${blockLabel(info.block)}</span><span class="badge">${esc(info.wave)}</span><span class="badge">${esc(per(info.name))}</span></div>`;
-        h += weekSummary(wk);
-        let list = `<div class="list">`;
-        for (let d = 0; d < 7; d++) {
-          const i = wk * 7 + d;
-          list += dayRow(i);
-          if (openDay === i && !wide)
-            list += `<div class="day-body">${sessionCard(i)}</div>`;
+        let h = `<div class="wkwrap"><div class="vh"><div class="kick">${fmt(dateFromIdx(wk * 7))} – ${fmt(dateFromIdx(wk * 7 + 6))}</div><h2>Woche ${wk + 1}</h2><div class="sub">${esc(info.wave)} · ${blockLabel(info.block)}${info.name ? " · " + esc(per(info.name)) : ""}</div></div>
+    <div class="wk-nav"><button data-wk="-1" aria-label="Vorherige Woche" ${wk === 0 ? "disabled" : ""}><span aria-hidden="true">‹</span><span class="wk-lbl" aria-hidden="true">${wk > 0 ? " Woche " + wk : ""}</span></button><button data-wk="1" aria-label="Nächste Woche" ${wk === NWEEKS - 1 ? "disabled" : ""}><span class="wk-lbl" aria-hidden="true">${wk < NWEEKS - 1 ? "Woche " + (wk + 2) + " " : ""}</span><span aria-hidden="true">›</span></button></div></div>`;
+        if (!wide) {
+          h += weekSummary(wk);
+          let list = `<div class="list">`;
+          for (let d = 0; d < 7; d++) {
+            const i = wk * 7 + d;
+            list += dayRow(i);
+            if (openDay === i) list += `<div class="day-body">${sessionCard(i)}</div>`;
+          }
+          return h + list + `</div>`;
         }
-        list += `</div>`;
-        if (!wide) return h + list;
         const det =
           openDay != null && Math.floor(openDay / 7) === wk
             ? openDay
             : TODAY >= wk * 7 && TODAY < wk * 7 + 7
               ? TODAY
               : wk * 7;
+        let cards = "";
+        for (let d = 0; d < 7; d++) cards += weekCard(wk * 7 + d, det);
         return (
           h +
-          `<div class="cols week"><div>${list}</div><div class="side">${sessionCard(det)}</div></div>`
+          `<div class="wk-cards">${cards}</div><div class="cols week"><div>${sessionCard(det)}</div><div class="side">${weekBilanz(wk)}</div></div>`
         );
       }
 
@@ -6454,7 +6911,7 @@
         // Zahl, die beim Einblenden hochzählt; Endwert steht schon im HTML (ohne JS korrekt)
         const cnt = (v, dec = 0, suf = "") =>
           `<span class="cnt" data-to="${v}" data-dec="${dec}" data-suf="${esc(suf)}">${dec ? (+v).toFixed(dec).replace(".", ",") : Math.round(v)}${esc(suf)}</span>`;
-        let h = `<div class="wide">${vhead("Dashboard", `${DAYSF[(NOW.getDay() + 6) % 7]}, ${fmt(NOW)}`, false)}`;
+        let h = `<div class="wide">${vhead("Dashboard", "", false, `${DAYSF[(NOW.getDay() + 6) % 7]}, ${fmt(NOW)}`)}`;
 
         // Ring 1 – Erholung: Garmin-Readiness (0–100); ohne Garmin die Check-in-Ampel
         const recLvl = LVL[rec.level] || null,
@@ -7019,10 +7476,9 @@
           S.review[w] = { at: Date.now(), level: r.level, ...(fc0 && fc0.total ? { fc: Math.round(fc0.total) } : {}) };
           save();
         }
-        let h = `<div class="narrow rv">${vhead("Wochenrückblick", "", true)}`;
-        h += `<div class="wk"><button data-act="rv-wk" data-d="-1" aria-label="Vorherige Woche" ${w === 0 ? "disabled" : ""}>‹</button>
-    <div><h2>Woche ${w + 1}<small class="rv-of"> / ${NWEEKS}</small></h2><div class="sub">${fmt(dateFromIdx(w * 7))} – ${fmt(dateFromIdx(w * 7 + 6))} · ${esc(wi.wave)}</div></div>
-    <button data-act="rv-wk" data-d="1" aria-label="Nächste Woche" ${w >= cur ? "disabled" : ""}>›</button></div>`;
+        let h = `<div class="narrow rv"><button class="back" data-back>‹ Zurück</button>`;
+        h += `<div class="wkwrap"><div class="vh"><div class="kick">Wochenrückblick · ${fmt(dateFromIdx(w * 7))} – ${fmt(dateFromIdx(w * 7 + 6))}</div><h2>Woche ${w + 1}</h2><div class="sub">${esc(wi.wave)} · ${blockLabel(wi.block)}</div></div>
+    <div class="wk-nav"><button data-act="rv-wk" data-d="-1" aria-label="Vorherige Woche" ${w === 0 ? "disabled" : ""}><span aria-hidden="true">‹</span><span class="wk-lbl" aria-hidden="true">${w > 0 ? " Woche " + w : ""}</span></button><button data-act="rv-wk" data-d="1" aria-label="Nächste Woche" ${w >= cur ? "disabled" : ""}><span class="wk-lbl" aria-hidden="true">${w < cur ? "Woche " + (w + 2) + " " : ""}</span><span aria-hidden="true">›</span></button></div></div>`;
 
         // 1. Ergebnis: Ring (Einheiten) + Urteil + Punkte, die Aufmerksamkeit brauchen
         const warn = r.notes.filter((n) => n.level !== "green");
@@ -7207,7 +7663,7 @@
       function vCoach() {
         const tab = (id, label) =>
           `<button role="tab" data-act="cc-tab" data-tab="${id}" class="${coachTab === id ? "on" : ""}" aria-selected="${coachTab === id}">${label}</button>`;
-        let h = `<div class="narrow">${vhead("Coach", "", false)}<div class="chips cc-tabs" role="tablist">${tab("chat", "Chat")}${tab("move", "Umplanen")}${tab("sore", "Muskelkater")}${tab("inj", "Verletzt / krank")}</div>`;
+        let h = `<div class="narrow">${vhead("Coach", "", false, `Woche ${CURW + 1} · ${esc(weekInfo(CURW).wave)}`)}${navigator.onLine === false ? `<div class="net-off" role="status">Offline. Der Coach antwortet, sobald du wieder online bist.</div>` : ""}<div class="chips cc-tabs" role="tablist">${tab("chat", "Chat")}${tab("move", "Umplanen")}${tab("sore", "Muskelkater")}${tab("inj", "Verletzt")}</div>`;
         if (coachTab === "inj") return h + injHtml() + `</div>`;
         if (coachTab === "move") return h + moveHtml() + `</div>`;
         if (coachTab === "sore") return h + soreHtml() + `</div>`;
@@ -8379,6 +8835,20 @@
           dk = keyI(i);
         if (!p) return;
         ciOpen = false;
+        const prev = p.i.map((_, j) => [S.done[dk + "|" + j], S.val[dk + "|" + j]]);
+        const undo = () => {
+          p.i.forEach((_, j) => {
+            const id = dk + "|" + j,
+              [d, v] = prev[j];
+            if (d == null) delete S.done[id];
+            else S.done[id] = d;
+            if (v == null) delete S.val[id];
+            else S.val[id] = v;
+          });
+          doneOpen.add(i);
+          save();
+          render();
+        };
         p.i.forEach((_, j) => {
           const id = dk + "|" + j;
           S.done[id] = 1;
@@ -8389,7 +8859,7 @@
           }
         });
         save();
-        workoutFeedback(i, null, true);
+        workoutFeedback(i, null, true, undo);
         closeCard(i);
       }
       /* Erledigten Einzel-Tag wieder öffnen (Hold auf der erledigten Zeile) */
@@ -8480,16 +8950,17 @@
         save();
         render();
       });
-      function workoutFeedback(i, id, all) {
+      function workoutFeedback(i, id, all, undo) {
         const p = dayPlan(i),
           dk = keyI(i);
         if (!p) return;
         const miss = missingValues(p.i, S.done, S.val, dk);
         if (all) {
-          if (!miss.length) return toast(`Workout erledigt – stark! 💪`);
+          if (!miss.length) return toast(`Workout erledigt – stark! 💪`, false, undo);
           return toast(
             `Workout abgehakt, aber ${miss.length === 1 ? `bei „${exLabel(miss[0].t)}“ fehlt noch ein Wert` : `bei ${miss.length} Übungen fehlen noch Werte`}`,
             true,
+            undo,
           );
         }
         const m = miss.find((x) => dk + "|" + x.j === id);
@@ -9001,13 +9472,28 @@
         if (e.key === "Escape") menu(false);
       });
       /* warn: gelb hinterlegt und länger sichtbar */
-      function toast(m, warn) {
+      function toast(m, warn, undo) {
         const t = $("#toast");
         clearTimeout(toast.h);
         clearTimeout(toast.o);
         t.classList.remove("out");
         t.textContent = m;
         t.classList.toggle("warn", !!warn);
+        t.classList.toggle("has-undo", !!undo);
+        if (undo) {
+          // Rückgängig: Knopf im Hinweis, bleibt etwas länger sichtbar
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "toast-undo";
+          b.textContent = "Rückgängig";
+          b.addEventListener("click", () => {
+            clearTimeout(toast.h);
+            clearTimeout(toast.o);
+            t.hidden = true;
+            undo();
+          });
+          t.append(" ", b);
+        }
         t.hidden = false;
         toast.h = setTimeout(
           () => {
@@ -9021,7 +9507,7 @@
               t.classList.remove("out");
             }, 240);
           },
-          warn ? 4200 : 2600,
+          undo ? 6500 : warn ? 4200 : 2600,
         );
       }
       /* Check-in fertig: auf der Startseite schrumpft die Karte weg, im Dashboard blendet die Empfehlung ein */

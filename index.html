@@ -4213,6 +4213,37 @@
         .cc-tabs button { font-size: 12px; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; }
       }
       th { overflow-wrap: normal; word-break: keep-all; }
+      /* Dashboard: Garmin-Kacheln */
+      .dg-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s2); margin: var(--s4) 0; }
+      .dg-tiles.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      @media (min-width: 600px) { .dg-tiles.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+      .dg-tile { display: flex; flex-direction: column; gap: 6px; padding: var(--s3) var(--s3); border-radius: var(--r-m); background: var(--well); min-width: 0; color: var(--muted); }
+      .dg-tile span { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+      .dg-tile b { font-family: var(--f-head); font-weight: 700; font-size: 26px; line-height: 1; color: var(--text); }
+      .dg-tile small { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 3px; }
+      .dg-spark { width: 100%; height: 20px; }
+      /* Verbindungen: Strava ist die Hauptaktion (Gold), Garmin ruhig */
+      .btn.strava { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+      .btn.garmin { background: var(--well); border-color: transparent; color: var(--text); }
+      .chk { list-style: none; margin: 0 0 var(--s3); padding: 0; display: flex; flex-direction: column; gap: var(--s2); font-size: 14px; line-height: 20px; }
+      .chk li { display: flex; gap: 10px; }
+      .chk li::before { content: "✓"; color: var(--ok); }
+      /* Backup: Statuskarte */
+      .bk-status { display: flex; align-items: center; gap: var(--s3); padding: var(--s4) var(--s5); margin-bottom: var(--s4); border-radius: var(--r-l, 22px); background: var(--card); box-shadow: var(--edge); }
+      .bk-status > span:last-child { display: flex; flex-direction: column; min-width: 0; }
+      .bk-ic { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; }
+      .bk-status.ok .bk-ic { background: rgba(48, 209, 88, 0.14); color: var(--ok); }
+      .bk-status.warn .bk-ic { background: rgba(255, 159, 10, 0.14); color: var(--warn); }
+      /* Plan: Kopfkarte mit Ziel und Blockbalken */
+      .plan-hero { padding: var(--s4) var(--s5); margin-bottom: var(--s4); }
+      .ph-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); margin-bottom: var(--s3); }
+      .ph-t { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .ph-goal { font-family: var(--f-head); font-weight: 700; font-size: 26px; line-height: 1; }
+      .ph-bar { display: flex; gap: 3px; height: 10px; }
+      .ph-seg { border-radius: 4px; background: var(--surface2, #1b1e29); overflow: hidden; }
+      .ph-seg i { display: block; height: 10px; background: var(--accent); }
+      .ph-cap { display: flex; justify-content: space-between; margin-top: var(--s2); font-size: 12px; color: var(--muted); }
+      .blk-now { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-right: var(--s1); }
       /* Umplanen am Desktop: Wörter in den schmalen Fächern nie mitten im Wort trennen */
       @media (min-width: 600px) {
         .sl-card { padding: 26px 4px var(--s2) 10px; }
@@ -5646,10 +5677,26 @@
         const P = PLAN(),
           cur = weekInfo(CURW).block,
           blocks = blockOverview(P);
+        const left = Math.max(0, Math.ceil((RACE - midnight(NOW)) / dayMs)),
+          span = (b, j) => ({
+            s: Math.max(0, b.start),
+            e: j === blocks.length - 1 ? LAST : Math.min(b.end, LAST),
+          }),
+          segs = blocks
+            .map((b, j) => {
+              const { s: a, e: z } = span(b, j),
+                nwk = Math.floor(z / 7) - Math.floor(a / 7) + 1,
+                frac = Math.max(0, Math.min(1, (TODAY - a + 1) / (z - a + 1)));
+              return `<span class="ph-seg" style="flex:${nwk} 1 0"><i style="width:${Math.round(frac * 100)}%"></i></span>`;
+            })
+            .join("");
         let h = vhead(
+          "Doubles Men PRO",
+          per("mit Jimoh · Sa 13.02.2027"),
+          true,
           "Der Weg nach Basel",
-          per("Doubles Men PRO mit Jimoh · Sa 13.02.2027 · Ziel Sub-60"),
         );
+        h += `<div class="card plan-hero"><div class="ph-row"><span class="ph-t">Ziel</span><b class="ph-goal">&lt; 60:00</b></div><div class="ph-bar" role="img" aria-label="Planverlauf: Woche ${CURW + 1} von ${NWEEKS}">${segs}</div><div class="ph-cap"><span>Woche ${CURW + 1} von ${NWEEKS}</span><span>${left} ${left === 1 ? "Tag" : "Tage"}</span></div></div>`;
         h += `<div class="cols"><div><div class="list">`;
         blocks.forEach((b, j) => {
           // Letzter Block läuft bis zum Planende, damit kein Tag fehlt
@@ -5668,7 +5715,7 @@
           }
           const nw = Math.floor(end / 7) - Math.floor(s / 7) + 1;
           h += `<button class="blk ${cur === b.id ? "cur" : ""}" data-pb="${esc(b.id)}" aria-expanded="${on}"><span class="tag">${esc(b.id)}</span>
-      <span class="t"><b>${esc(per(b.name))}</b><span class="sub">${fmt(dateFromIdx(s))} – ${fmt(dateFromIdx(end))} · ${nw} ${nw === 1 ? "Woche" : "Wochen"} · ${ok}/${plan} erledigt</span></span><span class="chev" aria-hidden="true">›</span></button>`;
+      <span class="t"><b>${esc(per(b.name))}</b><span class="sub">${fmt(dateFromIdx(s))} – ${fmt(dateFromIdx(end))} · ${nw} ${nw === 1 ? "Woche" : "Wochen"} · ${ok}/${plan} erledigt</span></span>${cur === b.id ? `<span class="blk-now">Jetzt</span>` : ""}<span class="chev" aria-hidden="true">›</span></button>`;
           if (!on) return;
           h += `<div class="blk-body">`;
           for (let w = Math.floor(s / 7); w <= Math.floor(end / 7); w++) {
@@ -5745,7 +5792,7 @@
           h += `<div class="card"><div class="acct"><span class="av alt">${esc(PARTNER[0])}</span><div><b>${esc(PARTNER)}</b><div class="sub">Nur lesen · ${src}</div></div></div></div>`;
         }
         const W = own ? S.weights : PP ? PP.weights : {};
-        h += `<div class="cap">Standard-Arbeitsgewichte</div><div class="card">${own ? `<p class="sub" style="margin-top:0">Wird bei Krafteinheiten automatisch ins Eingabefeld übernommen und beim Abhaken gespeichert. Im Training jederzeit überschreibbar. Leer = kein Vorschlag.</p>` : `<p class="sub" style="margin-top:0">Gewichte von ${esc(who)}. Ändern kann sie nur ${esc(who)} selbst.</p>`}
+        h += `<div class="cap">Arbeitsgewichte</div><div class="card">${own ? `<p class="sub" style="margin-top:0">Vorschlag bei Krafteinheiten, im Training jederzeit überschreibbar. Leer = kein Vorschlag.</p>` : `<p class="sub" style="margin-top:0">Gewichte von ${esc(who)}. Ändern kann sie nur ${esc(who)} selbst.</p>`}
     <table class="wt">${weightList(Object.values(PLAN().days))
       .map(
         (e) =>
@@ -6691,8 +6738,7 @@
       }
       function vStrava() {
         const tok = stTok();
-        let h = `<div class="narrow">${vhead("Strava / Garmin", "Aktivitäten werden den geplanten Einheiten zugeordnet. Strava und Garmin gehen gleichzeitig, dieselbe Einheit zählt nur einmal. Passt eine Aktivität zu einem anderen Tag, schlägt die App vor, den Plan nachzuziehen.", true)}`;
-        h += garminCard();
+        let h = `<div class="narrow">${vhead("Verbindungen", "Läufe und Fahrten werden automatisch mit dem Plan abgeglichen. Strava und Garmin gehen gleichzeitig, dieselbe Einheit zählt nur einmal.", true, "Strava / Garmin")}`;
         h += `<div class="card">`;
         if (tok) {
           h += `<div class="row between"><div class="acct"><span class="av" style="background:var(--strava);color:#fff">S</span><div><b>Verbunden${tok.athlete ? " als " + esc(tok.athlete) : ""}</b><div class="sub">${S.strava.at ? "Zuletzt synchronisiert " + new Date(S.strava.at).toLocaleString("de-CH", { dateStyle: "short", timeStyle: "short" }) : "Noch nicht synchronisiert"}</div></div></div></div>
@@ -6701,9 +6747,9 @@
       <button class="btn ghost sm mt-2" data-act="st-full" ${stBusy ? "disabled" : ""}>Alles neu laden (ab Planstart)</button>`;
         } else
           h +=
-            `<div class="acct" style="margin-bottom:var(--s3)"><span class="av" style="background:var(--strava);color:#fff">S</span><div><b>Strava</b></div></div>` +
+            `<div class="acct" style="margin-bottom:var(--s3)"><span class="av" style="background:var(--strava);color:#fff">S</span><div><b>Strava</b><div class="sub">Nicht verbunden</div></div></div><ul class="chk"><li>Passende Aktivitäten als erledigt übernehmen</li><li>Anderer Tag? Die App schlägt vor, den Plan nachzuziehen</li><li>Gilt nur für dein Konto</li></ul>` +
             stConnectForm();
-        h += `</div><div class="card tight"><b>Strava ohne Verbindung: Datei importieren</b><p class="sub mt-1">Strava → Einstellungen → Mein Konto → „Account-Daten herunterladen“. Aus dem ZIP die Datei <b>activities.csv</b> wählen.</p>
+        h += `</div>${garminCard()}<div class="card tight"><b>Strava ohne Verbindung: Datei importieren</b><p class="sub mt-1">Strava → Einstellungen → Mein Konto → „Account-Daten herunterladen“. Aus dem ZIP die Datei <b>activities.csv</b> wählen.</p>
     <div class="btns"><label class="btn file">activities.csv auswählen<input type="file" accept=".csv,.json,text/csv,application/json" data-file="strava"></label></div></div>`;
         const acts = Object.values(S.strava.acts)
           .sort((a, b) => (a.date < b.date ? 1 : -1))
@@ -6967,11 +7013,45 @@
           if (ciOpen) h += checkinCard(TODAY);
           else if (ciPending(TODAY))
             h += `<div class="card dash-today"><div class="row between"><h3>Heute</h3><button class="btn primary sm" data-act="ci-edit">Check-in ausfüllen</button></div>
-      <p class="sub mt-2">${todayVerdict(recLvl, p)}</p>${mHtml}</div>`;
+      <p class="sub mt-2">${todayVerdict(recLvl, p)}</p></div>`;
           else
             h += `<div class="card dash-today"><div class="row between"><h3>Heute</h3>${lvl ? `<span class="amp amp-${lvl}">${LVL_TXT[lvl]}</span>` : ""}</div>
-      <p class="mt-2">${todayVerdict(lvl, p)}</p>${rec.why.length ? `<p class="sub mt-1">Garmin: ${esc(rec.why.join(", "))}</p>` : ""}${mHtml}
+      <p class="mt-2">${todayVerdict(lvl, p)}</p>${rec.why.length ? `<p class="sub mt-1">Garmin: ${esc(rec.why.join(", "))}</p>` : ""}
       <button class="btn ghost sm mt-3" data-act="ci-edit">Check-in ändern</button></div>`;
+        }
+
+        // Garmin-Kacheln: Wert von heute mit Verlaufslinie der letzten 7 Tage
+        {
+          const iso7 = [];
+          for (let k = 6; k >= 0; k--) iso7.push(isoD(new Date(+NOW - k * dayMs)));
+          const hm = (v) => Math.floor(v) + ":" + String(Math.round((v - Math.floor(v)) * 60)).padStart(2, "0");
+          const defs = [
+            ["Schlaf", "sleepH", hm, " h"],
+            ["HRV", "hrv", (v) => Math.round(v), " ms"],
+            ["Ruhepuls", "rhr", (v) => Math.round(v), " bpm"],
+            ["Body Battery", "bb", (v) => Math.round(v), ""],
+          ];
+          const tiles = defs
+            .map(([l, k, f, u]) => {
+              const cur = w[k];
+              if (cur == null) return "";
+              const ser = iso7.map((d) => (S.garmin.well[d] || {})[k]).map((v) => (v == null ? null : +v));
+              const nums = ser.filter((v) => v != null);
+              let line = "";
+              if (nums.length > 1) {
+                const lo = Math.min(...nums),
+                  hi = Math.max(...nums),
+                  rg = hi - lo || 1;
+                const pts = ser
+                  .map((v, i) => (v == null ? null : (i * 90) / 6 + "," + (18 - ((v - lo) / rg) * 16).toFixed(1)))
+                  .filter(Boolean)
+                  .join(" ");
+                line = `<svg class="dg-spark" viewBox="0 0 90 20" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></polyline></svg>`;
+              }
+              return `<div class="dg-tile"><span>${l}</span><b>${esc(String(f(+cur)))}<small>${u}</small></b>${line}</div>`;
+            })
+            .filter(Boolean);
+          if (tiles.length) h += `<div class="dg-tiles n${tiles.length}" aria-label="Garmin-Werte">${tiles.join("")}</div>`;
         }
 
         // Diese Woche: Anstrengung pro Tag + drei Zahlen
@@ -7560,9 +7640,14 @@
       let bkp = null; // eingelesenes Backup, wartet auf Bestätigung: {name, data, meta, summary}
       function vBackup() {
         const cloud = sb && USER;
+        let lastBk = 0;
+        try {
+          lastBk = +localStorage.getItem("hx_lastbackup") || 0;
+        } catch {}
         let h = `<div class="narrow">${vhead("Backup", "Alle Einträge als Datei sichern, z. B. vor einem Handywechsel.", true)}`;
-        h += `<div class="card"><b>Backup exportieren</b><p class="sub mt-1">Lädt Haken, Werte, Notizen, Check-ins, Umplanungen, Tests und Strava-Aktivitäten als <b>.json</b>-Datei herunter. Zugangsdaten (Login, Strava-Token) sind nicht enthalten.</p>
-    <div class="grid2 mt-4"><button class="btn primary" data-act="bk-export">Export Backup</button><button class="btn" data-act="bk-share">Als Text teilen</button></div></div>`;
+        h += `<div class="bk-status ${lastBk ? "ok" : "warn"}" role="status"><span class="bk-ic" aria-hidden="true">${lastBk ? "✓" : "!"}</span><span><b>${lastBk ? "Letztes Backup: " + new Date(lastBk).toLocaleDateString("de-CH", { day: "numeric", month: "short", year: "numeric" }) : "Noch kein Backup auf diesem Gerät"}</b><span class="sub">${cloud ? "Angemeldet: Einträge liegen zusätzlich in der Cloud." : "Nicht angemeldet: Daten liegen nur auf diesem Gerät."}</span></span></div>`;
+        h += `<div class="card"><b>Sichern</b><p class="sub mt-1">Haken, Werte, Notizen, Check-ins, Umplanungen, Tests und Strava-Aktivitäten als <b>.json</b>. Ohne Zugangsdaten.</p>
+    <div class="grid2 mt-4"><button class="btn primary" data-act="bk-export">Datei sichern</button><button class="btn" data-act="bk-share">Als Text teilen</button></div></div>`;
         if (bkp) {
           const s = bkp.summary,
             m = bkp.meta;
@@ -7572,8 +7657,8 @@
       <div class="target bad">Ersetzt alle aktuellen Einträge${cloud ? " – auf diesem Gerät und in der Cloud" : " auf diesem Gerät"}. Tipp: vorher ein Backup exportieren.</div>
       <div class="grid2 mt-4"><button class="btn primary" data-act="bk-apply">Ersetzen</button><button class="btn" data-act="bk-cancel">Abbrechen</button></div></div>`;
         } else {
-          h += `<div class="card"><b>Backup importieren</b><p class="sub mt-1">Eine zuvor exportierte <b>.json</b>-Datei wählen. Vor dem Überschreiben siehst du, was drin ist.</p>
-      <div class="btns"><label class="btn file">Import Backup<input type="file" accept=".json,application/json,text/plain" data-file="backup"></label></div></div>`;
+          h += `<div class="card"><b>Wiederherstellen</b><p class="sub mt-1">Eine gesicherte <b>.json</b> wählen. Vor dem Überschreiben siehst du, was drin ist.</p>
+      <div class="btns"><label class="btn file">Datei wählen<input type="file" accept=".json,application/json,text/plain" data-file="backup"></label></div></div>`;
         }
         if (cloud && !bkp) h += historyCard();
         return h + `</div>`;
@@ -7621,7 +7706,11 @@
         a.click();
         a.remove();
         setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        try {
+          localStorage.setItem("hx_lastbackup", String(Date.now()));
+        } catch {}
         toast("Backup heruntergeladen");
+        if (view === "backup") render();
       }
 
       /* ---------- Coach-Chat ----------
@@ -8619,7 +8708,7 @@
           .join("")}</ol>`;
         if (focusFin) {
           const rv = S.rpe[dk] ? +S.rpe[dk] : 0;
-          el.innerHTML = `${top}${mini}<div class="fc-main fc-fin"><div class="fc-big">${FC_CHECK}</div><h1 class="fc-name">Workout erledigt</h1><p class="fc-sub">${nd} von ${n} Übungen abgehakt</p>
+          el.innerHTML = `${top}${mini}<div class="fc-main fc-fin"><div class="fc-big">${FC_CHECK}</div><h1 class="fc-name">Geschafft</h1><p class="fc-sub">${esc(p.t)} · ${nd} von ${n} Schritten</p>
     <div class="fc-lbl">Wie hart war's?${rv ? ` · <b>${esc(RPE_TXT[rv] || "")}</b>` : ""}</div>
     <div class="fc-rpe" role="group" aria-label="Anstrengung 1 bis 10">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => `<button type="button" class="${rv === x ? "on" : ""}" style="--rc:${rpeColor((x - 1) / 9)}" data-fc="rpe" data-r="${x}" aria-pressed="${rv === x}">${x}</button>`).join("")}</div></div>
     <div class="fc-nav fin"><button type="button" class="fc-fertig" data-fc="close">Fertig</button></div>`;

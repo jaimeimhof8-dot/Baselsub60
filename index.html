@@ -4410,7 +4410,7 @@
         .s6-ol li.done .t { color: #9a9ba3; }
         .s6-acts { gap: 10px; }
         .s6-acts .s6-er { display: inline-flex; }
-        .s6-acts .s6-vs { background: none; box-shadow: none; color: #9a9ba3; }
+        .s6-acts .s6-vs, .s6-acts .s6-st { background: none; box-shadow: none; color: #9a9ba3; }
         .s6-acts .s6-btn:first-child { flex: none; min-height: 52px; padding: 0 28px; font-size: 16px; }
         .s6-acts .s6-btn { min-height: 52px; padding: 0 20px; }
         .s6-ci { padding: 24px; gap: 14px; }
@@ -5109,7 +5109,8 @@
       .s6-acts .s6-btn { min-height: 52px; padding: 0 20px; font-size: 15px; box-shadow: none; }
       .s6-acts .s6-btn:first-child { flex: 1 1 0; min-width: 0; padding: 0 16px; }
       .s6-acts .s6-btn.gold { background: #e0bf6a; color: #16181a; }
-      .s6-acts .s6-vs { flex: 0 0 100%; min-height: 44px; margin-top: -6px; background: none; color: #9a9ba3; font-size: 14px; }
+      .s6-acts .s6-brk { flex: 0 0 100%; height: 0; margin-top: -10px; }
+      .s6-acts .s6-vs, .s6-acts .s6-st { flex: 1 1 40%; min-height: 44px; margin-top: -6px; background: none; color: #9a9ba3; font-size: 14px; }
       .s7-rules { display: flex; flex-direction: column; gap: 8px; }
       .s7-g3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
       .s7-well { background: #161922; border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; min-width: 0; }
@@ -5148,10 +5149,11 @@
         .s6-ol .s { font-size: 13px; line-height: 19px; }
         .s6-ol .d { font-size: 28px; }
         .s6-acts { flex-wrap: nowrap; gap: 12px; align-items: center; }
+        .s6-acts .s6-brk { display: none; }
         .s6-acts .s6-btn { min-height: 56px; font-size: 16px; padding: 0 24px; }
         .s6-acts .s6-btn:first-child { flex: none; padding: 0 32px; }
         .s6-acts .s6-btn.gold { box-shadow: 0 2px 10px rgba(224, 191, 106, 0.3); }
-        .s6-acts .s6-vs { flex: none; min-height: 56px; margin-top: 0; padding: 0 16px; font-size: 16px; }
+        .s6-acts .s6-vs, .s6-acts .s6-st { flex: none; min-height: 56px; margin-top: 0; padding: 0 16px; font-size: 16px; }
         .s6-goal { display: flex; flex-direction: column; gap: 0; padding: 24px; }
         .s7-gb { font-family: var(--f-head); font-weight: 700; font-size: 64px; line-height: 0.9; margin-top: 10px; }
         .s7-gd { margin-top: 12px; font-size: 15px; font-weight: 600; }
@@ -5195,6 +5197,8 @@
       .s7-dash > .s6-hd > div:first-child { gap: 0; }
       .s7-dash > .s6-hd .s6-h1 { font-size: 52px; line-height: 0.95; letter-spacing: 0.005em; margin-top: 4px; }
       .s7-cols, .s7-c { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+      .s7-rest { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+      .s7-rest:empty { display: none; }
       .s7-dash .s6-card { padding: 20px; }
       .s7-dh .r1, .s7-pg .r1 { display: flex; justify-content: space-between; align-items: center; }
       .s7-pill { display: inline-flex; align-items: center; gap: 8px; background: #161922; border-radius: 999px; padding: 6px 12px 6px 10px; font-size: 13px; font-weight: 600; }
@@ -5540,6 +5544,12 @@
       .f7-wl .v { flex: none; width: 62px; text-align: center; font-family: var(--f-head); font-size: 24px; font-weight: 700; line-height: 1; }
       .f7-wl .v.e { color: #9a9ba3; }
       .f7-wl .v small { font-size: 12px; font-weight: 500; color: #9a9ba3; }
+      .f7-sp { display: flex; flex-direction: column; }
+      .f7-spr { display: flex; flex-direction: column; gap: 8px; padding: 14px 0; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+      .f7-spr:first-child { border-top: 0; }
+      .f7-spr .nm { font-size: 15px; font-weight: 600; line-height: 20px; }
+      .f7-spr .sb { font-size: 12px; font-weight: 400; color: #9a9ba3; }
+      .f7-sl { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #9a9ba3; }
       /* ---- Heute: abgeschlossene Einheit ---- */
       .s7-okt { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #30d158; }
       .s7-okt svg { width: 18px; height: 18px; }
@@ -6359,8 +6369,35 @@
         ];
         return `<button class="done-bar k-${p.k}" data-act="done-open" data-i="${i}" data-day="${i}" aria-label="${esc(p.t)} erledigt – Details anzeigen"><span class="ck" aria-hidden="true">✓</span><span class="t"><b>${esc(p.t)}</b><span class="sub">Erledigt · ${info.join(" · ")}</span></span><span class="more">Details ▾</span></button>`;
       }
-      function sessionCard(i) {
-        return sessionCore(i) + carryCards(i);
+      /* Muskelkater- und Überlastungs-Hinweis eines Tages (mit Entlasten/Verschieben), von der Einheitskarte und der Heute-Karte genutzt */
+      function dayWarn(i, p) {
+        let h = "";
+        const hit = sore.impact(p, soreAt(i));
+        if (hit.level >= 4)
+          h += `<div class="target ${hit.level >= 7 ? "bad" : ""}">Muskelkater: ${sore
+            .summarize(hit.muscles.filter((m) => m.level >= 4))
+            .map((x) => esc(x).replace(/(\d+\/10)$/, "<b>$1</b>"))
+            .join(", ")}.${
+            hit.names.length
+              ? ` Betroffen: ${hit.names
+                  .slice(0, 3)
+                  .map((x) => `„${esc(x)}“`)
+                  .join(", ")} – dort Last reduzieren.`
+              : ""
+          }</div>`;
+        const oi = overloadInfo(i),
+          ol = oi.risk;
+        if (ol.length)
+          h += `<div class="target bad"><b>⚠ Überlastung</b> – ${ol
+            .slice(0, 2)
+            .map((o) => esc(sore.overloadText(o)))
+            .join(
+              "; ",
+            )}.${oi.byExtra && oi.runs.length ? `<div class="xcause">Ausgelöst durch Zusatz-Einheit: ${oi.runs.map((r) => `${esc(r.label)} (${esc(shortDay(r.d))})`).join(", ")}</div>` : ""}${p.easy ? " Die Einheit ist bereits entlastet." : `<div class="grid2 mt-3"><button class="btn sm" data-act="ol-easy" data-i="${i}">Entlasten</button><button class="btn sm" data-move="${i}">Verschieben …</button></div>`}</div>`;
+        return h;
+      }
+      function sessionCard(i, quiet) {
+        return sessionCore(i, quiet) + carryCards(i);
       }
       /* Angehängte Übungen anderer Tage (S.later). Abhaken und Werte zählen für die Ursprungs-Einheit. */
       function carryCards(i) {
@@ -6406,7 +6443,7 @@
             : `<div class="watch-row"><button type="button" class="lnk" data-act="gm-push" data-i="${i}">Auf Uhr senden</button></div>`;
         return h;
       }
-      function sessionCore(i) {
+      function sessionCore(i, quiet) {
         const p = dayPlan(i),
           d = dateFromIdx(i),
           dk = keyI(i),
@@ -6444,28 +6481,7 @@
             h +
             `<div class="hint">${esc(p.n || "Echte Erholung.")}</div>${stravaBox(i, p, 0, 0)}${extrasBox(i)}</div>`
           );
-        const hit = sore.impact(p, soreAt(i));
-        if (hit.level >= 4)
-          h += `<div class="target ${hit.level >= 7 ? "bad" : ""}">Muskelkater: ${sore
-            .summarize(hit.muscles.filter((m) => m.level >= 4))
-            .map((x) => esc(x).replace(/(\d+\/10)$/, "<b>$1</b>"))
-            .join(", ")}.${
-            hit.names.length
-              ? ` Betroffen: ${hit.names
-                  .slice(0, 3)
-                  .map((x) => `„${esc(x)}“`)
-                  .join(", ")} – dort Last reduzieren.`
-              : ""
-          }</div>`;
-        const oi = overloadInfo(i),
-          ol = oi.risk;
-        if (ol.length)
-          h += `<div class="target bad"><b>⚠ Überlastung</b> – ${ol
-            .slice(0, 2)
-            .map((o) => esc(sore.overloadText(o)))
-            .join(
-              "; ",
-            )}.${oi.byExtra && oi.runs.length ? `<div class="xcause">Ausgelöst durch Zusatz-Einheit: ${oi.runs.map((r) => `${esc(r.label)} (${esc(shortDay(r.d))})`).join(", ")}</div>` : ""}${p.easy ? " Die Einheit ist bereits entlastet." : `<div class="grid2 mt-3"><button class="btn sm" data-act="ol-easy" data-i="${i}">Entlasten</button><button class="btn sm" data-move="${i}">Verschieben …</button></div>`}</div>`;
+        if (!quiet) h += dayWarn(i, p);
         // Eine einzige Aufgabe: keine Fortschrittsleiste, keine Checkbox – die Zeile selbst ist der Hold-Button
         const single = n === 1,
           undo = single && done >= n;
@@ -10795,9 +10811,12 @@
         <h2 class="s6-title">${esc(s7Title(p.t))}</h2>
         <div class="s6-title-d"><h1>${esc(s7Title(p.t))}</h1></div>
         ${rules.html}
+        ${dayWarn(i, p)}
         <ol class="s6-ol">${rows}</ol>
-        <div class="s6-acts"><button type="button" class="s6-btn gold" data-fc="start" data-i="${i}">Fokusmodus starten</button><button type="button" class="s6-btn s6-er" data-act="all-done" data-i="${i}">Erledigt</button><button type="button" class="s6-btn s6-vs" data-move="${i}">Verschieben</button></div></article>`;
-          more = `<details class="s6-more"><summary>Übungen, Werte und Details</summary><div class="s6-more-b">${sessionCard(i)}${isT ? `<button class="btn ghost sm" data-act="sore-open">Muskelkater genau eintragen →</button>` : ""}</div></details>`;
+        <div class="s6-acts"><button type="button" class="s6-btn gold" data-fc="start" data-i="${i}">Fokusmodus starten</button><button type="button" class="s6-btn s6-er" data-act="all-done" data-i="${i}">Erledigt</button><i class="s6-brk" aria-hidden="true"></i><button type="button" class="s6-btn s6-vs" data-move="${i}">Verschieben</button><button type="button" class="s6-btn s6-st" data-act="off" data-i="${i}">Streichen</button></div></article>`;
+          /* Gewichte, Splits und Zeiten trägt man im Abschluss (Erledigt oder Ende des Fokusmodus) ein */
+          const soreBtn = isT ? `<button class="btn ghost sm" data-act="sore-open">Muskelkater genau eintragen →</button>` : "";
+          more = soreBtn;
         }
         const goal = `<section class="s6-card s6-goal"><span class="s6-kick">Ziel</span><b class="s7-gb">&lt; 60:00</b><span class="s7-gd">Sa 13.02.2027</span><span class="s7-gs">HYROX Basel · Doubles Men PRO mit ${esc(PARTNER)}</span></section>`;
         return `${intro}<div class="s6 s6-today">${head}${rail}<div class="s6-main">${hero}${more}${hintsHtml}</div><div class="s6-side">${goal}${s7Ready(i)}${ciHtml}</div></div>`;
@@ -11092,8 +11111,30 @@
           : `<p class="s7-note">Noch keine Garmin-Werte.</p>`;
         const verlauf = `<section class="s6-card s7-vl" aria-label="Erholung im Verlauf"><span class="s6-kick">Erholung im Verlauf</span><div class="seg" role="tablist" aria-label="Verlauf">${Object.entries(SER).map(([k, v]) => `<button type="button" role="tab" data-act="dash-ser" data-k="${k}" class="${k === sk ? "on" : ""}" aria-selected="${k === sk}">${v[0]}</button>`).join("")}</div><div class="av"><div><span class="s6-kick">Ø 7 Tage</span><b>${last7.length ? fm(mean(last7)) : "–"}</b></div><div><span class="s6-kick">Ø seit Start</span><b>${nums.length ? fm(mean(nums)) : "–"}</b></div></div>${svg}</section>`;
         const head = s6Head(`Saison · Woche ${curW + 1} von ${NWEEKS}`, "Dashboard", "");
-        const more = `<details class="s6-more"><summary>Weitere Auswertungen</summary><div class="s6-more-b">${vDashboard(true)}</div></details>`;
-        return `<div class="s6 s6-dash s7-dash">${head}<div class="s7-cols"><div class="s7-c">${ciOpen && inPlan ? s6Checkin(TODAY) : ""}${heute}${tiles}</div><div class="s7-c">${prog}${verlauf}</div></div>${more}</div>`;
+        /* Was früher unter „Weitere Auswertungen“ stand, steht jetzt offen im Dashboard: Kraft und Schlaf links, Aktivitäten und Wege rechts. Heute, Woche und Erholungsverlauf gibt es oben schon. */
+        const rest = (() => {
+          const t = document.createElement("template");
+          t.innerHTML = vDashboard(true);
+          const kids = [...((t.content.querySelector(".wide") || {}).children || [])];
+          const at = kids.findIndex((n) => n.classList.contains("dgrid"));
+          if (at < 0) return { left: "", right: "" };
+          const kraft = ([...kids[at].querySelectorAll("section")][1] || {}).outerHTML || "";
+          const after = kids.slice(at + 1);
+          const title = (re) => after.findIndex((n) => n.classList.contains("dash-title") && re.test(n.textContent));
+          const si = title(/Schlaf/),
+            ai = title(/Aktivit/);
+          const li = after.findIndex((n) => n.classList.contains("dash-links"));
+          const cut = ai >= 0 ? ai : li;
+          const html = (from, to) =>
+            from < 0
+              ? ""
+              : after
+                  .slice(from, to < 0 ? undefined : to)
+                  .map((n) => n.outerHTML)
+                  .join("");
+          return { left: kraft + html(si, cut), right: html(cut, -1) };
+        })();
+        return `<div class="s6 s6-dash s7-dash">${head}<div class="s7-cols"><div class="s7-c">${ciOpen && inPlan ? s6Checkin(TODAY) : ""}${heute}${tiles}<div class="s7-rest">${rest.left}</div></div><div class="s7-c">${prog}${verlauf}<div class="s7-rest">${rest.right}</div></div></div></div>`;
       }
       /* ---- Wochenrückblick ---- */
       const S6_SEASON_H = [40, 60, 80, 30, 50, 65, 85, 35, 55, 70, 90, 40, 60, 75, 100, 45, 30, 20];
@@ -11745,6 +11786,19 @@
         } catch (_) {}
       }
       const fin7Lifts = (p) => p.i.map((t, j) => ({ t, j })).filter(({ t }) => !isFiller(t) && (isLift(p.k, t) || preWeight(p, t)));
+      /* Zeilen mit Zeit-/Split-Feld (Lauf, Stationen …): alles Nicht-Kraft, ohne Füllzeilen */
+      /* Anzahl Wiederholungen einer Zeile (2 bis 20), sonst 0 */
+      const fin7RepN = (t) => {
+        const m = /(\d{1,2})\s*[×x]\s*\d/.exec(t);
+        const n = m ? +m[1] : 0;
+        return n >= 2 && n <= 20 ? n : 0;
+      };
+      /* Felder pro Zeile: je Lauf/Station, je Wiederholung, sonst eins */
+      const fin7Nf = (t) => {
+        const sl = lineSlots(t);
+        return sl ? sl.length : fin7RepN(t) || 1;
+      };
+      const fin7Splits = (p) => (p.k === "kraft" ? [] : p.i.map((t, j) => ({ t, j })).filter(({ t }) => !isFiller(t) && !isLift(p.k, t) && !preWeight(p, t)));
       function fin7Paint() {
         if (!fin7) return;
         const p = dayPlan(fin7.i),
@@ -11776,6 +11830,22 @@
             })
             .join("");
           body = `<div><h2>Gewichte eintragen</h2><div class="sb2">Pro Übung das Arbeitsgewicht. Leer lassen, was Du nicht brauchst.</div></div><div class="f7-wl">${rows}</div><div class="acts"><button type="button" class="s6-btn gold" data-fin="wok">Übernehmen</button></div>`;
+        } else if (fin7.sub === "s") {
+          const rows = fin7Splits(p)
+            .map(({ t, j }) => {
+              const r = s7Row(t),
+                slots = lineSlots(t),
+                reps = slots ? 0 : fin7RepN(t),
+                vals = fin7.s[j] || [];
+              const fld = slots
+                ? slots.map((sl, k) => `<label class="f7-sl"><span>${esc(sl.label)}</span><input class="f7-notiz" type="text" inputmode="numeric" data-fin-sp="${j}" data-k="${k}" value="${esc(vals[k] || "")}" placeholder="${esc(sl.goal || "Zeit")}" enterkeyhint="next" aria-label="${esc(sl.label)}"></label>`).join("")
+                : reps
+                  ? Array.from({ length: reps }, (_, k) => `<label class="f7-sl"><span>Wdh. ${k + 1}</span><input class="f7-notiz" type="text" inputmode="numeric" data-fin-sp="${j}" data-k="${k}" value="${esc(vals[k] || "")}" placeholder="Zeit" enterkeyhint="next" aria-label="Wiederholung ${k + 1}"></label>`).join("")
+                  : `<input class="f7-notiz" type="text" data-fin-sp="${j}" data-k="0" value="${esc(vals[0] || "")}" placeholder="${esc(placeholder(p.k, t))}" aria-label="${esc(r.title)}">`;
+              return `<div class="f7-spr"><div class="nm">${esc(r.title)}<div class="sb">${esc(r.val || "")}</div></div>${fld}</div>`;
+            })
+            .join("");
+          body = `<div><h2>Splits eintragen</h2><div class="sb2">Pro Zeile Zeit oder Split. Leer lassen, was Du nicht brauchst.</div></div><div class="f7-sp">${rows}</div><div class="acts"><button type="button" class="s6-btn gold" data-fin="sok">Übernehmen</button></div>`;
         } else {
           const nDone = fin7.mode === "plan" ? p.i.length : fin7.picks.size;
           const seg = [["plan", "Wie geplant"], ["part", "Teilweise"], ["other", "Anders"]].map(([m, l]) => `<button type="button" class="${fin7.mode === m ? "on" : ""}" data-fin="mode" data-m="${m}" role="radio" aria-checked="${fin7.mode === m}">${l}</button>`).join("");
@@ -11784,13 +11854,14 @@
               ? `<div><span class="s6-kick">Was hast Du gemacht? · ${nDone} von ${p.i.length}</span><div class="it-l">${p.i.map((t, j) => `<button type="button" class="it${fin7.picks.has(j) ? " on" : ""}" data-fin="pick" data-j="${j}" role="checkbox" aria-checked="${fin7.picks.has(j)}"><span class="cb">${fin7.picks.has(j) ? S7_CHECK : ""}</span><span class="tx">${esc(s7Row(t).title)}</span></button>`).join("")}</div></div>`
               : "";
           const rpe = `<div><div class="rl"><span class="s6-kick">Anstrengung (RPE 1–10)</span>${lim ? `<span>Grenze diese Woche ${String(lim).replace(".", ",")}</span>` : ""}</div><div class="rpe-g">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => `<button type="button" class="${fin7.rpe === x ? "on" : ""}" data-fin="rpe" data-r="${x}" aria-pressed="${fin7.rpe === x}">${x}</button>`).join("")}</div></div>`;
+          const spRow = fin7Splits(p).length ? `<button type="button" class="f7-row" data-fin="sopen">Splits und Zeiten eintragen<span>optional ${F7_CHEV("M9 6l6 6-6 6").replace('width="24" height="24"', 'width="18" height="18"')}</span></button>` : "";
           const wRow = fin7Lifts(p).length ? `<button type="button" class="f7-row" data-fin="wopen">Gewichte eintragen<span>optional ${F7_CHEV("M9 6l6 6-6 6").replace('width="24" height="24"', 'width="18" height="18"')}</span></button>` : "";
           body = `<div><span class="s6-kick">${fin7.focus ? "Schritt 1 von 1 · Nach dem Fokusmodus" : "Schritt 1 von 1 · Ohne Fokusmodus"}</span><h2>Einheit abschliessen</h2><div class="sb2">${esc(s7Title(p.t))}</div></div>
-    <div><span class="s6-kick">Wie lief es?</span><div class="f7-seg" role="radiogroup" aria-label="Wie lief es?">${seg}</div></div>${list}${rpe}${wRow}
+    <div><span class="s6-kick">Wie lief es?</span><div class="f7-seg" role="radiogroup" aria-label="Wie lief es?">${seg}</div></div>${list}${rpe}${wRow}${spRow}
     <input class="f7-notiz" type="text" data-fin-note maxlength="200" value="${esc(fin7.note)}" placeholder="${fin7.mode === "other" ? "Was hast Du stattdessen gemacht?" : "Notiz (optional), z. B. „Knie zwickt“"}" aria-label="Notiz">
     <div class="acts"><button type="button" class="s6-btn gold" data-fin="save">Speichern</button><button type="button" class="s7-tx" data-fin="cancel">Abbrechen</button></div>`;
         }
-        el.innerHTML = `<div class="f7-scrim" data-fin="cancel"></div><section role="dialog" aria-modal="true" aria-label="${fin7.sub === "w" ? "Gewichte eintragen" : "Einheit abschliessen"}" class="f7-sheet" tabindex="-1"><div class="f7-grab"></div>${body}</section>`;
+        el.innerHTML = `<div class="f7-scrim" data-fin="cancel"></div><section role="dialog" aria-modal="true" aria-label="${fin7.sub === "w" ? "Gewichte eintragen" : fin7.sub === "s" ? "Splits eintragen" : "Einheit abschliessen"}" class="f7-sheet" tabindex="-1"><div class="f7-grab"></div>${body}</section>`;
         const sh = el.querySelector(".f7-sheet");
         sh.scrollTop = keepTop;
         const again = keepSel ? el.querySelector(keepSel) : null;
@@ -11837,7 +11908,7 @@
         const a = b.dataset.fin,
           p = dayPlan(fin7.i);
         if (a === "cancel") {
-          if (fin7.sub === "w") {
+          if (fin7.sub) {
             fin7.sub = null;
             return fin7Paint();
           }
@@ -11890,10 +11961,44 @@
           fin7.sub = null;
           return fin7Paint();
         }
+        if (a === "sopen") {
+          const dk = keyI(fin7.i);
+          fin7.s = {};
+          fin7.s0 = {};
+          for (const { t, j } of fin7Splits(p)) {
+            const raw = S.val[dk + "|" + j] || "";
+            const nf = fin7Nf(t);
+            const vals = nf > 1 ? raw.split(" / ") : [raw];
+            while (vals.length < nf) vals.push("");
+            fin7.s[j] = vals.slice(0, nf);
+            fin7.s0[j] = JSON.stringify(fin7.s[j]);
+          }
+          fin7.sub = "s";
+          return fin7Paint();
+        }
+        if (a === "sok") {
+          const dk = keyI(fin7.i);
+          for (const { t, j } of fin7Splits(p)) {
+            const nf = fin7Nf(t);
+            const parts = Array.from({ length: nf }, (_, k) => ((fin7.s[j] || [])[k] || "").trim());
+            if (JSON.stringify(parts) === fin7.s0[j]) continue; // nur Geändertes schreiben
+            const v = nf > 1 ? (parts.some(Boolean) ? parts.join(" / ") : "") : parts[0];
+            if (v) S.val[dk + "|" + j] = v;
+            else delete S.val[dk + "|" + j];
+          }
+          save();
+          fin7.sub = null;
+          return fin7Paint();
+        }
         if (a === "save") return fin7Save();
       });
       document.addEventListener("input", (e) => {
         if (fin7 && e.target.matches && e.target.matches("[data-fin-note]")) fin7.note = e.target.value;
+        if (fin7 && fin7.s && e.target.matches && e.target.matches("[data-fin-sp]")) {
+          const j = +e.target.dataset.finSp,
+            k = +e.target.dataset.k;
+          (fin7.s[j] = fin7.s[j] || [])[k] = e.target.value;
+        }
       });
       document.addEventListener("change", (e) => {
         const t = e.target;

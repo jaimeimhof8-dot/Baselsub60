@@ -5057,6 +5057,510 @@
         #focus .fin-bot .st { padding: 0 8px 0 18px; }
         #focus .fin-bot .ok { padding: 0 32px; }
       }
+      /* ================= Canvas «Neu» (Sub-60 Screens überarbeitet) ================= */
+      .s6-menu { width: 48px; height: 48px; }
+      /* Tab-Leiste Handy: schwebend, 68 px */
+      @media (max-width: 899px) {
+        .tabs { left: 16px; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom)); height: 68px; padding: 0 6px; background: rgba(14, 16, 22, 0.88); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06); }
+        .tabs button { height: 68px; gap: 4px; }
+        .tabs button svg { width: 24px; height: 24px; }
+      }
+      /* Kopfleiste Desktop: 80 px, Pillen 44 px */
+      @media (min-width: 900px) {
+        .top { height: 80px; }
+        .top .menu-btn { width: 48px; height: 48px; }
+        .top .cd small { font-size: 14px; }
+        .tabs { top: 18px; gap: 4px; padding: 4px; background: #0e1016; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); }
+        .tabs button { min-height: 44px; height: 44px; padding: 0 18px; font-size: 15px; }
+        .tabs button.on { background: #161922; }
+      }
+      /* ---- Heute ---- */
+      .s6-today { gap: 12px; padding-top: 28px; }
+      .s6-today .s6-hd { align-items: flex-start; padding: 0 4px 8px; }
+      .s6-today .s6-hd > div:first-child { gap: 0; }
+      .s6-today .s6-hd .s6-h1 { font-size: 52px; line-height: 0.95; letter-spacing: 0.005em; margin-top: 4px; }
+      .s6-today .s6-hd .s6-sub { margin-top: 8px; font-size: 14px; line-height: normal; }
+      .s7-n { font-family: var(--f-head); font-size: 17px; font-weight: 600; color: #f5f5f7; font-variant-numeric: tabular-nums; }
+      .s6-hero { gap: 16px; padding: 20px; }
+      .s6-hero.is-today { box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 2px 10px rgba(224, 191, 106, 0.3); }
+      .s6-chip { gap: 8px; padding: 6px 12px 6px 10px; }
+      .s6-hero-top { justify-content: space-between; }
+      .s7-cnt { font-size: 13px; color: #9a9ba3; }
+      .s6-hero h2.s6-title { font-size: 24px; line-height: 28px; font-weight: 600; }
+      .s6-ol { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+      .s6-ol li { border-top: 1px solid rgba(255, 255, 255, 0.06); border-bottom: 0; }
+      .s6-ol li:first-child { border-top: 0; }
+      .s6-ol label { display: flex; align-items: center; gap: 14px; min-height: 0; padding: 13px 0; cursor: pointer; }
+      .s6-ol input { position: absolute; opacity: 0; pointer-events: none; }
+      .s6-ol .c { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #3a3e4b; box-shadow: none; box-sizing: border-box; flex: none; display: grid; place-items: center; color: #fff; }
+      .s6-ol .c svg { display: none; }
+      .s6-ol input:checked + .c { background: #1d7f37; border-color: #1d7f37; box-shadow: none; }
+      .s6-ol input:checked + .c svg { display: block; }
+      .s6-ol input:checked + .c::after { content: none; }
+      .s6-ol input:focus-visible + .c { outline: 2px solid #e0bf6a; outline-offset: 2px; }
+      .s6-ol .m { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+      .s6-ol .t { font-size: 15px; font-weight: 600; line-height: 21px; flex: none; }
+      .s6-ol .s { font-size: 12px; line-height: 17px; color: #9a9ba3; }
+      .s6-ol .d { flex: none; font-family: var(--f-head); font-size: 22px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+      .s6-ol li.done .t { color: #9a9ba3; }
+      .s6-ol li.done { opacity: 0.7; }
+      .s6-acts { display: flex; flex-wrap: wrap; gap: 10px; }
+      .s6-acts .s6-er { display: inline-flex; }
+      .s6-acts .s6-btn { min-height: 52px; padding: 0 20px; font-size: 15px; box-shadow: none; }
+      .s6-acts .s6-btn:first-child { flex: 1 1 0; min-width: 0; padding: 0 16px; }
+      .s6-acts .s6-btn.gold { background: #e0bf6a; color: #16181a; }
+      .s6-acts .s6-vs { flex: 0 0 100%; min-height: 44px; margin-top: -6px; background: none; color: #9a9ba3; font-size: 14px; }
+      .s7-rules { display: flex; flex-direction: column; gap: 8px; }
+      .s7-g3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+      .s7-well { background: #161922; border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; min-width: 0; }
+      .s7-well b { white-space: nowrap; font-family: var(--f-head); font-weight: 700; font-size: 24px; line-height: normal; margin-top: 2px; font-variant-numeric: tabular-nums; }
+      .s7-rs { font-size: 12px; line-height: 17px; color: #9a9ba3; }
+      .s7-rules p { font-size: 13px; line-height: 19px; color: #9a9ba3; }
+      .s6-card.s7-rdy { flex-direction: row; gap: 14px; align-items: flex-start; padding: 16px 20px; }
+      .s7-rdy i { margin-top: 6px; width: 10px; height: 10px; border-radius: 50%; flex: none; }
+      .s7-rdy b { display: block; font-size: 15px; font-weight: 600; line-height: 22px; }
+      .s7-rdy span { display: block; font-size: 13px; line-height: 18px; color: #9a9ba3; margin-top: 2px; }
+      .s6-goal { display: none; }
+      @media (max-width: 899px) {
+        .s6-today .s6-hd { order: -3; }
+        .s6-side .s7-rdy { order: -2; }
+        .s6-ci { order: 4; }
+      }
+      @media (min-width: 900px) {
+        .s6-today { grid-template-columns: 250px minmax(0, 1fr) 300px; gap: 32px; padding: 0; }
+        .s6-rail { gap: 2px; }
+        .s6-rail > .s6-kick { padding: 0 14px 10px; }
+        .s6-rail button { gap: 12px; padding: 10px 14px; font-size: 15px; }
+        .s6-rail button.on { box-shadow: none; }
+        .s6-rail button b { width: 22px; }
+        .s6-rail button i { width: 9px; height: 9px; }
+        .s6-rail button span { font-size: 15px; }
+        .s6-rail button.rest { color: #9a9ba3; }
+        .s6-hero { gap: 24px; padding: 32px; }
+        .s6-hero.is-today { box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06); }
+        .s6-hero-top { justify-content: flex-start; gap: 14px; }
+        .s7-cnt { display: none; }
+        .s6-title-d { display: block; }
+        .s6-title-d h1 { font-size: 68px; line-height: 0.92; }
+        .s6-ol label { gap: 16px; padding: 14px 0; }
+        .s6-ol .c { width: 28px; height: 28px; }
+        .s6-ol .t { font-size: 17px; line-height: normal; }
+        .s6-ol .s { font-size: 13px; line-height: 19px; }
+        .s6-ol .d { font-size: 28px; }
+        .s6-acts { flex-wrap: nowrap; gap: 12px; align-items: center; }
+        .s6-acts .s6-btn { min-height: 56px; font-size: 16px; padding: 0 24px; }
+        .s6-acts .s6-btn:first-child { flex: none; padding: 0 32px; }
+        .s6-acts .s6-btn.gold { box-shadow: 0 2px 10px rgba(224, 191, 106, 0.3); }
+        .s6-acts .s6-vs { flex: none; min-height: 56px; margin-top: 0; padding: 0 16px; font-size: 16px; }
+        .s6-goal { display: flex; flex-direction: column; gap: 0; padding: 24px; }
+        .s7-gb { font-family: var(--f-head); font-weight: 700; font-size: 64px; line-height: 0.9; margin-top: 10px; }
+        .s7-gd { margin-top: 12px; font-size: 15px; font-weight: 600; }
+        .s7-gs { margin-top: 4px; font-size: 14px; line-height: 19px; color: #9a9ba3; }
+        .s6-card.s7-rdy { padding: 20px; }
+        .s6-ci { padding: 20px; }
+        .s6-ci-g { grid-template-columns: 78px repeat(3, minmax(0, 1fr)); gap: 4px; }
+        .s6-ci-g button { font-size: 12px; padding: 0 2px; }
+        .s6-rail button span { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
+      }
+      /* ---- Woche (Canvas «Neu») ---- */
+      .s6-week { gap: 12px; padding-top: 28px; }
+      .s6-week > .s6-hd { align-items: flex-start; padding: 0 4px 8px; }
+      .s6-week > .s6-hd > div:first-child { gap: 0; }
+      .s6-week > .s6-hd .s6-h1 { font-size: 52px; line-height: 0.95; letter-spacing: 0.005em; margin-top: 4px; }
+      .s6-week > .s6-hd .s6-sub { margin-top: 8px; font-size: 14px; line-height: normal; }
+      .s6-ring { gap: 22px; }
+      .s6-ring-c { width: 92px; height: 92px; }
+      .s6-ring-c b { font-size: 34px; }
+      .s6-ring-c span { font-size: 10px; line-height: normal; letter-spacing: 0.08em; font-weight: 600; margin-top: 2px; }
+      .s6-ring-r { gap: 16px; }
+      .s6-ring-r > .g { display: block; }
+      .s6-ring-r .l { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+      .s6-ring-r i { margin-top: 6px; }
+      .s6-days { padding: 8px; }
+      .s6-day { gap: 14px; min-height: 44px; padding: 14px 12px; border-bottom: 0; border-radius: 14px; width: 100%; }
+      .s6-day + .s6-day { margin-top: 2px; }
+      .s6-day.today { min-height: 44px; margin: 0; width: 100%; padding: 14px 12px; }
+      .s6-day b.w { width: 24px; }
+      .s6-day.today b.w { color: #e0bf6a; }
+      .s6-day i.dot { width: 10px; height: 10px; }
+      .s6-day .t span:first-child { font-size: 16px; font-weight: 500; line-height: 22px; }
+      .s6-day.today .t span:first-child { font-weight: 600; }
+      .s6-day .t span + span { font-size: 13px; line-height: normal; }
+      .s6-day .st.now { color: #e0bf6a; }
+      .s6-wn { gap: 10px; }
+      .s6-wn .s6-btn { min-height: 48px; gap: 8px; box-shadow: none; }
+      /* ---- Dashboard (Canvas «Neu») ---- */
+      .s7-dash { display: flex; flex-direction: column; gap: 12px; padding: 28px 16px 0; color: #f5f5f7; }
+      .s7-dash > .s6-hd { align-items: flex-start; padding: 0 4px 8px; }
+      .s7-dash > .s6-hd > div:first-child { gap: 0; }
+      .s7-dash > .s6-hd .s6-h1 { font-size: 52px; line-height: 0.95; letter-spacing: 0.005em; margin-top: 4px; }
+      .s7-cols, .s7-c { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+      .s7-dash .s6-card { padding: 20px; }
+      .s7-dh .r1, .s7-pg .r1 { display: flex; justify-content: space-between; align-items: center; }
+      .s7-pill { display: inline-flex; align-items: center; gap: 8px; background: #161922; border-radius: 999px; padding: 6px 12px 6px 10px; font-size: 13px; font-weight: 600; }
+      .s7-pill i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+      .s7-dh .big { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; }
+      .s7-dh .big b, .s7-pg .big b { font-family: var(--f-head); font-size: 72px; line-height: 0.9; font-weight: 700; font-variant-numeric: tabular-nums; }
+      .s7-dh .big b.w { font-size: 56px; }
+      .s7-dh .big span { font-size: 13px; color: #9a9ba3; }
+      .s7-dh p { margin: 12px 0 0; font-size: 15px; line-height: 22px; }
+      .s7-dh .g3 { display: flex; gap: 8px; margin-top: 16px; }
+      .s7-dh .s7-well { flex: 1; padding: 10px 12px; min-width: 0; }
+      .s7-dh .s7-well b { font-size: 26px; margin-top: 4px; }
+      .s7-dh .s7-well small { font-size: 14px; font-weight: 600; color: #9a9ba3; }
+      .s7-lnk { margin-top: 14px; min-height: 44px; padding: 0 4px; border: 0; background: none; color: #e0bf6a; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; align-self: flex-start; text-align: left; }
+      .s7-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .s7-dash .s6-card.s7-t { padding: 16px; }
+      .s7-t b { font-family: var(--f-head); font-size: 36px; line-height: 1; font-weight: 700; margin-top: 8px; font-variant-numeric: tabular-nums; }
+      .s7-t b small { font-size: 16px; color: #9a9ba3; font-weight: 600; }
+      .s7-t .n { font-size: 12px; color: #9a9ba3; margin-top: 6px; }
+      .s7-note { margin: 0 4px; font-size: 13px; line-height: 18px; color: #9a9ba3; }
+      .s7-pg .big { margin-top: 14px; }
+      .s7-pg .cap { margin: 8px 0 0; font-size: 13px; line-height: 18px; color: #9a9ba3; }
+      .s7-pg .bar { position: relative; margin-top: 20px; }
+      .s7-pg .bar > div { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: #161922; gap: 2px; }
+      .s7-pg .bar u { display: block; text-decoration: none; }
+      .s7-pg .bar > i { position: absolute; top: -5px; width: 3px; height: 22px; border-radius: 2px; background: #e0bf6a; }
+      .s7-pg .lg { display: flex; gap: 14px; margin-top: 10px; font-size: 12px; color: #9a9ba3; flex-wrap: wrap; }
+      .s7-pg .lg span { display: inline-flex; align-items: center; gap: 6px; }
+      .s7-pg .lg i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+      .s7-pg .lg i.m { width: 3px; height: 10px; border-radius: 2px; background: #e0bf6a; }
+      .s7-pg .rows { margin-top: 18px; }
+      .s7-pg .tr, .s7-det .tr { display: flex; justify-content: space-between; align-items: center; min-height: 44px; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 15px; }
+      .s7-pg .rows .tr:first-child { border-top: 0; }
+      .s7-pg .tr small { color: #9a9ba3; font-size: 13px; }
+      .s7-pg .tr b { font-family: var(--f-head); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+      .s7-det { margin-top: 4px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+      .s7-det > summary { list-style: none; display: flex; justify-content: space-between; align-items: center; min-height: 44px; padding-top: 12px; box-sizing: content-box; font-size: 14px; font-weight: 600; color: #e0bf6a; cursor: pointer; }
+      .s7-det > summary::-webkit-details-marker { display: none; }
+      .s7-det[open] > summary svg { transform: rotate(180deg); }
+      .s7-vl .seg { display: flex; gap: 6px; margin-top: 14px; background: #161922; border-radius: 999px; padding: 4px; }
+      .s7-vl .seg button { flex: 1; min-height: 36px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 999px; background: none; font-family: inherit; font-size: 14px; font-weight: 500; color: #9a9ba3; cursor: pointer; }
+      .s7-vl .seg button.on { background: #f5f5f7; color: #0e1016; font-weight: 600; }
+      .s7-vl .av { display: flex; gap: 28px; margin-top: 18px; }
+      .s7-vl .av b { display: block; font-family: var(--f-head); font-size: 36px; line-height: 1; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+      .s7-vl svg { display: block; margin-top: 16px; }
+      @media (min-width: 900px) {
+        .s7-dash { padding: 0; gap: 20px; }
+        .s7-dash > .s6-hd { padding: 0; }
+        .s7-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+        .s7-c { gap: 16px; }
+      }
+      /* ---- Coach (Canvas «Neu») ---- */
+      .s6-coach { gap: 12px; padding: 28px 16px 0; }
+      .s7-ch { align-items: center; padding: 0 4px 4px; }
+      .s7-ch .s6-h1 { font-size: 52px; line-height: 0.95; letter-spacing: 0.005em; }
+      .s6-coach.is-chat > .s6-seg { display: none; }
+      .s6-coach.is-chat { padding-bottom: 0; }
+      .s7-kn { flex-direction: row; flex-wrap: wrap; gap: 6px 18px; padding: 14px 16px; font-size: 13px; color: #9a9ba3; }
+      .s7-kn b { color: #f5f5f7; font-weight: 600; }
+      .s7-kn b.ok, .s7-knd .ok { color: #30d158; }
+      .s7-kn b.bad, .s7-knd .bad { color: #ff6961; }
+      .s7-knd { display: none; }
+      .s6-chatc .s6-msgs { gap: 10px; }
+      .s6-msg { max-width: 92%; padding: 16px; font-size: 15px; line-height: 23px; }
+      .s6-msg p { font-size: 15px; line-height: 23px; }
+      .s6-msg.user { max-width: 78%; padding: 12px 16px; background: #161922; border-radius: 22px 22px 6px 22px; box-shadow: none; }
+      .s6-msg.user p { line-height: 22px; }
+      .s6-msg.ex { display: flex; flex-direction: column; gap: 12px; }
+      .s7-box { background: #161922; border-radius: 14px; padding: 12px 14px; }
+      .s7-box .s6-kick { display: block; color: #e0bf6a; margin-bottom: 4px; }
+      .s6-msg.ex ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+      .s7-dock { display: flex; flex-direction: column; gap: 12px; }
+      .s7-tg { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
+      .s7-sw { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0; border: 0; background: none; font-family: inherit; font-size: 14px; color: #9a9ba3; cursor: pointer; text-align: left; }
+      .s7-sw .sw { width: 40px; height: 24px; border-radius: 999px; background: #1b1e29; position: relative; flex: none; }
+      .s7-sw .sw i { position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: #9a9ba3; transition: left 0.15s; }
+      .s7-sw[aria-checked="true"] .sw { background: #e0bf6a; }
+      .s7-sw[aria-checked="true"] .sw i { left: 19px; background: #16181a; }
+      .s7-tx { min-height: 44px; padding: 0 4px; border: 0; background: none; color: #9a9ba3; font-family: inherit; font-size: 13px; cursor: pointer; }
+      .s7-gem { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; border-radius: 14px; background: #161922; color: #f5f5f7; font-size: 15px; font-weight: 600; text-decoration: none; }
+      .s6-cin { position: static; z-index: auto; display: flex; flex-direction: column; gap: 12px; }
+      .s7-chips { display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px; padding: 0 16px; scrollbar-width: none; }
+      .s7-chips::-webkit-scrollbar { display: none; }
+      .s7-chips button { flex: none; min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: #161922; color: #f5f5f7; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+      .s7-chips button:disabled { opacity: 0.5; }
+      .s6-inp { gap: 8px; padding: 6px 6px 6px 18px; min-height: 56px; border-radius: 22px; background: #0e1016; box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06); }
+      .s6-inp > input[type="text"] { font-size: 15px; }
+      .s6-inp button { width: 48px; height: 48px; border-radius: 14px; background: #e0bf6a; color: #16181a; }
+      .s6-inp button:disabled { opacity: 0.5; }
+      @media (max-width: 899px) {
+        .s6-coach.is-chat { min-height: calc(100vh - 112px); }
+        .s6-coach.is-chat .s6-chatc { flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+        .s6-coach.is-chat .s6-msgs { flex: 1 1 auto; }
+      }
+      @media (min-width: 900px) {
+        .s7-dock .s6-m, .s7-kn.s6-m, .s7-chips .s6-m { display: none !important; }
+        .s6-coach { grid-template-columns: 200px minmax(0, 1fr) 280px; gap: 32px; padding: 0; min-height: calc(100vh - 80px - 64px); }
+        .s6-cside h1 { margin: 0 0 16px 4px; font-size: 52px; line-height: 0.95; letter-spacing: 0.005em; }
+        .s6-cside { gap: 4px; }
+        .s6-cside button { color: #9a9ba3; font-weight: 500; }
+        .s6-cside button.on { background: #161922; box-shadow: none; color: #f5f5f7; font-weight: 600; }
+        .s6-cmain.s6-chatc { padding: 0; gap: 0; overflow: hidden; }
+        .s6-chatc .s6-msgs { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 28px 32px 16px; gap: 16px; }
+        .s6-msg { max-width: 600px; padding: 0; background: none; box-shadow: none; border-radius: 0; }
+        .s6-msg.user { max-width: 520px; padding: 14px 18px; background: #161922; border-radius: 22px 22px 6px 22px; }
+        .s6-msg.prop { padding: 16px; background: #161922; border-radius: 22px; }
+        .s7-dock { padding: 16px 32px 24px; gap: 10px; }
+        .s6-cin { gap: 10px; }
+        .s7-chips { margin: 0; padding: 0; overflow: visible; }
+        .s6-inp { background: #161922; box-shadow: none; padding: 6px 6px 6px 20px; border-radius: 22px; }
+        .s6-cinfo { display: flex; flex-direction: column; gap: 12px; }
+        .s7-knd { display: flex; padding: 20px; gap: 0; }
+        .s7-knd .s6-kick { margin-bottom: 8px; }
+        .s7-knd .r { display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 14px; color: #9a9ba3; }
+        .s7-knd .r:nth-of-type(1) { border-top: 0; }
+        .s7-knd .r span + span { color: #f5f5f7; }
+        .s7-knd .r span.ok { color: #30d158; }
+        .s7-knd .r span.bad { color: #ff6961; }
+        .s6-cinfo .s7-sw { padding: 0 4px; gap: 12px; color: #f5f5f7; }
+        .s6-cinfo .s7-gem { font-size: 14px; }
+        .s7-clr { align-self: flex-start; }
+      }
+      /* ---- Fokusmodus (Canvas «Neu») ---- */
+      #focus.f7on { background: #06070a; padding: 0; gap: 0; color: #f5f5f7; font-family: var(--f-body); overflow: hidden; }
+      #focus.f7on * { box-sizing: border-box; }
+      #focus.f7on button { font-family: inherit; }
+      #focus.f7on .s6-kick { font-size: 11px; line-height: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #9a9ba3; }
+      .f7-h { display: flex; align-items: center; gap: 14px; padding: max(20px, env(safe-area-inset-top)) 16px 0; }
+      .f7-x { flex: none; width: 48px; height: 48px; border: 0; border-radius: 50%; background: #161922; color: #f5f5f7; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; }
+      .f7-t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+      .f7-t b { font-size: 15px; font-weight: 600; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .f7-p { display: flex; align-items: center; gap: 14px; }
+      .f7-c { font-family: var(--f-head); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+      .f7-sg { display: none; }
+      .f7-segrow, .f7-sg { gap: 4px; }
+      .f7-segrow { display: flex; padding: 20px 16px 0; }
+      .f7-segrow i, .f7-sg i { flex: 1; height: 5px; border-radius: 999px; background: #1b1e29; display: block; }
+      .f7-segrow i.d, .f7-sg i.d { background: #9a9ba3; }
+      .f7-segrow i.c, .f7-sg i.c { background: #f5f5f7; }
+      .f7-b { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+      .f7-list { display: none; }
+      .f7-ma { max-width: none; width: auto; margin: 0; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 20px; padding: 32px 16px max(28px, env(safe-area-inset-bottom)); overflow-y: auto; }
+      .f7-ma.go-next { animation: fcInNext 0.28s ease-out; }
+      .f7-ma.go-prev { animation: fcInPrev 0.28s ease-out; }
+      .f7-gold { color: #e0bf6a !important; }
+      .f7-name { margin: 6px 0 0; font-family: var(--f-head); font-size: 68px; line-height: 0.9; font-weight: 700; text-transform: uppercase; letter-spacing: normal; overflow-wrap: anywhere; }
+      .f7-name.f7-m2 { font-size: 56px; }
+      .f7-name.f7-s { font-size: 44px; line-height: 0.95; }
+      .f7-name.f7-xs { font-size: 34px; line-height: 1; }
+      .f7-meta { margin: 10px 0 0; font-size: 14px; color: #9a9ba3; }
+      .f7-de { display: none; }
+      .f7-w { display: flex; align-items: center; justify-content: space-between; background: #0e1016; border-radius: 22px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); padding: 12px; }
+      .f7-w > button { flex: none; width: 60px; height: 60px; border: 0; border-radius: 14px; background: #161922; color: #f5f5f7; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+      .f7-w > button:active { background: #1b1e29; }
+      .f7-wv { text-align: center; min-width: 0; flex: 1; display: flex; flex-direction: column; align-items: center; }
+      .f7-n { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+      .f7-n span { font-family: var(--f-head); font-size: 22px; font-weight: 700; color: #9a9ba3; }
+      .f7-in { width: 3.2em; border: 0; background: transparent; color: #f5f5f7; text-align: right; font-family: var(--f-head); font-size: 60px; line-height: 0.9; font-weight: 700; outline: none; padding: 0; font-variant-numeric: tabular-nums; }
+      .f7-in.pre { color: #e0bf6a; }
+      .f7-in.txt { width: 100%; text-align: center; font-size: 40px; }
+      .f7-in::placeholder { color: #3a3e4b; }
+      .f7-wv .s6-kick { margin-top: 6px; }
+      .f7-w.one { justify-content: center; padding: 16px; }
+      .f7-note { margin: -8px 0 0; font-size: 13px; color: #9a9ba3; }
+      .f7-last { align-self: flex-start; margin-top: -8px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: #161922; color: #f5f5f7; font-size: 14px; cursor: pointer; }
+      .f7-sets { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+      .f7-sets .s6-kick { margin-right: 6px; }
+      .f7-sets button { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #3a3e4b; background: none; color: #9a9ba3; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+      .f7-sets button.on { border-color: #f5f5f7; color: #f5f5f7; }
+      .f7-sets button.d { background: #1d7f37; border-color: #1d7f37; color: #fff; }
+      #focus.f7on .fc-timer { background: #0e1016; border: 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); }
+      .f7-bot { margin-top: auto; display: flex; flex-direction: column; gap: 16px; }
+      .f7-up { display: flex; justify-content: space-between; align-items: center; background: #0e1016; border: 0; border-radius: 14px; padding: 0 16px; min-height: 52px; color: #9a9ba3; cursor: pointer; text-align: left; font-family: inherit; }
+      .f7-up b { font-size: 15px; font-weight: 600; color: #f5f5f7; margin-left: 10px; }
+      .f7-up svg { width: 18px; height: 18px; }
+      .f7-nav { display: flex; align-items: center; gap: 12px; }
+      .f7-pv, .f7-nx > button { flex: none; width: 56px; height: 56px; border: 0; border-radius: 50%; background: #161922; color: #f5f5f7; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; }
+      .f7-pv:disabled, .f7-nx > button:disabled { background: #0e1016; color: #3a3e4b; cursor: default; }
+      .f7-pv svg, .f7-nx > button svg { width: 22px; height: 22px; }
+      .f7-nx { display: flex; align-items: center; gap: 14px; }
+      .f7-ok { flex: 1; min-height: 64px; border: 0; border-radius: 999px; background: #e0bf6a; color: #16181a; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 2px 10px rgba(224, 191, 106, 0.3); cursor: pointer; }
+      .f7-ok svg { width: 24px; height: 24px; }
+      .f7-ok.on { background: #1d7f37; color: #fff; box-shadow: none; }
+      @media (min-width: 900px) {
+        .f7-de { display: inline; }
+        .f7-mo { display: none !important; }
+        .f7-h { padding: 16px 40px; gap: 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+        .f7-t b { font-size: 19px; }
+        .f7-sg { display: flex; }
+        .f7-sg i { flex: none; width: 28px; height: 6px; }
+        .f7-c { font-size: 24px; }
+        .f7-segrow { display: none; }
+        .f7-b { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 40px; padding: 32px 40px; flex-direction: row; }
+        .f7-list { display: flex; flex-direction: column; gap: 4px; align-self: start; background: #0e1016; border-radius: 22px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); padding: 12px; }
+        .f7-list button { display: flex; align-items: center; gap: 14px; min-height: 52px; padding: 0 14px; border: 0; border-radius: 14px; background: none; color: #9a9ba3; font-size: 15px; font-weight: 500; text-align: left; cursor: pointer; }
+        .f7-list button > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .f7-list button i { flex: none; width: 28px; height: 28px; border-radius: 50%; background: #161922; display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 13px; font-weight: 600; color: #9a9ba3; }
+        .f7-list button em { margin-left: auto; white-space: nowrap; font-style: normal; font-size: 13px; color: #9a9ba3; }
+        .f7-list button em.g { color: #e0bf6a; font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+        .f7-list button.on { background: #161922; color: #f5f5f7; font-weight: 600; }
+        .f7-list button.on i { background: #f5f5f7; color: #0e1016; }
+        .f7-list button.d i { background: #1d7f37; color: #fff; }
+        .f7-ma { padding: 0; gap: 24px; }
+        .f7-name { font-size: 88px; margin-top: 0; }
+        .f7-name.f7-m2 { font-size: 72px; }
+        .f7-name.f7-s { font-size: 52px; }
+        .f7-name.f7-xs { font-size: 40px; }
+        .f7-meta { margin-top: 12px; font-size: 15px; }
+        .f7-w { padding: 16px; }
+        .f7-w > button { width: 72px; height: 72px; }
+        .f7-in { font-size: 72px; }
+        .f7-n span { font-size: 28px; }
+        .f7-note { margin-top: -12px; }
+        .f7-sets button { width: 44px; height: 44px; }
+        .f7-nav { gap: 24px; justify-content: space-between; }
+        .f7-pv, .f7-nx > button { width: 64px; height: 64px; }
+        .f7-ok { flex: 1; max-width: 420px; min-height: 72px; font-size: 18px; gap: 12px; }
+        .f7-nx > .f7-de { text-align: right; display: block; }
+        .f7-nx b { display: block; font-size: 16px; font-weight: 600; margin-top: 2px; }
+      }
+      /* ---- Stationstag: Splits ---- */
+      #focus.sp-on { background: #06070a; padding: 0; gap: 0; color: #f5f5f7; font-family: var(--f-body); overflow-y: auto; display: block; }
+      #focus.sp-on * { box-sizing: border-box; }
+      #focus.sp-on button { font-family: inherit; }
+      #focus.sp-on .s6-kick { font-size: 11px; line-height: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #9a9ba3; }
+      .sp { display: flex; flex-direction: column; gap: 10px; min-height: 100%; padding: max(20px, env(safe-area-inset-top)) 16px 28px; }
+      .sp-h { display: flex; align-items: center; gap: 12px; }
+      .sp-tt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+      .sp-tt b { font-size: 19px; font-weight: 600; margin-top: 2px; }
+      .sp-tt .s6-kick { display: none; }
+      .sp.chk .sp-tt .s6-kick { display: block; }
+      .sp-tot { font-family: var(--f-head); font-size: 44px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; flex: 1; }
+      .sp-h .sp-tt { display: none; }
+      .sp.chk .sp-h .sp-tt { display: flex; }
+      .f7-go { min-height: 52px; padding: 0 26px; border: 0; border-radius: 999px; background: #e0bf6a; color: #16181a; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 10px rgba(224, 191, 106, 0.3); cursor: pointer; }
+      .sp-rules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+      .sp-w { background: #0e1016; border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; min-width: 0; }
+      .sp-w b { font-family: var(--f-head); font-size: 22px; font-weight: 700; margin-top: 2px; white-space: nowrap; }
+      .sp-w span:last-child { font-size: 12px; line-height: 17px; color: #9a9ba3; }
+      .sp-hint { margin: 0; padding: 0 4px; font-size: 13px; line-height: 19px; color: #9a9ba3; }
+      .sp-g { display: flex; flex-direction: column; gap: 10px; }
+      .sp-t { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 14px; background: #0e1016; border-radius: 22px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); padding: 14px 16px; min-height: 92px; position: relative; text-align: left; }
+      button.sp-t { cursor: pointer; }
+      .sp-t.done { opacity: 0.45; }
+      .sp-t.now { background: #161922; box-shadow: inset 0 0 0 2px #f5f5f7; }
+      .sp-t .bar { flex: none; width: 6px; align-self: stretch; border-radius: 999px; }
+      .sp-t .dt { display: none; width: 9px; height: 9px; border-radius: 50%; flex: none; }
+      .sp-t .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+      .sp-t .tp { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #9a9ba3; display: flex; align-items: center; gap: 8px; }
+      .sp-t.now .tp { color: #f5f5f7; }
+      .sp-t .nm { font-size: 20px; font-weight: 600; line-height: 24px; margin-top: 2px; }
+      .sp-t .dd { font-size: 12px; line-height: 17px; color: #9a9ba3; margin-top: 2px; }
+      .sp-t .dd b { color: #ff9f0a; }
+      .sp-t .dd b.mi { color: #30d158; }
+      .sp-t .dd b.ze { color: #9a9ba3; }
+      .sp-t .big { flex: none; min-width: 92px; text-align: right; font-family: var(--f-head); font-size: 52px; line-height: 0.9; font-weight: 700; font-variant-numeric: tabular-nums; }
+      .sp-t .ck { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #3a3e4b; display: flex; align-items: center; justify-content: center; color: #fff; }
+      .sp-t .ck.on { background: #1d7f37; border-color: #1d7f37; }
+      /* Splits prüfen */
+      .sp.chk { gap: 14px; }
+      .sp-sum { display: flex; justify-content: space-between; align-items: flex-end; background: #0e1016; border-radius: 22px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); padding: 16px 20px; }
+      .sp-sum b { display: block; font-family: var(--f-head); font-size: 56px; line-height: 0.9; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+      .sp-sum .r { text-align: right; }
+      .sp-sum .r b { font-size: 32px; }
+      .sp-sum .pl, .sp-tab .pl { color: #ff9f0a; }
+      .sp-sum .mi, .sp-tab .mi { color: #30d158; }
+      .sp-sum .ze, .sp-tab .ze { color: #9a9ba3; }
+      .sp-tab { background: #0e1016; border-radius: 22px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); padding: 14px 12px; }
+      .sp-tab .th, .sp-tab .tr { display: grid; grid-template-columns: minmax(0, 1fr) 62px 70px 62px; gap: 8px; align-items: center; padding: 0 4px; }
+      .sp-tab .th { padding-bottom: 8px; }
+      .sp-tab .tr { min-height: 50px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+      .sp-tab .r { text-align: right; }
+      .sp-tab .c { text-align: center; }
+      .sp-tab .nm { font-size: 15px; font-weight: 500; }
+      .sp-tab .nm small { display: block; font-size: 11px; color: #9a9ba3; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+      .sp-tab .tr > .c:not(.ze):not(.pl):not(.mi), .sp-tab .tr > div:nth-child(2), .sp-tab .tr > div:nth-child(4) { font-family: var(--f-head); font-size: 22px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+      .sp-tab .ist { width: 100%; min-height: 38px; border: 0; border-radius: 10px; background: #161922; color: #f5f5f7; text-align: center; font-family: var(--f-head); font-size: 22px; font-weight: 700; padding: 0; }
+      .sp-act { display: flex; flex-direction: column; gap: 6px; }
+      .sp-act .s6-btn { min-height: 48px; }
+      .sp-act .s6-btn.gold { min-height: 56px; font-size: 16px; box-shadow: 0 2px 10px rgba(224, 191, 106, 0.3); }
+      @media (min-width: 900px) {
+        .sp { padding: 14px 32px 24px; }
+        .sp:not(.chk) .sp-tt { display: flex; }
+        .sp:not(.chk) .sp-tt .s6-kick { display: block; }
+        .sp-tot { flex: none; }
+        .sp-rules { display: flex; gap: 10px; padding-top: 4px; }
+        .sp-rules .sp-w { flex-direction: row; align-items: baseline; gap: 10px; border-radius: 14px; padding: 10px 16px; }
+        .sp-rules .sp-w b { font-size: 24px; margin: 0; }
+        .sp-rules .sp-w span:last-child { font-size: 13px; }
+        .sp:not(.chk) .sp-hint { display: none; }
+        .sp:not(.chk) .sp-g { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(130px, 1fr); gap: 12px; padding-top: 4px; }
+        .sp:not(.chk) .sp-t { flex-direction: column; align-items: stretch; gap: 0; padding: 14px 16px; min-height: 0; }
+        .sp:not(.chk) .sp-t .bar { display: none; }
+        .sp:not(.chk) .sp-t .dt { display: block; }
+        .sp:not(.chk) .sp-t .mid { display: contents; }
+        .sp:not(.chk) .sp-t .tp { order: 0; }
+        .sp:not(.chk) .sp-t .nm { order: 1; margin-top: 6px; }
+        .sp:not(.chk) .sp-t .big { order: 2; margin-top: auto; text-align: left; font-size: 64px; min-width: 0; }
+        .sp:not(.chk) .sp-t .dd { order: 3; margin-top: 6px; font-size: 13px; line-height: 18px; }
+        .sp:not(.chk) .sp-t .ck { position: absolute; right: 14px; top: 12px; }
+        .sp.chk { max-width: 520px; margin: 0 auto; }
+      }
+      /* ---- Einheit abschliessen (Sheet) ---- */
+      body.fin-on { overflow: hidden; }
+      #fin7 { position: fixed; inset: 0; z-index: 1100; display: flex; align-items: flex-end; justify-content: center; font-family: var(--f-body); color: #f5f5f7; }
+      #fin7 * { box-sizing: border-box; }
+      .f7-scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.55); }
+      .f7-sheet { position: relative; width: 100%; max-width: 520px; max-height: 94vh; overflow-y: auto; background: #0e1016; border-radius: 28px 28px 0 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08); padding: 12px 20px max(28px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 18px; }
+      @media (min-width: 900px) { #fin7 { align-items: center; } .f7-sheet { border-radius: 28px; } }
+      .f7-grab { align-self: center; width: 40px; height: 5px; border-radius: 999px; background: #3a3e4b; flex: none; }
+      .f7-sheet .s6-kick { font-size: 11px; line-height: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #9a9ba3; }
+      .f7-sheet h2 { margin: 6px 0 0; font-size: 24px; line-height: 28px; font-weight: 600; letter-spacing: normal; font-family: var(--f-body); }
+      .f7-sheet .sb2 { font-size: 14px; color: #9a9ba3; margin-top: 4px; }
+      .f7-seg { display: flex; gap: 4px; background: #161922; border-radius: 999px; padding: 4px; margin-top: 8px; }
+      .f7-seg button { flex: 1; min-height: 48px; border: 0; border-radius: 999px; background: none; color: #9a9ba3; font-size: 14px; font-weight: 500; cursor: pointer; }
+      .f7-seg button.on { background: #f5f5f7; color: #0e1016; font-weight: 600; }
+      .it-l { display: flex; flex-direction: column; margin-top: 4px; }
+      .it-l .it { display: flex; align-items: center; gap: 14px; min-height: 48px; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.06); background: none; color: #9a9ba3; font-size: 15px; text-align: left; cursor: pointer; padding: 0; }
+      .it-l .it:first-child { border-top: 0; }
+      .it-l .it.on { color: #f5f5f7; }
+      .it-l .cb { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #3a3e4b; display: flex; align-items: center; justify-content: center; }
+      .it-l .it.on .cb { background: #f5f5f7; border-color: #f5f5f7; color: #0e1016; }
+      .rl { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+      .rl > span:last-child { font-size: 12px; color: #9a9ba3; }
+      .rpe-g { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+      .rpe-g button { min-height: 48px; border: 0; border-radius: 14px; background: #161922; color: #f5f5f7; font-family: var(--f-head); font-size: 20px; font-weight: 600; cursor: pointer; }
+      .rpe-g button.on { background: #e0bf6a; color: #16181a; }
+      .f7-row { display: flex; align-items: center; justify-content: space-between; min-height: 56px; padding: 0 16px; border: 0; border-radius: 14px; background: #161922; color: #f5f5f7; font-size: 15px; font-weight: 600; cursor: pointer; }
+      .f7-row span { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 400; color: #9a9ba3; }
+      .f7-notiz { min-height: 52px; padding: 0 16px; border: 0; border-radius: 14px; background: #161922; color: #f5f5f7; font-family: inherit; font-size: 15px; width: 100%; }
+      .f7-notiz::placeholder { color: #9a9ba3; }
+      .f7-sheet .acts { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
+      .f7-sheet .acts .s6-btn { min-height: 56px; font-size: 16px; border-radius: 14px; }
+      .f7-sheet .acts .s6-btn.gold { box-shadow: 0 2px 10px rgba(224, 191, 106, 0.3); }
+      .f7-sheet .acts .s7-tx { align-self: center; min-height: 44px; padding: 0 16px; font-size: 14px; font-weight: 600; }
+      .f7-wl { display: flex; flex-direction: column; }
+      .f7-wl .r { display: flex; align-items: center; gap: 10px; min-height: 64px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+      .f7-wl .r:first-child { border-top: 0; }
+      .f7-wl .nm { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; line-height: 20px; }
+      .f7-wl .sb { font-size: 12px; font-weight: 400; color: #9a9ba3; }
+      .f7-wl .b { flex: none; width: 44px; height: 44px; border: 0; border-radius: 14px; background: #161922; color: #f5f5f7; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+      .f7-wl .b svg { width: 20px; height: 20px; }
+      .f7-wl .v { flex: none; width: 62px; text-align: center; font-family: var(--f-head); font-size: 24px; font-weight: 700; line-height: 1; }
+      .f7-wl .v.e { color: #9a9ba3; }
+      .f7-wl .v small { font-size: 12px; font-weight: 500; color: #9a9ba3; }
+      /* ---- Heute: abgeschlossene Einheit ---- */
+      .s7-okt { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #30d158; }
+      .s7-okt svg { width: 18px; height: 18px; }
+      .s7-g2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .s7-g2 .s7-well b { font-size: 32px; }
+      .s7-g2 .s7-well small { font-size: 15px; color: #9a9ba3; font-weight: 400; }
+      .s7-fp { margin: 0; font-size: 13px; line-height: 19px; color: #9a9ba3; }
+      .s7-fa { display: flex; gap: 10px; }
+      .s7-fa .s6-btn { min-height: 52px; box-shadow: none; }
+      .s7-fa .s6-btn:first-child { flex: 1; }
+      .s6-card.s7-fw { flex-direction: row; align-items: center; justify-content: space-between; padding: 16px 20px; gap: 12px; }
+      .s7-fw b { display: block; font-family: var(--f-head); font-size: 32px; line-height: 1; font-weight: 700; margin-top: 2px; }
+      .s7-fw b small { font-size: 15px; color: #9a9ba3; font-weight: 400; }
+      .s7-fw .r { text-align: right; }
+      .s7-fw .r span:last-child { display: block; font-size: 15px; font-weight: 600; margin-top: 4px; }
+      @media (min-width: 900px) { .s7-fin .s6-title { display: none; } }
+      /* Nachbesserungen nach Prüfung */
+      .sp:not(.chk) .sp-h { position: sticky; top: 0; z-index: 2; background: #06070a; padding-bottom: 8px; }
+      .sp-rd { align-self: center; margin-top: 6px; }
+      .f7-in:focus-visible, .sp-t:focus-visible, .f7-go:focus-visible, .f7-sheet:focus-visible, .sp-tab .ist:focus-visible { outline: 2px solid #e0bf6a; outline-offset: 2px; }
+      .f7-sheet:focus { outline: none; }
       /* S6-CSS-END */
     </style>
   </head>
@@ -6173,6 +6677,7 @@
         pain: ["keine", "leicht", "stark"],
       };
       let ciOpen = false;
+      let dashSer = "readiness"; // Dashboard: Verlauf (readiness | hrv | rhr)
       function checkinCard(i) {
         const k = keyI(i),
           c = S.checkin[k] || {},
@@ -8622,6 +9127,7 @@
             text: r.reply,
             actions: r.actions,
             state: r.actions.length ? "open" : "none",
+            ex: ccExplain,
             at: Date.now(),
           });
           S.chat = S.chat.slice(-40);
@@ -9447,6 +9953,8 @@
           document.body.classList.add("focus-on");
         }
         const dran = nextOpen(n, isDone, 0); // erste offene Übung = was als Nächstes zu tun ist
+        if (!focusFin && s7FocusPaint(el, p, dk, n, nd, dran, dir)) return;
+        el.classList.remove("f7on", "sp-on");
         el.classList.toggle("fc-dash", !focusFin && runPhases(p, focusJ).length > 0);
         el.classList.toggle("fc-finish", !!focusFin); // Lauf-Zeile: Dashboard statt Übungsliste
         const top = `<div class="fc-top"><button type="button" class="fc-x" data-fc="close" aria-label="Fokusmodus beenden">✕</button><div class="fc-title"><small>${esc(KIND[p.k] || "")}</small><b>${esc(p.t)}</b></div><span class="fc-count">${nd}/${n}</span></div>`;
@@ -9531,6 +10039,8 @@
         fcRCtx = null;
         focusI = null;
         focusFin = false;
+        clearInterval(fcSpIv);
+        fcSp = null;
         fcTimerReset();
         try {
           if (fcLock) fcLock.release();
@@ -9564,9 +10074,12 @@
           if (focusI !== at || focusJ !== from) return; // inzwischen weitergeschaltet oder geschlossen
           const nx = nextOpen(p.i.length, (x) => !!S.done[dk + "|" + x], focusJ + 1);
           fcTimerReset();
-          if (nx < 0) focusFin = true;
-          else focusJ = nx;
-          focusRender(nx < 0 ? "" : "next");
+          if (nx < 0) {
+            focusClose();
+            return fin7Open(at, true);
+          }
+          focusJ = nx;
+          focusRender("next");
         }, 260);
       }
       function fcStep(dir) {
@@ -9630,6 +10143,26 @@
         if (!p) return;
         if (a === "close") return focusClose();
         if (a === "done") return focusDone();
+        if (a === "sdone") return fcSetDone();
+        if (a === "sset") return fcSetTap(+b.dataset.k);
+        if (a === "sp-start") return spStart();
+        if (a === "sp-split") return spSplit();
+        if (a === "sp-save") return spSaveAll();
+        if (a === "sp-redo") {
+          if (!confirm("Gemessene Zeiten verwerfen und neu starten?")) return;
+          fcSp = { dk: keyI(focusI), t0: 0, s0: 0, idx: 0, done: [] };
+          spSave();
+          return focusRender();
+        }
+        if (a === "sp-watch") {
+          const st = s7Steps(p),
+            act = (actsOf(focusI) || []).find((x) => x.laps && st && x.laps.length === st.length);
+          if (!act) return toast("Keine passenden Runden von der Uhr gefunden (Schritte im Plan: " + (st ? st.length : 0) + ")", true);
+          fcSp.done = st.map((_, k) => act.laps[k].t);
+          spSave();
+          toast("Zeiten aus der Uhr übernommen");
+          return focusRender();
+        }
         if (a === "inc") return fcStep(1);
         if (a === "dec") return fcStep(-1);
         if (a === "last") {
@@ -10070,6 +10603,129 @@
           g += `<span>${label}</span>${["g", "y", "r"].map((v, j) => `<button type="button" class="${c[f] === v ? "on" : ""}" data-ci="${k}|${f}|${v}" aria-pressed="${c[f] === v}">${CI_LABELS[f][j]}</button>`).join("")}`;
         return `<section class="s6-card s6-ci" aria-label="Check-in"><div class="s6-ci-h"><h2>Check-in</h2><span>${n} von ${CHECKIN_FIELDS.length}</span></div><button type="button" class="s6-btn s6-ok" data-act="ci-ok" data-k="${k}">✓ Keine Beschwerden</button><div class="s6-ci-g">${g}</div>${r && ciOpen ? `<button type="button" class="s6-btn gold" data-act="ci-done">Fertig</button>` : ""}</section>`;
       }
+      /* ---- Heute (Canvas «Neu»): Übungen als Zeilen mit Wert rechts ---- */
+      const S7_MOD = /\s+(vorgebeugt|aufrecht|gestreckt)$/;
+      const s7Pace = (x) => x.replace(/\/km/g, " /km");
+      const s7Title = (t) => String(t).replace(/^(Kraft \d+) (?!\+)(\S.*)$/, "$1 · $2");
+      const S7_CHECK = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l5 5 9-10"/></svg>`;
+      /* Planzeile → Titel, Nebenzeilen, Wert rechts. Unbekannte Zeilen bleiben vollständig lesbar (Titel = ganze Zeile). */
+      function s7Row(raw) {
+        const t = String(raw).replace(/\s+/g, " ").trim();
+        let m;
+        if ((m = /^(\d+)\s*[′']\s*(.*)$/.exec(t))) return { title: m[2] || t, subs: [], val: m[1] + "′" };
+        if ((m = /^(Einlaufen|Auslaufen)\s+(.*?)\s*\((\d+:\d\d)\)$/.exec(t))) return { title: m[1], subs: [s7Pace(m[2])], val: m[3] };
+        if ((m = /^Runde (\d+) frisch ohne Station:\s*(\d+(?:,\d+)? km)\b.*?\((\d+:\d\d)\)/.exec(t))) return { title: `Runde ${m[1]} · Referenz`, subs: [`${m[2]} frisch, ohne Station`], val: m[3] };
+        if ((m = /^Runde (\d+):\s*(.+?)\s*\(([^)]*)\)\s*→\s*(.+)$/.exec(t))) {
+          const hm = /^(.*?)\s+(\d[\d,.]*\s?m)(?:\s+mit\s+(\d+\s?kg))?$/.exec(m[2]),
+            name = hm ? hm[1] : m[2],
+            ps = m[3].split(/,\s*/),
+            plates = ps.find((x) => /^\d+\s?kg Platten$/.test(x)),
+            ziel = ps.map((x) => /^Ziel (\d+:\d\d)$/.exec(x)).find(Boolean),
+            rest = ps
+              .filter((x) => x !== plates && !/^Ziel /.test(x) && !/Übergang/.test(x) && !/Standzeit vor der Bahn/.test(x))
+              .map((x) => x.replace(/ als Ghost-Partner$/, "")),
+            kg = hm && hm[3] ? (plates ? `${hm[3]} (${plates})` : hm[3]) : plates || "",
+            tail = m[4].replace(/\s*\(\d+:\d\d\)/g, "").split(/,\s*/).map(s7Pace);
+          return { title: `Runde ${m[1]} · ${name}`, subs: [[hm ? hm[2] : "", kg, ...rest].filter(Boolean).join(" · "), "danach " + tail.join(" · ")].filter((x) => x !== "danach "), val: ziel ? ziel[1] : "" };
+        }
+        if ((m = /^(.+?)\s+(\d[\d,.]*\s?m)\s+mit\s+(\d+\s?kg)\s*\(([^)]*)\)$/.exec(t))) {
+          const ps = m[4].split(/,\s*/),
+            plates = ps.find((x) => /Platten$/.test(x)),
+            reps = ps.map((x) => /^(\d+) Wiederholungen$/.exec(x)).find(Boolean),
+            pause = ps.find((x) => /^Pause/.test(x));
+          return { title: `${m[1]} ${m[2]}`, subs: [[plates ? `${m[3]} (${plates})` : m[3], pause].filter(Boolean).join(" · ")], val: reps ? reps[1] + " ×" : "" };
+        }
+        const parts = t.split(/\s*→\s*/),
+          k = parts.map((x) => /^(.+?)\s+(\d+)\s*[×x]\s*(\d+)(?:\s+(je Seite))?(?:\s*\(([^)]*)\))?(?:,\s*(Pause [^,()]+))?$/.exec(x));
+        if (k.every(Boolean)) {
+          const f = k[0];
+          let name = f[1],
+            mod = "";
+          const mm = S7_MOD.exec(name);
+          if (mm) {
+            mod = mm[1];
+            name = name.slice(0, mm.index);
+          }
+          const sub = [mod, f[4], ...(f[5] ? f[5].split(/,\s*/) : []), f[6]].filter(Boolean);
+          return { title: [name, ...k.slice(1).map((x) => x[1])].join(", dann "), subs: [[...new Set(sub)].join(" · ")].filter(Boolean), val: `${f[2]} × ${f[3]}` };
+        }
+        const tm = /\((\d+:\d\d)\)\s*$/.exec(t) || /Ziel (\d+:\d\d)/.exec(t),
+          it = s6Item(t),
+          val = tm ? tm[1] : it.timed ? Math.round(it.tot) + "′" : "";
+        const cut = t.length > 46 ? /^(.{8,46}?)(?::\s+|\s+\(|,\s+| → )(.+)$/.exec(t) : null;
+        return cut ? { title: cut[1], subs: [cut[2]], val } : { title: t, subs: [], val };
+      }
+      /* Regeln, die für alle Runden gelten (Tempo, Puls, Redline, Anlaufen, Ghost-Partner): als Kacheln über der Liste statt in jeder Zeile */
+      function s7Rules(p) {
+        const L = p.i || [],
+          skip = new Set(),
+          all = L.join(" | "),
+          tempo = /Verbot schneller als (\d:\d\d)\s*\/km/.exec(all),
+          puls = /Puls (\d+[–-]\d+) bpm/.exec(all),
+          red = /Redline ab (\d+) bpm/.exec(all),
+          st = /(\d+) s Standzeit vor der Bahn/.exec(all),
+          ue = /(\d+) s Übergang/.exec(all);
+        let first = null;
+        L.forEach((x, j) => {
+          const m = /^Erste (\d+) m nach jeder Station .*?bei (\d:\d\d)\s*\/km .*?dann auf (\d:\d\d)\s*\/km/.exec(x);
+          if (m) {
+            first = m;
+            skip.add(j);
+          }
+        });
+        const wells = tempo && puls && red;
+        if (!wells && !st && !first) return { html: "", skip };
+        const well = (k, v, s) => `<div class="s7-well"><span class="s6-kick">${k}</span><b>${v}</b><span class="s7-rs">${s}</span></div>`;
+        const sentence = [first ? `Erste ${first[1]} m nach jeder Station bei ${first[2]} /km, dann ${first[3]} /km.` : "", st ? `Ghost-Partner: ${st[1]} s Standzeit vor der Bahn${ue ? `, ${ue[1]} s Übergang` : ""}.` : ""].filter(Boolean).join(" ");
+        return {
+          html: `<div class="s7-rules"><span class="s6-kick">Regeln für alle Runden</span>${wells ? `<div class="s7-g3">${well("Tempo", tempo[1], "/km, nie schneller")}${well("Puls", puls[1], "bpm")}${well("Redline", red[1], "bpm")}</div>` : ""}${sentence ? `<p>${esc(sentence)}</p>` : ""}</div>`,
+          skip,
+        };
+      }
+      /* Karte «Readiness»: Garmin-Wert und/oder Check-in, nur heute */
+      function s7Ready(i) {
+        if (i !== TODAY || TODAY < 0 || TODAY > LAST) return "";
+        const wl = S.garmin.well[isoI(i)] || {},
+          rec = garmin.recoveryHint(S.garmin.well[isoI(i)]),
+          lvl = worst(LVL[rec.level] || null, readiness(S.checkin[keyI(i)] || {})),
+          p = dayPlan(i);
+        if (!lvl || !p) return "";
+        const kind = S6_KIND[p.k] || p.t,
+          head = { green: "Bereit", yellow: "Etwas angeschlagen", red: "Erholung vor Leistung" }[lvl],
+          sub =
+            p.k === "rest"
+              ? "Ruhetag. Erholung ist heute dein Training."
+              : { green: `${kind} heute wie geplant.`, yellow: `${kind} heute machen, harte Teile eher etwas lockerer.`, red: `${kind} heute nur locker machen oder verschieben.` }[lvl];
+        return `<section class="s6-card s7-rdy" aria-label="Readiness"><i style="background:${lvl === "green" ? "#30d158" : "#ff9f0a"}"></i><div><b>${wl.readiness != null ? `Readiness ${Math.round(wl.readiness)} · ` : ""}${head}</b><span>${esc(sub)}</span></div></section>`;
+      }
+      /* Heute, wenn die Einheit abgeschlossen ist: Zusammenfassung, offene Übungen, Woche */
+      function s7FinCard(i, p) {
+        const dk = keyI(i),
+          st = dayStatus(i);
+        if (!p || p.k === "rest" || S.off[dk] || S.later[dk] || !st.n) return "";
+        const rpe = S.rpe[dk],
+          fin = st.done >= st.n || (rpe != null && st.done > 0);
+        if (!fin) return "";
+        const open = p.i.map((t, j) => (S.done[dk + "|" + j] || S.xs[dk + "|" + j] || /^Erste \d+ m nach jeder Station/.test(t) ? null : s7Row(t).title)).filter(Boolean),
+          w = Math.floor(i / 7),
+          D = s6WeekData(w);
+        let nx = "";
+        for (let x = i + 1; x <= Math.min(LAST, w * 7 + 6 + 7); x++) {
+          const q = dayPlan(x);
+          if (q && q.k !== "rest" && !trained(x) && !S.off[keyI(x)]) {
+            nx = `${DAYS[dow(x)]} · ${s7Title(q.t)}`;
+            break;
+          }
+        }
+        const can = open.length && canCarry({ i, today: TODAY, last: LAST, day: p, open: openItems(p, S.done, dk) });
+        const card = `<article class="s6-hero s7-fin" data-day="${i}"><div class="s6-hero-top"><span class="s6-chip"><i style="background:var(--${p.k})"></i>${S6_KIND[p.k] || p.k}</span><span class="s7-okt">${S7_CHECK}Erledigt</span></div>
+        <h2 class="s6-title">${esc(s7Title(p.t))}</h2><div class="s6-title-d"><h1>${esc(s7Title(p.t))}</h1></div>
+        <div class="s7-g2"><div class="s7-well"><span class="s6-kick">Übungen</span><b>${st.done} <small>von ${st.n}</small></b></div><div class="s7-well"><span class="s6-kick">Anstrengung</span><b>${rpe != null ? rpe : "–"} <small>von 10</small></b></div></div>
+        ${open.length ? `<p class="s7-fp">Nicht gemacht: ${esc(open.join(", "))}.${can ? " Die offenen Übungen kannst Du verschieben." : ""}</p>` : ""}
+        <div class="s7-fa">${can ? `<button type="button" class="s6-btn" data-act="later" data-i="${i}">Offene verschieben</button>` : ""}<button type="button" class="s6-btn" data-act="all-done" data-i="${i}">Ändern</button></div></article>`;
+        const wk = `<section class="s6-card s7-fw"><div><span class="s6-kick">Woche ${w + 1}</span><b>${D.ok} <small>/ ${D.plan} Einheiten</small></b></div>${nx ? `<div class="r"><span class="s6-kick">Als Nächstes</span><span>${esc(nx)}</span></div>` : ""}</section>`;
+        return card + wk;
+      }
       function s6Today() {
         const i = sel != null ? sel : Math.max(0, Math.min(LAST, TODAY)),
           info = weekInfo(Math.floor(i / 7)),
@@ -10080,14 +10736,11 @@
         let intro = "";
         if (TODAY < 0 && sel == null) intro += `<div class="hint" style="margin:16px 16px 0">Start in ${-TODAY} ${TODAY === -1 ? "Tag" : "Tagen"} (Mo 12.10.). Hier siehst du schon Tag 1.</div>`;
         if (TODAY > LAST && sel == null) intro += `<div class="hint" style="margin:16px 16px 0">Der Plan ist abgeschlossen. Stark gemacht! 🏁</div>`;
-        // Hinweise (Strava-Vorschlag, Erholung, Wochen-Check, Umplan-Vorschläge) gebündelt hinter „Hinweise“
+        // Hinweise (Strava-Vorschlag, Wochen-Check, Umplan-Vorschläge) gebündelt hinter „Hinweise“
         let hints = "",
           ciHtml = "";
         if (sel == null) hints += stravaBanner();
-        if (isT && TODAY >= 0 && TODAY <= LAST) {
-          hints += recFirstOpen(i) ? recoveryCard(i) : "";
-          if (ciPending(i)) ciHtml = s6Checkin(i);
-        }
+        if (isT && TODAY >= 0 && TODAY <= LAST && ciPending(i)) ciHtml = s6Checkin(i);
         if (sel == null) hints += reviewCard();
         hints += sugCard();
         const hn = (hints.match(/class="card/g) || []).length;
@@ -10095,7 +10748,7 @@
         const left = Math.ceil((RACE - midnight(NOW)) / dayMs),
           d = dateFromIdx(i),
           dlong = d.toLocaleDateString("de-CH", { day: "numeric", month: "long" });
-        const head = s6Head(`${DAYSF[dow(i)]}, ${dlong}`, isT ? "Heute" : DAYSF[dow(i)], `${left > 0 ? `Noch ${left} ${left === 1 ? "Tag" : "Tage"} bis Basel · ` : ""}Woche ${wn}`);
+        const head = s6Head(`${DAYSF[dow(i)]}, ${dlong}`, isT ? "Heute" : DAYSF[dow(i)], `${left > 0 ? `<b class="s7-n">${left}</b> ${left === 1 ? "Tag" : "Tage"} bis Basel · ` : ""}Woche ${wn}`);
         // Wochenleiste (nur Desktop)
         const w0 = Math.floor(i / 7) * 7;
         let rail = `<nav class="s6-rail" aria-label="Woche ${wn}"><span class="s6-kick">Woche ${wn} · Block ${esc(info.block)}</span>`;
@@ -10104,42 +10757,50 @@
             pj = dayPlan(j);
           if (!pj) continue;
           const missed = j < TODAY && pj.k !== "rest" && !S.off[keyI(j)] && !trained(j);
-          rail += `<button type="button" class="${j === i ? "on" : ""}" data-sel="${j}" aria-label="${DAYSF[x]} ${fmt(dateFromIdx(j))}: ${esc(pj.t)}"><b>${DAYS[x]}</b><i style="background:var(--${pj.k})"></i><span>${esc(pj.t)}</span>${missed ? "<em>verp.</em>" : ""}</button>`;
+          rail += `<button type="button" class="${j === i ? "on" : ""}${pj.k === "rest" ? " rest" : ""}" data-sel="${j}" aria-label="${DAYSF[x]} ${fmt(dateFromIdx(j))}: ${esc(pj.t)}"><b>${DAYS[x]}</b><i style="background:var(--${pj.k})"></i><span>${esc(pj.t)}</span>${missed ? "<em>verp.</em>" : ""}</button>`;
         }
         rail += `</nav>`;
         // Einheit
         let hero = "",
           more = "";
         const st = p ? dayStatus(i) : { n: 0, done: 0 },
-          simple = p && p.k !== "rest" && !S.off[dk] && !S.later[dk] && !(st.n && st.done >= st.n);
+          finCard = p ? s7FinCard(i, p) : "",
+          simple = p && p.k !== "rest" && !S.off[dk] && !S.later[dk] && !finCard;
         if (!p) hero = "";
-        else if (!simple) hero = sessionCard(i);
+        else if (!simple) {
+          hero = finCard || sessionCard(i);
+          if (finCard) {
+            const had = doneOpen.has(i);
+            doneOpen.add(i);
+            const sc = sessionCard(i);
+            if (!had) doneOpen.delete(i);
+            more = `<details class="s6-more"><summary>Übungen, Werte und Details</summary><div class="s6-more-b">${sc}</div></details>`;
+          }
+        }
         else {
-          const fl = s6Flow(p),
-            lab = S6_KIND[p.k] || p.k,
-            mins = fl.min ? `<span class="s6-min"><b>${fl.min}</b> min</span>` : "",
-            sum = (p.i || []).map(s6Norm).join(" · ");
-          const rows = (p.i || [])
-            .map((t, j) => {
-              const id = dk + "|" + j,
-                on = !!S.done[id],
-                m = /^(\d+)\s*[′']\s*(.*)$/.exec(t),
-                it = s6Item(t);
-              return `<li class="${on ? "done" : ""}"><label><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span class="c" aria-hidden="true"></span><span class="t">${m ? esc(m[2]) : s6Norm(t)}</span><span class="d">${m ? m[1] + "′" : it.timed ? Math.round(it.tot) + "′" : ""}</span></label></li>`;
-            })
-            .join("");
+          const lab = S6_KIND[p.k] || p.k,
+            rules = s7Rules(p),
+            rows = (p.i || [])
+              .map((t, j) => {
+                if (rules.skip.has(j)) return "";
+                const id = dk + "|" + j,
+                  on = !!S.done[id],
+                  r = s7Row(t);
+                return `<li class="${on ? "done" : ""}"><label><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span class="c" aria-hidden="true">${S7_CHECK}</span><span class="m"><span class="t">${s6Norm(r.title)}</span>${r.subs.map((x) => `<span class="s">${s6Norm(x)}</span>`).join("")}</span>${r.val ? `<span class="d num">${s6Norm(r.val)}</span>` : ""}</label></li>`;
+              })
+              .join(""),
+            cnt = (p.i || []).length - rules.skip.size;
           hero = `<article class="s6-hero${isT ? " is-today" : ""}" style="--kc:var(--${p.k})" data-day="${i}">
-        <div class="s6-hero-top"><span class="s6-chip"><i style="background:var(--${p.k})"></i>${lab}</span>${mins}<span class="s6-kick s6-kick-d">${isT ? "Heute · " : ""}${DAYSF[dow(i)]}, ${fmt(d)}</span></div>
-        <h2 class="s6-title">${esc(p.t)}</h2>
-        <div class="s6-title-d"><h1>${esc(p.t)}</h1>${fl.min ? `<div><b>${fl.min}</b><span>min</span></div>` : ""}</div>
-        <div class="s6-flow" aria-label="Ablauf der Einheit">${s6Bars(fl.segs, "s6-bar")}<p>${sum}</p></div>
-        ${s6Bars(fl.segs, "s6-flow-d")}
+        <div class="s6-hero-top"><span class="s6-chip"><i style="background:var(--${p.k})"></i>${lab}</span>${cnt ? `<span class="s7-cnt">${cnt} ${p.k === "kraft" ? "Blöcke" : cnt === 1 ? "Schritt" : "Schritte"}</span>` : ""}<span class="s6-kick s6-kick-d">${DAYSF[dow(i)]}, ${fmt(d)}${isT ? " · Heute" : ""}</span></div>
+        <h2 class="s6-title">${esc(s7Title(p.t))}</h2>
+        <div class="s6-title-d"><h1>${esc(s7Title(p.t))}</h1></div>
+        ${rules.html}
         <ol class="s6-ol">${rows}</ol>
         <div class="s6-acts"><button type="button" class="s6-btn gold" data-fc="start" data-i="${i}">Fokusmodus starten</button><button type="button" class="s6-btn s6-er" data-act="all-done" data-i="${i}">Erledigt</button><button type="button" class="s6-btn s6-vs" data-move="${i}">Verschieben</button></div></article>`;
           more = `<details class="s6-more"><summary>Übungen, Werte und Details</summary><div class="s6-more-b">${sessionCard(i)}${isT ? `<button class="btn ghost sm" data-act="sore-open">Muskelkater genau eintragen →</button>` : ""}</div></details>`;
         }
-        const goal = `<section class="s6-card s6-goal"><span class="s6-kick">Ziel</span><div class="row"><b>&lt; 60:00</b><span class="m">Sa 13.02.2027</span></div><span class="m">HYROX Basel · Doubles Men PRO mit Jimoh</span></section>`;
-        return `${intro}<div class="s6 s6-today">${head}${rail}<div class="s6-main">${hero}${more}${hintsHtml}</div><div class="s6-side">${ciHtml}${goal}</div></div>`;
+        const goal = `<section class="s6-card s6-goal"><span class="s6-kick">Ziel</span><b class="s7-gb">&lt; 60:00</b><span class="s7-gd">Sa 13.02.2027</span><span class="s7-gs">HYROX Basel · Doubles Men PRO mit ${esc(PARTNER)}</span></section>`;
+        return `${intro}<div class="s6 s6-today">${head}${rail}<div class="s6-main">${hero}${more}${hintsHtml}</div><div class="s6-side">${goal}${s7Ready(i)}${ciHtml}</div></div>`;
       }
       /* ---- Woche ---- */
       function s6RunKm(w) {
@@ -10197,13 +10858,13 @@
         const info = weekInfo(wk),
           blk = (blockOverview(PLAN()).find((b) => b.id === info.block) || {}).name || "",
           D = s6WeekData(wk),
-          C = 2 * Math.PI * 46,
+          C = 2 * Math.PI * 40,
           range = `${fmt(dateFromIdx(wk * 7))} – ${fmt(dateFromIdx(wk * 7 + 6))}`,
           sub = `${esc(info.wave)} · Block ${esc(info.block)}`;
         const frac = D.plan ? Math.min(1, D.ok / D.plan) : 0;
         const pct = (a, b) => (b > 0 ? Math.min(100, Math.round((a / b) * 100)) : 0);
-        const ring = `<section class="s6-card s6-ring" aria-label="Wochenfortschritt"><div class="s6-ring-c"><svg width="104" height="104" viewBox="0 0 104 104" role="img" aria-label="${D.ok} von ${D.plan} Einheiten erledigt"><circle cx="52" cy="52" r="46" fill="none" stroke="#1b1e29" stroke-width="10"/>${frac > 0 ? `<circle cx="52" cy="52" r="46" fill="none" stroke="#e0bf6a" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - frac)).toFixed(1)}" transform="rotate(-90 52 52)"/>` : ""}</svg><div><b>${D.ok}/${D.plan}</b><span>Einheiten</span></div></div>
-    <div class="s6-ring-r"><div><span>Laufen</span><b>${s6Km(D.kmDone)}${D.km ? ` / ${s6Km(D.km)}` : ""} km</b></div><i><u style="width:${pct(D.kmDone, D.km)}%;background:var(--lauf)"></u></i><div><span>Kraft + Stationen</span><b>${D.ksOk} / ${D.ks}</b></div><i><u style="width:${pct(D.ksOk, D.ks)}%;background:var(--kraft)"></u></i></div></section>`;
+        const ring = `<section class="s6-card s6-ring" aria-label="Wochenfortschritt"><div class="s6-ring-c"><svg width="92" height="92" viewBox="0 0 92 92" role="img" aria-label="${D.ok} von ${D.plan} Einheiten erledigt"><circle cx="46" cy="46" r="40" fill="none" stroke="#1b1e29" stroke-width="9"/>${frac > 0 ? `<circle cx="46" cy="46" r="40" fill="none" stroke="#e0bf6a" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - frac)).toFixed(1)}" transform="rotate(-90 46 46)"/>` : ""}</svg><div><b>${D.ok}/${D.plan}</b><span>Einheiten</span></div></div>
+    <div class="s6-ring-r"><div class="g"><div class="l"><span>Laufen</span><b>${s6Km(D.kmDone)}${D.km ? ` / ${s6Km(D.km)}` : ""} km</b></div><i><u style="width:${pct(D.kmDone, D.km)}%;background:var(--lauf)"></u></i></div><div class="g"><div class="l"><span>Kraft + Stationen</span><b>${D.ksOk} / ${D.ks}</b></div><i><u style="width:${pct(D.ksOk, D.ks)}%;background:var(--kraft)"></u></i></div></div></section>`;
         let rows = "";
         for (let d = 0; d < 7; d++) {
           const i = wk * 7 + d,
@@ -10212,10 +10873,10 @@
           const stt = s6DayStatus(i),
             fl = s6Flow(p),
             isT = i === TODAY,
-            show = isT && !stt.c ? `<span class="st now">Heute</span>` : `<span class="st ${stt.c}">${stt.t}</span>`;
-          rows += `<button type="button" class="s6-day${isT ? " today" : ""}${p.k === "rest" ? " rest" : ""}" data-goday="${i}"${isT ? ' aria-current="date"' : ""}><b class="w">${DAYS[d]}</b><i class="dot" style="background:var(--${p.k})"></i><span class="t"><span>${esc(p.t)}</span>${p.k === "rest" ? "" : `<span>${S6_KIND[p.k] || p.k}${fl.min ? ` · ${fl.min} min` : ""}</span>`}</span>${p.k === "rest" ? "" : show}</button>`;
+            show = isT && !stt.c ? `<span class="st now">Heute</span>` : stt.t === "Geplant" ? "" : `<span class="st ${stt.c}">${stt.t}</span>`;
+          rows += `<button type="button" class="s6-day${isT ? " today" : ""}${p.k === "rest" ? " rest" : ""}" data-goday="${i}"${isT ? ' aria-current="date"' : ""}><b class="w">${DAYS[d]}</b><i class="dot" style="background:var(--${p.k})"></i><span class="t"><span>${esc(s7Title(p.t))}</span>${p.k === "rest" ? "" : `<span>${S6_KIND[p.k] || p.k}${fl.min ? ` · ${fl.min} min` : ""}</span>`}</span>${p.k === "rest" ? "" : show}</button>`;
         }
-        const wn = `<div class="s6-wn"><button type="button" class="s6-btn" data-wk="-1" ${wk === 0 ? "disabled" : ""}>‹ Woche ${wk}</button><button type="button" class="s6-btn" data-wk="1" ${wk === NWEEKS - 1 ? "disabled" : ""}>Woche ${wk + 2} ›</button></div>`;
+        const wn = `<div class="s6-wn"><button type="button" class="s6-btn" data-wk="-1" ${wk === 0 ? "disabled" : ""}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Woche ${wk}</button><button type="button" class="s6-btn" data-wk="1" ${wk === NWEEKS - 1 ? "disabled" : ""}>Woche ${wk + 2}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>`;
         // Desktop: sieben Tageskarten, darunter Einheit im Detail und Wochenbilanz
         const det = openDay != null && Math.floor(openDay / 7) === wk ? openDay : TODAY >= wk * 7 && TODAY < wk * 7 + 7 ? TODAY : wk * 7;
         let cards = "";
@@ -10250,7 +10911,7 @@
         S.chat.forEach((m, k) => {
           const has = m.actions && m.actions.length;
           if (!has) {
-            h += bub(m.role === "user" ? "user" : "", m.text);
+            h += m.role !== "user" && m.ex ? `<div class="s6-msg ex">${s7Explain(m.text)}</div>` : bub(m.role === "user" ? "user" : "", m.text);
             return;
           }
           const open = m.state === "open",
@@ -10279,17 +10940,31 @@
         if (ccErr) h += bub("err", ccErr);
         return h;
       }
+      /* Antwort im Erklär-Modus: erster Absatz als Kasten «Wozu», Aufzählungen mit „–“ als Liste */
+      function s7Explain(text) {
+        const paras = String(text || "").split(/\n{2,}/).map((x) => x.trim()).filter(Boolean);
+        if (paras.length < 2) return `<p>${esc(text)}</p>`;
+        const body = paras.slice(1).map((x) => {
+          const ls = x.split("\n").map((l) => l.trim()).filter(Boolean),
+            lead = ls.length > 1 && /:$/.test(ls[0]) && !/^[–-]\s/.test(ls[0]) ? ls[0] : null,
+            items = lead ? ls.slice(1) : ls,
+            bul = items.filter((l) => /^[–-]\s/.test(l));
+          if (bul.length && bul.length === items.length) return `<div>${lead ? `<span class="s6-kick">${esc(lead.replace(/:$/, ""))}</span>` : ""}<ul>${bul.map((l) => `<li>${esc(l.replace(/^[–-]\s+/, ""))}</li>`).join("")}</ul></div>`;
+          return `<div>${ls.map(esc).join("<br>")}</div>`;
+        });
+        return `<div class="s7-box"><span class="s6-kick">Wozu</span><div>${esc(paras[0])}</div></div>${body.join("")}`;
+      }
       function s6Coach() {
         const tabs = [["chat", "Chat", "Chat"], ["move", "Umplanen", "Umplanen"], ["sore", "Muskelkater", "Muskelkater"], ["inj", "Verletzt", "Verletzt / krank"]];
         const seg = `<div class="s6-seg" role="tablist" aria-label="Coach-Bereiche">${tabs.map(([id, l]) => `<button type="button" role="tab" data-act="cc-tab" data-tab="${id}" class="${coachTab === id ? "on" : ""}" aria-selected="${coachTab === id}">${l}</button>`).join("")}</div>`;
         const side = `<aside class="s6-cside"><h1>Coach</h1>${tabs.map(([id, , l]) => `<button type="button" data-act="cc-tab" data-tab="${id}" class="${coachTab === id ? "on" : ""}"${coachTab === id ? ' aria-current="page"' : ""}>${l}</button>`).join("")}</aside>`;
-        const head = s6Head(`Woche ${CURW + 1} · ${esc(weekInfo(CURW).wave)}`, "Coach", "");
+        const head = `<header class="s6-hd s7-ch"><h1 class="s6-h1">Coach</h1>${S6_MENU}</header>`;
         const off = navigator.onLine === false ? `<div class="s6-off" role="status">${S6_ICON_OFF}<span>Offline. Der Coach antwortet, sobald du wieder online bist.</span></div>` : "";
         if (coachTab !== "chat") {
           const body = coachTab === "inj" ? injHtml() : coachTab === "move" ? moveHtml() : soreHtml();
           return `<div class="s6 s6-coach">${head}${seg}${side}<div class="s6-cmain s6-legacy">${off}${body}</div></div>`;
         }
-        // „Der Coach kennt“ (Desktop)
+        // „Der Coach kennt“
         let missed = null;
         for (let i = Math.min(TODAY, LAST) - 1; i >= 0 && i >= CURW * 7 - 7; i--) {
           const p = dayPlan(i);
@@ -10299,14 +10974,25 @@
           }
         }
         const tp = TODAY >= 0 && TODAY <= LAST ? dayPlan(TODAY) : null,
-          ciDone = TODAY >= 0 && TODAY <= LAST && !!readiness(S.checkin[keyI(TODAY)] || {});
-        const cxHtml = `<div class="s6-cx"><button type="button" data-act="cc-mode" data-m="${ccExplain ? "" : "explain"}" aria-pressed="${ccExplain}">${ccExplain ? "Erklären: an" : "Nur erklären"}</button>${coachReady() ? (S.chat.length ? `<button type="button" data-act="cc-clear">Verlauf löschen</button>` : "") : `<button type="button" data-act="cc-copy">Anfrage kopieren</button>`}</div>`;
-        const info = `<aside class="s6-cinfo"><section class="s6-card"><span class="s6-kick">Der Coach kennt</span><div class="r"><span>Woche</span><span>${CURW + 1} · ${esc(weekInfo(CURW).wave)}</span></div><div class="r"><span>Heute</span><span>${tp ? esc(tp.t) : "–"}</span></div><div class="r"><span>Verpasst</span><span class="${missed ? "bad" : ""}">${missed ? esc(missed) : "nichts"}</span></div><div class="r"><span>Check-in</span><span>${ciDone ? "erledigt" : "fehlt"}</span></div></section>${coachReady() ? "" : `<p class="s6-cnote">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`}<div class="s6-d s6-cx-d">${cxHtml}</div></aside>`;
-        const ready = coachReady();
-        const qr = [["Knie zwickt", "Mein Knie zwickt. Was soll ich ändern?", ""], ["Zu müde heute", "Ich bin heute zu müde fürs Training.", ""], ["Erklär die Einheit", "Erkläre mir die heutige Einheit.", "explain"]];
-        const inp = `<form class="s6-cin" data-form="coach"><div class="s6-qr" role="group" aria-label="Schnellantworten">${qr.map(([l, q, m]) => `<button type="button" data-act="cc-quick" data-q="${esc(q)}" data-m="${m}" ${ccBusy ? "disabled" : ""}>${l}</button>`).join("")}</div><div class="s6-inp"><label for="cc-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Nachricht an den Coach</label><input id="cc-in" type="text" maxlength="${coach.MAX_MSG}" value="${esc(ccDraft)}" placeholder="${ccExplain ? "Was soll ich dir erklären?" : "z. B. „Knie zwickt seit gestern“"}" autocomplete="off" enterkeyhint="send" ${ccBusy ? "disabled" : ""}><button type="submit" aria-label="${ready ? "Senden" : "Vorbereiten"}" ${ccBusy ? "disabled" : ""}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button></div></form>
-<div class="s6-cx s6-cx-o s6-m"><button type="button" data-act="cc-mode" data-m="${ccExplain ? "" : "explain"}" aria-pressed="${ccExplain}">${ccExplain ? "Erklären: an" : "Nur erklären"}</button>${ready ? (S.chat.length ? `<button type="button" data-act="cc-clear">Verlauf löschen</button>` : "") : `<button type="button" data-act="cc-copy">Anfrage kopieren</button>`}</div>`;
-        return `<div class="s6 s6-coach is-chat">${head}${seg}${side}<section class="s6-cmain s6-chatc" aria-label="Chat">${off}<div class="s6-msgs" id="chat">${s6CoachMsgs()}</div>${ready ? "" : `<p class="s6-cnote m">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`}${inp}</section>${info}</div>`;
+          ciDone = TODAY >= 0 && TODAY <= LAST && !!readiness(S.checkin[keyI(TODAY)] || {}),
+          ready = coachReady();
+        const facts = [
+          ["Woche", `${CURW + 1} · ${esc(weekInfo(CURW).wave)}`, ""],
+          ["Heute", tp ? esc(s7Title(tp.t).replace(/^(Kraft \d+) · .*$/, "$1")) : "–", ""],
+          ["Verpasst", missed ? esc(missed) : "nichts", missed ? "bad" : ""],
+          ["Check-in", ciDone ? "erledigt" : "fehlt", ciDone ? "ok" : ""],
+        ];
+        const kn = `<section class="s6-card s7-kn s6-m" aria-label="Der Coach kennt">${facts.map(([l, v, c]) => `<span>${l} <b class="${c}">${v}</b></span>`).join("")}</section>`;
+        const knD = `<section class="s6-card s7-knd" aria-label="Der Coach kennt"><span class="s6-kick">Der Coach kennt</span>${facts.map(([l, v, c]) => `<div class="r"><span>${l}</span><span class="${c}">${v}</span></div>`).join("")}</section>`;
+        const sw = `<button type="button" class="s7-sw" role="switch" aria-checked="${ccExplain}" data-act="cc-mode" data-m="${ccExplain ? "" : "explain"}"><span class="sw" aria-hidden="true"><i></i></span>Nur erklären</button>`,
+          clr = ready ? (S.chat.length ? `<button type="button" class="s7-tx" data-act="cc-clear">Verlauf löschen</button>` : "") : `<button type="button" class="s7-tx" data-act="cc-copy">Anfrage kopieren</button>`,
+          gem = `<a class="s7-gem" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e0bf6a" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.6 5.4 3.6 8.4 9 9-5.4.6-8.4 3.6-9 9-.6-5.4-3.6-8.4-9-9 5.4-.6 8.4-3.6 9-9z"/></svg>Mit Gemini weiter diskutieren</a>`;
+        const info = `<aside class="s6-cinfo">${knD}${ready ? "" : `<p class="s6-cnote">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`}${sw}${gem}<span class="s7-clr">${clr}</span></aside>`;
+        const qr = [["Erklär die Einheit", "Erkläre mir die heutige Einheit.", "explain"], ["Zu müde heute", "Ich bin heute zu müde fürs Training.", ""], ["Knie zwickt", "Mein Knie zwickt. Was soll ich ändern?", ""]];
+        const chips = `<div class="s7-chips" role="group" aria-label="Schnellfragen">${qr.map(([l, q, m]) => `<button type="button" data-act="cc-quick" data-q="${esc(q)}" data-m="${m}" ${ccBusy ? "disabled" : ""}>${l}</button>`).join("")}${[["sore", "Muskelkater"], ["move", "Umplanen"], ["inj", "Verletzt / krank"]].map(([id, l]) => `<button type="button" class="s6-m" data-act="cc-tab" data-tab="${id}">${l}</button>`).join("")}</div>`;
+        const inp = `<form class="s6-cin" data-form="coach">${chips}<div class="s6-inp"><label for="cc-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Nachricht an den Coach</label><input id="cc-in" type="text" maxlength="${coach.MAX_MSG}" value="${esc(ccDraft)}" placeholder="${ccExplain ? "Was soll ich dir erklären?" : "z. B. „Knie zwickt seit gestern“"}" autocomplete="off" enterkeyhint="send" ${ccBusy ? "disabled" : ""}><button type="submit" aria-label="${ready ? "Senden" : "Vorbereiten"}" ${ccBusy ? "disabled" : ""}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div></form>`;
+        const dock = `<div class="s7-dock"><div class="s7-tg s6-m">${sw}${clr}</div>${gem.replace('class="s7-gem"', 'class="s7-gem s6-m"')}${inp}</div>`;
+        return `<div class="s6 s6-coach is-chat">${head}${kn}${side}<section class="s6-cmain s6-chatc" aria-label="Chat">${off}<div class="s6-msgs" id="chat">${s6CoachMsgs()}</div>${ready ? "" : `<p class="s6-cnote m">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`}${dock}</section>${info}</div>`;
       }
       /* ---- Dashboard ---- */
       function s6Ring(frac, col, inner, label, aria, t) {
@@ -10318,83 +11004,96 @@
       function s6Dashboard() {
         const T = Math.max(-1, Math.min(TODAY, LAST)),
           inPlan = TODAY >= 0 && TODAY <= LAST,
-          curW = Math.max(0, Math.floor(Math.max(T, 0) / 7));
-        const wl = S.garmin.well[isoD(NOW)] || {},
+          curW = Math.max(0, Math.floor(Math.max(T, 0) / 7)),
+          wl = S.garmin.well[isoD(NOW)] || {},
           rec = garmin.recoveryHint(S.garmin.well[isoD(NOW)]),
           ci = inPlan ? readiness(S.checkin[keyI(TODAY)] || {}) : null,
-          recLvl = LVL[rec.level] || null;
-        // Erholung
-        let e;
-        if (wl.readiness != null) e = [wl.readiness / 100, LVL_COL[recLvl] || "var(--ok)", String(Math.round(wl.readiness)), `Erholung ${Math.round(wl.readiness)} von 100`, false];
-        else if (ci) e = [1, LVL_COL[ci], LVL_TXT[ci], `Erholung ${LVL_TXT[ci]}`, true];
-        else e = [0, "var(--muted)", "–", "Erholung noch offen", false];
-        // Belastung (RPE heute)
-        const rpe = inPlan ? S.rpe[keyI(TODAY)] : null;
-        const bw = rpe == null ? null : rpe <= 4 ? "niedrig" : rpe <= 7 ? "mittel" : "hoch",
-          bc = rpe == null ? "var(--muted)" : rpe <= 4 ? "var(--ok)" : rpe <= 7 ? "var(--warn)" : "var(--danger)";
-        // Woche
-        const ws = weekStats(curW);
-        const rings = `<section class="s6-card s6-rings" aria-label="Heute">${s6Ring(e[0], e[1], e[2], "Erholung", e[3], e[4])}${s6Ring(rpe == null ? 0 : rpe / 10, bc, bw || "–", "Belastung", rpe == null ? "Belastung noch offen" : `Belastung ${bw}`, true)}${s6Ring(ws.plan ? ws.ok / ws.plan : 0, "var(--accent)", `${ws.ok}/${ws.plan}`, "Woche", `Woche ${ws.ok} von ${ws.plan} Einheiten`, false)}</section>`;
-        // Garmin-Kacheln
-        const iso7 = [],
-          iso14 = [];
-        for (let k = 13; k >= 0; k--) {
-          const d = isoD(new Date(+NOW - k * dayMs));
-          iso14.push(d);
-          if (k < 7) iso7.push(d);
+          recLvl = LVL[rec.level] || null,
+          lvl = worst(recLvl, ci),
+          p = inPlan ? dayPlan(TODAY) : null;
+        const fmtN = (v, d = 1) => (v == null || isNaN(v) ? "–" : (+v).toFixed(d).replace(".", ","));
+        /* Heute: Erholung, Aussage, Garmin-Werte */
+        const chipTxt = { green: "Erholung gut", yellow: "Erholung mittel", red: "Erholung tief" }[lvl] || "Erholung offen",
+          chipCol = { green: "#30d158", yellow: "#ff9f0a", red: "#ff6961" }[lvl] || "#9a9ba3";
+        const bigNum = wl.readiness != null ? String(Math.round(wl.readiness)) : ci ? LVL_TXT[ci] : "–",
+          bigLbl = wl.readiness != null ? "Garmin Readiness" : ci ? "Check-in" : "Noch kein Check-in";
+        const verdict = p ? todayVerdict(lvl, p).replace(/^Heute /, "") : "";
+        const well = (l, v, u) => `<div class="s7-well"><span class="s6-kick">${l}</span><b>${v != null ? esc(String(v)) : "–"}${v != null && u ? ` <small>${u}</small>` : ""}</b></div>`;
+        const heute = `<section class="s6-card s7-dh" aria-label="Heute"><div class="r1"><span class="s6-kick">Heute</span><span class="s7-pill" style="color:${chipCol}"><i style="background:${chipCol}"></i>${chipTxt}</span></div><div class="big"><b class="${wl.readiness != null ? "" : "w"}">${esc(bigNum)}</b><span>${bigLbl}</span></div>${verdict ? `<p>${verdict}</p>` : ""}<div class="g3">${well("HRV", wl.hrv != null ? Math.round(wl.hrv) : null, "ms")}${well("Ruhepuls", wl.rhr != null ? Math.round(wl.rhr) : null)}${well("Battery", wl.bb != null ? Math.round(wl.bb) : null)}</div>${inPlan ? `<button type="button" class="s7-lnk" data-act="ci-edit">${ci ? "Check-in ändern" : "Check-in ausfüllen"}</button>` : ""}</section>`;
+        /* Diese Woche */
+        const D = s6WeekData(curW),
+          wave = weekInfo(curW).wave,
+          lim = review.RPE_MAX[wave],
+          slp = [];
+        for (let k = 0; k < 7; k++) {
+          const v = (S.garmin.well[isoD(new Date(+NOW - k * dayMs))] || {}).sleepH;
+          if (v != null) slp.push(+v);
         }
-        const hm = (v) => Math.floor(v) + ":" + String(Math.round((v - Math.floor(v)) * 60)).padStart(2, "0");
-        const defs = [["Schlaf", "sleepH", hm, " h"], ["HRV", "hrv", (v) => Math.round(v), " ms"], ["Ruhepuls", "rhr", (v) => Math.round(v), " bpm"]];
-        const tiles = defs
-          .map(([l, k, f, u]) => {
-            const cur = wl[k],
-              ser = iso7.map((d) => (S.garmin.well[d] || {})[k]).map((v) => (v == null ? null : +v)),
-              nums = ser.filter((v) => v != null);
-            let line = "";
-            if (nums.length > 1) {
-              const lo = Math.min(...nums),
-                hi = Math.max(...nums),
-                rg = hi - lo || 1;
-              const pts = ser
-                .map((v, i) => (v == null ? null : ((i * 100) / 6).toFixed(1) + "," + (90 - ((v - lo) / rg) * 80).toFixed(1)))
-                .filter(Boolean)
-                .join(" ");
-              line = `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
-            } else line = `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>`;
-            return `<div class="s6-tile"><span>${l}</span><b>${cur != null ? esc(String(f(+cur))) : "–"}${cur != null ? `<small>${u}</small>` : ""}</b>${line}<span class="cap7">7 Tage</span></div>`;
-          })
-          .join("");
-        // Erholung im Verlauf (14 Tage)
-        const rv = iso14.map((d) => (S.garmin.well[d] || {}).readiness).map((v) => (v == null ? null : +v));
+        const tile = (l, v, u, n) => `<div class="s6-card s7-t"><span class="s6-kick">${l}</span><b>${v}${u ? ` <small>${u}</small>` : ""}</b>${n ? `<span class="n">${n}</span>` : ""}</div>`;
+        const tiles = `<section class="s7-tiles" aria-label="Diese Woche">${tile("Laufen", s6Km(D.kmDone), D.km ? `/ ${s6Km(D.km)} km` : "km", "")}${tile("Ø Anstrengung", D.ar === "–" ? "–" : D.ar, "", lim ? `Grenze ${String(lim).replace(".", ",")}` : "")}${tile("Ø Schlaf", slp.length ? fmtN(slp.reduce((a, b) => a + b, 0) / slp.length) : "–", slp.length ? "h" : "", "Ziel 7–9 h")}${tile("Saison", curW + 1, `von ${NWEEKS} Wo`, "")}</section>${D.ar === "–" ? `<p class="s7-note">Noch keine Anstrengung eingetragen. Nach jedem Training die RPE (1–10) erfassen.</p>` : ""}`;
+        /* Rennprognose */
+        const fc = rvForecast();
+        let prog;
+        if (!fc || !fc.total) {
+          prog = `<section class="s6-card s7-pg" aria-label="Rennprognose"><div class="r1"><span class="s6-kick">Rennprognose</span></div><p class="s7-note">Noch keine Testwerte. Nach dem Lauf-Pacing-Test und dem Stationen-Benchmark rechnet die App hier eure Zielzeit hoch.</p><button type="button" class="s7-lnk" data-v="profile">Tests eintragen</button></section>`;
+        } else {
+          const gap = fc.total - review.GOAL_S,
+            REF = 3801,
+            ax = Math.max(REF, fc.total * 1.02),
+            pc = (v) => ((v / ax) * 100).toFixed(1),
+            stSum = fc.stations ? fc.stations.reduce((a, b) => a + (b || 0), 0) : fc.st || 0,
+            bd = review.breakdown(fc);
+          const row = (l, v, extra) => `<div class="tr"><span>${l}${extra ? ` <small>${extra}</small>` : ""}</span><b>${mmss(v)}</b></div>`;
+          const det = bd
+            ? `<details class="s7-det"><summary>Details je Station<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>${bd.rows.slice(1, 9).map((r) => `<div class="tr"><span>${esc(r.label)}</span><b>${r.est != null ? mmss(r.est) : "–"}</b></div>`).join("")}</details>`
+            : "";
+          prog = `<section class="s6-card s7-pg" aria-label="Rennprognose"><div class="r1"><span class="s6-kick">Rennprognose</span><span class="s7-pill"><i style="background:${gap > 0 ? "#ff9f0a" : "#30d158"}"></i>${mmss(Math.abs(gap))} ${gap > 0 ? "zu langsam" : "Puffer"}</span></div><div class="big"><b>${mmss(fc.total)}</b></div><p class="cap">Spanne ${mmss(fc.lo)} bis ${mmss(fc.hi)} · Ziel 60:00</p>
+        <div class="bar"><div><u style="width:${pc(fc.run)}%;background:#f5f5f7"></u><u style="width:${pc(stSum)}%;background:#9a9ba3"></u><u style="width:${pc(fc.rox)}%;background:#6d7176"></u></div><i style="left:${pc(review.GOAL_S)}%"></i></div>
+        <div class="lg"><span><i style="background:#f5f5f7"></i>Laufen</span><span><i style="background:#9a9ba3"></i>Stationen</span><span><i style="background:#6d7176"></i>Roxzone</span><span><i class="m"></i>60:00 Ziel · 63:21 St. Gallen</span></div>
+        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${det}</section>`;
+        }
+        /* Erholung im Verlauf */
+        const SER = { readiness: ["Erholung", "readiness", (v) => Math.round(v), "Erholungswert"], hrv: ["HRV", "hrv", (v) => Math.round(v), "HRV in ms"], rhr: ["Ruhepuls", "rhr", (v) => Math.round(v), "Ruhepuls"] },
+          sk = SER[dashSer] ? dashSer : "readiness",
+          [, key, fm, alab] = SER[sk];
+        const nDays = Math.max(15, Math.min(60, TODAY + 1)),
+          days = [];
+        for (let k = nDays - 1; k >= 0; k--) days.push(new Date(+NOW - k * dayMs));
+        const ser = days.map((d) => {
+          const v = (S.garmin.well[isoD(d)] || {})[key];
+          return v == null ? null : +v;
+        });
+        const nums = ser.filter((v) => v != null),
+          mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null),
+          last7 = ser.slice(-7).filter((v) => v != null);
+        let lo = 0,
+          hi = 100;
+        if (sk !== "readiness" && nums.length) {
+          lo = Math.floor(Math.min(...nums) * 0.9);
+          hi = Math.ceil(Math.max(...nums) * 1.05);
+          if (hi - lo < 4) hi = lo + 4;
+        }
+        const X = (i) => (36 + (i * 298) / Math.max(1, ser.length - 1)).toFixed(1),
+          Y = (v) => (130 - ((v - lo) / (hi - lo)) * 120).toFixed(1);
         let segs = [],
           cur = [];
-        rv.forEach((v, i) => {
+        ser.forEach((v, i) => {
           if (v == null) {
             if (cur.length) segs.push(cur);
             cur = [];
-          } else cur.push(((i * 100) / 13).toFixed(1) + "," + (90 - v * 0.8).toFixed(1));
+          } else cur.push([i, v]);
         });
         if (cur.length) segs.push(cur);
-        const hasLine = segs.some((s) => s.length > 1);
-        const lines = segs.filter((s) => s.length > 1).map((s) => `<polyline points="${s.join(" ")}" fill="none" stroke="#30d158" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`).join("");
-        const chart1 = `<section class="s6-card s6-chart" aria-label="Erholung im Verlauf"><div class="hd"><h2>Erholung im Verlauf</h2><span>14 Tage</span></div><div class="s6-line"><span class="yl" style="top:10%">100</span><span class="yl" style="top:50%">50</span><span class="yl" style="top:90%">0</span><svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Erholung der letzten 14 Tage"><g stroke="rgba(255,255,255,0.06)" stroke-width="1" vector-effect="non-scaling-stroke"><line x1="0" y1="10" x2="100" y2="10" vector-effect="non-scaling-stroke"/><line x1="0" y1="50" x2="100" y2="50" vector-effect="non-scaling-stroke"/><line x1="0" y1="90" x2="100" y2="90" vector-effect="non-scaling-stroke"/></g>${lines}</svg>${hasLine ? "" : `<span class="empty">Noch keine Garmin-Werte.</span>`}</div></section>`;
-        // Anstrengung pro Tag
-        let names = "",
-          vals = "";
-        for (let d = 0; d < 7; d++) {
-          const x = curW * 7 + d,
-            v = x <= T ? S.rpe[keyI(x)] : null;
-          names += `<span class="${x === TODAY ? "today" : ""}">${DAYS[d]}</span>`;
-          vals += `<span class="${v != null ? "v" : ""}">${v != null ? v : "—"}</span>`;
-        }
-        const chart2 = `<section class="s6-card s6-chart" aria-label="Anstrengung pro Tag"><div class="hd"><h2>Anstrengung pro Tag</h2><span>RPE 1–10</span></div><div class="s6-rpe">${names}${vals}</div><p class="foot">Wird nach jedem Training eingetragen.</p></section>`;
-        const gOn = !!(S.garmin.conn || Object.keys(S.garmin.well).length);
-        const gd = `<span class="s6-gdot"><i></i>Garmin · ${gOn ? "verbunden" : "nicht verbunden"}</span>`;
-        const dk = `${DAYSF[(NOW.getDay() + 6) % 7]}, ${fmt(NOW)}`;
-        const head = `<header class="s6-hd"><div><span class="s6-kick">${dk}</span><h1 class="s6-h1">Dashboard</h1>${gd}</div>${S6_MENU}</header>`;
-        const headD = `<div class="s6-d-only s6-dh"><div><span class="s6-kick">${dk}</span><h1>Dashboard</h1></div>${gd}</div>`;
+        const path = (s) => s.map(([i, v], n) => (n ? "L" : "M") + X(i) + " " + Y(v)).join("");
+        const dd = (d) => `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}`;
+        const lastPt = nums.length ? ser.lastIndexOf(nums[nums.length - 1]) : -1;
+        const svg = nums.length
+          ? `<svg viewBox="0 0 342 170" width="100%" role="img" aria-label="${alab} vom ${dd(days[0])} bis ${dd(days[days.length - 1])}${nums.length ? `, zuletzt ${fm(nums[nums.length - 1])}` : ""}"><g stroke="rgba(255,255,255,.06)" stroke-width="1"><path d="M36 10H334M36 70H334M36 130H334"/></g><g font-size="11" fill="#9a9ba3" font-family="IBM Plex Sans,sans-serif"><text x="0" y="14">${Math.round(hi)}</text><text x="6" y="74">${Math.round((hi + lo) / 2)}</text><text x="12" y="134">${Math.round(lo)}</text><text x="30" y="156">${dd(days[0])}</text><text x="300" y="156">${dd(days[days.length - 1])}</text></g>${segs.filter((s) => s.length > 1).map((s) => `<path d="${path(s)}L${X(s[s.length - 1][0])} 130L${X(s[0][0])} 130Z" fill="#64a8ff" fill-opacity=".12"/>`).join("")}${segs.map((s) => `<path d="${path(s)}" fill="none" stroke="#64a8ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`).join("")}${lastPt >= 0 ? `<circle cx="${X(lastPt)}" cy="${Y(ser[lastPt])}" r="5" fill="#64a8ff"/>` : ""}</svg>`
+          : `<p class="s7-note">Noch keine Garmin-Werte.</p>`;
+        const verlauf = `<section class="s6-card s7-vl" aria-label="Erholung im Verlauf"><span class="s6-kick">Erholung im Verlauf</span><div class="seg" role="tablist" aria-label="Verlauf">${Object.entries(SER).map(([k, v]) => `<button type="button" role="tab" data-act="dash-ser" data-k="${k}" class="${k === sk ? "on" : ""}" aria-selected="${k === sk}">${v[0]}</button>`).join("")}</div><div class="av"><div><span class="s6-kick">Ø 7 Tage</span><b>${last7.length ? fm(mean(last7)) : "–"}</b></div><div><span class="s6-kick">Ø seit Start</span><b>${nums.length ? fm(mean(nums)) : "–"}</b></div></div>${svg}</section>`;
+        const head = s6Head(`Saison · Woche ${curW + 1} von ${NWEEKS}`, "Dashboard", "");
         const more = `<details class="s6-more"><summary>Weitere Auswertungen</summary><div class="s6-more-b">${vDashboard(true)}</div></details>`;
-        return `<div class="s6 s6-dash">${head}${headD}<div class="s6-top">${rings}<section class="s6-tiles" aria-label="Garmin-Werte">${tiles}</section></div><div class="s6-low">${chart1}${chart2}</div>${more}</div>`;
+        return `<div class="s6 s6-dash s7-dash">${head}<div class="s7-cols"><div class="s7-c">${ciOpen && inPlan ? s6Checkin(TODAY) : ""}${heute}${tiles}</div><div class="s7-c">${prog}${verlauf}</div></div>${more}</div>`;
       }
       /* ---- Wochenrückblick ---- */
       const S6_SEASON_H = [40, 60, 80, 30, 50, 65, 85, 35, 55, 70, 90, 40, 60, 75, 100, 45, 30, 20];
@@ -10676,6 +11375,531 @@
         }
         return `<div class="macct"><button type="button" class="av3" data-v="profile" aria-label="Profil öffnen">${esc(ini)}</button><span class="tx"><b>${esc(name)}</b>${sub}</span>${btn}</div>`;
       }
+      /* ================= Fokusmodus (Canvas «Neu») ================= */
+      /* Satzfortschritt je Übung: nur auf diesem Gerät und nur für den heutigen Trainingstag */
+      const FC_SETS_KEY = "hx:fc-sets";
+      const fcSetsAll = () => {
+        try {
+          return JSON.parse(lsGet(FC_SETS_KEY) || "{}") || {};
+        } catch (_) {
+          return {};
+        }
+      };
+      const fcSetsGet = (id) => +fcSetsAll()[id] || 0;
+      function fcSetsSet(id, n) {
+        const a = fcSetsAll(),
+          dk = id.split("|")[0],
+          out = {};
+        for (const k of Object.keys(a)) if (k.startsWith(dk + "|")) out[k] = a[k];
+        if (n > 0) out[id] = n;
+        else delete out[id];
+        lsSet(FC_SETS_KEY, JSON.stringify(out));
+      }
+      const s7SetN = (t) => {
+        const m = /(\d+)\s*[×x]\s*(\d+)/.exec(String(t));
+        return m ? Math.max(1, +m[1]) : 1;
+      };
+      const F7_X = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
+      const F7_CHEV = (d) => `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+      const F7_OK = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l5 5 9-10"/></svg>`;
+      /* Eine Übung pro Bildschirm: Titel, Gewicht, Sätze, grosse Hauptaktion */
+      function s7ExView(p, dk, n, nd, dran, dir) {
+        const isDone = (x) => !!S.done[dk + "|" + x];
+        const t = p.i[focusJ],
+          id = dk + "|" + focusJ,
+          on = isDone(focusJ),
+          lift = isLift(p.k, t),
+          filler = isFiller(t),
+          r = s7Row(t),
+          sn = s7SetN(t),
+          sd = on ? sn : Math.min(sn - 1, fcSetsGet(id));
+        const pre = !S.val[id] ? preWeight(p, t) : "",
+          val = S.val[id] || pre,
+          le = lift ? lastEntry(focusI, t) : null;
+        const segs = p.i.map((_, x) => `<i class="${isDone(x) ? "d" : ""}${x === focusJ ? " c" : ""}"></i>`).join("");
+        const items = p.i
+          .map((t2, x) => {
+            const r2 = s7Row(t2),
+              wv = S.val[dk + "|" + x] || preWeight(p, t2),
+              meta = x === dran && !isDone(x) ? `<em class="g">Dran</em>` : `<em>${esc(/×\s*\d+$/.test(r2.val) || !wv ? r2.val : wv)}</em>`;
+            return `<button type="button" class="${x === focusJ ? "on" : ""}${isDone(x) ? " d" : ""}" data-fc="go" data-j="${x}"><i>${isDone(x) ? "✓" : x + 1}</i><span>${esc(r2.title.replace(", dann ", " + "))}</span>${meta}</button>`;
+          })
+          .join("");
+        const nm = r.title.length;
+        const fs = nm > 30 ? "f7-xs" : nm > 20 ? "f7-s" : nm > 14 ? "f7-m2" : "";
+        const subs = r.subs.filter(Boolean).join(" · ");
+        const setsTxt = /^(\d+) × (\d+)$/.exec(r.val);
+        const meta = `<span class="f7-de">${setsTxt ? `${setsTxt[1]} Sätze × ${setsTxt[2]} Wiederholungen` : esc(r.val)}${subs ? ` · ${esc(subs)}` : ""}</span><span class="f7-mo">${setsTxt ? `${setsTxt[1]} Sätze × ${setsTxt[2]} Wdh` : esc(r.val)}${subs ? ` · ${esc(subs)}` : ""}</span>`;
+        // Gewicht oder Zeitfelder
+        let field = "",
+          note = "";
+        if (!filler) {
+          if (lineSlots(t)) field = `<div class="fc-field slots">${slotsField(id, lineSlots(t), S.val[id])}</div>`;
+          else if (lift) {
+            const num = String(val || "").replace(/\s*kg\s*$/i, "");
+            field = `<div class="f7-w"><button type="button" data-fc="dec" aria-label="Gewicht verringern">${F7_CHEV("M5 12h14")}</button><div class="f7-wv"><div class="f7-n"><input class="f7-in${pre ? " pre" : ""}" type="text" data-v2="${id}" value="${esc(num)}" inputmode="decimal" placeholder="–" enterkeyhint="done" aria-label="Gewicht für ${esc(r.title)} in Kilogramm"><span>kg</span></div><span class="s6-kick">Gewicht</span></div><button type="button" data-fc="inc" aria-label="Gewicht erhöhen">${F7_CHEV("M12 5v14M5 12h14")}</button></div>`;
+            note =
+              le && le.v && S.val[id] !== le.v && !pre
+                ? `<button type="button" class="f7-last" data-fc="last" data-v="${esc(le.v)}">Zuletzt ${esc(le.v)} übernehmen</button>`
+                : le && le.v
+                  ? `<p class="f7-note"><span class="f7-de">Zuletzt ${esc(le.v)}, bereits übernommen. Ändern mit − und +.</span><span class="f7-mo">Zuletzt ${esc(le.v)}, übernommen.</span></p>`
+                  : pre
+                    ? `<p class="f7-note">Geplant ${esc(pre)}. Ändern mit − und +.</p>`
+                    : `<p class="f7-note">Gewicht mit − und + eintragen.</p>`;
+          } else field = `<div class="f7-w one"><div class="f7-wv"><input class="f7-in txt" type="text" data-v2="${id}" value="${esc(val)}" placeholder="${esc(placeholder(p.k, t))}" enterkeyhint="done" aria-label="Wert für ${esc(r.title)}"><span class="s6-kick">Zeit oder Wert</span></div></div>`;
+        }
+        // Sätze
+        let sets = "";
+        if (sn > 1)
+          sets = `<div class="f7-sets" role="group" aria-label="Sätze"><span class="s6-kick">Satz</span>${Array.from({ length: sn }, (_, k) => `<button type="button" class="${k < sd ? "d" : k === sd ? "on" : ""}" data-fc="sset" data-k="${k + 1}" aria-label="Satz ${k + 1}${k < sd ? " erledigt" : ""}">${k < sd ? "✓" : k + 1}</button>`).join("")}</div>`;
+        // Timer nur, wenn der Plan eine Zeit vorgibt
+        const spec = timedSpec(t, p.k);
+        let timer = "";
+        if (spec) {
+          const v = fcT.spec && fcT.spec.work === spec.work && fcT.spec.rounds === spec.rounds ? fcView(spec) : { time: mmss(spec.work), label: spec.label + (spec.rounds > 1 ? ` · ${spec.rounds} Runden` : ""), ph: "idle" };
+          const started = fcT.spec && fcElapsed() > 0;
+          timer = `<div class="fc-timer" data-ph="${v.ph}"><div><div class="fc-time" id="fc-time">${v.time}</div><div class="fc-tlabel" id="fc-tlabel">${esc(v.label)}</div></div><div class="fc-tbtn"><button type="button" class="${fcT.run ? "stop" : "go"}" data-fc="tstart">${fcT.run ? "Pause" : started && v.ph !== "done" ? "Weiter" : "Start"}</button>${started && !fcT.run ? `<button type="button" data-fc="treset">Neu</button>` : ""}</div></div>`;
+        }
+        const nxt = on || dran !== focusJ ? dran : nextOpen(n, (x) => isDone(x) || x === focusJ, focusJ + 1);
+        const nxName = nxt >= 0 && nxt !== focusJ ? esc(s7Row(p.i[nxt]).title) : "";
+        const label = on ? "Erledigt" : sn > 1 ? `Satz ${sd + 1} fertig` : "Fertig";
+        return `<header class="f7-h"><button type="button" class="f7-x" data-fc="close" aria-label="Fokusmodus schliessen">${F7_X}</button><div class="f7-t"><span class="s6-kick">${esc(KIND[p.k] || "")}</span><b>${esc(s7Title(p.t))}</b></div><div class="f7-p"><span class="f7-sg" aria-hidden="true">${segs}</span><span class="f7-c">${nd} / ${n}</span></div></header>
+    <div class="f7-segrow" aria-hidden="true">${segs}</div>
+    <div class="f7-b"><nav class="f7-list" aria-label="Übungen">${items}</nav>
+    <main class="f7-ma${dir ? " go-" + dir : ""}"><div class="f7-ex"><span class="s6-kick f7-gold f7-mo">Übung ${focusJ + 1} von ${n}</span><h1 class="f7-name ${fs}">${esc(r.title)}</h1><p class="f7-meta">${meta}</p></div>${field}${note}${sets}${timer}
+    <div class="f7-bot">${nxName ? `<button type="button" class="f7-up f7-mo" data-fc="go" data-j="${nxt}"><span><small class="s6-kick">Danach</small> <b>${nxName}</b></span>${F7_CHEV("M9 6l6 6-6 6")}</button>` : ""}
+    <div class="f7-nav"><button type="button" class="f7-pv" data-fc="prev" ${focusJ === 0 ? "disabled" : ""} aria-label="Vorherige Übung">${F7_CHEV("M15 6l-6 6 6 6")}</button><button type="button" class="f7-ok${on ? " on" : ""}" data-fc="sdone" aria-label="${on ? "Erledigt, nochmals tippen zum Rückgängig" : label}">${F7_OK}${label}</button><div class="f7-nx">${nxName ? `<span class="f7-de"><small class="s6-kick">Danach</small><b>${nxName}</b></span>` : ""}<button type="button" data-fc="next" ${focusJ === n - 1 ? "disabled" : ""} aria-label="Nächste Übung">${F7_CHEV("M9 6l6 6-6 6")}</button></div></div></div></main></div>`;
+      }
+      /* Satz abschliessen; nach dem letzten Satz ist die Übung erledigt. Auf einen erledigten Satz tippen nimmt ihn zurück. */
+      let fcTapLock = 0;
+      function fcSetDone() {
+        if (Date.now() < fcTapLock) return;
+        const p = dayPlan(focusI),
+          dk = keyI(focusI),
+          id = dk + "|" + focusJ,
+          n = s7SetN(p.i[focusJ]);
+        if (S.done[id]) {
+          fcSetsSet(id, Math.max(0, n - 1));
+          return focusDone(); // nochmals tippen = wieder öffnen
+        }
+        const sd = fcSetsGet(id) + 1;
+        if (sd < n) {
+          fcSetsSet(id, sd);
+          try {
+            navigator.vibrate && navigator.vibrate(18);
+          } catch (_) {}
+          return focusRender();
+        }
+        fcSetsSet(id, n);
+        fcTapLock = Date.now() + 500;
+        focusDone();
+      }
+      function fcSetTap(k) {
+        const p = dayPlan(focusI),
+          id = keyI(focusI) + "|" + focusJ,
+          n = s7SetN(p.i[focusJ]);
+        if (S.done[id]) return;
+        const sd = fcSetsGet(id);
+        if (k >= n) {
+          fcSetsSet(id, n - 1);
+          return fcSetDone();
+        }
+        fcSetsSet(id, k === sd ? Math.max(0, k - 1) : k);
+        focusRender();
+      }
+
+      /* ---------- Stationstag: Schritte mit Zeiten (Splits) ---------- */
+      const SP_KEY = "hx:fc-sp";
+      const SP_COL = { warm: "#9a9ba3", cool: "#9a9ba3", run: "#64a8ff", station: "#bf8cff", rest: "#6d7176", other: "#9a9ba3" };
+      /* Plan eines Stationstags → Schritte: Einlaufen, Referenzlauf, je Runde Station · Lauf · Pause, Auslaufen. Sonst null (dann normaler Fokusmodus). */
+      function s7Steps(p) {
+        if (!p || p.k !== "station" || !(p.i || []).length) return null;
+        const all = p.i.join(" | "),
+          f200 = /Erste (\d+) m nach jeder Station .*?bei (\d:\d\d)\s*\/km/.exec(all),
+          ue = /(\d+) s Übergang/.exec(all),
+          steps = [];
+        let rounds = 0;
+        p.i.forEach((t0, j) => {
+          const t = String(t0).replace(/\s+/g, " ").trim();
+          let m;
+          if ((m = /^(Einlaufen|Auslaufen)\s+(\d[\d,.]*\s?(?:km|m))\s*@\s*(\d:\d\d)\/km\s*\((\d+:\d\d)\)$/.exec(t))) steps.push({ j, kind: m[1] === "Einlaufen" ? "warm" : "cool", tp: m[1], name: m[2], sub: `@ ${m[3]} /km`, goal: parseT(m[4]) });
+          else if ((m = /^Runde (\d+) frisch ohne Station:\s*(\d+(?:,\d+)? km)\b.*?\((\d+:\d\d)\)/.exec(t))) steps.push({ j, kind: "run", tp: "Lauf", name: `${m[2]} Referenz`, sub: "", goal: parseT(m[3]) });
+          else if ((m = /^Runde (\d+):\s*(.+?)\s*\(([^)]*)\)\s*→\s*(.+)$/.exec(t))) {
+            rounds++;
+            const hm = /^(.*?)\s+(\d[\d,.]*\s?m)(?:\s+mit\s+(\d+\s?kg))?$/.exec(m[2]),
+              ps = m[3].split(/,\s*/),
+              plates = ps.find((x) => /^\d+\s?kg Platten$/.test(x)),
+              ziel = ps.map((x) => /^Ziel (\d+:\d\d)$/.exec(x)).find(Boolean),
+              extra = ps.filter((x) => x !== plates && !/^Ziel /.test(x) && !/Übergang/.test(x)).map((x) => x.replace(/ als Ghost-Partner$/, "")),
+              tail = m[4].split(/,\s*/),
+              rest = tail.map((x) => /^(\d+) (Min|s) Pause$/.exec(x)).find(Boolean);
+            const kg = hm && hm[3] ? (plates ? `${hm[3]} (${plates})` : hm[3]) : plates || "";
+            steps.push({ j, kind: "station", tp: "Station", name: hm ? hm[1] : m[2], sub: [hm ? hm[2] : "", kg, ...extra].filter(Boolean).join(" · "), goal: ziel ? parseT(ziel[1]) : 0 });
+            const rm = /(\d+(?:,\d+)?\s?km)\s*@\s*(\d:\d\d)\/km\s*(?:\((\d+:\d\d)\))?/.exec(m[4]);
+            steps.push({ j, kind: "run", tp: "Lauf", name: rm ? rm[1] : "Lauf", sub: ue && f200 ? `${ue[1]} s Übergang · erste ${f200[1]} m ${f200[2]}` : rm ? `@ ${rm[2]} /km` : "", goal: rm && rm[3] ? parseT(rm[3]) : rm ? Math.round(parseFloat(rm[1]) * parseT(rm[2])) : 0 });
+            if (rest) steps.push({ j, kind: "rest", tp: "Pause", name: "Erholen", sub: rest[2], goal: +rest[1] * (rest[2] === "Min" ? 60 : 1) });
+          } else if (!/^Erste \d+ m nach jeder Station/.test(t)) steps.push({ j, kind: "other", tp: "Schritt", name: s7Row(t).title, sub: "", goal: 0 });
+        });
+        return rounds ? steps : null;
+      }
+      function s7SpRules(p) {
+        const all = (p.i || []).join(" | "),
+          tempo = /Verbot schneller als (\d:\d\d)\s*\/km/.exec(all),
+          puls = /Puls (\d+[–-]\d+) bpm/.exec(all),
+          red = /Redline ab (\d+) bpm/.exec(all),
+          f = /Erste (\d+) m nach jeder Station .*?bei (\d:\d\d)\s*\/km .*?dann auf (\d:\d\d)\s*\/km/.exec(all);
+        const w = (k, v, s) => `<div class="sp-w"><span class="s6-kick">${k}</span><b>${v}</b><span>${s}</span></div>`;
+        const out = [tempo ? w("Tempo", `${tempo[1]} /km`, "nie schneller") : "", puls && red ? w("Puls", puls[1], `Redline ${red[1]} bpm`) : "", f ? w("Nach Station", `${f[1]} m ${f[2]} /km`, `dann ${f[3]}`) : ""].filter(Boolean);
+        return out.length ? `<div class="sp-rules">${out.join("")}</div>` : "";
+      }
+      let fcSp = null, // {dk, t0, s0, idx, done:[s]} – gemessene Schritte des Tages
+        fcSpIv = null,
+        fcSpBeep = -1;
+      const spSave = () => lsSet(SP_KEY, JSON.stringify(fcSp));
+      function spLoad(dk, steps) {
+        let o = null;
+        try {
+          o = JSON.parse(lsGet(SP_KEY) || "null");
+        } catch (_) {}
+        if (o && o.t0 && o.idx < steps.length && Date.now() - o.s0 > 6 * 3600 * 1000) o = null; // alte, nie beendete Messung
+        fcSp = o && o.dk === dk && Array.isArray(o.done) ? o : { dk, t0: 0, s0: 0, idx: 0, done: [] };
+        if (fcSp.idx > steps.length) fcSp.idx = steps.length;
+      }
+      const spDiff = (a, g) => {
+        const d = a - g;
+        return d === 0 ? { t: "0:00", c: "ze" } : d > 0 ? { t: "+" + mmss(d), c: "pl" } : { t: "−" + mmss(-d), c: "mi" };
+      };
+      const spCur = () => (fcSp && fcSp.t0 ? Math.max(0, Math.round((Date.now() - fcSp.s0) / 1000)) : 0);
+      function spTick() {
+        if (focusI == null || !fcSp || !fcSp.t0 || !document.getElementById("sp")) return;
+        const steps = s7Steps(dayPlan(focusI));
+        if (!steps || fcSp.idx >= steps.length) return;
+        const set = (id, t) => {
+          const e = document.getElementById(id);
+          if (e && e.textContent !== t) e.textContent = t;
+        };
+        set("sp-tot", mmss(Math.max(0, Math.round((Date.now() - fcSp.t0) / 1000))));
+        set("sp-cur", mmss(spCur()));
+        const g = steps[fcSp.idx].goal;
+        if (g && spCur() >= g && fcSpBeep !== fcSp.idx) {
+          fcSpBeep = fcSp.idx;
+          fcBeep(false);
+        }
+      }
+      function spStartTick() {
+        clearInterval(fcSpIv);
+        fcSpIv = setInterval(spTick, 250);
+      }
+      function spStart() {
+        const steps = s7Steps(dayPlan(focusI));
+        if (!steps) return;
+        fcSp.t0 = fcSp.s0 = Date.now();
+        fcSp.idx = 0;
+        fcSp.done = [];
+        fcSpBeep = -1;
+        spSave();
+        fcBeep(false); // der erste Ton entsperrt auch den Ton auf dem Handy
+        spStartTick();
+        focusRender();
+      }
+      function spSplit() {
+        const steps = s7Steps(dayPlan(focusI));
+        if (!steps || !fcSp || !fcSp.t0 || fcSp.idx >= steps.length) return;
+        if (spCur() < 2) return; // versehentlicher Doppeltipp
+        fcSp.done[fcSp.idx] = Math.max(1, spCur());
+        fcSp.idx++;
+        fcSp.s0 = Date.now();
+        fcSpBeep = -1;
+        spSave();
+        try {
+          navigator.vibrate && navigator.vibrate(30);
+        } catch (_) {}
+        if (fcSp.idx >= steps.length) {
+          clearInterval(fcSpIv);
+          fcBeep(true);
+        } else fcBeep(false);
+        focusRender();
+      }
+      /* Kacheln (Desktop) bzw. Zeilen (Handy): gleiche Struktur, die Darstellung wechselt per CSS */
+      function s7SpView(p, steps) {
+        const run = !!fcSp.t0,
+          fin = fcSp.idx >= steps.length;
+        const tiles = steps
+          .map((s, k) => {
+            const d = k < fcSp.idx,
+              now = run && !fin && k === fcSp.idx;
+            const big = d ? mmss(fcSp.done[k]) : now ? mmss(spCur()) : s.goal ? mmss(s.goal) : "–";
+            const df = d && s.goal ? spDiff(fcSp.done[k], s.goal) : null;
+            const dd = d ? (s.goal ? `Ziel ${mmss(s.goal)}${df ? ` · <b class="${df.c}">${df.t}</b>` : ""}` : "") : now ? `läuft${s.goal ? ` · Ziel ${mmss(s.goal)}` : ""}${s.sub ? ` · ${esc(s.sub)}` : ""} · beim Zieleinlauf tippen` : esc(s.sub);
+            const tag = now ? "button" : "div";
+            return `<${tag} ${now ? `type="button" data-fc="sp-split" id="sp-now" aria-label="Split speichern: ${esc(s.tp)} ${esc(s.name)}"` : ""} class="sp-t${d ? " done" : ""}${now ? " now" : ""}"><i class="bar" style="background:${SP_COL[s.kind]}"></i><span class="mid"><span class="tp"><i class="dt" style="background:${SP_COL[s.kind]}"></i>${k + 1} · ${esc(s.tp)}</span><span class="nm">${esc(s.name)}</span><span class="dd">${dd}</span></span><span class="big"${now ? ` id="sp-cur"` : ""}>${big}</span><span class="ck${d ? " on" : ""}" aria-hidden="true">${d ? S7_CHECK : ""}</span></${tag}>`;
+          })
+          .join("");
+        const tot = run ? (fin ? fcSp.done.reduce((a, b) => a + (b || 0), 0) : Math.round((Date.now() - fcSp.t0) / 1000)) : 0;
+        const btn = fin ? "" : run ? `<button type="button" class="f7-go" data-fc="sp-split"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l5 5 9-10"/></svg>Split</button>` : `<button type="button" class="f7-go" data-fc="sp-start"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Start</button>`;
+        return `<div id="sp" class="sp"><header class="sp-h"><button type="button" class="f7-x" data-fc="close" aria-label="Fokusmodus schliessen">${F7_X}</button><div class="sp-tt"><span class="s6-kick">Stationen · Kachel tippen oder Lap-Taste = Split speichern</span><b>${esc(s7Title(p.t))}</b></div><span class="sp-tot" id="sp-tot">${mmss(tot)}</span>${btn}</header>${s7SpRules(p)}<p class="sp-hint">Tippe eine Kachel beim Zieleinlauf (oder drücke die Lap-Taste der Uhr): Der Split wird gespeichert und die nächste Kachel startet.</p><div class="sp-g">${tiles}</div>${run && !fin ? `<button type="button" class="s7-tx sp-rd" data-fc="sp-redo">Messung verwerfen und neu starten</button>` : ""}</div>`;
+      }
+      /* Splits prüfen: Ist-Zeiten lassen sich korrigieren */
+      function s7SpCheck(p, steps) {
+        const sum = (a) => a.reduce((x, y) => x + (y || 0), 0),
+          gT = sum(steps.map((s) => s.goal)),
+          aT = sum(steps.map((_, k) => fcSp.done[k])),
+          df = spDiff(aT, gT);
+        const rows = steps
+          .map((s, k) => {
+            const d = spDiff(fcSp.done[k] || 0, s.goal);
+            return `<div class="tr"><div class="nm"><small>${esc(s.tp)}</small>${esc(s.name)}</div><div class="c ze">${s.goal ? mmss(s.goal) : "–"}</div><input class="ist" type="text" inputmode="text" pattern="[0-9:]*" value="${mmss(fcSp.done[k] || 0)}" data-sp="${k}" aria-label="Ist-Zeit ${esc(s.tp)} ${esc(s.name)}"><div class="c ${s.goal ? d.c : "ze"}" id="sp-d${k}">${s.goal ? d.t : "–"}</div></div>`;
+          })
+          .join("");
+        return `<div id="sp" class="sp chk"><header class="sp-h"><button type="button" class="f7-x" data-fc="close" aria-label="Zurück zur Übersicht" title="Zurück">${F7_CHEV("M15 6l-6 6 6 6")}</button><div class="sp-tt"><span class="s6-kick">Nach der Einheit</span><b>Splits prüfen</b></div></header>
+    <div class="sp-sum"><div><span class="s6-kick">Gesamt</span><b id="sp-sa">${mmss(aT)}</b></div><div class="r"><span class="s6-kick">Ziel ${mmss(gT)}</span><b class="${df.c}" id="sp-sd">${df.t}</b></div></div>
+    <p class="sp-hint">Die Splits wurden beim Tippen gespeichert. Falsch? Tippe auf die Ist-Zeit und korrigiere sie.</p>
+    <div class="sp-tab"><div class="th"><span class="s6-kick">Schritt</span><span class="s6-kick r">Ziel</span><span class="s6-kick c">Ist</span><span class="s6-kick r">Diff</span></div>${rows}</div>
+    <div class="sp-act"><button type="button" class="s6-btn gold" data-fc="sp-save">Speichern</button><button type="button" class="s6-btn" data-fc="sp-watch">Splits aus der Uhr übernehmen</button><button type="button" class="s7-tx" data-fc="sp-redo">Messung verwerfen und neu starten</button></div></div>`;
+      }
+      function spEdit(k, txt) {
+        const steps = s7Steps(dayPlan(focusI));
+        const m = /^(\d{1,3}):(\d{2})$/.exec(String(txt).trim()),
+          s = m ? +m[1] * 60 + +m[2] : /^\d+$/.test(String(txt).trim()) ? +txt : NaN;
+        if (!steps || isNaN(s)) return focusRender();
+        fcSp.done[k] = s;
+        spSave();
+        const sum = (a) => a.reduce((x, y) => x + (y || 0), 0),
+          gT = sum(steps.map((q) => q.goal)),
+          aT = sum(steps.map((_, i) => fcSp.done[i])),
+          df = spDiff(aT, gT),
+          d = spDiff(s, steps[k].goal);
+        const set = (id, t, c) => {
+          const e = document.getElementById(id);
+          if (e) {
+            e.textContent = t;
+            if (c) e.className = e.className.replace(/\b(pl|mi|ze)\b/g, "").trim() + " " + c;
+          }
+        };
+        set("sp-sa", mmss(aT));
+        set("sp-sd", df.t, df.c);
+        set("sp-d" + k, steps[k].goal ? d.t : "–", d.c);
+      }
+      function spSaveAll() {
+        const p = dayPlan(focusI),
+          steps = s7Steps(p),
+          dk = keyI(focusI);
+        if (!steps) return;
+        const byLine = {};
+        steps.forEach((s, k) => (byLine[s.j] = byLine[s.j] || []).push(fcSp.done[k]));
+        for (const [j, arr] of Object.entries(byLine)) {
+          const id = dk + "|" + j;
+          S.val[id] = arr.map((x) => mmss(x || 0)).join(" · ");
+          S.done[id] = 1;
+        }
+        p.i.forEach((_, j) => {
+          if (!byLine[j]) S.done[dk + "|" + j] = 1; // Regel- und Hinweiszeilen ohne eigene Zeit
+        });
+        save();
+        const at = focusI;
+        lsSet(SP_KEY, "null");
+        fcSp = null;
+        focusClose();
+        fin7Open(at, true);
+      }
+      /* Neuer Fokus-Bildschirm für Stationstage und alle Übungen ohne eigenes Lauf-Dashboard. Gibt true zurück, wenn gezeichnet. */
+      function s7FocusPaint(el, p, dk, n, nd, dran, dir) {
+        const steps = s7Steps(p);
+        if (steps) {
+          if (!fcSp || fcSp.dk !== dk) spLoad(dk, steps);
+          if (fcSp.t0 && fcSp.idx < steps.length) spStartTick();
+          else clearInterval(fcSpIv);
+          el.className = "f7on sp-on";
+          el.innerHTML = fcSp.idx >= steps.length && fcSp.t0 ? s7SpCheck(p, steps) : s7SpView(p, steps);
+          const nw = el.querySelector("#sp-now");
+          if (nw && nw.scrollIntoView) nw.scrollIntoView({ block: "center" });
+          return true;
+        }
+        if (runPhases(p, focusJ).length) return false;
+        el.className = "f7on";
+        el.innerHTML = s7ExView(p, dk, n, nd, dran, dir);
+        const cur = el.querySelector(".f7-list .on");
+        if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: "nearest" });
+        return true;
+      }
+
+      /* ================= Einheit abschliessen (Sheet) ================= */
+      let fin7 = null; // {i, mode: "plan"|"part"|"other", rpe, note, picks:Set, sub: null|"w", w:{j:kg|null}, focus}
+      function fin7Open(i, fromFocus) {
+        const p = dayPlan(i),
+          dk = keyI(i);
+        if (!p || p.k === "rest") return;
+        const done = p.i.map((_, j) => !!S.done[dk + "|" + j]),
+          part = done.some(Boolean) && !done.every(Boolean);
+        fin7 = { i, mode: part ? "part" : "plan", rpe: S.rpe[dk] != null ? +S.rpe[dk] : null, note: S.notes[dk] || "", picks: new Set(done.map((d, j) => (d ? j : -1)).filter((j) => j >= 0)), sub: null, w: null, focus: !!fromFocus };
+        fin7Paint();
+      }
+      function fin7Close() {
+        fin7 = null;
+        const el = document.getElementById("fin7");
+        const prev = el && el._prev;
+        if (el) el.remove();
+        document.body.classList.remove("fin-on");
+        try {
+          if (prev && prev.isConnected && prev.focus) prev.focus();
+        } catch (_) {}
+      }
+      const fin7Lifts = (p) => p.i.map((t, j) => ({ t, j })).filter(({ t }) => !isFiller(t) && (isLift(p.k, t) || preWeight(p, t)));
+      function fin7Paint() {
+        if (!fin7) return;
+        const p = dayPlan(fin7.i),
+          dk = keyI(fin7.i),
+          wave = weekInfo(Math.floor(fin7.i / 7)).wave,
+          lim = review.RPE_MAX[wave];
+        let el = document.getElementById("fin7");
+        const first = !el;
+        if (first) {
+          el = document.createElement("div");
+          el.id = "fin7";
+          el._prev = document.activeElement;
+          document.body.appendChild(el);
+          document.body.classList.add("fin-on");
+        }
+        const oldSheet = el.querySelector(".f7-sheet"),
+          keepTop = oldSheet ? oldSheet.scrollTop : 0,
+          ae = document.activeElement && el.contains(document.activeElement) ? document.activeElement : null,
+          keepSel = ae && ae.dataset && ae.dataset.fin ? ["fin", "j", "r", "m", "d"].filter((k) => ae.dataset[k] != null).map((k) => `[data-${k}="${ae.dataset[k]}"]`).join("") : "";
+        let body;
+        if (fin7.sub === "w") {
+          const rows = fin7Lifts(p)
+            .map(({ t, j }) => {
+              const r = s7Row(t),
+                le = lastEntry(fin7.i, t),
+                v = fin7.w[j];
+              const sb = [r.val, r.subs[0] && /je Seite/.test(r.subs[0]) ? "je Seite" : "", le && le.v ? `zuletzt ${le.v}` : ""].filter(Boolean).join(" · ");
+              return `<div class="r"><div class="nm">${esc(r.title)}<div class="sb">${esc(sb)}</div></div><button type="button" class="b" data-fin="wst" data-j="${j}" data-d="-1" aria-label="weniger">${F7_CHEV("M5 12h14")}</button><div class="v${v == null ? " e" : ""}">${v == null ? "–" : String(v).replace(".", ",")}<br><small>kg</small></div><button type="button" class="b" data-fin="wst" data-j="${j}" data-d="1" aria-label="mehr">${F7_CHEV("M12 5v14M5 12h14")}</button></div>`;
+            })
+            .join("");
+          body = `<div><h2>Gewichte eintragen</h2><div class="sb2">Pro Übung das Arbeitsgewicht. Leer lassen, was Du nicht brauchst.</div></div><div class="f7-wl">${rows}</div><div class="acts"><button type="button" class="s6-btn gold" data-fin="wok">Übernehmen</button></div>`;
+        } else {
+          const nDone = fin7.mode === "plan" ? p.i.length : fin7.picks.size;
+          const seg = [["plan", "Wie geplant"], ["part", "Teilweise"], ["other", "Anders"]].map(([m, l]) => `<button type="button" class="${fin7.mode === m ? "on" : ""}" data-fin="mode" data-m="${m}" role="radio" aria-checked="${fin7.mode === m}">${l}</button>`).join("");
+          const list =
+            fin7.mode === "part"
+              ? `<div><span class="s6-kick">Was hast Du gemacht? · ${nDone} von ${p.i.length}</span><div class="it-l">${p.i.map((t, j) => `<button type="button" class="it${fin7.picks.has(j) ? " on" : ""}" data-fin="pick" data-j="${j}" role="checkbox" aria-checked="${fin7.picks.has(j)}"><span class="cb">${fin7.picks.has(j) ? S7_CHECK : ""}</span><span class="tx">${esc(s7Row(t).title)}</span></button>`).join("")}</div></div>`
+              : "";
+          const rpe = `<div><div class="rl"><span class="s6-kick">Anstrengung (RPE 1–10)</span>${lim ? `<span>Grenze diese Woche ${String(lim).replace(".", ",")}</span>` : ""}</div><div class="rpe-g">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => `<button type="button" class="${fin7.rpe === x ? "on" : ""}" data-fin="rpe" data-r="${x}" aria-pressed="${fin7.rpe === x}">${x}</button>`).join("")}</div></div>`;
+          const wRow = fin7Lifts(p).length ? `<button type="button" class="f7-row" data-fin="wopen">Gewichte eintragen<span>optional ${F7_CHEV("M9 6l6 6-6 6").replace('width="24" height="24"', 'width="18" height="18"')}</span></button>` : "";
+          body = `<div><span class="s6-kick">${fin7.focus ? "Schritt 1 von 1 · Nach dem Fokusmodus" : "Schritt 1 von 1 · Ohne Fokusmodus"}</span><h2>Einheit abschliessen</h2><div class="sb2">${esc(s7Title(p.t))}</div></div>
+    <div><span class="s6-kick">Wie lief es?</span><div class="f7-seg" role="radiogroup" aria-label="Wie lief es?">${seg}</div></div>${list}${rpe}${wRow}
+    <input class="f7-notiz" type="text" data-fin-note maxlength="200" value="${esc(fin7.note)}" placeholder="${fin7.mode === "other" ? "Was hast Du stattdessen gemacht?" : "Notiz (optional), z. B. „Knie zwickt“"}" aria-label="Notiz">
+    <div class="acts"><button type="button" class="s6-btn gold" data-fin="save">Speichern</button><button type="button" class="s7-tx" data-fin="cancel">Abbrechen</button></div>`;
+        }
+        el.innerHTML = `<div class="f7-scrim" data-fin="cancel"></div><section role="dialog" aria-modal="true" aria-label="${fin7.sub === "w" ? "Gewichte eintragen" : "Einheit abschliessen"}" class="f7-sheet" tabindex="-1"><div class="f7-grab"></div>${body}</section>`;
+        const sh = el.querySelector(".f7-sheet");
+        sh.scrollTop = keepTop;
+        const again = keepSel ? el.querySelector(keepSel) : null;
+        if (again) again.focus({ preventScroll: true });
+        else if (first) sh.focus({ preventScroll: true });
+      }
+      function fin7Save() {
+        if (!fin7) return;
+        const i = fin7.i,
+          p = dayPlan(i),
+          dk = keyI(i),
+          mode = fin7.mode;
+        if (mode === "other" && fin7.rpe == null) return toast("Bei «Anders» bitte die Anstrengung (RPE) wählen, sonst zählt die Einheit nicht", true);
+        p.i.forEach((_, j) => {
+          const id = dk + "|" + j;
+          if (mode === "plan") {
+            S.done[id] = 1;
+            delete S.xs[id];
+            if (!S.val[id]) {
+              const pw = preWeightOf(id);
+              if (pw) S.val[id] = pw;
+            }
+          } else if (mode === "part") {
+            if (fin7.picks.has(j)) {
+              S.done[id] = 1;
+              delete S.xs[id];
+            } else delete S.done[id];
+          }
+        });
+        if (fin7.rpe != null) S.rpe[dk] = fin7.rpe;
+        else delete S.rpe[dk];
+        const note = fin7.note.trim();
+        if (note) S.notes[dk] = mode === "other" && !/^Anders:/i.test(note) ? `Anders: ${note}` : note;
+        else if (S.notes[dk] != null && !S.notes["n|" + dk]) delete S.notes[dk];
+        ciOpen = false;
+        save();
+        fin7Close();
+        toast("Einheit gespeichert");
+        render();
+      }
+      document.addEventListener("click", (e) => {
+        const b = e.target.closest && e.target.closest("[data-fin]");
+        if (!b || !fin7) return;
+        const a = b.dataset.fin,
+          p = dayPlan(fin7.i);
+        if (a === "cancel") {
+          if (fin7.sub === "w") {
+            fin7.sub = null;
+            return fin7Paint();
+          }
+          const f = fin7.focus;
+          fin7Close();
+          return f && render();
+        }
+        if (a === "mode") {
+          fin7.mode = b.dataset.m;
+          return fin7Paint();
+        }
+        if (a === "pick") {
+          const j = +b.dataset.j;
+          if (fin7.picks.has(j)) fin7.picks.delete(j);
+          else fin7.picks.add(j);
+          return fin7Paint();
+        }
+        if (a === "rpe") {
+          fin7.rpe = fin7.rpe === +b.dataset.r ? null : +b.dataset.r;
+          return fin7Paint();
+        }
+        if (a === "wopen") {
+          const dk = keyI(fin7.i);
+          fin7.w = {};
+          fin7.w0 = {};
+          for (const { t, j } of fin7Lifts(p)) {
+            const le = lastEntry(fin7.i, t),
+              kg = parseKg(S.val[dk + "|" + j] || preWeight(p, t) || (le && le.v) || "");
+            fin7.w[j] = isNaN(kg) ? null : kg;
+            fin7.w0[j] = S.val[dk + "|" + j] ? fin7.w[j] : null;
+          }
+          fin7.sub = "w";
+          return fin7Paint();
+        }
+        if (a === "wst") {
+          const j = +b.dataset.j,
+            cur = fin7.w[j];
+          const nv = Math.max(0, +((cur == null ? 0 : cur) + +b.dataset.d * 2.5).toFixed(1));
+          fin7.w[j] = nv > 0 ? nv : null;
+          return fin7Paint();
+        }
+        if (a === "wok") {
+          const dk = keyI(fin7.i);
+          for (const [j, kg] of Object.entries(fin7.w)) {
+            if (kg === fin7.w0[j]) continue; // nur Geändertes schreiben
+            if (kg == null) delete S.val[dk + "|" + j];
+            else S.val[dk + "|" + j] = `${kg} kg`;
+          }
+          save();
+          fin7.sub = null;
+          return fin7Paint();
+        }
+        if (a === "save") return fin7Save();
+      });
+      document.addEventListener("input", (e) => {
+        if (fin7 && e.target.matches && e.target.matches("[data-fin-note]")) fin7.note = e.target.value;
+      });
+      document.addEventListener("change", (e) => {
+        const t = e.target;
+        if (t && t.matches && t.matches("[data-sp]") && focusI != null) spEdit(+t.dataset.sp, t.value);
+      });
+      document.addEventListener("keydown", (e) => e.key === "Escape" && fin7 && (fin7.sub ? ((fin7.sub = null), fin7Paint()) : fin7Close()));
       /* S6-JS-END */
       const VIEWS = {
         today: s6Today,
@@ -11402,7 +12626,7 @@
           );
           return leaveCheckin(t);
         }
-        if (d.act === "all-done") return completeAll(+d.i);
+        if (d.act === "all-done") return fin7Open(+d.i);
         if (d.act === "rpe-set") {
           if (+S.rpe[d.k] === +d.r) delete S.rpe[d.k];
           else S.rpe[d.k] = +d.r;
@@ -11466,6 +12690,10 @@
           save();
           render();
           return pop(`[data-ci="${d.ci}"]`);
+        }
+        if (d.act === "dash-ser") {
+          dashSer = d.k;
+          return render();
         }
         if (d.act === "ci-edit") {
           return transition("fade", () => {

@@ -1,0 +1,272 @@
+[
+  {
+    "name": "Training abhaken (Erledigt)",
+    "note": "Heute «Erledigt», Dialog «Einheit abschliessen», Speichern: alle Übungen von heute sind abgehakt.",
+    "start": {
+      "seed": "voll",
+      "date": "2026-10-27"
+    },
+    "steps": [
+      {
+        "type": "click",
+        "sel": "[data-act=\"all-done\"]",
+        "text": "Erledigt",
+        "expect": [
+          {
+            "kind": "sel",
+            "sel": "[data-fin=\"save\"]",
+            "present": true
+          },
+          {
+            "kind": "prefixcount",
+            "path": "done",
+            "prefix": "2026-10-27|",
+            "max": 0
+          }
+        ]
+      },
+      {
+        "type": "click",
+        "sel": "[data-fin=\"save\"]",
+        "text": "Speichern",
+        "expect": [
+          {
+            "kind": "prefixcount",
+            "path": "done",
+            "prefix": "2026-10-27|",
+            "min": 3
+          },
+          {
+            "kind": "sel",
+            "sel": "[data-fin=\"save\"]",
+            "present": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Fokusmodus: Übung erledigen und beenden",
+    "note": "Start, erste Übung «Fertig», Beenden: Zustand bleibt gespeichert, Fokusansicht verschwindet.",
+    "start": {
+      "seed": "voll",
+      "date": "2026-10-27"
+    },
+    "steps": [
+      {
+        "type": "click",
+        "sel": "[data-fc=\"start\"]",
+        "text": "Fokusmodus starten",
+        "expect": [
+          {
+            "kind": "sel",
+            "sel": "#focus",
+            "present": true
+          },
+          {
+            "kind": "prefixcount",
+            "path": "done",
+            "prefix": "2026-10-27|",
+            "max": 0
+          }
+        ]
+      },
+      {
+        "type": "click",
+        "sel": "[data-fc=\"sdone\"]",
+        "text": "Fertig",
+        "expect": [
+          {
+            "kind": "state",
+            "path": "done/2026-10-27|0",
+            "op": "eq",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "type": "click",
+        "sel": "[data-fc=\"close\"]",
+        "expect": [
+          {
+            "kind": "sel",
+            "sel": "#focus",
+            "present": false
+          },
+          {
+            "kind": "state",
+            "path": "done/2026-10-27|0",
+            "op": "eq",
+            "value": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Krank melden: 3 Tage Pause",
+    "note": "Coach → Verletzt → 3 Tage, komplette Pause: 27.–29.10. werden Pause, danach Comeback.",
+    "start": {
+      "seed": "voll",
+      "date": "2026-10-27"
+    },
+    "steps": [
+      {
+        "type": "click",
+        "sel": "[data-v=\"coach\"]",
+        "text": "Coach",
+        "expect": []
+      },
+      {
+        "type": "click",
+        "sel": ".cc-tabs button",
+        "text": "Verletzt",
+        "expect": []
+      },
+      {
+        "type": "click",
+        "sel": "[data-injd=\"3\"]",
+        "text": "3 Tage",
+        "expect": []
+      },
+      {
+        "type": "click",
+        "sel": "[data-injm=\"pause\"]",
+        "text": "Komplette Pause",
+        "expect": []
+      },
+      {
+        "type": "click",
+        "sel": "[data-act=\"inj-apply\"]",
+        "text": "Übernehmen",
+        "expect": [
+          {
+            "kind": "state",
+            "path": "sched/15/inj",
+            "op": "eq",
+            "value": "pause"
+          },
+          {
+            "kind": "state",
+            "path": "sched/16/inj",
+            "op": "eq",
+            "value": "pause"
+          },
+          {
+            "kind": "state",
+            "path": "sched/17/inj",
+            "op": "eq",
+            "value": "pause"
+          },
+          {
+            "kind": "state",
+            "path": "sched/18/inj",
+            "op": "absent"
+          }
+        ]
+      },
+      {
+        "type": "click",
+        "sel": "[data-v=\"today\"]",
+        "text": "Heute",
+        "expect": [
+          {
+            "kind": "text",
+            "text": "Verletzt – Pause",
+            "present": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Krank melden, wenn heute eine Einheit zu zweit ist",
+    "note": "Heute «Intervall mit Jimoh» (Partner-Einheit), Solo war eingeschaltet. Krank: Pause statt Solo-Einheit. Was Jimoh sieht, ist noch nicht gebaut.",
+    "start": {
+      "seed": "voll",
+      "date": "2026-10-27",
+      "merge": {
+        "solo": {
+          "2026-10-27": 1
+        }
+      }
+    },
+    "steps": [
+      {
+        "type": "click",
+        "sel": "[data-v=\"coach\"]",
+        "text": "Coach",
+        "expect": []
+      },
+      {
+        "type": "click",
+        "sel": ".cc-tabs button",
+        "text": "Verletzt",
+        "expect": []
+      },
+      {
+        "type": "click",
+        "sel": "[data-injd=\"3\"]",
+        "text": "3 Tage",
+        "expect": []
+      },
+      {
+        "type": "click",
+        "sel": "[data-injm=\"pause\"]",
+        "text": "Komplette Pause",
+        "expect": []
+      },
+      {
+        "type": "click",
+        "sel": "[data-act=\"inj-apply\"]",
+        "text": "Übernehmen",
+        "expect": [
+          {
+            "kind": "state",
+            "path": "sched/15/inj",
+            "op": "eq",
+            "value": "pause"
+          },
+          {
+            "kind": "state",
+            "path": "sched/16/inj",
+            "op": "eq",
+            "value": "pause"
+          },
+          {
+            "kind": "state",
+            "path": "sched/17/inj",
+            "op": "eq",
+            "value": "pause"
+          },
+          {
+            "kind": "state",
+            "path": "sched/18/inj",
+            "op": "absent"
+          }
+        ]
+      },
+      {
+        "type": "click",
+        "sel": "[data-v=\"today\"]",
+        "text": "Heute",
+        "expect": [
+          {
+            "kind": "text",
+            "text": "Verletzt – Pause",
+            "present": true
+          },
+          {
+            "kind": "text",
+            "text": "halbes Volumen",
+            "present": false
+          },
+          {
+            "kind": "todo",
+            "note": "Jimoh sieht in seiner App nicht, dass Jaime krank ist und die gemeinsame Einheit ausfällt (noch nicht gebaut)."
+          }
+        ]
+      }
+    ]
+  }
+]

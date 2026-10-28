@@ -13273,6 +13273,342 @@
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
         border: 1px solid rgba(255, 255, 255, 0.08);
       }
+      /* Coach unten und Fakten oben: nur das Element selbst, Glas ohne zusätzlichen Rand */
+      .s7-dock button,
+      .s7-dock .s7-gem,
+      .s7-dock .s7-chips button,
+      .s7-dock .s6-inp,
+      .s7-kn.s6-card {
+        border: 0 !important;
+        box-shadow: none !important;
+        background: rgba(255, 255, 255, 0.07) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(1.5);
+        backdrop-filter: blur(18px) saturate(1.5);
+      }
+      .s7-dock .s6-inp input {
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+      }
+      /* Senden-Knopf wird gold, sobald Text im Feld steht */
+      .s7-dock .s6-inp:has(input:not(:placeholder-shown)) button[type="submit"],
+      .s7-dock .s6-inp:has(input:not(:placeholder-shown)) button:last-child {
+        background: #e0bf6a !important;
+        color: #16181a !important;
+      }
+      /* Desktop: Reiter im Coach, Wochenleiste und Seitenspalte bei Heute bleiben stehen */
+      @media (min-width: 900px) {
+        .s6-coach > .s6-seg,
+        .s6-coach > .s6-hd {
+          position: sticky;
+          top: 0;
+          z-index: 5;
+        }
+        .s6-today .s6-rail,
+        .s6-today .s6-side {
+          position: sticky;
+          top: 16px;
+          align-self: start;
+        }
+        /* Rennprognose: Querformat, die Karte ist der Fokus */
+        .s6-rv-2 {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .s6-rv-2 .s7-pg {
+          order: -1;
+          grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1fr);
+          padding: 32px;
+        }
+        .s6-rv .s7-pg > details:first-of-type {
+          grid-column: 2;
+          grid-row: 1 / span 8;
+        }
+        .s6-rv .s7-pg > details:last-of-type {
+          grid-column: 3;
+          grid-row: 1 / span 8;
+        }
+      }
+      /* Rennprognose Desktop: kompakt, links Zusammenfassung, rechts die zwei Menüs untereinander */
+      @media (min-width: 900px) {
+        .s6-rv-2 .s7-pg {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          padding: 24px;
+          align-content: start;
+        }
+        .s6-rv .s7-pg > details:first-of-type {
+          grid-column: 2;
+          grid-row: 1;
+          align-self: start;
+        }
+        .s6-rv .s7-pg > details:last-of-type {
+          grid-column: 2;
+          grid-row: 2;
+          align-self: start;
+        }
+        .s6-rv .s7-pg > details:not(:first-of-type):not(:last-of-type) {
+          grid-column: 2;
+        }
+        .cc-tabs,
+        .s6-coach > .s6-seg {
+          position: sticky;
+          top: 0;
+          z-index: 6;
+          background: var(--bg, #06070a);
+        }
+      }
+      /* Coach: Apple-Glas, nur das Element, kein Rand */
+      .s7-dock,
+      .s7-dock *,
+      .s7-kn.s6-card {
+        border: 0 !important;
+        outline: 0;
+      }
+      .s7-dock button,
+      .s7-dock .s7-gem,
+      .s7-dock .s6-inp,
+      .s7-kn.s6-card {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)) !important;
+        -webkit-backdrop-filter: blur(28px) saturate(1.8);
+        backdrop-filter: blur(28px) saturate(1.8);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+      }
+      .s7-dock .s7-tx,
+      .s7-dock .s7-sw {
+        border-radius: 999px;
+        min-height: 36px;
+        padding: 0 14px;
+        text-decoration: none;
+        color: #f5f5f7;
+      }
+      /* Coach-Knöpfe und -Felder exakt wie die schwebende Menüleiste unten: dunkle Pille, weicher Schatten, kein Rand */
+      .s7-dock button,
+      .s7-dock .s7-gem,
+      .s7-dock .s6-inp,
+      .s7-kn.s6-card {
+        background: rgba(14, 16, 22, 0.88) !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+        border: 0 !important;
+        border-radius: 999px !important;
+      }
+      .s7-kn.s6-card {
+        border-radius: 999px !important;
+      }
+      @media (min-width: 900px) {
+        /* Coach Desktop: linke Spalte mit den Reitern bleibt beim Scrollen stehen */
+        .s6-cside {
+          position: sticky;
+          top: 16px;
+          align-self: start;
+        }
+      }
+      /* Coach: dunkle Pille wie die Menüleiste, dazu durchscheinend (Weichzeichner) */
+      .s7-dock button,
+      .s7-dock .s7-gem,
+      .s7-dock .s6-inp,
+      .s7-kn.s6-card,
+      .s6-coach .s6-seg,
+      .s6-cside button {
+        background: rgba(14, 16, 22, 0.55) !important;
+        -webkit-backdrop-filter: blur(22px) saturate(1.6) !important;
+        backdrop-filter: blur(22px) saturate(1.6) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+        border: 0 !important;
+      }
+      .s6-coach .s6-seg {
+        border-radius: 999px !important;
+      }
+      .s6-coach .s6-seg button {
+        background: transparent !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+      .s6-coach .s6-seg button.on {
+        background: rgba(255, 255, 255, 0.14) !important;
+      }
+      .s6-cside button {
+        border-radius: 999px !important;
+      }
+      .s7-kn.s6-card {
+        border-radius: 24px !important;
+      }
+      /* Chat-Leiste: «+» öffnet das Menü mit allem Zusätzlichen */
+      .s7-dock {
+        position: relative;
+      }
+      .s7-plus {
+        position: absolute;
+        left: 0;
+        bottom: 6px;
+        z-index: 8;
+      }
+      .s7-plus > summary {
+        list-style: none;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 26px;
+        cursor: pointer;
+        background: rgba(14, 16, 22, 0.55);
+        -webkit-backdrop-filter: blur(22px) saturate(1.6);
+        backdrop-filter: blur(22px) saturate(1.6);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      }
+      .s7-plus > summary::-webkit-details-marker {
+        display: none;
+      }
+      .s7-plus[open] > summary {
+        transform: rotate(45deg);
+      }
+      .s7-pm {
+        position: absolute;
+        left: 0;
+        bottom: 58px;
+        width: min(92vw, 360px);
+        max-height: 60vh;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+        border-radius: 24px;
+        background: rgba(14, 16, 22, 0.8);
+        -webkit-backdrop-filter: blur(22px) saturate(1.6);
+        backdrop-filter: blur(22px) saturate(1.6);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      }
+      .s7-pmr {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .s7-dock .s6-inp {
+        margin-left: 56px;
+      }
+      /* «+» sitzt im Eingabefeld; Menü als saubere Liste */
+      .s7-dock .s6-inp {
+        margin-left: 0 !important;
+        padding-left: 52px !important;
+      }
+      .s7-plus {
+        left: 8px !important;
+        bottom: 8px !important;
+      }
+      .s7-plus > summary {
+        width: 40px !important;
+        height: 40px !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+      }
+      .s7-pm {
+        left: 0 !important;
+        bottom: 64px !important;
+        gap: 0 !important;
+        padding: 6px !important;
+      }
+      .s7-pm .s7-pmr {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .s7-pm button,
+      .s7-pm a,
+      .s7-pm .s7-sw,
+      .s7-pm summary {
+        display: flex !important;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        min-height: 46px;
+        padding: 0 14px !important;
+        margin: 0 !important;
+        border: 0 !important;
+        border-radius: 14px !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        color: #f5f5f7;
+        font-size: 15px;
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .s7-pm > * + *,
+      .s7-pm .s7-pmr > * + * {
+        border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+      }
+      .s7-pm .s6-cnote,
+      .s7-pm .s7-note {
+        padding: 6px 14px;
+        font-size: 12px;
+        color: #9a9ba3;
+      }
+      .s7-pm .s7-gp {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+      }
+      .s7-pm .s7-gp textarea {
+        width: calc(100% - 28px);
+        margin: 4px 14px;
+      }
+      /* Plus-Knopf mittig; Menü mit Glas wie die übrigen Coach-Elemente */
+      .s7-plus > summary {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        padding: 0 0 3px !important;
+        background: rgba(255, 255, 255, 0.16) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+      }
+      .s7-pm {
+        background: rgba(14, 16, 22, 0.55) !important;
+        -webkit-backdrop-filter: blur(22px) saturate(1.6) !important;
+        backdrop-filter: blur(22px) saturate(1.6) !important;
+      }
+      /* Nur erklären wie die anderen Schnell-Knöpfe */
+      .s7-chips .s7-sw {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 36px;
+        padding: 0 14px;
+        border-radius: 999px;
+        background: rgba(14, 16, 22, 0.55);
+        -webkit-backdrop-filter: blur(22px) saturate(1.6);
+        backdrop-filter: blur(22px) saturate(1.6);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        border: 0;
+        color: #f5f5f7;
+      }
+      /* Alle Schnell-Knöpfe im Coach gleich gross; Menü mit sichtbarem Glas (heller Verlauf) */
+      .s7-chips button,
+      .s7-chips .s7-sw,
+      .s7-dock .s7-gem {
+        height: 40px !important;
+        min-height: 40px !important;
+        padding: 0 16px !important;
+        font-size: 14px !important;
+        line-height: 1 !important;
+        white-space: nowrap;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .s7-pm {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.08)) !important;
+        -webkit-backdrop-filter: blur(28px) saturate(1.8) !important;
+        backdrop-filter: blur(28px) saturate(1.8) !important;
+      }
       /* S6-CSS-END */
     </style>
   </head>
@@ -19793,14 +20129,14 @@
               : ""
             : `<button type="button" class="s7-tx" data-act="cc-copy">Anfrage kopieren</button><button type="button" class="s7-tx" data-act="gem-paste">Antwort einfügen</button>`,
           gem = `<a class="s7-gem" data-act="gem-open" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e0bf6a" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.6 5.4 3.6 8.4 9 9-5.4.6-8.4 3.6-9 9-.6-5.4-3.6-8.4-9-9 5.4-.6 8.4-3.6 9-9z"/></svg>Mit Gemini weiter diskutieren</a>`;
-        const gemBox = ready ? "" : `<details class="s7-gp"${ccGemOpen ? " open" : ""}><summary>Antwort aus Gemini übernehmen</summary><p class="s7-note">1. «Mit Gemini weiter diskutieren» tippen (Anfrage wird kopiert, in Gemini mit Strg+V einfügen). 2. Antwort in Gemini kopieren. 3. Hier einfügen und übernehmen. Sie steht dann im Chat und geht bei der nächsten Anfrage mit.</p><textarea id="gem-in" rows="5" placeholder="Antwort von Gemini hier einfügen"></textarea><button type="button" class="s6-btn gold" data-act="gem-take">Übernehmen</button></details>`;
+        const gemBox = ready ? "" : `<details class="s7-gp"${ccGemOpen ? " open" : ""}><summary>Antwort aus Gemini übernehmen</summary><p class="s7-note">Antwort in Gemini kopieren, hier einfügen, übernehmen.</p><textarea id="gem-in" rows="5" placeholder="Antwort von Gemini hier einfügen"></textarea><button type="button" class="s6-btn gold" data-act="gem-take">Übernehmen</button></details>`;
         const info = `<aside class="s6-cinfo">${knD}${ready ? "" : `<p class="s6-cnote">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`}${sw}${gem}<span class="s7-clr">${clr}</span></aside>`;
         const qr = [
           ["Erklär die Einheit", "Erkläre mir die heutige Einheit.", "explain"],
           ["Zu müde heute", "Ich bin heute zu müde fürs Training.", ""],
           ["Knie zwickt", "Mein Knie zwickt. Was soll ich ändern?", ""],
         ];
-        const chips = `<div class="s7-chips" role="group" aria-label="Schnellfragen">${qr.map(([l, q, m]) => `<button type="button" data-act="cc-quick" data-q="${esc(q)}" data-m="${m}" ${ccBusy ? "disabled" : ""}>${l}</button>`).join("")}${[
+        const chips = `<div class="s7-chips" role="group" aria-label="Schnellfragen"><span class="s6-m">${sw}</span>${qr.map(([l, q, m]) => `<button type="button" data-act="cc-quick" data-q="${esc(q)}" data-m="${m}" ${ccBusy ? "disabled" : ""}>${l}</button>`).join("")}${[
           ["sore", "Muskelkater"],
           ["move", "Umplanen"],
           ["inj", "Verletzt / krank"],
@@ -19811,8 +20147,10 @@
           )
           .join("")}</div>`;
         const inp = `<form class="s6-cin" data-form="coach">${chips}<div class="s6-inp"><label for="cc-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Nachricht an den Coach</label><input id="cc-in" type="text" maxlength="${coach.MAX_MSG}" value="${esc(ccDraft)}" placeholder="${ccExplain ? "Was soll ich dir erklären?" : "z. B. „Knie zwickt seit gestern“"}" autocomplete="off" enterkeyhint="send" ${ccBusy ? "disabled" : ""}><button type="submit" aria-label="${ready ? "Senden" : "Vorbereiten"}" ${ccBusy ? "disabled" : ""}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div></form>`;
-        const dock = `<div class="s7-dock"><div class="s7-tg s6-m">${sw}${clr}</div>${gem.replace('class="s7-gem"', 'class="s7-gem s6-m"')}${inp}</div>`;
-        return `<div class="s6 s6-coach is-chat">${head}${kn}${side}<section class="s6-cmain s6-chatc" aria-label="Chat">${off}<div class="s6-msgs" id="chat">${s6CoachMsgs()}</div>${ready ? "" : `<p class="s6-cnote m">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`}${gemBox}${dock}</section>${info}</div>`;
+        const cnote = ready ? "" : `<p class="s6-cnote m">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`;
+        // Alles Zusätzliche (Nur erklären, Verlauf, Gemini, Hinweise) steckt hinter dem «+» in der Chat-Leiste
+        const dock = `<div class="s7-dock"><details class="s7-plus"><summary aria-label="Mehr">+</summary><div class="s7-pm"><div class="s6-m s7-pmr">${clr}</div>${gem.replace('class="s7-gem"', 'class="s7-gem s6-m"')}${cnote}${gemBox}</div></details>${inp}</div>`;
+        return `<div class="s6 s6-coach is-chat">${head}${kn}${side}<section class="s6-cmain s6-chatc" aria-label="Chat">${off}<div class="s6-msgs" id="chat">${s6CoachMsgs()}</div>${dock}</section>${info}</div>`;
       }
       /* ---- Dashboard ---- */
       function s6Ring(frac, col, inner, label, aria, t) {
@@ -19843,7 +20181,7 @@
             `<div class="tr"><span>${l}${extra ? ` <small>${extra}</small>` : ""}</span><b>${mmss(v)}</b></div>`;
           // Nachrechnen: alle Zwischenwerte der Prognose, damit man sie gegen die eigenen Zeiten prüfen kann
           const SN = ["SkiErg", "Sled Push", "Sled Pull", "Burpee Broad Jumps", "RowErg", "Farmers Carry", "Sandbag Lunges", "Wall Balls"];
-          const wide = matchMedia("(min-width: 900px)").matches ? " open" : ""; // Desktop: Rechenweg und Stationen gleich sichtbar
+          const wide = ""; // zugeklappt: Karte ist nur so gross wie nötig
           const calc = `<details class="s7-det"${wide}><summary>So wird gerechnet<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
             <p class="s7-note">Gesamt = Laufen + Stationen + Roxzone. Läufe: Pacing-Test-Schnitt (${mmss(Math.round(fc.T))} /km) plus Ermüdungsaufschlag (Stufe «${esc(fc.level)}»), ab Lauf 5 kommt Tempoverlust dazu.</p>
             <div class="cap">Laufen · 8 × 1 km</div>${(fc.paces || []).map((p, r) => `<div class="tr"><span>Lauf ${r + 1}</span><b>${mmss(Math.round(p))}</b></div>`).join("")}<div class="tr"><span><b>Summe Laufen</b></span><b>${mmss(fc.run)}</b></div>
@@ -19851,7 +20189,7 @@
             <div class="cap">Roxzone und Wechsel</div><div class="tr"><span>Pauschale je Stufe</span><b>${mmss(fc.rox)}</b></div>
             <div class="cap">Gesamt</div><div class="tr"><span><b>${mmss(fc.run)} + ${mmss(stSum)} + ${mmss(fc.rox)}</b></span><b>${mmss(fc.total)}</b></div>
             ${(fc.basis || []).map((b) => `<p class="s7-note">${esc(b)}</p>`).join("")}${(fc.warnings || []).map((b) => `<p class="s7-note">⚠ ${esc(b)}</p>`).join("")}</details>`;
-          const wide0 = matchMedia("(min-width: 900px)").matches ? " open" : "";
+          const wide0 = "";
           const det = bd
             ? `<details class="s7-det"${wide0}><summary>Details je Station<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>${bd.rows
                 .slice(1, 9)

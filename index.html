@@ -12904,6 +12904,375 @@
           box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
         }
       }
+      /* Regeln für alle Runden (Handy): drei Zeilen statt drei enger Kacheln, nichts bricht mehr um */
+      @media (max-width: 599px) {
+        .s7-rules .s7-g3 {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+        .s7-rules .s7-well {
+          flex-direction: row;
+          align-items: baseline;
+          gap: 12px;
+          padding: 12px 16px;
+        }
+        .s7-rules .s7-well .s6-kick {
+          flex: 0 0 72px;
+        }
+        .s7-rules .s7-well b {
+          margin-top: 0;
+        }
+      }
+      /* Fokusmodus: Text auf den goldenen Knöpfen schwarz (#focus button erbte sonst Weiss) */
+      #focus .f7-ok,
+      #focus .f7-go {
+        color: #16181a;
+      }
+      #focus .f7-ok.on {
+        color: #fff;
+      }
+      /* Schlaf-Karte: Schnitt unter den Kennzahlen, Phasen als 2×2 */
+      .lstats .sl-avg {
+        margin-top: 2px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .sl-bar {
+        height: 16px;
+      }
+      .sl-leg {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px 14px;
+        font-size: 13px;
+      }
+      /* Erledigte Einheit: kleine Karte, die nächste Einheit steht darunter im Fokus */
+      .s7-fin.s6-hero {
+        padding: 12px 16px;
+        gap: 6px;
+      }
+      .s7-fin .s6-title,
+      .s7-fin .s6-title-d h1 {
+        font-size: 24px;
+        line-height: 1.1;
+      }
+      .s7-fin .s7-fl {
+        margin: 0;
+        font-size: 14px;
+        color: #9a9ba3;
+      }
+      .s7-fin .s7-fl b {
+        color: #f5f5f7;
+        font-weight: 600;
+      }
+      .s7-fin .s7-fa .s6-btn {
+        min-height: 40px;
+      }
+      .s7-nxl {
+        margin: 8px 4px -4px;
+      }
+      /* Abschluss-Sheet: je Übung «Streichen» (Übung entfällt, zählt nicht als offen) */
+      .it-l .it-w {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .it-l .it-w:first-child {
+        border-top: 0;
+      }
+      .it-l .it-w .it {
+        flex: 1;
+        min-width: 0;
+        border-top: 0;
+      }
+      .it-l .it-x {
+        flex: none;
+        min-height: 36px;
+        padding: 0 12px;
+        border: 0;
+        border-radius: 999px;
+        background: #161922;
+        color: #9a9ba3;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .it-l .it-w.sk .tx {
+        text-decoration: line-through;
+        opacity: 0.55;
+      }
+      /* Heute (Handy): Regeln und Übungsliste als Akkordeon */
+      .s7-acc > summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 48px;
+        padding: 0 16px;
+        margin: 8px 0;
+        border-radius: 14px;
+        background: #161922;
+        font-weight: 600;
+        cursor: pointer;
+        list-style: none;
+      }
+      .s7-acc > summary::-webkit-details-marker {
+        display: none;
+      }
+      .s7-acc > summary::after {
+        content: "▾";
+        color: #9a9ba3;
+      }
+      .s7-acc[open] > summary::after {
+        content: "▴";
+      }
+      .s7-acc > summary em {
+        margin-left: auto;
+        margin-right: 10px;
+        font-style: normal;
+        color: #9a9ba3;
+        font-weight: 500;
+      }
+      @media (min-width: 900px) {
+        .s7-acc > summary {
+          display: none;
+        }
+      }
+      /* Woche: Ring-Karte mit kleinerer Schrift, damit alles Platz hat */
+      .s6-ring-c b {
+        font-size: 24px;
+      }
+      .s6-ring-r span {
+        font-size: 12px;
+      }
+      .s6-ring-r b {
+        font-size: 16px;
+      }
+      /* Coach: Kopf und Fakten bleiben stehen, nur der Chat scrollt */
+      @media (max-width: 899px) {
+        .s6-coach.is-chat > .s6-hd,
+        .s6-coach.is-chat > .s7-kn {
+          position: sticky;
+          top: 0;
+          z-index: 5;
+          background: var(--bg, #06070a);
+        }
+      }
+      @media (min-width: 900px) {
+        .s6-coach.is-chat .s6-cinfo {
+          position: sticky;
+          top: 16px;
+          align-self: start;
+        }
+      }
+      /* Woche, Einheit im Detail: klare Stufen (Nummer, Titel, Details, Zeit) */
+      .s6-wk-det .rows > .s7-wr {
+        display: grid;
+        grid-template-columns: 28px 1fr auto;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        min-height: 56px;
+      }
+      .s7-wr .n {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #161922;
+        color: #9a9ba3;
+        font-size: 13px;
+        display: grid;
+        place-items: center;
+      }
+      .s7-wr .m {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .s7-wr .m b {
+        font-size: 16px;
+        font-weight: 600;
+        color: #f5f5f7;
+      }
+      .s7-wr .m small {
+        font-size: 13px;
+        color: #9a9ba3;
+      }
+      .s7-wr .v {
+        font-family: var(--f-head);
+        font-size: 24px;
+        font-weight: 600;
+        color: #f5f5f7;
+      }
+      .s6-wk-det .rows > .s7-rules {
+        display: block;
+        margin-bottom: 8px;
+      }
+      /* Splits eintragen: Kacheln wie im Fokusmodus (Farbbalken je Art, Titel, Ziel) */
+      .f7-spr {
+        position: relative;
+        padding-left: 18px;
+        border-radius: 16px;
+        background: #161922;
+        margin-bottom: 8px;
+        border-top: 0;
+      }
+      .f7-spr .bar {
+        position: absolute;
+        left: 8px;
+        top: 12px;
+        bottom: 12px;
+        width: 4px;
+        border-radius: 2px;
+        background: var(--c, #9a9ba3);
+      }
+      .f7-spr .nm {
+        font-size: 17px;
+        font-weight: 600;
+      }
+      /* Coach-Chat: Seite steht still, nur die Nachrichten scrollen (Eingabe bleibt unten) */
+      .s6-coach.is-chat .s6-cmain.s6-chatc {
+        display: flex;
+        flex-direction: column;
+        height: calc(100dvh - 150px);
+        min-height: 0;
+      }
+      .s6-coach.is-chat .s6-cmain.s6-chatc .s6-msgs {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+      }
+      @media (max-width: 899px) {
+        .s6-coach.is-chat .s6-cmain.s6-chatc {
+          height: calc(100dvh - 330px);
+        }
+      }
+      /* Regeln (Handy): Text mittig in der Zeile */
+      .s7-rules .s7-well {
+        align-items: center !important;
+      }
+      /* Rennprognose im Rückblick: mehr Luft */
+      .s6-rv .s7-pg {
+        padding: 24px 20px;
+        gap: 20px;
+      }
+      .s6-rv .s7-pg .rows {
+        gap: 12px;
+      }
+      .s6-rv .s7-pg .tr {
+        min-height: 44px;
+        padding: 6px 0;
+      }
+      .s6-rv .s7-pg .s7-note {
+        margin: 8px 0;
+        line-height: 22px;
+      }
+      /* Übungen anpassen: eine Zeile je Übung */
+      .ed-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 6px 0 12px;
+        counter-reset: ed;
+      }
+      .ed-r {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        counter-increment: ed;
+      }
+      .ed-r .n::before {
+        content: counter(ed);
+      }
+      .ed-r .n {
+        flex: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #161922;
+        color: #9a9ba3;
+        font-size: 13px;
+        display: grid;
+        place-items: center;
+      }
+      .ed-li {
+        flex: 1;
+        min-width: 0;
+      }
+      .ed-x {
+        flex: none;
+        width: 40px;
+        height: 40px;
+        border: 0;
+        border-radius: 50%;
+        background: #161922;
+        color: #9a9ba3;
+        font-size: 22px;
+        cursor: pointer;
+      }
+      .s7-gp {
+        background: #161922;
+        border-radius: 14px;
+        padding: 12px 16px;
+        margin: 8px 0;
+      }
+      .s7-gp > summary {
+        cursor: pointer;
+        font-weight: 600;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+      }
+      .s7-gp textarea {
+        width: 100%;
+        margin: 8px 0;
+      }
+      /* Wochenrückblick, Desktop: Prognose nutzt die Breite (Zahl und Balken links, Rechenweg rechts) */
+      @media (min-width: 900px) {
+        .s6-rv-2 {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+          align-items: start;
+        }
+        .s6-rv .s7-pg {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          column-gap: 40px;
+          align-items: start;
+        }
+        .s6-rv .s7-pg > * {
+          grid-column: 1;
+        }
+        .s6-rv .s7-pg > details {
+          grid-column: 2;
+        }
+        .s6-rv .s7-pg > details:first-of-type {
+          grid-row: 1 / span 6;
+        }
+      }
+      /* Coach: Scrollbalken des Chats ausblenden, unten nur Glas-Knöpfe ohne schwarzen Hintergrund */
+      .s6-coach .s6-msgs {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .s6-coach .s6-msgs::-webkit-scrollbar {
+        display: none;
+      }
+      .s7-dock {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        backdrop-filter: none !important;
+      }
+      .s7-dock button,
+      .s7-dock .s7-gem,
+      .s7-dock .s7-chips button,
+      .s7-dock .s6-inp {
+        background: rgba(255, 255, 255, 0.08) !important;
+        -webkit-backdrop-filter: blur(16px) saturate(1.4);
+        backdrop-filter: blur(16px) saturate(1.4);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
       /* S6-CSS-END */
     </style>
   </head>
@@ -13189,6 +13558,7 @@
       import { makeBackup, backupFileName, readBackup } from "./src/backup.js";
       import * as coach from "./src/coach.js";
       import { canSolo, soloize } from "./src/solo.js";
+      import { tidyDay } from "./src/split.js";
       import {
         EXTRA_TYPES,
         makeExtra,
@@ -13476,7 +13846,8 @@
             n: ed.n || "",
             edited: 1,
           });
-        return p;
+        // Titel «Compromised Running» ohne Kraft; Zeilen mit « → » ab Plantag 16 in zwei Zeilen teilen (nicht bei eigener Anpassung)
+        return tidyDay(p, src, !!(ed && p.k !== "rest"));
       }
       function dayPlan(i) {
         if (i < 0 || i > LAST) return null;
@@ -14928,16 +15299,11 @@
             `<div class="hint">Dieser Tag ist wegen Verletzung angepasst.</div>
     <div class="btns"><button class="btn" data-act="restore">Für diesen Tag aufheben</button><button class="btn" data-act="cc-tab" data-tab="inj">Verletzung verwalten →</button></div>`
           );
-        if (!rest) {
-          h += `<div class="cap">Übungen ändern</div>
-      <button class="btn" data-edit="${i}">Übungen anpassen →</button>`;
-          h += `<div class="cap">Keine Zeit gehabt?</div>
-      <button class="btn ${S.skip[dk] ? "" : "primary"}" data-act="skip">${S.skip[dk] ? "Doch nicht ausgefallen" : "Als ausgefallen markieren"}</button>`;
-        }
-        h += `<div class="cap">Ohne Ziehen verschieben</div>
-    <div class="btns"><button id="shelf-step-prev" class="btn" data-act="shelf-step" data-d="-1" ${shelfOk(i, i - 1) ? "" : "disabled"}>${rest ? "‹ Einheit von gestern hierher" : "‹ Einen Tag früher"}</button><button id="shelf-step-next" class="btn" data-act="shelf-step" data-d="1" ${shelfOk(i, i + 1) ? "" : "disabled"}>${rest ? "Einheit von morgen hierher ›" : "Einen Tag später ›"}</button></div>
-    <p class="sub mt-2">„Hart auf hart“ heisst: Danach lägen zwei harte Einheiten direkt hintereinander. Das geht, ist aber nicht ideal; nach dem Tausch bietet die App an, den späteren Tag zu entlasten.</p>`;
-        h += `<div class="cap">Verletzt oder krank?</div><button class="btn" data-act="inj-from">Ab diesem Tag anpassen →</button>`;
+        // Wenige Knöpfe: Tag verschieben (früher/später), darunter Übungen anpassen und ausfallen lassen.
+        // «Verletzt oder krank?» entfällt, dafür gibt es den Reiter «Verletzt».
+        h += `<div class="cap">Verschieben</div><div class="btns"><button id="shelf-step-prev" class="btn" data-act="shelf-step" data-d="-1" ${shelfOk(i, i - 1) ? "" : "disabled"}>${rest ? "‹ Einheit von gestern hierher" : "‹ Einen Tag früher"}</button><button id="shelf-step-next" class="btn" data-act="shelf-step" data-d="1" ${shelfOk(i, i + 1) ? "" : "disabled"}>${rest ? "Einheit von morgen hierher ›" : "Einen Tag später ›"}</button></div>`;
+        if (!rest)
+          h += `<div class="btns mt-2"><button class="btn" data-edit="${i}">Übungen anpassen</button><button class="btn" data-act="skip">${S.skip[dk] ? "Doch nicht ausgefallen" : "Ausfallen lassen"}</button></div>`;
         if (S.sched[i])
           h += `<div class="cap">Änderung rückgängig</div><button class="btn" data-act="restore">Original wiederherstellen</button>`;
         return h;
@@ -15102,6 +15468,12 @@
         return h;
       }
 
+      /* Übungsliste im Bearbeiten-Bildschirm: versteckte Textarea #ed-i (eine Übung pro Zeile) bleibt mit den Eingabefeldern synchron */
+      const edSync = () => {
+        const ta = document.getElementById("ed-i");
+        if (ta) ta.value = [...document.querySelectorAll(".ed-li")].map((x) => x.value.trim()).filter(Boolean).join(String.fromCharCode(10));
+      };
+      document.addEventListener("input", (e) => e.target.classList && e.target.classList.contains("ed-li") && edSync());
       let editFrom = null,
         editBack = null; // editBack: zurück in den Coach statt zur Tagesansicht
       function vEdit() {
@@ -15111,7 +15483,10 @@
         return `<div class="narrow">${vhead("Übungen anpassen", `${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))} · „Nur für mich“ oder „Für alle“`, true)}
     <div class="card k-${p.k}">
       <label class="lbl" for="ed-t">Titel</label><input type="text" id="ed-t" value="${esc(p.t)}">
-      <label class="lbl" for="ed-i">Übungen – eine pro Zeile</label><textarea id="ed-i" rows="8" style="min-height:190px">${esc(p.i.join("\n"))}</textarea>
+      <span class="lbl">Übungen</span>
+      <div id="ed-list" class="ed-list">${p.i.map((t) => `<div class="ed-r"><span class="n"></span><input type="text" class="ed-li" value="${esc(t)}" aria-label="Übung"><button type="button" class="ed-x" data-act="ed-del" aria-label="Übung löschen">×</button></div>`).join("")}</div>
+      <button type="button" class="btn" data-act="ed-add">＋ Übung hinzufügen</button>
+      <textarea id="ed-i" hidden>${esc(p.i.join("\n"))}</textarea>
       <label class="lbl" for="ed-n">Hinweis</label><textarea id="ed-n">${esc(p.n)}</textarea>
       <div class="btns"><button class="btn primary" data-act="edit-save">Nur für mich speichern</button>
       ${S.edit[src] ? `<button class="btn" data-act="edit-reset">Meine Änderung zurücksetzen</button>` : ""}</div>
@@ -16231,7 +16606,7 @@
         ];
         const tot = PH.reduce((a, [k]) => a + (n[k] || 0), 0);
         let h = `<div class="card"><div class="row between"><h3>Letzte Nacht</h3><span class="sub">${dmy(last)}${n.bed && n.wake ? ` · ${n.bed} – ${n.wake}` : ""}</span></div>
-    <div class="lstats l3 mt-2"><div><span>Dauer</span><b>${one(n.sleepH)} h</b></div><div><span>Score</span><b>${n.sleepScore ?? "–"}</b></div><div><span>Tiefschlaf</span><b>${hm(n.deep)}</b></div></div>`;
+    <div class="lstats l2 mt-2"><div><span>Dauer</span><b>${one(n.sleepH)} h</b><span class="sl-avg" data-avg="sleepH"></span></div><div><span>Score</span><b>${n.sleepScore ?? "–"}</b><span class="sl-avg" data-avg="sleepScore"></span></div></div>`;
         if (tot)
           h += `<div class="sl-bar mt-3" role="img" aria-label="Schlafphasen">${PH.filter(
             ([k]) => n[k],
@@ -16253,7 +16628,10 @@
           const v = avg(k, list);
           return v == null ? "–" : fmtf(v);
         };
-        h += `<p class="sub mt-3">Ø 7 Nächte: <b>${a("sleepH", w7, (v) => one(v) + " h")}</b> · Score ${a("sleepScore", w7, (v) => Math.round(v))} · Tief ${a("deep", w7, hm)} · REM ${a("rem", w7, hm)}</p>`;
+        // Dauer und Score tragen ihren 7-Nächte-Schnitt direkt darunter (kein zweites «Dauer» im Fliesstext)
+        h = h
+          .replace('<span class="sl-avg" data-avg="sleepH"></span>', `<span class="sl-avg">Ø 7 Nächte ${a("sleepH", w7, (v) => one(v) + " h")}</span>`)
+          .replace('<span class="sl-avg" data-avg="sleepScore"></span>', `<span class="sl-avg">Ø 7 Nächte ${a("sleepScore", w7, (v) => Math.round(v))}</span>`);
         h += `<button class="btn ghost sm mt-2" data-act="sleep-open" aria-expanded="${sleepOpen}">${sleepOpen ? "Weniger anzeigen" : "Details und alle Nächte"}</button>`;
         if (!sleepOpen) return h + `</div>`;
         const night = [
@@ -17047,8 +17425,18 @@
           scrollChat();
         }
       }
+      /* Anfrage für einen externen Chat (Gemini): lesbarer Text mit Stand, Verlauf und Frage */
+      function coachPrompt(req) {
+        const hist = (req.history || []).map((m) => (m.role === "user" ? "Ich: " : "Coach: ") + m.content).join("\n");
+        return (
+          "Du bist mein HYROX-Coach (Basel 2027, Ziel unter 60:00, Doubles Men PRO). Antworte auf Deutsch, knapp und konkret. Ändere nichts am Plan von dir aus, schlage nur vor.\n\n" +
+          "Mein Stand (JSON):\n" + JSON.stringify(req.context) + "\n\n" +
+          (hist ? "Bisheriger Verlauf:\n" + hist + "\n\n" : "") +
+          "Meine Frage:\n" + req.message
+        );
+      }
       function copyCoach(req) {
-        const txt = JSON.stringify(req, null, 1);
+        const txt = coachPrompt(req);
         if (navigator.clipboard)
           navigator.clipboard.writeText(txt).then(
             () => toast("Anfrage kopiert"),
@@ -17056,9 +17444,14 @@
           );
         else prompt("Anfrage:", txt);
       }
+      let ccGemOpen = false;
       const scrollChat = () => {
-        const f = document.querySelector("[data-form=coach]");
-        if (f) f.scrollIntoView({ block: "end" });
+        const m = document.querySelector(".s6-msgs");
+        if (m) m.scrollTop = m.scrollHeight;
+        else {
+          const f = document.querySelector("[data-form=coach]");
+          if (f) f.scrollIntoView({ block: "end" });
+        }
       };
 
       /* ---------- Geteilte Woche (Lese-Link, nur Anzeige) ---------- */
@@ -18819,6 +19212,17 @@
             subs: [`${m[2]} frisch, ohne Station`],
             val: m[3],
           };
+        // Aufgeteilte Runden (src/split.js): Station und Lauf stehen als zwei Zeilen
+        if ((m = /^Runde (\d+):\s*(\d+(?:,\d+)?)\s*km\s*@\s*(\d+:\d\d)\s*\/km(?:\s*\((\d+:\d\d)\))?(?:,\s*(.+))?$/.exec(t)))
+          return {
+            title: `Runde ${m[1]} · Lauf`,
+            subs: [[s7Pace(`${m[2]} km @ ${m[3]}/km`), m[5]].filter(Boolean).join(" · ")],
+            val: m[4] || "",
+          };
+        if ((m = /^Runde (\d+):\s*(.+?)\s*\(([^)]*)\)$/.exec(t)) && !/\bkm\b/.test(m[2])) {
+          const r = s7Row(`Runde ${m[1]}: ${m[2]} (${m[3]}) → ·`); // Stationszeile wie bisher, ohne den angehängten Lauf
+          return { ...r, subs: r.subs.slice(0, 1) };
+        }
         if ((m = /^Runde (\d+):\s*(.+?)\s*\(([^)]*)\)\s*→\s*(.+)$/.exec(t))) {
           const hm = /^(.*?)\s+(\d[\d,.]*\s?m)(?:\s+mit\s+(\d+\s?kg))?$/.exec(
               m[2],
@@ -19021,11 +19425,34 @@
           });
         const card = `<article class="s6-hero s7-fin" data-day="${i}"><div class="s6-hero-top"><span class="s6-chip"><i style="background:var(--${p.k})"></i>${S6_KIND[p.k] || p.k}</span><span class="s7-okt">${S7_CHECK}Erledigt</span></div>
         <h2 class="s6-title">${esc(s7Title(p.t))}</h2><div class="s6-title-d"><h1>${esc(s7Title(p.t))}</h1></div>
-        <div class="s7-g2"><div class="s7-well"><span class="s6-kick">Übungen</span><b>${st.done} <small>von ${st.n}</small></b></div><div class="s7-well"><span class="s6-kick">Anstrengung</span><b>${rpe != null ? rpe : "–"} <small>von 10</small></b></div></div>
+        <p class="s7-fl"><b>${st.done - p.i.filter((_, j) => S.xs[dk + "|" + j]).length}</b> von ${st.n} Übungen${p.i.some((_, j) => S.xs[dk + "|" + j]) ? ` · ${p.i.filter((_, j) => S.xs[dk + "|" + j]).length} gestrichen` : ""} · Anstrengung <b>${rpe != null ? rpe : "–"}</b> von 10</p>
         ${open.length ? `<p class="s7-fp">Nicht gemacht: ${esc(open.join(", "))}.${can ? " Die offenen Übungen kannst Du verschieben." : ""}</p>` : ""}
         <div class="s7-fa">${can ? `<button type="button" class="s6-btn" data-act="later" data-i="${i}">Offene verschieben</button>` : ""}<button type="button" class="s6-btn" data-act="all-done" data-i="${i}">Ändern</button></div></article>`;
-        const wk = `<section class="s6-card s7-fw"><div><span class="s6-kick">Woche ${w + 1}</span><b>${D.ok} <small>/ ${D.plan} Einheiten</small></b></div>${nx ? `<div class="r"><span class="s6-kick">Als Nächstes</span><span>${esc(nx)}</span></div>` : ""}</section>`;
-        return card + wk;
+        const wk = `<section class="s6-card s7-fw"><div><span class="s6-kick">Woche ${w + 1}</span><b>${D.ok} <small>/ ${D.plan} Einheiten</small></b></div></section>`;
+        return card;
+      }
+      /* Hero-Karte einer Einheit (Titel, Regeln, Übungen, Aktionen). Auch für «Als Nächstes» unter der erledigten Einheit. */
+      function s7HeroHtml(i, p, dk, isT) {
+        const lab = S6_KIND[p.k] || p.k,
+          rules = s7Rules(p),
+          rows = (p.i || [])
+            .map((t, j) => {
+              if (rules.skip.has(j)) return "";
+              const id = dk + "|" + j,
+                on = !!S.done[id],
+                r = s7Row(t);
+              return `<li class="${on ? "done" : ""}"><label><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span class="c" aria-hidden="true">${S7_CHECK}</span><span class="m"><span class="t">${s6Norm(r.title)}</span>${r.subs.map((x) => `<span class="s">${s6Norm(x)}</span>`).join("")}</span>${r.val ? `<span class="d num">${s6Norm(r.val)}</span>` : ""}</label></li>`;
+            })
+            .join(""),
+          cnt = (p.i || []).length - rules.skip.size;
+        return `<article class="s6-hero${isT ? " is-today" : ""}" style="--kc:var(--${p.k})" data-day="${i}">
+        <div class="s6-hero-top"><span class="s6-chip"><i style="background:var(--${p.k})"></i>${lab}</span>${cnt ? `<span class="s7-cnt">${cnt} ${p.k === "kraft" ? "Blöcke" : cnt === 1 ? "Schritt" : "Schritte"}</span>` : ""}<span class="s6-kick s6-kick-d">${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))}${isT ? " · Heute" : ""}</span></div>
+        <h2 class="s6-title">${esc(s7Title(p.t))}</h2>
+        <div class="s6-title-d"><h1>${esc(s7Title(p.t))}</h1></div>
+        ${dayWarn(i, p)}
+        ${rules.html ? `<details class="s7-acc"${matchMedia("(max-width: 899px)").matches ? "" : " open"}><summary>Regeln für alle Runden</summary>${rules.html}</details>` : ""}
+        <ol class="s6-ol">${rows}</ol>
+        <div class="s6-acts"><button type="button" class="s6-btn gold" data-fc="start" data-i="${i}">Fokusmodus starten</button><button type="button" class="s6-btn s6-er" data-act="all-done" data-i="${i}">Erledigt</button><i class="s6-brk" aria-hidden="true"></i><button type="button" class="s6-btn s6-vs" data-move="${i}">Verschieben</button><button type="button" class="s6-btn s6-st" data-act="off" data-i="${i}">Streichen</button></div></article>`;
       }
       function s6Today() {
         const i = sel != null ? sel : Math.max(0, Math.min(LAST, TODAY)),
@@ -19085,33 +19512,20 @@
         else if (!simple) {
           hero = finCard || sessionCard(i);
           if (finCard) {
-            const had = doneOpen.has(i);
-            doneOpen.add(i);
-            const sc = sessionCard(i);
-            if (!had) doneOpen.delete(i);
-            more = `<details class="s6-more"><summary>Übungen, Werte und Details</summary><div class="s6-more-b">${sc}</div></details>`;
+            // Erledigt: kleine Karte, darunter die nächste Einheit im Fokus. Werte ändern geht über «Ändern» (Abschluss-Sheet),
+            // darum entfällt der Block «Übungen, Werte und Details» (er zeigte dasselbe doppelt).
+            if (isT) {
+              let nxI = -1;
+              for (let x = i + 1; x <= Math.min(LAST, i + 14); x++) {
+                const q = dayPlan(x);
+                if (q && q.k !== "rest" && !trained(x) && !S.off[keyI(x)] && !S.later[keyI(x)]) { nxI = x; break; }
+              }
+              if (nxI >= 0)
+                hero += `<div class="s7-nxl"><span class="s6-kick">Als Nächstes · ${DAYSF[dow(nxI)]}, ${fmt(dateFromIdx(nxI))}</span></div>${s7HeroHtml(nxI, dayPlan(nxI), keyI(nxI), false)}`;
+            }
           }
         } else {
-          const lab = S6_KIND[p.k] || p.k,
-            rules = s7Rules(p),
-            rows = (p.i || [])
-              .map((t, j) => {
-                if (rules.skip.has(j)) return "";
-                const id = dk + "|" + j,
-                  on = !!S.done[id],
-                  r = s7Row(t);
-                return `<li class="${on ? "done" : ""}"><label><input type="checkbox" data-c="${id}" ${on ? "checked" : ""}><span class="c" aria-hidden="true">${S7_CHECK}</span><span class="m"><span class="t">${s6Norm(r.title)}</span>${r.subs.map((x) => `<span class="s">${s6Norm(x)}</span>`).join("")}</span>${r.val ? `<span class="d num">${s6Norm(r.val)}</span>` : ""}</label></li>`;
-              })
-              .join(""),
-            cnt = (p.i || []).length - rules.skip.size;
-          hero = `<article class="s6-hero${isT ? " is-today" : ""}" style="--kc:var(--${p.k})" data-day="${i}">
-        <div class="s6-hero-top"><span class="s6-chip"><i style="background:var(--${p.k})"></i>${lab}</span>${cnt ? `<span class="s7-cnt">${cnt} ${p.k === "kraft" ? "Blöcke" : cnt === 1 ? "Schritt" : "Schritte"}</span>` : ""}<span class="s6-kick s6-kick-d">${DAYSF[dow(i)]}, ${fmt(d)}${isT ? " · Heute" : ""}</span></div>
-        <h2 class="s6-title">${esc(s7Title(p.t))}</h2>
-        <div class="s6-title-d"><h1>${esc(s7Title(p.t))}</h1></div>
-        ${rules.html}
-        ${dayWarn(i, p)}
-        <ol class="s6-ol">${rows}</ol>
-        <div class="s6-acts"><button type="button" class="s6-btn gold" data-fc="start" data-i="${i}">Fokusmodus starten</button><button type="button" class="s6-btn s6-er" data-act="all-done" data-i="${i}">Erledigt</button><i class="s6-brk" aria-hidden="true"></i><button type="button" class="s6-btn s6-vs" data-move="${i}">Verschieben</button><button type="button" class="s6-btn s6-st" data-act="off" data-i="${i}">Streichen</button></div></article>`;
+          hero = s7HeroHtml(i, p, dk, isT);
           /* Gewichte, Splits und Zeiten trägt man im Abschluss (Erledigt oder Ende des Fokusmodus) ein */
           const soreBtn = isT
             ? `<button class="btn ghost sm" data-act="sore-open">Muskelkater genau eintragen →</button>`
@@ -19167,14 +19581,20 @@
         if (i < TODAY && !trained(i)) return { t: "✕ Verpasst", c: "miss" };
         return { t: "Geplant", c: "" };
       }
-      const s6Rows = (p) =>
-        (p.i || [])
-          .map((t) => {
-            const m = /^(\d+)\s*[′']\s*(.*)$/.exec(t),
-              it = s6Item(t);
-            return `<div><span>${m ? esc(m[2]) : s6Norm(t)}</span><span>${m ? m[1] + "′" : it.timed ? Math.round(it.tot) + "′" : ""}</span></div>`;
+      /* Einheit in der Wochenansicht wie im Fokusmodus: Regeln als Kacheln, dann je Schritt Nummer, Titel, Details und Zeit */
+      const s6Rows = (p) => {
+        const rl = s7Rules(p);
+        let n = 0;
+        const rows = (p.i || [])
+          .map((t, j) => {
+            if (rl.skip.has(j)) return "";
+            const r = s7Row(t);
+            n++;
+            return `<div class="s7-wr"><span class="n">${n}</span><span class="m"><b>${s6Norm(r.title)}</b>${r.subs.map((x) => `<small>${s6Norm(x)}</small>`).join("")}</span><span class="v">${esc(r.val || "")}</span></div>`;
           })
           .join("");
+        return rl.html + rows;
+      };
       function s6Week() {
         const info = weekInfo(wk),
           blk =
@@ -19371,8 +19791,9 @@
             ? S.chat.length
               ? `<button type="button" class="s7-tx" data-act="cc-clear">Verlauf löschen</button>`
               : ""
-            : `<button type="button" class="s7-tx" data-act="cc-copy">Anfrage kopieren</button>`,
-          gem = `<a class="s7-gem" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e0bf6a" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.6 5.4 3.6 8.4 9 9-5.4.6-8.4 3.6-9 9-.6-5.4-3.6-8.4-9-9 5.4-.6 8.4-3.6 9-9z"/></svg>Mit Gemini weiter diskutieren</a>`;
+            : `<button type="button" class="s7-tx" data-act="cc-copy">Anfrage kopieren</button><button type="button" class="s7-tx" data-act="gem-paste">Antwort einfügen</button>`,
+          gem = `<a class="s7-gem" data-act="gem-open" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e0bf6a" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.6 5.4 3.6 8.4 9 9-5.4.6-8.4 3.6-9 9-.6-5.4-3.6-8.4-9-9 5.4-.6 8.4-3.6 9-9z"/></svg>Mit Gemini weiter diskutieren</a>`;
+        const gemBox = ready ? "" : `<details class="s7-gp"${ccGemOpen ? " open" : ""}><summary>Antwort aus Gemini übernehmen</summary><p class="s7-note">1. «Mit Gemini weiter diskutieren» tippen (Anfrage wird kopiert, in Gemini mit Strg+V einfügen). 2. Antwort in Gemini kopieren. 3. Hier einfügen und übernehmen. Sie steht dann im Chat und geht bei der nächsten Anfrage mit.</p><textarea id="gem-in" rows="5" placeholder="Antwort von Gemini hier einfügen"></textarea><button type="button" class="s6-btn gold" data-act="gem-take">Übernehmen</button></details>`;
         const info = `<aside class="s6-cinfo">${knD}${ready ? "" : `<p class="s6-cnote">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`}${sw}${gem}<span class="s7-clr">${clr}</span></aside>`;
         const qr = [
           ["Erklär die Einheit", "Erkläre mir die heutige Einheit.", "explain"],
@@ -19391,7 +19812,7 @@
           .join("")}</div>`;
         const inp = `<form class="s6-cin" data-form="coach">${chips}<div class="s6-inp"><label for="cc-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Nachricht an den Coach</label><input id="cc-in" type="text" maxlength="${coach.MAX_MSG}" value="${esc(ccDraft)}" placeholder="${ccExplain ? "Was soll ich dir erklären?" : "z. B. „Knie zwickt seit gestern“"}" autocomplete="off" enterkeyhint="send" ${ccBusy ? "disabled" : ""}><button type="submit" aria-label="${ready ? "Senden" : "Vorbereiten"}" ${ccBusy ? "disabled" : ""}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div></form>`;
         const dock = `<div class="s7-dock"><div class="s7-tg s6-m">${sw}${clr}</div>${gem.replace('class="s7-gem"', 'class="s7-gem s6-m"')}${inp}</div>`;
-        return `<div class="s6 s6-coach is-chat">${head}${kn}${side}<section class="s6-cmain s6-chatc" aria-label="Chat">${off}<div class="s6-msgs" id="chat">${s6CoachMsgs()}</div>${ready ? "" : `<p class="s6-cnote m">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`}${dock}</section>${info}</div>`;
+        return `<div class="s6 s6-coach is-chat">${head}${kn}${side}<section class="s6-cmain s6-chatc" aria-label="Chat">${off}<div class="s6-msgs" id="chat">${s6CoachMsgs()}</div>${ready ? "" : `<p class="s6-cnote m">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`}${gemBox}${dock}</section>${info}</div>`;
       }
       /* ---- Dashboard ---- */
       function s6Ring(frac, col, inner, label, aria, t) {
@@ -19402,6 +19823,50 @@
             ? `<circle cx="56" cy="56" r="${R}" fill="none" style="stroke:${col}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - Math.min(1, frac))).toFixed(1)}" transform="rotate(-90 56 56)"/>`
             : "";
         return `<div class="s6-rg"><div><svg viewBox="0 0 112 112" width="100%" height="100%" role="img" aria-label="${esc(aria)}"><circle cx="56" cy="56" r="${R}" fill="none" stroke="#1b1e29" stroke-width="9"/>${arc}</svg><span class="${t ? "t" : ""}">${inner}</span></div><span>${label}</span></div>`;
+      }
+      /* Rennprognose-Karte mit Aufschlüsselung (Laufen, Stationen, Roxzone, Details je Station) und Rechenbasis. Im Wochenrückblick. */
+      function s7ProgCard() {
+        const fc = rvForecast();
+        let prog;
+        if (!fc || !fc.total) {
+          prog = `<section class="s6-card s7-pg" aria-label="Rennprognose"><div class="r1"><span class="s6-kick">Rennprognose</span></div><p class="s7-note">Noch keine Testwerte. Nach dem Lauf-Pacing-Test und dem Stationen-Benchmark rechnet die App hier eure Zielzeit hoch.</p><button type="button" class="s7-lnk" data-v="profile">Tests eintragen</button></section>`;
+        } else {
+          const gap = fc.total - review.GOAL_S,
+            REF = 3801,
+            ax = Math.max(REF, fc.total * 1.02),
+            pc = (v) => ((v / ax) * 100).toFixed(1),
+            stSum = fc.stations
+              ? fc.stations.reduce((a, b) => a + (b || 0), 0)
+              : fc.st || 0,
+            bd = review.breakdown(fc);
+          const row = (l, v, extra) =>
+            `<div class="tr"><span>${l}${extra ? ` <small>${extra}</small>` : ""}</span><b>${mmss(v)}</b></div>`;
+          // Nachrechnen: alle Zwischenwerte der Prognose, damit man sie gegen die eigenen Zeiten prüfen kann
+          const SN = ["SkiErg", "Sled Push", "Sled Pull", "Burpee Broad Jumps", "RowErg", "Farmers Carry", "Sandbag Lunges", "Wall Balls"];
+          const wide = matchMedia("(min-width: 900px)").matches ? " open" : ""; // Desktop: Rechenweg und Stationen gleich sichtbar
+          const calc = `<details class="s7-det"${wide}><summary>So wird gerechnet<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <p class="s7-note">Gesamt = Laufen + Stationen + Roxzone. Läufe: Pacing-Test-Schnitt (${mmss(Math.round(fc.T))} /km) plus Ermüdungsaufschlag (Stufe «${esc(fc.level)}»), ab Lauf 5 kommt Tempoverlust dazu.</p>
+            <div class="cap">Laufen · 8 × 1 km</div>${(fc.paces || []).map((p, r) => `<div class="tr"><span>Lauf ${r + 1}</span><b>${mmss(Math.round(p))}</b></div>`).join("")}<div class="tr"><span><b>Summe Laufen</b></span><b>${mmss(fc.run)}</b></div>
+            <div class="cap">Stationen · Team (Benchmark × Faktor k = ${String(Math.round(fc.k * 100) / 100).replace(".", ",")})</div>${(fc.stations || []).map((v, r) => `<div class="tr"><span>${SN[r]} <small>${fc.sources && fc.sources[r] === "bench" ? "aus Benchmark" : "Annahme (St. Gallen)"}</small></span><b>${v != null ? mmss(Math.round(v)) : "–"}</b></div>`).join("")}<div class="tr"><span><b>Summe Stationen</b></span><b>${mmss(stSum)}</b></div>
+            <div class="cap">Roxzone und Wechsel</div><div class="tr"><span>Pauschale je Stufe</span><b>${mmss(fc.rox)}</b></div>
+            <div class="cap">Gesamt</div><div class="tr"><span><b>${mmss(fc.run)} + ${mmss(stSum)} + ${mmss(fc.rox)}</b></span><b>${mmss(fc.total)}</b></div>
+            ${(fc.basis || []).map((b) => `<p class="s7-note">${esc(b)}</p>`).join("")}${(fc.warnings || []).map((b) => `<p class="s7-note">⚠ ${esc(b)}</p>`).join("")}</details>`;
+          const wide0 = matchMedia("(min-width: 900px)").matches ? " open" : "";
+          const det = bd
+            ? `<details class="s7-det"${wide0}><summary>Details je Station<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>${bd.rows
+                .slice(1, 9)
+                .map(
+                  (r) =>
+                    `<div class="tr"><span>${esc(r.label)}</span><b>${r.est != null ? mmss(r.est) : "–"}</b></div>`,
+                )
+                .join("")}</details>`
+            : "";
+          prog = `<section class="s6-card s7-pg" aria-label="Rennprognose"><div class="r1"><span class="s6-kick">Rennprognose</span><span class="s7-pill"><i style="background:${gap > 0 ? "#ff9f0a" : "#30d158"}"></i>${mmss(Math.abs(gap))} ${gap > 0 ? "zu langsam" : "Puffer"}</span></div><div class="big"><b>${mmss(fc.total)}</b></div><p class="cap">Spanne ${mmss(fc.lo)} bis ${mmss(fc.hi)} · Ziel 60:00</p>
+        <div class="bar"><div><u style="width:${pc(fc.run)}%;background:#f5f5f7"></u><u style="width:${pc(stSum)}%;background:#9a9ba3"></u><u style="width:${pc(fc.rox)}%;background:#6d7176"></u></div><i style="left:${pc(review.GOAL_S)}%"></i></div>
+        <div class="lg"><span><i style="background:#f5f5f7"></i>Laufen</span><span><i style="background:#9a9ba3"></i>Stationen</span><span><i style="background:#6d7176"></i>Roxzone</span><span><i class="m"></i>60:00 Ziel · 63:21 St. Gallen</span></div>
+        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${det}${calc}</section>`;
+        }
+        return prog;
       }
       function s6Dashboard() {
         const T = Math.max(-1, Math.min(TODAY, LAST)),
@@ -19454,36 +19919,7 @@
         const tile = (l, v, u, n) =>
           `<div class="s6-card s7-t"><span class="s6-kick">${l}</span><b>${v}${u ? ` <small>${u}</small>` : ""}</b>${n ? `<span class="n">${n}</span>` : ""}</div>`;
         const tiles = `<section class="s7-tiles" aria-label="Diese Woche">${tile("Laufen", s6Km(D.kmDone), D.km ? `/ ${s6Km(D.km)} km` : "km", "")}${tile("Ø Anstrengung", D.ar === "–" ? "–" : D.ar, "", lim ? `Grenze ${String(lim).replace(".", ",")}` : "")}${tile("Ø Schlaf", slp.length ? fmtN(slp.reduce((a, b) => a + b, 0) / slp.length) : "–", slp.length ? "h" : "", "Ziel 7–9 h")}${tile("Saison", curW + 1, `von ${NWEEKS} Wo`, "")}</section>${D.ar === "–" ? `<p class="s7-note">Noch keine Anstrengung eingetragen. Nach jedem Training die RPE (1–10) erfassen.</p>` : ""}`;
-        /* Rennprognose */
-        const fc = rvForecast();
-        let prog;
-        if (!fc || !fc.total) {
-          prog = `<section class="s6-card s7-pg" aria-label="Rennprognose"><div class="r1"><span class="s6-kick">Rennprognose</span></div><p class="s7-note">Noch keine Testwerte. Nach dem Lauf-Pacing-Test und dem Stationen-Benchmark rechnet die App hier eure Zielzeit hoch.</p><button type="button" class="s7-lnk" data-v="profile">Tests eintragen</button></section>`;
-        } else {
-          const gap = fc.total - review.GOAL_S,
-            REF = 3801,
-            ax = Math.max(REF, fc.total * 1.02),
-            pc = (v) => ((v / ax) * 100).toFixed(1),
-            stSum = fc.stations
-              ? fc.stations.reduce((a, b) => a + (b || 0), 0)
-              : fc.st || 0,
-            bd = review.breakdown(fc);
-          const row = (l, v, extra) =>
-            `<div class="tr"><span>${l}${extra ? ` <small>${extra}</small>` : ""}</span><b>${mmss(v)}</b></div>`;
-          const det = bd
-            ? `<details class="s7-det"><summary>Details je Station<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>${bd.rows
-                .slice(1, 9)
-                .map(
-                  (r) =>
-                    `<div class="tr"><span>${esc(r.label)}</span><b>${r.est != null ? mmss(r.est) : "–"}</b></div>`,
-                )
-                .join("")}</details>`
-            : "";
-          prog = `<section class="s6-card s7-pg" aria-label="Rennprognose"><div class="r1"><span class="s6-kick">Rennprognose</span><span class="s7-pill"><i style="background:${gap > 0 ? "#ff9f0a" : "#30d158"}"></i>${mmss(Math.abs(gap))} ${gap > 0 ? "zu langsam" : "Puffer"}</span></div><div class="big"><b>${mmss(fc.total)}</b></div><p class="cap">Spanne ${mmss(fc.lo)} bis ${mmss(fc.hi)} · Ziel 60:00</p>
-        <div class="bar"><div><u style="width:${pc(fc.run)}%;background:#f5f5f7"></u><u style="width:${pc(stSum)}%;background:#9a9ba3"></u><u style="width:${pc(fc.rox)}%;background:#6d7176"></u></div><i style="left:${pc(review.GOAL_S)}%"></i></div>
-        <div class="lg"><span><i style="background:#f5f5f7"></i>Laufen</span><span><i style="background:#9a9ba3"></i>Stationen</span><span><i style="background:#6d7176"></i>Roxzone</span><span><i class="m"></i>60:00 Ziel · 63:21 St. Gallen</span></div>
-        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${det}</section>`;
-        }
+        const prog = s7ProgCard();
         /* Erholung im Verlauf */
         const SER = {
             readiness: [
@@ -19544,7 +19980,7 @@
               )
               .join(
                 "",
-              )}${segs.map((s) => `<path d="${path(s)}" fill="none" stroke="#64a8ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`).join("")}${lastPt >= 0 ? `<circle cx="${X(lastPt)}" cy="${Y(ser[lastPt])}" r="5" fill="#64a8ff"/>` : ""}</svg>`
+              )}${segs.map((s) => `<path d="${path(s)}" fill="none" stroke="#64a8ff" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`).join("")}${lastPt >= 0 ? `<circle cx="${X(lastPt)}" cy="${Y(ser[lastPt])}" r="5" fill="#64a8ff"/>` : ""}</svg>`
           : `<p class="s7-note">Noch keine Garmin-Werte.</p>`;
         const verlauf = `<section class="s6-card s7-vl" aria-label="Erholung im Verlauf"><span class="s6-kick">Erholung im Verlauf</span><div class="seg" role="tablist" aria-label="Verlauf">${Object.entries(
           SER,
@@ -19590,9 +20026,9 @@
                   .slice(from, to < 0 ? undefined : to)
                   .map((n) => n.outerHTML)
                   .join("");
-          return { left: kraft + html(si, cut), right: html(cut, -1) };
+          return { left: html(si, cut) + kraft, right: html(cut, -1) };
         })();
-        return `<div class="s6 s6-dash s7-dash">${head}<div class="s7-cols"><div class="s7-c">${ciOpen && inPlan ? s6Checkin(TODAY) : ""}${heute}${tiles}<div class="s7-rest">${rest.left}</div></div><div class="s7-c">${prog}${verlauf}<div class="s7-rest">${rest.right}</div></div></div></div>`;
+        return `<div class="s6 s6-dash s7-dash">${head}<div class="s7-cols"><div class="s7-c">${ciOpen && inPlan ? s6Checkin(TODAY) : ""}${heute}${tiles}<div class="s7-rest">${rest.left}</div></div><div class="s7-c">${verlauf}<div class="s7-rest">${rest.right}</div></div></div></div>`;
       }
       /* ---- Wochenrückblick ---- */
       const S6_SEASON_H = [
@@ -19683,7 +20119,7 @@
           rp = D.ar === "–" ? "—" : D.ar;
         const kp = `<section class="s6-kp" aria-label="Zahlen"><div class="d4"><span>Einheiten</span><b>${D.ok}/${D.plan}</b></div><div><span>Laufen</span><b>${km}</b></div><div class="d4"><span>Kraft + Stationen</span><b>${D.ksOk}/${D.ks}</b></div><div><span>Ø RPE</span><b>${rp}</b></div><div class="m3"><span>Saison</span><b>${w + 1} <small>von ${NWEEKS} Wo</small></b></div></section>`;
         const more = `<details class="s6-more"><summary>Weitere Auswertungen</summary><div class="s6-more-b">${vReview(true)}</div></details>`;
-        return `<div class="s6 s6-rv">${top}<div class="s6-rv-hd">${title}${arrows.replace('class="s6-round"', 'class="s6-round s6-rv-darrows"')}</div><div class="s6-rv-2">${verdict}${forecast}</div><div class="s6-rv-3">${daysSec}${season}</div>${kp}${more}</div>`;
+        return `<div class="s6 s6-rv">${top}<div class="s6-rv-hd">${title}${arrows.replace('class="s6-round"', 'class="s6-round s6-rv-darrows"')}</div><div class="s6-rv-2">${verdict}${s7ProgCard()}</div><div class="s6-rv-3">${daysSec}${season}</div>${kp}</div>`;
       }
       /* ---- Plan ---- */
       const S6_BSHORT = {
@@ -20174,8 +20610,23 @@
           ue = /(\d+) s Übergang/.exec(all),
           steps = [];
         let rounds = 0;
+        // Aufgeteilte Runden (src/split.js: «Runde 2: Station» + «Runde 2: 1 km …») wieder zu einer Runde zusammenfassen;
+        // jr = Zeile des Laufs, damit Lauf und Pause an ihrer eigenen Zeile hängen
+        const lines = [];
         p.i.forEach((t0, j) => {
-          const t = String(t0).replace(/\s+/g, " ").trim();
+          const t = String(t0).replace(/\s+/g, " ").trim(),
+            prev = lines[lines.length - 1],
+            rm = /^Runde (\d+):\s*(\d+(?:,\d+)?\s?km)\s*@/.exec(t),
+            sm = /^Runde (\d+):\s*(.+?)\s*\(([^)]*)\)$/.exec(t);
+          if (rm && prev && prev.round === rm[1] && !prev.merged) {
+            prev.t += " → " + t.replace(/^Runde \d+:\s*/, "");
+            prev.jr = j;
+            prev.merged = true;
+            return;
+          }
+          lines.push({ t, j, jr: j, round: sm && !/\bkm\b/.test(sm[2]) ? sm[1] : null });
+        });
+        lines.forEach(({ t, j, jr }) => {
           let m;
           if (
             (m =
@@ -20244,7 +20695,7 @@
                 m[4],
               );
             steps.push({
-              j,
+              j: jr,
               kind: "run",
               tp: "Lauf",
               name: rm ? rm[1] : "Lauf",
@@ -20263,7 +20714,7 @@
             });
             if (rest)
               steps.push({
-                j,
+                j: jr,
                 kind: "rest",
                 tp: "Pause",
                 name: "Erholen",
@@ -20430,7 +20881,7 @@
           : run
             ? `<button type="button" class="f7-go" data-fc="sp-split"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l5 5 9-10"/></svg>Split</button>`
             : `<button type="button" class="f7-go" data-fc="sp-start"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Start</button>`;
-        return `<div id="sp" class="sp"><header class="sp-h"><button type="button" class="f7-x" data-fc="close" aria-label="Fokusmodus schliessen">${F7_X}</button><div class="sp-tt"><span class="s6-kick">Stationen · Kachel tippen oder Lap-Taste = Split speichern</span><b>${esc(s7Title(p.t))}</b></div><span class="sp-tot" id="sp-tot">${mmss(tot)}</span>${btn}</header>${s7SpRules(p)}<p class="sp-hint">Tippe eine Kachel beim Zieleinlauf (oder drücke die Lap-Taste der Uhr): Der Split wird gespeichert und die nächste Kachel startet.</p><div class="sp-g">${tiles}</div>${run && !fin ? `<button type="button" class="s7-tx sp-rd" data-fc="sp-redo">Messung verwerfen und neu starten</button>` : ""}</div>`;
+        return `<div id="sp" class="sp"><header class="sp-h"><button type="button" class="f7-x" data-fc="close" aria-label="Fokusmodus schliessen">${F7_X}</button><div class="sp-tt"><span class="s6-kick">Stationen · Kachel tippen oder Lap-Taste = Split speichern</span><b>${esc(s7Title(p.t))}</b></div><span class="sp-tot" id="sp-tot">${mmss(tot)}</span>${btn}</header><p class="sp-hint">Tippe eine Kachel beim Zieleinlauf (oder drücke die Lap-Taste der Uhr): Der Split wird gespeichert und die nächste Kachel startet.</p><div class="sp-g">${tiles}</div>${run && !fin ? `<button type="button" class="s7-tx sp-rd" data-fc="sp-redo">Messung verwerfen und neu starten</button>` : ""}</div>`;
       }
       /* Splits prüfen: Ist-Zeiten lassen sich korrigieren */
       function s7SpCheck(p, steps) {
@@ -20543,6 +20994,7 @@
           picks: new Set(
             done.map((d, j) => (d ? j : -1)).filter((j) => j >= 0),
           ),
+          skips: new Set(p.i.map((_, j) => (S.xs[dk + "|" + j] ? j : -1)).filter((j) => j >= 0)),
           sub: null,
           w: null,
           focus: !!fromFocus,
@@ -20572,7 +21024,7 @@
           : p.i
               .map((t, j) => ({ t, j }))
               .filter(
-                ({ t }) => !isFiller(t) && !isLift(p.k, t) && !preWeight(p, t),
+                ({ t }) => !isFiller(t) && !isLift(p.k, t) && !preWeight(p, t) && !/^Erste \d+ m nach jeder Station/.test(t) && !/Verbot schneller|Redline ab/.test(t),
               );
       function fin7Paint() {
         if (!fin7) return;
@@ -20634,12 +21086,13 @@
                     )
                     .join("")
                 : `<input class="f7-notiz" type="text" data-fin-sp="${j}" data-k="0" value="${esc(vals[0] || "")}" placeholder="${esc(placeholder(p.k, t))}" aria-label="${esc(r.title)}">`;
-              return `<div class="f7-spr"><div class="nm">${esc(r.title)}<div class="sb">${esc(r.val || "")}</div></div>${fld}</div>`;
+              const col = /^(Einlaufen|Auslaufen)/.test(t) ? SP_COL.warm : /Sled|Burpee|Ski|Row|Farmers|Lunges|Wall/i.test(r.title) ? SP_COL.station : SP_COL.run;
+              return `<div class="f7-spr" style="--c:${col}"><i class="bar"></i><div class="nm">${esc(r.title)}<div class="sb">${esc(r.val ? "Ziel " + r.val : "")}${r.subs[0] ? " · " + esc(r.subs[0]) : ""}</div></div>${fld}</div>`;
             })
             .join("");
           body = `<div><h2>Splits eintragen</h2><div class="sb2">Pro Zeile Zeit oder Split. Leer lassen, was Du nicht brauchst.</div></div><div class="f7-sp">${rows}</div><div class="acts"><button type="button" class="s6-btn gold" data-fin="sok">Übernehmen</button></div>`;
         } else {
-          const nDone = fin7.mode === "plan" ? p.i.length : fin7.picks.size;
+          const nDone = fin7.mode === "plan" ? p.i.length - fin7.skips.size : fin7.picks.size;
           const seg = [
             ["plan", "Wie geplant"],
             ["part", "Teilweise"],
@@ -20651,8 +21104,14 @@
             )
             .join("");
           const list =
-            fin7.mode === "part"
-              ? `<div><span class="s6-kick">Was hast Du gemacht? · ${nDone} von ${p.i.length}</span><div class="it-l">${p.i.map((t, j) => `<button type="button" class="it${fin7.picks.has(j) ? " on" : ""}" data-fin="pick" data-j="${j}" role="checkbox" aria-checked="${fin7.picks.has(j)}"><span class="cb">${fin7.picks.has(j) ? S7_CHECK : ""}</span><span class="tx">${esc(s7Row(t).title)}</span></button>`).join("")}</div></div>`
+            fin7.mode !== "other"
+              ? `<div><span class="s6-kick">${fin7.mode === "plan" ? "Übungen" : "Was hast Du gemacht?"} · ${nDone} von ${p.i.length}${fin7.skips.size ? ` · ${fin7.skips.size} gestrichen` : ""}</span><div class="it-l">${p.i
+                  .map((t, j) => {
+                    const sk = fin7.skips.has(j),
+                      on = !sk && (fin7.mode === "plan" || fin7.picks.has(j));
+                    return `<div class="it-w${sk ? " sk" : ""}"><button type="button" class="it${on ? " on" : ""}" data-fin="pick" data-j="${j}" role="checkbox" aria-checked="${on}"><span class="cb">${on ? S7_CHECK : ""}</span><span class="tx">${esc(s7Row(t).title)}</span></button><button type="button" class="it-x" data-fin="skip" data-j="${j}" aria-pressed="${sk}">${sk ? "Zurück" : "Streichen"}</button></div>`;
+                  })
+                  .join("")}</div></div>`
               : "";
           const rpe = `<div><div class="rl"><span class="s6-kick">Anstrengung (RPE 1–10)</span>${lim ? `<span>Grenze diese Woche ${String(lim).replace(".", ",")}</span>` : ""}</div><div class="rpe-g">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => `<button type="button" class="${fin7.rpe === x ? "on" : ""}" data-fin="rpe" data-r="${x}" aria-pressed="${fin7.rpe === x}">${x}</button>`).join("")}</div></div>`;
           const spRow = fin7Splits(p).length
@@ -20686,7 +21145,10 @@
           );
         p.i.forEach((_, j) => {
           const id = dk + "|" + j;
-          if (mode === "plan") {
+          if (mode !== "other" && fin7.skips.has(j)) {
+            S.xs[id] = 1;
+            delete S.done[id];
+          } else if (mode === "plan") {
             S.done[id] = 1;
             delete S.xs[id];
             if (!S.val[id]) {
@@ -20697,7 +21159,10 @@
             if (fin7.picks.has(j)) {
               S.done[id] = 1;
               delete S.xs[id];
-            } else delete S.done[id];
+            } else {
+              delete S.done[id];
+              delete S.xs[id];
+            }
           }
         });
         if (fin7.rpe != null) S.rpe[dk] = fin7.rpe;
@@ -20735,8 +21200,23 @@
         }
         if (a === "pick") {
           const j = +b.dataset.j;
+          if (fin7.mode === "plan") {
+            // erste Auswahl in «Wie geplant»: zu «Teilweise» wechseln, alles ausser Gestrichenem bleibt gewählt
+            fin7.mode = "part";
+            fin7.picks = new Set(p.i.map((_, x) => x).filter((x) => !fin7.skips.has(x)));
+          }
+          fin7.skips.delete(j);
           if (fin7.picks.has(j)) fin7.picks.delete(j);
           else fin7.picks.add(j);
+          return fin7Paint();
+        }
+        if (a === "skip") {
+          const j = +b.dataset.j;
+          if (fin7.skips.has(j)) fin7.skips.delete(j);
+          else {
+            fin7.skips.add(j);
+            fin7.picks.delete(j);
+          }
           return fin7Paint();
         }
         if (a === "rpe") {
@@ -20780,6 +21260,20 @@
           return fin7Paint();
         }
         if (a === "sopen") {
+          // Stationstag ohne Fokusmodus: dieselbe Split-Ansicht wie nach dem Fokusmodus (Ziel/Ist/Diff), vorbelegt mit den Zielzeiten
+          const stp = s7Steps(p);
+          if (stp && !fin7.focus) {
+            const at = fin7.i,
+              dk0 = keyI(at);
+            fin7Close();
+            spLoad(dk0, stp);
+            if (!(fcSp.t0 && fcSp.idx >= stp.length)) {
+              const t = Date.now();
+              fcSp = { dk: dk0, t0: t, s0: t, idx: stp.length, done: stp.map((s, k) => (fcSp.done[k] != null ? fcSp.done[k] : s.goal)) };
+              spSave();
+            }
+            return focusOpen(at);
+          }
           const dk = keyI(fin7.i);
           fin7.s = {};
           fin7.s0 = {};
@@ -21727,7 +22221,22 @@
           save();
           return transition("fade", render);
         }
+        if (d.act === "ed-add") {
+          const r = document.createElement("div");
+          r.className = "ed-r";
+          r.innerHTML = `<span class="n"></span><input type="text" class="ed-li" value="" aria-label="Übung" placeholder="z. B. Back Squat 4×5, Pause 150 s"><button type="button" class="ed-x" data-act="ed-del" aria-label="Übung löschen">×</button>`;
+          $("#ed-list").appendChild(r);
+          r.querySelector("input").focus();
+          return;
+        }
+        if (d.act === "ed-del") {
+          const r = t.closest(".ed-r");
+          if (r) r.remove();
+          edSync();
+          return;
+        }
         if (d.act === "edit-save") {
+          edSync();
           const lines = $("#ed-i")
             .value.split("\n")
             .map((s) => s.trim())
@@ -21756,6 +22265,7 @@
               p_day: src,
             }));
           } else {
+            edSync();
             const lines = $("#ed-i")
               .value.split("\n")
               .map((x) => x.trim())
@@ -22476,6 +22986,39 @@
           ccErr = "";
           save();
           return render();
+        }
+        if (d.act === "gem-open" || d.act === "gem-paste") {
+          if (d.act === "gem-open") {
+            // Link öffnet Gemini wie bisher, vorher landet die fertige Anfrage in der Zwischenablage (dort Strg+V)
+            try {
+              const req = coach.buildCoachRequest({ context: coachCtx(), chat: S.chat, message: $("#cc-in").value || ccDraft || (S.chat.filter((m) => m.role === "user").pop() || {}).text || "(Frage hier eintippen)" });
+              ccDraft = $("#cc-in").value || ccDraft;
+              if (navigator.clipboard) navigator.clipboard.writeText(coachPrompt(req)).then(() => toast("Anfrage kopiert: in Gemini mit Strg+V einfügen"), () => {});
+            } catch (err) {
+              toast(err.message);
+            }
+            return; // Link selbst öffnet den neuen Tab
+          }
+          ccGemOpen = true;
+          render();
+          const bx = $("#gem-in");
+          if (bx) bx.focus();
+          return;
+        }
+        if (d.act === "gem-take") {
+          const txt = ($("#gem-in") ? $("#gem-in").value : "").trim();
+          if (!txt) return toast("Bitte zuerst die Antwort von Gemini einfügen");
+          const q = ($("#cc-in") && $("#cc-in").value.trim()) || ccDraft || (S.chat.filter((m) => m.role === "user").pop() || {}).text || "(Frage in Gemini gestellt)";
+          S.chat.push({ role: "user", text: q.slice(0, coach.MAX_MSG), at: Date.now() });
+          S.chat.push({ role: "assistant", text: txt.slice(0, 4000), actions: [], state: "none", ex: ccExplain, at: Date.now() });
+          S.chat = S.chat.slice(-40);
+          ccDraft = "";
+          ccGemOpen = false;
+          save();
+          render();
+          scrollChat();
+          toast("Antwort übernommen");
+          return;
         }
         if (d.act === "cc-copy") {
           try {

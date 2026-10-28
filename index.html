@@ -14206,11 +14206,29 @@
         if (!lsSet(LSK, JSON.stringify(S)))
           toast("Speicher voll – bitte Backup exportieren");
       }
+      /* Prognose beobachten: ändert sich die Gesamtzeit (neue Testwerte, Splits, Simulationen), kommt eine Meldung mit alt → neu.
+         Entprellt, damit Tippen nicht jede Ziffer meldet. */
+      let fcPrognoseTimer = 0;
+      function fcAnnounce() {
+        try {
+          const fc = rvForecast();
+          if (!fc || !fc.total) return;
+          const t = Math.round(fc.total),
+            old = +lsGet("hx:fc-last");
+          if (old && Math.abs(t - old) >= 1) {
+            const d = t - old;
+            toast(`Prognose verändert: ${mmss(old)} → ${mmss(t)} (${d < 0 ? "−" : "+"}${mmss(Math.abs(d))})`);
+          }
+          lsSet("hx:fc-last", String(t));
+        } catch (_) {}
+      }
       function save() {
         weekSnap();
         S._t = Date.now();
         saveLocal();
         queuePush();
+        clearTimeout(fcPrognoseTimer);
+        fcPrognoseTimer = setTimeout(fcAnnounce, 1500);
       }
       loadLocal();
 

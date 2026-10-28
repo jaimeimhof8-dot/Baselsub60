@@ -13609,6 +13609,143 @@
         -webkit-backdrop-filter: blur(28px) saturate(1.8) !important;
         backdrop-filter: blur(28px) saturate(1.8) !important;
       }
+      /* Coach Desktop: «+» und zweiter Gemini-Knopf entfallen (steht rechts in der Spalte) */
+      @media (min-width: 900px) {
+        .s7-plus,
+        .s7-dock .s7-gem {
+          display: none !important;
+        }
+        .s7-dock .s6-inp {
+          padding-left: 16px !important;
+        }
+      }
+      /* Rennprognose im Rückblick, Desktop: oben Zahl und Balken, darunter Kachelreihen */
+      .s7-pgw {
+        display: none;
+      }
+      @media (min-width: 900px) {
+        .s6-rv .s7-pg > details {
+          display: none !important;
+        }
+        .s6-rv .s7-pg {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) !important;
+          column-gap: 48px;
+          row-gap: 12px;
+          align-items: start;
+        }
+        .s6-rv .s7-pg > .r1,
+        .s6-rv .s7-pg > .big,
+        .s6-rv .s7-pg > .cap {
+          grid-column: 1;
+        }
+        .s6-rv .s7-pg > .bar,
+        .s6-rv .s7-pg > .lg,
+        .s6-rv .s7-pg > .rows {
+          grid-column: 2;
+        }
+        .s6-rv .s7-pg > .r1 {
+          grid-row: 1;
+        }
+        .s6-rv .s7-pg > .bar {
+          grid-row: 1;
+        }
+        .s6-rv .s7-pg .s7-pgw {
+          display: block;
+          grid-column: 1 / -1;
+          grid-row: auto;
+          border-top: 1px solid rgba(255, 255, 255, 0.07);
+          padding-top: 16px;
+        }
+        .s7-pgw .g8 {
+          margin-bottom: 16px;
+        }
+        .s7-pgw .t8 {
+          display: grid;
+          grid-template-columns: repeat(8, minmax(0, 1fr));
+          gap: 8px;
+          margin-top: 8px;
+        }
+        .s7-pgw .t8 > div {
+          background: #161922;
+          border-radius: 14px;
+          padding: 10px 12px;
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+        }
+        .s7-pgw .t8 small {
+          font-size: 12px;
+          color: #9a9ba3;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .s7-pgw .t8 b {
+          font-family: var(--f-head);
+          font-size: 22px;
+          font-weight: 700;
+        }
+        .s7-pgw .t8 i {
+          font-style: normal;
+          font-size: 11px;
+          color: #6d7176;
+        }
+      }
+      /* Prognose Desktop, dichter: links die Zahl, rechts drei grosse Summen-Blöcke, Balken darunter über die ganze Breite */
+      @media (min-width: 900px) {
+        .s6-rv .s7-pg {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) !important;
+          column-gap: 32px;
+          row-gap: 14px;
+          align-items: stretch;
+        }
+        .s6-rv .s7-pg > .r1 {
+          grid-column: 1 !important;
+          grid-row: 1 !important;
+        }
+        .s6-rv .s7-pg > .big {
+          grid-column: 1 !important;
+          grid-row: 2 !important;
+        }
+        .s6-rv .s7-pg > .cap {
+          grid-column: 1 !important;
+          grid-row: 3 !important;
+        }
+        .s6-rv .s7-pg > .rows {
+          grid-column: 2 !important;
+          grid-row: 1 / span 3 !important;
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 12px;
+        }
+        .s6-rv .s7-pg > .rows > .tr {
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: center;
+          gap: 6px;
+          min-height: 0;
+          padding: 16px 20px;
+          border-radius: 16px;
+          background: #161922;
+          border: 0;
+        }
+        .s6-rv .s7-pg > .rows > .tr b {
+          font-family: var(--f-head);
+          font-size: 40px;
+          line-height: 1;
+        }
+        .s6-rv .s7-pg > .bar {
+          grid-column: 1 / -1 !important;
+          grid-row: 4 !important;
+        }
+        .s6-rv .s7-pg > .lg {
+          grid-column: 1 / -1 !important;
+          grid-row: 5 !important;
+        }
+        .s6-rv .s7-pg > .s7-pgw {
+          grid-row: 6 !important;
+        }
+      }
       /* S6-CSS-END */
     </style>
   </head>
@@ -20129,8 +20266,9 @@
               : ""
             : `<button type="button" class="s7-tx" data-act="cc-copy">Anfrage kopieren</button><button type="button" class="s7-tx" data-act="gem-paste">Antwort einfügen</button>`,
           gem = `<a class="s7-gem" data-act="gem-open" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e0bf6a" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.6 5.4 3.6 8.4 9 9-5.4.6-8.4 3.6-9 9-.6-5.4-3.6-8.4-9-9 5.4-.6 8.4-3.6 9-9z"/></svg>Mit Gemini weiter diskutieren</a>`;
-        const gemBox = ready ? "" : `<details class="s7-gp"${ccGemOpen ? " open" : ""}><summary>Antwort aus Gemini übernehmen</summary><p class="s7-note">Antwort in Gemini kopieren, hier einfügen, übernehmen.</p><textarea id="gem-in" rows="5" placeholder="Antwort von Gemini hier einfügen"></textarea><button type="button" class="s6-btn gold" data-act="gem-take">Übernehmen</button></details>`;
-        const info = `<aside class="s6-cinfo">${knD}${ready ? "" : `<p class="s6-cnote">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`}${sw}${gem}<span class="s7-clr">${clr}</span></aside>`;
+        const isMob = matchMedia("(max-width: 899px)").matches;
+        const gemBox0 = ready ? "" : `<details class="s7-gp"${ccGemOpen ? " open" : ""}><summary>Antwort aus Gemini übernehmen</summary><p class="s7-note">Antwort in Gemini kopieren, hier einfügen, übernehmen.</p><textarea id="gem-in" rows="5" placeholder="Antwort von Gemini hier einfügen"></textarea><button type="button" class="s6-btn gold" data-act="gem-take">Übernehmen</button></details>`;
+        const info = `<aside class="s6-cinfo">${knD}${ready ? "" : `<p class="s6-cnote">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`}${sw}${gem}<span class="s7-clr">${clr}</span>${isMob ? "" : gemBox0}</aside>`;
         const qr = [
           ["Erklär die Einheit", "Erkläre mir die heutige Einheit.", "explain"],
           ["Zu müde heute", "Ich bin heute zu müde fürs Training.", ""],
@@ -20147,6 +20285,7 @@
           )
           .join("")}</div>`;
         const inp = `<form class="s6-cin" data-form="coach">${chips}<div class="s6-inp"><label for="cc-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Nachricht an den Coach</label><input id="cc-in" type="text" maxlength="${coach.MAX_MSG}" value="${esc(ccDraft)}" placeholder="${ccExplain ? "Was soll ich dir erklären?" : "z. B. „Knie zwickt seit gestern“"}" autocomplete="off" enterkeyhint="send" ${ccBusy ? "disabled" : ""}><button type="submit" aria-label="${ready ? "Senden" : "Vorbereiten"}" ${ccBusy ? "disabled" : ""}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div></form>`;
+        const gemBox = isMob ? gemBox0 : "";
         const cnote = ready ? "" : `<p class="s6-cnote m">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`;
         // Alles Zusätzliche (Nur erklären, Verlauf, Gemini, Hinweise) steckt hinter dem «+» in der Chat-Leiste
         const dock = `<div class="s7-dock"><details class="s7-plus"><summary aria-label="Mehr">+</summary><div class="s7-pm"><div class="s6-m s7-pmr">${clr}</div>${gem.replace('class="s7-gem"', 'class="s7-gem s6-m"')}${cnote}${gemBox}</div></details>${inp}</div>`;
@@ -20190,6 +20329,11 @@
             <div class="cap">Gesamt</div><div class="tr"><span><b>${mmss(fc.run)} + ${mmss(stSum)} + ${mmss(fc.rox)}</b></span><b>${mmss(fc.total)}</b></div>
             ${(fc.basis || []).map((b) => `<p class="s7-note">${esc(b)}</p>`).join("")}${(fc.warnings || []).map((b) => `<p class="s7-note">⚠ ${esc(b)}</p>`).join("")}</details>`;
           const wide0 = "";
+          // Desktop: Rechenweg als Kachelreihen (8 Läufe, 8 Stationen) statt zweier Ausklappmenüs
+          const tl = (l, v, x) => `<div><small>${l}</small><b>${v}</b>${x ? `<i>${x}</i>` : ""}</div>`;
+          const pgw = `<div class="s7-pgw"><div class="g8"><span class="s6-kick">Laufen · 8 × 1 km</span><div class="t8">${(fc.paces || []).map((p, r) => tl("Lauf " + (r + 1), mmss(Math.round(p)))).join("")}</div></div>
+            <div class="g8"><span class="s6-kick">Stationen · Team (Benchmark × k = ${String(Math.round(fc.k * 100) / 100).replace(".", ",")})</span><div class="t8">${(fc.stations || []).map((v, r) => tl(SN[r], v != null ? mmss(Math.round(v)) : "–", fc.sources && fc.sources[r] === "bench" ? "Benchmark" : "Annahme")).join("")}</div></div>
+            <p class="s7-note">Gesamt ${mmss(fc.total)} = Laufen ${mmss(fc.run)} + Stationen ${mmss(stSum)} + Roxzone ${mmss(fc.rox)}. Läufe: Pacing-Test-Schnitt ${mmss(Math.round(fc.T))} /km plus Ermüdungsaufschlag (Stufe «${esc(fc.level)}»), ab Lauf 5 Tempoverlust. ${(fc.basis || []).map(esc).join(" · ")}${(fc.warnings || []).map((b) => " ⚠ " + esc(b)).join("")}</p></div>`;
           const det = bd
             ? `<details class="s7-det"${wide0}><summary>Details je Station<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>${bd.rows
                 .slice(1, 9)
@@ -20202,7 +20346,7 @@
           prog = `<section class="s6-card s7-pg" aria-label="Rennprognose"><div class="r1"><span class="s6-kick">Rennprognose</span><span class="s7-pill"><i style="background:${gap > 0 ? "#ff9f0a" : "#30d158"}"></i>${mmss(Math.abs(gap))} ${gap > 0 ? "zu langsam" : "Puffer"}</span></div><div class="big"><b>${mmss(fc.total)}</b></div><p class="cap">Spanne ${mmss(fc.lo)} bis ${mmss(fc.hi)} · Ziel 60:00</p>
         <div class="bar"><div><u style="width:${pc(fc.run)}%;background:#f5f5f7"></u><u style="width:${pc(stSum)}%;background:#9a9ba3"></u><u style="width:${pc(fc.rox)}%;background:#6d7176"></u></div><i style="left:${pc(review.GOAL_S)}%"></i></div>
         <div class="lg"><span><i style="background:#f5f5f7"></i>Laufen</span><span><i style="background:#9a9ba3"></i>Stationen</span><span><i style="background:#6d7176"></i>Roxzone</span><span><i class="m"></i>60:00 Ziel · 63:21 St. Gallen</span></div>
-        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${det}${calc}</section>`;
+        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${det}${calc}${pgw}</section>`;
         }
         return prog;
       }

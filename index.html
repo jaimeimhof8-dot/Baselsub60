@@ -12806,6 +12806,103 @@
         line-height: 19px;
         color: #9a9ba3;
       }
+      .s7-an {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 14px;
+        display: grid;
+        gap: 4px;
+      }
+      .s7-an-h {
+        margin: 8px 0 0;
+        font-size: 17px;
+        line-height: 24px;
+        font-weight: 600;
+      }
+      .s7-an-st {
+        margin: 8px 0 0;
+        font-size: 13px;
+        color: #e6b94d;
+      }
+      .s7-an-err {
+        margin: 8px 0 0;
+        font-size: 13px;
+        color: #e5636b;
+      }
+      .s7-an h4 {
+        margin: 14px 0 4px;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #9a9ba3;
+        font-weight: 600;
+      }
+      .s7-an ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 8px;
+      }
+      .s7-an li {
+        position: relative;
+        padding-left: 18px;
+        font-size: 14px;
+        line-height: 20px;
+      }
+      .s7-an li b {
+        font-weight: 600;
+        margin-right: 4px;
+      }
+      .s7-an li .why {
+        display: block;
+        color: #9a9ba3;
+        font-size: 13px;
+      }
+      .s7-an li::before {
+        content: "";
+        position: absolute;
+        left: 2px;
+        top: 7px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #9a9ba3;
+      }
+      .s7-an ul.g li::before {
+        background: #4cc38a;
+      }
+      .s7-an ul.b li::before {
+        background: #e5636b;
+      }
+      .s7-an ul.a li::before {
+        background: #e6b94d;
+      }
+      .s7-an-e {
+        margin: 8px 0 0;
+        font-size: 14px;
+        line-height: 21px;
+      }
+      .s7-an > .s6-btn {
+        margin-top: 14px;
+        min-height: 48px;
+        box-shadow: none;
+      }
+      .s7-an .s7-fa {
+        margin-top: 12px;
+      }
+      .s7-an-top { display: flex; }
+      .s7-an-tg { all: unset; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 32px; color: #9a9ba3; }
+      .s7-an-tg:focus-visible { outline: 2px solid #e6b94d; outline-offset: 2px; }
+      .s7-an-form { margin: 12px 0 0; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,.06); font-size: 14px; line-height: 21px; }
+      .s7-an-form b { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #e6b94d; margin-bottom: 2px; }
+      .s7-an-q {
+        margin-top: 16px;
+        font-size: 13px;
+        color: #9a9ba3;
+      }
+      .s7-an-q summary {
+        cursor: pointer;
+      }
       .s7-fa {
         display: flex;
         gap: 10px;
@@ -13367,7 +13464,11 @@
       .s7-dock .s7-gem,
       .s7-dock .s6-inp,
       .s7-kn.s6-card {
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)) !important;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.16),
+          rgba(255, 255, 255, 0.06)
+        ) !important;
         -webkit-backdrop-filter: blur(28px) saturate(1.8);
         backdrop-filter: blur(28px) saturate(1.8);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
@@ -13605,7 +13706,11 @@
         gap: 8px;
       }
       .s7-pm {
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.08)) !important;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.2),
+          rgba(255, 255, 255, 0.08)
+        ) !important;
         -webkit-backdrop-filter: blur(28px) saturate(1.8) !important;
         backdrop-filter: blur(28px) saturate(1.8) !important;
       }
@@ -14046,6 +14151,8 @@
       } from "./src/extras.js";
       import { safeMerge, countEntries, stable } from "./src/merge.js";
       import * as review from "./src/review.js";
+      import { analyseSession } from "./src/analyse.js";
+      import { alignSplits } from "./src/laps.js";
       import {
         extractTests,
         applyTests,
@@ -14160,6 +14267,8 @@
         solo: {},
         review: {},
         later: {},
+        analysis: {},
+        wsplit: {},
         off: {},
         simres: {},
         tests: {
@@ -14217,7 +14326,9 @@
             old = +lsGet("hx:fc-last");
           if (old && Math.abs(t - old) >= 1) {
             const d = t - old;
-            toast(`Prognose verändert: ${mmss(old)} → ${mmss(t)} (${d < 0 ? "−" : "+"}${mmss(Math.abs(d))})`);
+            toast(
+              `Prognose verändert: ${mmss(old)} → ${mmss(t)} (${d < 0 ? "−" : "+"}${mmss(Math.abs(d))})`,
+            );
           }
           lsSet("hx:fc-last", String(t));
         } catch (_) {}
@@ -15962,9 +16073,19 @@
       /* Übungsliste im Bearbeiten-Bildschirm: versteckte Textarea #ed-i (eine Übung pro Zeile) bleibt mit den Eingabefeldern synchron */
       const edSync = () => {
         const ta = document.getElementById("ed-i");
-        if (ta) ta.value = [...document.querySelectorAll(".ed-li")].map((x) => x.value.trim()).filter(Boolean).join(String.fromCharCode(10));
+        if (ta)
+          ta.value = [...document.querySelectorAll(".ed-li")]
+            .map((x) => x.value.trim())
+            .filter(Boolean)
+            .join(String.fromCharCode(10));
       };
-      document.addEventListener("input", (e) => e.target.classList && e.target.classList.contains("ed-li") && edSync());
+      document.addEventListener(
+        "input",
+        (e) =>
+          e.target.classList &&
+          e.target.classList.contains("ed-li") &&
+          edSync(),
+      );
       let editFrom = null,
         editBack = null; // editBack: zurück in den Coach statt zur Tagesansicht
       function vEdit() {
@@ -16259,10 +16380,7 @@
         try {
           // Fehlen bei älteren Garmin-Einheiten noch die Runden (Laps), ab Planstart neu holen (der Server lädt je Abruf 15)
           const noLaps = Object.values(S.strava.acts).some(
-            (a) =>
-              a.src === "garmin" &&
-              ["run", "row", "ride", "ski"].includes(a.group) &&
-              a.laps === undefined,
+            (a) => a.src === "garmin" && a.lapsV !== 3,
           );
           const to = isoD(NOW),
             from = isoD(
@@ -16274,10 +16392,11 @@
               ),
             );
           const have = Object.values(S.strava.acts)
-            .filter((a) => a.src === "garmin" && a.laps !== undefined)
+            .filter((a) => a.src === "garmin" && a.lapsV === 3)
             .map((a) => a.id);
           const r = await gmInvoke({ action: "sync", from, to, have });
           const n = mergeActs(r.acts || []);
+          if (autoSplits()) toast("Splits aus der Uhr übernommen");
           S.garmin.well = garmin.mergeWell(S.garmin.well, r.well || {});
           S.garmin.at = Date.now();
           // Welche Erholungs-Abfragen geklappt haben (ok / leer / HTTP-Status) – für die Fehlersuche im Tab sichtbar
@@ -16492,17 +16611,26 @@
         if (!rows.length)
           return `<p class="sub mt-2">Noch keine Erholungswerte.</p>`;
         return (
-          `<table class="well"><tr><th>Tag</th><th>Ready</th><th>HRV</th><th>Schlaf</th><th>BB</th><th>Ruhepuls</th></tr>` +
+          `<table class="well"><tr><th>Tag</th><th>Ready</th><th>HRV</th><th>Schlaf</th><th>BB</th><th>Ruhepuls</th><th>Schritte</th></tr>` +
           rows
             .map((d) => {
               const w = S.garmin.well[d],
                 r = garmin.recoveryHint(w),
                 dt = isoToDate(d);
-              return `<tr><td class="${r.level ? "rec-" + r.level : ""}">${DAYS[(dt.getDay() + 6) % 7]} ${dt.getDate()}.${dt.getMonth() + 1}.</td><td>${fmtWell(w, "readiness")}</td><td>${fmtWell(w, "hrv")}${w.hrvStatus ? ` <span class="sub">${esc(fmtWell(w, "hrvStatus"))}</span>` : ""}</td><td>${fmtWell(w, "sleepH")}${w.sleepH != null ? " h" : ""}</td><td>${fmtWell(w, "bb")}</td><td>${fmtWell(w, "rhr")}</td></tr>`;
+              return `<tr><td class="${r.level ? "rec-" + r.level : ""}">${DAYS[(dt.getDay() + 6) % 7]} ${dt.getDate()}.${dt.getMonth() + 1}.</td><td>${fmtWell(w, "readiness")}</td><td>${fmtWell(w, "hrv")}${w.hrvStatus ? ` <span class="sub">${esc(fmtWell(w, "hrvStatus"))}</span>` : ""}</td><td>${fmtWell(w, "sleepH")}${w.sleepH != null ? " h" : ""}</td><td>${fmtWell(w, "bb")}</td><td>${fmtWell(w, "rhr")}</td><td>${w.steps != null ? w.steps.toLocaleString("de-CH") : "–"}</td></tr>`;
             })
             .join("") +
-          `</table>`
+          `</table>` +
+          stepsLink()
         );
+      }
+      /* Schritte an die Ernährungs-App übergeben (öffnet sie mit ?steps=…, siehe nutritionUrl in config.js) */
+      function stepsLink() {
+        const url = (window.HX_CONFIG || {}).nutritionUrl;
+        const d = isoD(NOW),
+          w = S.garmin.well[d];
+        if (!url || !w || w.steps == null) return "";
+        return `<p class="mt-2"><a class="btn" href="${esc(url.replace(/\/+$/, ""))}/?steps=${w.steps}&date=${d}" target="_blank" rel="noopener">${w.steps.toLocaleString("de-CH")} Schritte an die Ernährungs-App senden</a></p>`;
       }
       /* Erholung heute (Garmin) auf der Startseite – nur wenn Werte da sind */
       function recoveryCard(i) {
@@ -17121,8 +17249,14 @@
         };
         // Dauer und Score tragen ihren 7-Nächte-Schnitt direkt darunter (kein zweites «Dauer» im Fliesstext)
         h = h
-          .replace('<span class="sl-avg" data-avg="sleepH"></span>', `<span class="sl-avg">Ø 7 Nächte ${a("sleepH", w7, (v) => one(v) + " h")}</span>`)
-          .replace('<span class="sl-avg" data-avg="sleepScore"></span>', `<span class="sl-avg">Ø 7 Nächte ${a("sleepScore", w7, (v) => Math.round(v))}</span>`);
+          .replace(
+            '<span class="sl-avg" data-avg="sleepH"></span>',
+            `<span class="sl-avg">Ø 7 Nächte ${a("sleepH", w7, (v) => one(v) + " h")}</span>`,
+          )
+          .replace(
+            '<span class="sl-avg" data-avg="sleepScore"></span>',
+            `<span class="sl-avg">Ø 7 Nächte ${a("sleepScore", w7, (v) => Math.round(v))}</span>`,
+          );
         h += `<button class="btn ghost sm mt-2" data-act="sleep-open" aria-expanded="${sleepOpen}">${sleepOpen ? "Weniger anzeigen" : "Details und alle Nächte"}</button>`;
         if (!sleepOpen) return h + `</div>`;
         const night = [
@@ -17918,12 +18052,17 @@
       }
       /* Anfrage für einen externen Chat (Gemini): lesbarer Text mit Stand, Verlauf und Frage */
       function coachPrompt(req) {
-        const hist = (req.history || []).map((m) => (m.role === "user" ? "Ich: " : "Coach: ") + m.content).join("\n");
+        const hist = (req.history || [])
+          .map((m) => (m.role === "user" ? "Ich: " : "Coach: ") + m.content)
+          .join("\n");
         return (
           "Du bist mein HYROX-Coach (Basel 2027, Ziel unter 60:00, Doubles Men PRO). Antworte auf Deutsch, knapp und konkret. Ändere nichts am Plan von dir aus, schlage nur vor.\n\n" +
-          "Mein Stand (JSON):\n" + JSON.stringify(req.context) + "\n\n" +
+          "Mein Stand (JSON):\n" +
+          JSON.stringify(req.context) +
+          "\n\n" +
           (hist ? "Bisheriger Verlauf:\n" + hist + "\n\n" : "") +
-          "Meine Frage:\n" + req.message
+          "Meine Frage:\n" +
+          req.message
         );
       }
       function copyCoach(req) {
@@ -19189,23 +19328,7 @@
           spSave();
           return focusRender();
         }
-        if (a === "sp-watch") {
-          const st = s7Steps(p),
-            act = (actsOf(focusI) || []).find(
-              (x) => x.laps && st && x.laps.length === st.length,
-            );
-          if (!act)
-            return toast(
-              "Keine passenden Runden von der Uhr gefunden (Schritte im Plan: " +
-                (st ? st.length : 0) +
-                ")",
-              true,
-            );
-          fcSp.done = st.map((_, k) => act.laps[k].t);
-          spSave();
-          toast("Zeiten aus der Uhr übernommen");
-          return focusRender();
-        }
+        if (a === "sp-watch") return spFromWatch();
         if (a === "inc") return fcStep(1);
         if (a === "dec") return fcStep(-1);
         if (a === "last") {
@@ -19704,13 +19827,25 @@
             val: m[3],
           };
         // Aufgeteilte Runden (src/split.js): Station und Lauf stehen als zwei Zeilen
-        if ((m = /^Runde (\d+):\s*(\d+(?:,\d+)?)\s*km\s*@\s*(\d+:\d\d)\s*\/km(?:\s*\((\d+:\d\d)\))?(?:,\s*(.+))?$/.exec(t)))
+        if (
+          (m =
+            /^Runde (\d+):\s*(\d+(?:,\d+)?)\s*km\s*@\s*(\d+:\d\d)\s*\/km(?:\s*\((\d+:\d\d)\))?(?:,\s*(.+))?$/.exec(
+              t,
+            ))
+        )
           return {
             title: `Runde ${m[1]} · Lauf`,
-            subs: [[s7Pace(`${m[2]} km @ ${m[3]}/km`), m[5]].filter(Boolean).join(" · ")],
+            subs: [
+              [s7Pace(`${m[2]} km @ ${m[3]}/km`), m[5]]
+                .filter(Boolean)
+                .join(" · "),
+            ],
             val: m[4] || "",
           };
-        if ((m = /^Runde (\d+):\s*(.+?)\s*\(([^)]*)\)$/.exec(t)) && !/\bkm\b/.test(m[2])) {
+        if (
+          (m = /^Runde (\d+):\s*(.+?)\s*\(([^)]*)\)$/.exec(t)) &&
+          !/\bkm\b/.test(m[2])
+        ) {
           const r = s7Row(`Runde ${m[1]}: ${m[2]} (${m[3]}) → ·`); // Stationszeile wie bisher, ohne den angehängten Lauf
           return { ...r, subs: r.subs.slice(0, 1) };
         }
@@ -19878,6 +20013,308 @@
         return `<section class="s6-card s7-rdy" aria-label="Readiness"><i style="background:${lvl === "green" ? "#30d158" : "#ff9f0a"}"></i><div><b>${wl.readiness != null ? `Readiness ${Math.round(wl.readiness)} · ` : ""}${head}</b><span>${esc(sub)}</span></div></section>`;
       }
       /* Heute, wenn die Einheit abgeschlossen ist: Zusammenfassung, offene Übungen, Woche */
+      /* Alles, was der Coach zur fertigen Einheit wissen muss (siehe coach.analysisContext) */
+      /* Uhr-Runden (oder, ohne Uhr, die eingetragenen Zeiten) je Plan-Schritt, mit Ziel, Abweichung und Pace */
+      function s7AnSplits(i, p) {
+        const steps = s7Steps(p);
+        if (!steps) return null;
+        const hit = watchSplitsFor(i, steps),
+          dk = keyI(i),
+          seen = {};
+        const rows = steps.map((s, k) => {
+          const idx = (seen[s.j] = (seen[s.j] || 0) + 1) - 1;
+          const typed = parseT(String(S.val[dk + "|" + s.j] || "").split(" · ")[idx]);
+          const actual = hit ? hit.times[k] : isNaN(typed) ? null : typed;
+          const km = /^(d+(?:,d+)?)s?km/.exec(s.name),
+            o = { step: s.tp + " " + s.name, kind: s.kind, goal: s.goal || null, actual };
+          if (s.sub) o.note = s.sub;
+          if (actual != null && s.goal) o.delta = actual - s.goal;
+          if (actual != null && km) o.pace = Math.round(actual / parseFloat(km[1].replace(",", ".")));
+          if (hit && hit.hr[k]) o.hr = hit.hr[k];
+          return o;
+        });
+        return rows.some((r) => r.actual != null) ? rows : null;
+      }
+      function s7AnData(i, p) {
+        const dk = keyI(i),
+          iso = coach.isoFromIdx(i),
+          info = weekInfo(Math.floor(i / 7)),
+          st = (j, q) =>
+            S.done[keyI(j) + "|" + q]
+              ? "erledigt"
+              : S.xs[keyI(j) + "|" + q]
+                ? "gestrichen"
+                : "offen",
+          valsOf = (j, q) =>
+            q.i
+              .map((t, x) => ({ ex: exName(t), v: S.val[keyI(j) + "|" + x] }))
+              .filter((o) => o.ex && String(o.v || "").trim());
+        const items = p.i
+          .map((t, j) => ({ t, j }))
+          .filter(({ t }) => !isFiller(t))
+          .map(({ t, j }) => {
+            const le = lastEntry(i, t),
+              o = {
+                plan: t,
+                status: st(i, j),
+                value: S.val[dk + "|" + j] || "",
+              };
+            if (le)
+              o.prev = { value: le.v, rpe: le.rpe != null ? +le.rpe : null };
+            return o;
+          });
+        const acts = actsOf(i),
+          a = acts.find((x) => x.laps && x.laps.length) || acts[0] || null,
+          similar = [];
+        for (
+          let x = i - 1;
+          x >= Math.max(0, i - 70) && similar.length < 3;
+          x--
+        ) {
+          const q = dayPlan(x);
+          if (!q || q.k !== p.k || !trained(x)) continue;
+          const s = dayStatus(x);
+          similar.push({
+            date: coach.isoFromIdx(x),
+            title: q.t,
+            rpe: S.rpe[keyI(x)] != null ? +S.rpe[keyI(x)] : null,
+            done: `${s.done}/${s.n}`,
+            values: valsOf(x, q),
+          });
+        }
+        const wd = s6WeekData(Math.floor(i / 7)),
+          c = S.checkin[dk],
+          well = S.garmin.well[iso];
+        const t = S.tests || {};
+        return {
+          date: iso,
+          weekday: DAYSF[dow(i)],
+          title: p.t,
+          kind: p.k,
+          planNote: p.n || "",
+          wave: info.wave,
+          block: info.block,
+          week: Math.floor(i / 7) + 1,
+          daysToRace: Math.ceil((RACE - midnight(dateFromIdx(i))) / dayMs),
+          items,
+          rpe: S.rpe[dk] != null ? +S.rpe[dk] : null,
+          note: S.notes[dk] || "",
+          checkin: c ? { ...c, ampel: readiness(c) } : null,
+          garmin: well || null,
+          watch: a
+            ? {
+                name: a.name,
+                type: a.type,
+                dist: a.dist,
+                time: a.time,
+                hr: a.hr,
+                watts: a.watts,
+                laps: a.laps || [],
+                lapsAvailable: !!(a.laps && a.laps.length),
+              }
+            : null,
+          splits: s7AnSplits(i, p),
+          similar,
+          weekDone: { done: wd.ok, plan: wd.plan },
+          tests: { lauf: t.lauf || null, station: t.station || null },
+        };
+      }
+      /* Fingerabdruck der Eingaben: ändert er sich, ist die gespeicherte Analyse veraltet */
+      const s7AnSig = (i, p) => {
+        const dk = keyI(i);
+        return JSON.stringify([
+          p.i.map((_, j) => [
+            S.done[dk + "|" + j] ? 1 : 0,
+            S.xs[dk + "|" + j] ? 1 : 0,
+            S.val[dk + "|" + j] || "",
+          ]),
+          S.rpe[dk] ?? null,
+          S.notes[dk] || "",
+          actsOf(i).map((a) => a.id),
+        ]);
+      };
+      let anBusy = {},
+        anErr = {};
+      function anFnError(error) {
+        const res =
+          error.context && typeof error.context.json === "function"
+            ? error.context
+            : null;
+        return (async () => {
+          let code = "";
+          if (res) {
+            try {
+              code = (await res.clone().json()).error || "";
+            } catch (_) {}
+          }
+          return coach.coachErrorText(
+            res ? res.status : navigator.onLine === false ? 0 : -1,
+            code,
+          );
+        })();
+      }
+      async function runAnalysis(i) {
+        const p = dayPlan(i),
+          dk = keyI(i);
+        if (!p || anBusy[dk]) return;
+        if (!coachReady()) {
+          anErr[dk] = "Die Coach-Analyse braucht eine Anmeldung.";
+          return render();
+        }
+        anBusy[dk] = 1;
+        delete anErr[dk];
+        render();
+        try {
+          if (gmOn() && !gmBusy && !actsOf(i).some((a) => a.laps && a.laps.length)) await garminSync(true);
+          const req = coach.buildCoachRequest({
+            context: coach.analysisContext(coachCtx(), s7AnData(i, p)),
+            chat: [],
+            message: coach.analyseMessage(i, p),
+            mode: "analyse",
+          });
+          const { data, error } = await sb.functions.invoke("coach", {
+            body: req,
+          });
+          if (error) throw new Error(await anFnError(error));
+          const r = coach.parseAnalysis(data);
+          S.analysis[dk] = {
+            at: Date.now(),
+            sig: s7AnSig(i, p),
+            data: r,
+            state: r.actions.length ? "open" : "none",
+          };
+          save();
+        } catch (e) {
+          anErr[dk] = e.message || coach.coachErrorText(-1, "");
+        }
+        delete anBusy[dk];
+        if (view === "today") render();
+      }
+      /* Schnell-Check ohne Netz (feste Regeln, src/analyse.js) */
+      function s7Analysis(i, p) {
+        const dk = keyI(i),
+          wave = weekInfo(Math.floor(i / 7)).wave,
+          items = p.i
+            .map((t, j) => ({
+              t,
+              done: !!S.done[dk + "|" + j],
+              skip: !!S.xs[dk + "|" + j],
+              val: S.val[dk + "|" + j] || "",
+              prevVal: (lastEntry(i, t) || {}).v || "",
+              fill: isFiller(t) || /^Erste \d+ m nach jeder Station/.test(t),
+            }))
+            .filter((x) => !x.fill),
+          acts = actsOf(i),
+          act = acts.find((a) => a.laps && a.laps.length) || acts[0] || null,
+          prevRpe = [];
+        for (let x = i - 1; x >= 0 && prevRpe.length < 2; x--) {
+          const q = dayPlan(x);
+          if (q && q.k === p.k && S.rpe[keyI(x)] != null)
+            prevRpe.unshift(+S.rpe[keyI(x)]);
+        }
+        const sv = (j) =>
+          Object.values(S.sore[keyI(j)] || {})
+            .map(Number)
+            .filter((v) => v > 0);
+        const sore = Math.max(0, ...sv(i), ...(i + 1 <= LAST ? sv(i + 1) : []));
+        const c = S.checkin[dk];
+        return analyseSession({
+          kind: p.k,
+          title: p.t,
+          easy: isEasyRun(p),
+          wave,
+          rpe: S.rpe[dk] != null ? +S.rpe[dk] : null,
+          rpeMax: review.RPE_MAX[wave],
+          items,
+          act,
+          ready: c ? readiness(c) : null,
+          note: S.notes[dk] || "",
+          sore: sore || null,
+          prevRpe,
+        });
+      }
+      const AN_AREA = {
+        session: "Einheit",
+        rest: "Pausen",
+        load: "Belastung",
+        tempo: "Tempo",
+        plan: "Plan",
+        recovery: "Erholung",
+      };
+      function s7AnHtml(i, p) {
+        const dk = keyI(i),
+          rec = S.analysis[dk],
+          busy = !!anBusy[dk],
+          stale = !!rec && rec.sig !== s7AnSig(i, p);
+        const li = (a) => a.map((t) => `<li>${esc(t)}</li>`).join("");
+        const pair = (a) =>
+          a
+            .map((x) => `<li><b>${esc(x.title)}</b> ${esc(x.detail)}</li>`)
+            .join("");
+        let quick = "";
+        try {
+          const r = s7Analysis(i, p);
+          quick = `<details class="s7-an-q"><summary>Schnell-Check (automatisch, ohne Coach) · ${esc(r.verdict)}</summary>
+          <p class="s7-an-e">${esc(r.exec)}</p>
+          ${r.good.length ? `<h4>Gut</h4><ul class="g">${li(r.good)}</ul>` : ""}
+          ${r.bad.length ? `<h4>Schlecht</h4><ul class="b">${li(r.bad)}</ul>` : ""}
+          ${r.adjust.length ? `<h4>Anpassen</h4><ul class="a">${li(r.adjust)}</ul>` : ""}</details>`;
+        } catch (e) {}
+        const btn = (label) =>
+          `<button type="button" class="s6-btn gold" data-act="an-run" data-i="${i}"${busy ? " disabled" : ""}>${label}</button>`;
+        const open = !rec || rec.open !== false;
+        let body;
+        if (busy)
+          body = `<p class="s7-an-e">Coach liest deine Einheit und die letzten gleichartigen …</p>`;
+        else if (!rec) {
+          body = `<p class="s7-an-e">Dein Coach wertet die Einheit aus: Stärken, Schwächen, Tempo, Pausen und was du am Workout oder am Plan ändern solltest.</p>${btn("Coach-Analyse starten")}`;
+        } else {
+          const r = rec.data,
+            ex = r.execution;
+          const exRows = [
+            ["Tempo & Verlauf", ex.pacing],
+            ["Pausen", ex.rest],
+            ["Technik", ex.technique],
+          ]
+            .filter(([, t]) => t)
+            .map(([k, t]) => `<li><b>${k}</b> ${esc(t)}</li>`)
+            .join("");
+          const adj = r.adjustments
+            .map(
+              (x) =>
+                `<li><b>${AN_AREA[x.area] || "Einheit"}</b> ${esc(x.change)}${x.why ? ` <span class="why">${esc(x.why)}</span>` : ""}</li>`,
+            )
+            .join("");
+          let acts = "";
+          if (r.actions.length) {
+            const { valid } = coachCheck(r.actions);
+            if (valid.length && rec.state === "open")
+              acts = `<h4>Vorschlag für den Plan</h4><ul class="a">${valid.map((a) => `<li>${esc(propText(a))}${a.reason ? ` <span class="why">${esc(a.reason)}</span>` : ""}</li>`).join("")}</ul>
+              <div class="s7-fa"><button type="button" class="s6-btn gold" data-act="an-apply" data-i="${i}">Nur für mich</button>${valid.some((a) => a.type === "edit") ? `<button type="button" class="s6-btn gold" data-act="an-apply-all" data-i="${i}">Für uns beide</button>` : ""}<button type="button" class="s6-btn" data-act="an-dismiss" data-i="${i}">Verwerfen</button></div>`;
+            else if (rec.state === "applied")
+              acts = `<p class="s7-an-e">Planänderung übernommen.</p>`;
+          }
+          const formHtml = r.form
+            ? `<p class="s7-an-form"><b>${esc(r.form.rating)}</b> ${esc(r.form.text)}</p>`
+            : "";
+          body = !open
+            ? `<p class="s7-an-h">${esc(r.headline)}</p>`
+            : `${stale ? `<p class="s7-an-st">Seit der Analyse hast du Werte geändert.</p>` : ""}
+          <p class="s7-an-h">${esc(r.headline)}</p>
+          <p class="s7-an-e">${esc(r.summary)}</p>
+          ${formHtml}
+          ${r.insights && r.insights.length ? `<h4>Erkenntnisse</h4><ul class="n">${pair(r.insights)}</ul>` : ""}
+          ${r.strengths.length ? `<h4>Stärken</h4><ul class="g">${pair(r.strengths)}</ul>` : ""}
+          ${r.weaknesses.length ? `<h4>Schwächen</h4><ul class="b">${pair(r.weaknesses)}</ul>` : ""}
+          ${exRows ? `<h4>Umsetzung</h4><ul class="n">${exRows}</ul>` : ""}
+          ${adj ? `<h4>Anpassen</h4><ul class="a">${adj}</ul>` : ""}
+          ${r.nextFocus ? `<h4>Nächstes Mal</h4><p class="s7-an-e">${esc(r.nextFocus)}</p>` : ""}
+          ${r.dataGaps.length ? `<h4>Offene Fragen</h4><ul class="n">${li(r.dataGaps)}</ul>` : ""}
+          ${acts}
+          ${btn(stale ? "Neu analysieren" : "Nochmals analysieren")}`;
+        }
+        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top">${rec && !busy ? `<button type="button" class="s7-an-tg" data-act="an-toggle" data-i="${i}" aria-expanded="${open}"><span class="s6-kick">Coach-Analyse</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(${open ? 180 : 0}deg)"><path d="M6 9l6 6 6-6"/></svg></button>` : `<span class="s6-kick">Coach-Analyse</span>`}</div>${body}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}${quick}</section>`;
+      }
       function s7FinCard(i, p) {
         const dk = keyI(i),
           st = dayStatus(i);
@@ -19918,6 +20355,7 @@
         <h2 class="s6-title">${esc(s7Title(p.t))}</h2><div class="s6-title-d"><h1>${esc(s7Title(p.t))}</h1></div>
         <p class="s7-fl"><b>${st.done - p.i.filter((_, j) => S.xs[dk + "|" + j]).length}</b> von ${st.n} Übungen${p.i.some((_, j) => S.xs[dk + "|" + j]) ? ` · ${p.i.filter((_, j) => S.xs[dk + "|" + j]).length} gestrichen` : ""} · Anstrengung <b>${rpe != null ? rpe : "–"}</b> von 10</p>
         ${open.length ? `<p class="s7-fp">Nicht gemacht: ${esc(open.join(", "))}.${can ? " Die offenen Übungen kannst Du verschieben." : ""}</p>` : ""}
+        ${s7AnHtml(i, p)}
         <div class="s7-fa">${can ? `<button type="button" class="s6-btn" data-act="later" data-i="${i}">Offene verschieben</button>` : ""}<button type="button" class="s6-btn" data-act="all-done" data-i="${i}">Ändern</button></div></article>`;
         const wk = `<section class="s6-card s7-fw"><div><span class="s6-kick">Woche ${w + 1}</span><b>${D.ok} <small>/ ${D.plan} Einheiten</small></b></div></section>`;
         return card;
@@ -20009,7 +20447,16 @@
               let nxI = -1;
               for (let x = i + 1; x <= Math.min(LAST, i + 14); x++) {
                 const q = dayPlan(x);
-                if (q && q.k !== "rest" && !trained(x) && !S.off[keyI(x)] && !S.later[keyI(x)]) { nxI = x; break; }
+                if (
+                  q &&
+                  q.k !== "rest" &&
+                  !trained(x) &&
+                  !S.off[keyI(x)] &&
+                  !S.later[keyI(x)]
+                ) {
+                  nxI = x;
+                  break;
+                }
               }
               if (nxI >= 0)
                 hero += `<div class="s7-nxl"><span class="s6-kick">Als Nächstes · ${DAYSF[dow(nxI)]}, ${fmt(dateFromIdx(nxI))}</span></div>${s7HeroHtml(nxI, dayPlan(nxI), keyI(nxI), false)}`;
@@ -20285,7 +20732,9 @@
             : `<button type="button" class="s7-tx" data-act="cc-copy">Anfrage kopieren</button><button type="button" class="s7-tx" data-act="gem-paste">Antwort einfügen</button>`,
           gem = `<a class="s7-gem" data-act="gem-open" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e0bf6a" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.6 5.4 3.6 8.4 9 9-5.4.6-8.4 3.6-9 9-.6-5.4-3.6-8.4-9-9 5.4-.6 8.4-3.6 9-9z"/></svg>Mit Gemini weiter diskutieren</a>`;
         const isMob = matchMedia("(max-width: 899px)").matches;
-        const gemBox0 = ready ? "" : `<details class="s7-gp"${ccGemOpen ? " open" : ""}><summary>Antwort aus Gemini übernehmen</summary><p class="s7-note">Antwort in Gemini kopieren, hier einfügen, übernehmen.</p><textarea id="gem-in" rows="5" placeholder="Antwort von Gemini hier einfügen"></textarea><button type="button" class="s6-btn gold" data-act="gem-take">Übernehmen</button></details>`;
+        const gemBox0 = ready
+          ? ""
+          : `<details class="s7-gp"${ccGemOpen ? " open" : ""}><summary>Antwort aus Gemini übernehmen</summary><p class="s7-note">Antwort in Gemini kopieren, hier einfügen, übernehmen.</p><textarea id="gem-in" rows="5" placeholder="Antwort von Gemini hier einfügen"></textarea><button type="button" class="s6-btn gold" data-act="gem-take">Übernehmen</button></details>`;
         const info = `<aside class="s6-cinfo">${knD}${ready ? "" : `<p class="s6-cnote">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`}${sw}${gem}<span class="s7-clr">${clr}</span>${isMob ? "" : gemBox0}</aside>`;
         const qr = [
           ["Erklär die Einheit", "Erkläre mir die heutige Einheit.", "explain"],
@@ -20304,7 +20753,9 @@
           .join("")}</div>`;
         const inp = `<form class="s6-cin" data-form="coach">${chips}<div class="s6-inp"><label for="cc-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Nachricht an den Coach</label><input id="cc-in" type="text" maxlength="${coach.MAX_MSG}" value="${esc(ccDraft)}" placeholder="${ccExplain ? "Was soll ich dir erklären?" : "z. B. „Knie zwickt seit gestern“"}" autocomplete="off" enterkeyhint="send" ${ccBusy ? "disabled" : ""}><button type="submit" aria-label="${ready ? "Senden" : "Vorbereiten"}" ${ccBusy ? "disabled" : ""}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div></form>`;
         const gemBox = isMob ? gemBox0 : "";
-        const cnote = ready ? "" : `<p class="s6-cnote m">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`;
+        const cnote = ready
+          ? ""
+          : `<p class="s6-cnote m">Der Coach läuft über die Cloud. Ohne Login wird die Anfrage nur vorbereitet.</p>`;
         // Alles Zusätzliche (Nur erklären, Verlauf, Gemini, Hinweise) steckt hinter dem «+» in der Chat-Leiste
         const dock = `<div class="s7-dock"><details class="s7-plus"><summary aria-label="Mehr">+</summary><div class="s7-pm"><div class="s6-m s7-pmr">${clr}</div>${gem.replace('class="s7-gem"', 'class="s7-gem s6-m"')}${cnote}${gemBox}</div></details>${inp}</div>`;
         return `<div class="s6 s6-coach is-chat">${head}${kn}${side}<section class="s6-cmain s6-chatc" aria-label="Chat">${off}<div class="s6-msgs" id="chat">${s6CoachMsgs()}</div>${dock}</section>${info}</div>`;
@@ -20337,7 +20788,16 @@
           const row = (l, v, extra) =>
             `<div class="tr"><span>${l}${extra ? ` <small>${extra}</small>` : ""}</span><b>${mmss(v)}</b></div>`;
           // Nachrechnen: alle Zwischenwerte der Prognose, damit man sie gegen die eigenen Zeiten prüfen kann
-          const SN = ["SkiErg", "Sled Push", "Sled Pull", "Burpee Broad Jumps", "RowErg", "Farmers Carry", "Sandbag Lunges", "Wall Balls"];
+          const SN = [
+            "SkiErg",
+            "Sled Push",
+            "Sled Pull",
+            "Burpee Broad Jumps",
+            "RowErg",
+            "Farmers Carry",
+            "Sandbag Lunges",
+            "Wall Balls",
+          ];
           const wide = ""; // zugeklappt: Karte ist nur so gross wie nötig
           const calc = `<details class="s7-det"${wide}><summary>So wird gerechnet<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
             <p class="s7-note">Gesamt = Laufen + Stationen + Roxzone. Läufe: Pacing-Test-Schnitt (${mmss(Math.round(fc.T))} /km) plus Ermüdungsaufschlag (Stufe «${esc(fc.level)}»), ab Lauf 5 kommt Tempoverlust dazu.</p>
@@ -20348,7 +20808,8 @@
             ${(fc.basis || []).map((b) => `<p class="s7-note">${esc(b)}</p>`).join("")}${(fc.warnings || []).map((b) => `<p class="s7-note">⚠ ${esc(b)}</p>`).join("")}</details>`;
           const wide0 = "";
           // Desktop: Rechenweg als Kachelreihen (8 Läufe, 8 Stationen) statt zweier Ausklappmenüs
-          const tl = (l, v, x) => `<div><small>${l}</small><b>${v}</b>${x ? `<i>${x}</i>` : ""}</div>`;
+          const tl = (l, v, x) =>
+            `<div><small>${l}</small><b>${v}</b>${x ? `<i>${x}</i>` : ""}</div>`;
           const pgw = `<div class="s7-pgw"><div class="g8"><span class="s6-kick">Laufen · 8 × 1 km</span><div class="t8">${(fc.paces || []).map((p, r) => tl("Lauf " + (r + 1), mmss(Math.round(p)))).join("")}</div></div>
             <div class="g8"><span class="s6-kick">Stationen · Team (Benchmark × k = ${String(Math.round(fc.k * 100) / 100).replace(".", ",")})</span><div class="t8">${(fc.stations || []).map((v, r) => tl(SN[r], v != null ? mmss(Math.round(v)) : "–", fc.sources && fc.sources[r] === "bench" ? "Benchmark" : "Annahme")).join("")}</div></div>
             <p class="s7-note">Gesamt ${mmss(fc.total)} = Laufen ${mmss(fc.run)} + Stationen ${mmss(stSum)} + Roxzone ${mmss(fc.rox)}. Läufe: Pacing-Test-Schnitt ${mmss(Math.round(fc.T))} /km plus Ermüdungsaufschlag (Stufe «${esc(fc.level)}»), ab Lauf 5 Tempoverlust. ${(fc.basis || []).map(esc).join(" · ")}${(fc.warnings || []).map((b) => " ⚠ " + esc(b)).join("")}</p></div>`;
@@ -21124,7 +21585,12 @@
             prev.merged = true;
             return;
           }
-          lines.push({ t, j, jr: j, round: sm && !/\bkm\b/.test(sm[2]) ? sm[1] : null });
+          lines.push({
+            t,
+            j,
+            jr: j,
+            round: sm && !/\bkm\b/.test(sm[2]) ? sm[1] : null,
+          });
         });
         lines.forEach(({ t, j, jr }) => {
           let m;
@@ -21380,8 +21846,8 @@
           ? ""
           : run
             ? `<button type="button" class="f7-go" data-fc="sp-split"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l5 5 9-10"/></svg>Split</button>`
-            : `<button type="button" class="f7-go" data-fc="sp-start"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Start</button>`;
-        return `<div id="sp" class="sp"><header class="sp-h"><button type="button" class="f7-x" data-fc="close" aria-label="Fokusmodus schliessen">${F7_X}</button><div class="sp-tt"><span class="s6-kick">Stationen · Kachel tippen oder Lap-Taste = Split speichern</span><b>${esc(s7Title(p.t))}</b></div><span class="sp-tot" id="sp-tot">${mmss(tot)}</span>${btn}</header><p class="sp-hint">Tippe eine Kachel beim Zieleinlauf (oder drücke die Lap-Taste der Uhr): Der Split wird gespeichert und die nächste Kachel startet.</p><div class="sp-g">${tiles}</div>${run && !fin ? `<button type="button" class="s7-tx sp-rd" data-fc="sp-redo">Messung verwerfen und neu starten</button>` : ""}</div>`;
+            : `<button type="button" class="f7-go" data-fc="sp-watch">Von Garmin holen</button>`;
+        return `<div id="sp" class="sp"><header class="sp-h"><button type="button" class="f7-x" data-fc="close" aria-label="Fokusmodus schliessen">${F7_X}</button><div class="sp-tt"><span class="s6-kick">${run ? "Stationen · Kachel tippen = Split speichern" : "Stationen · Zeiten von der Uhr"}</span><b>${esc(s7Title(p.t))}</b></div><span class="sp-tot" id="sp-tot">${mmss(tot)}</span>${btn}</header><p class="sp-hint">${run ? "Tippe eine Kachel beim Zieleinlauf: Der Split wird gespeichert und die nächste Kachel startet." : "Trainiere mit der Lap-Taste deiner Uhr. Nach dem Training holt die App die Rundenzeiten von Garmin – hier musst du nichts tippen."}</p><div class="sp-g">${tiles}</div>${run && !fin ? `<button type="button" class="s7-tx sp-rd" data-fc="sp-redo">Messung verwerfen und neu starten</button>` : ""}${!run ? `<button type="button" class="s7-tx sp-rd" data-fc="sp-start">Stoppuhr in der App benutzen</button>` : ""}</div>`;
       }
       /* Splits prüfen: Ist-Zeiten lassen sich korrigieren */
       function s7SpCheck(p, steps) {
@@ -21391,8 +21857,11 @@
           df = spDiff(aT, gT);
         const rows = steps
           .map((s, k) => {
-            const d = spDiff(fcSp.done[k] || 0, s.goal);
-            return `<div class="tr"><div class="nm"><small>${esc(s.tp)}</small>${esc(s.name)}</div><div class="c ze">${s.goal ? mmss(s.goal) : "–"}</div><input class="ist" type="text" inputmode="text" pattern="[0-9:]*" value="${mmss(fcSp.done[k] || 0)}" data-sp="${k}" aria-label="Ist-Zeit ${esc(s.tp)} ${esc(s.name)}"><div class="c ${s.goal ? d.c : "ze"}" id="sp-d${k}">${s.goal ? d.t : "–"}</div></div>`;
+            const d =
+              fcSp.done[k] != null
+                ? spDiff(fcSp.done[k], s.goal)
+                : { t: "–", c: "ze" };
+            return `<div class="tr"><div class="nm"><small>${esc(s.tp)}</small>${esc(s.name)}</div><div class="c ze">${s.goal ? mmss(s.goal) : "–"}</div><input class="ist" type="text" inputmode="text" pattern="[0-9:]*" value="${fcSp.done[k] != null ? mmss(fcSp.done[k]) : ""}" placeholder="–:––" data-sp="${k}" aria-label="Ist-Zeit ${esc(s.tp)} ${esc(s.name)}"><div class="c ${s.goal ? d.c : "ze"}" id="sp-d${k}">${s.goal ? d.t : "–"}</div></div>`;
           })
           .join("");
         return `<div id="sp" class="sp chk"><header class="sp-h"><button type="button" class="f7-x" data-fc="close" aria-label="Zurück zur Übersicht" title="Zurück">${F7_CHEV("M15 6l-6 6 6 6")}</button><div class="sp-tt"><span class="s6-kick">Nach der Einheit</span><b>Splits prüfen</b></div></header>
@@ -21430,20 +21899,95 @@
         set("sp-sd", df.t, df.c);
         set("sp-d" + k, steps[k].goal ? d.t : "–", d.c);
       }
+      /* Split-Zeiten je Planzeile als «0:41 · 4:03 · 3:00» in S.val schreiben. onlyEmpty: vorhandene Eingaben nie überschreiben. */
+      function writeSplits(dk, steps, done, onlyEmpty) {
+        const by = {};
+        steps.forEach((s, k) => (by[s.j] = by[s.j] || []).push(done[k]));
+        let n = 0;
+        for (const [j, arr] of Object.entries(by)) {
+          const id = dk + "|" + j;
+          if (!arr.some((x) => x != null)) continue;
+          if (onlyEmpty && String(S.val[id] || "").trim()) continue;
+          S.val[id] = arr.map((x) => (x != null ? mmss(x) : "–")).join(" · ");
+          n++;
+        }
+        return n;
+      }
+      /* Lap-Runden der Uhr (Garmin/Strava) den Plan-Schritten zuordnen: Treffer {times, hr, mode, act} oder null */
+      function watchSplitsFor(i, steps) {
+        for (const a of actsOf(i)) {
+          if (!a.laps || !a.laps.length) continue;
+          const r = alignSplits(a.laps, steps);
+          if (r.times) return { ...r, act: a };
+        }
+        return null;
+      }
+      /* Stationstag: Uhr-Zeiten übernehmen. Garmin hat Vorrang vor älteren Eingaben (z. B. Stoppuhr-Reste) – aber nur einmal je
+         Aktivität (S.wsplit), damit spätere Korrekturen von Hand erhalten bleiben. Gibt true zurück, wenn übernommen wurde. */
+      function importWatchSplits(i, force) {
+        const steps = s7Steps(dayPlan(i));
+        if (!steps) return false;
+        const r = watchSplitsFor(i, steps),
+          dk = keyI(i);
+        if (!r || (!force && S.wsplit[dk] === r.act.id)) return false;
+        writeSplits(dk, steps, r.times, false);
+        S.wsplit[dk] = r.act.id;
+        if (fcSp && fcSp.dk === dk) {
+          fcSp.done = r.times.slice();
+          fcSp.idx = steps.length;
+          if (!fcSp.t0) fcSp.t0 = fcSp.s0 = Date.now();
+          spSave();
+        } else {
+          try {
+            const o = JSON.parse(lsGet(SP_KEY) || "null");
+            if (o && o.dk === dk) lsSet(SP_KEY, "null"); // alte Stoppuhr-Messung dieses Tages verwerfen
+          } catch (_) {}
+        }
+        return true;
+      }
+      /* Nach einem Garmin-Abruf: Zeiten der letzten Tage automatisch übernehmen */
+      function autoSplits() {
+        let n = 0;
+        for (let i = Math.max(0, TODAY - 7); i <= Math.min(TODAY, LAST); i++) n += importWatchSplits(i) ? 1 : 0;
+        return n;
+      }
+      async function spFromWatch() {
+        const at = focusI,
+          st = s7Steps(dayPlan(at));
+        if (!st) return;
+        let r = watchSplitsFor(at, st);
+        if (!r && gmOn()) {
+          toast("Hole Runden von Garmin …");
+          await garminSync(true);
+          r = watchSplitsFor(at, st);
+        }
+        if (!r) {
+          const a = actsOf(at).find((x) => x.laps && x.laps.length);
+          return toast(
+            a
+              ? "Die Uhr hat " + alignSplits(a.laps, st).count + " Runden, der Plan " + st.length + " Schritte (Lauf, Station, Pause). So lassen sie sich nicht zuordnen – Zeiten von Hand eintragen."
+              : "Noch keine Garmin-Einheit mit Runden gefunden. Uhr mit Garmin Connect synchronisieren und nochmals versuchen.",
+            true,
+          );
+        }
+        if (focusI !== at) return;
+        importWatchSplits(at, true);
+        const t = Date.now();
+        fcSp = { dk: keyI(at), t0: t, s0: t, idx: st.length, done: r.times.slice() };
+        spSave();
+        save();
+        toast("Zeiten aus der Uhr übernommen");
+        focusRender();
+      }
       function spSaveAll() {
         const p = dayPlan(focusI),
           steps = s7Steps(p),
           dk = keyI(focusI);
         if (!steps) return;
         const byLine = {};
-        steps.forEach((s, k) =>
-          (byLine[s.j] = byLine[s.j] || []).push(fcSp.done[k]),
-        );
-        for (const [j, arr] of Object.entries(byLine)) {
-          const id = dk + "|" + j;
-          S.val[id] = arr.map((x) => mmss(x || 0)).join(" · ");
-          S.done[id] = 1;
-        }
+        steps.forEach((s) => (byLine[s.j] = 1));
+        writeSplits(dk, steps, fcSp.done, false);
+        for (const j of Object.keys(byLine)) S.done[dk + "|" + j] = 1;
         p.i.forEach((_, j) => {
           if (!byLine[j]) S.done[dk + "|" + j] = 1; // Regel- und Hinweiszeilen ohne eigene Zeit
         });
@@ -21459,6 +22003,7 @@
         const steps = s7Steps(p);
         if (steps) {
           if (!fcSp || fcSp.dk !== dk) spLoad(dk, steps);
+          if (importWatchSplits(focusI)) save();
           if (fcSp.t0 && fcSp.idx < steps.length) spStartTick();
           else clearInterval(fcSpIv);
           el.className = "f7on sp-on";
@@ -21480,6 +22025,17 @@
 
       /* ================= Einheit abschliessen (Sheet) ================= */
       let fin7 = null; // {i, mode: "plan"|"part"|"other", rpe, note, picks:Set, sub: null|"w", w:{j:kg|null}, focus}
+      /* Stationstag ohne Zeiten: Splits von Garmin holen und eintragen (still, im Hintergrund) */
+      async function ensureWatchSplits(i) {
+        if (!s7Steps(dayPlan(i)) || !gmOn()) return;
+        if (!importWatchSplits(i)) {
+          await garminSync(true);
+          if (!importWatchSplits(i)) return;
+        }
+        save();
+        toast("Splits aus der Uhr übernommen");
+        render();
+      }
       function fin7Open(i, fromFocus) {
         const p = dayPlan(i),
           dk = keyI(i);
@@ -21494,12 +22050,17 @@
           picks: new Set(
             done.map((d, j) => (d ? j : -1)).filter((j) => j >= 0),
           ),
-          skips: new Set(p.i.map((_, j) => (S.xs[dk + "|" + j] ? j : -1)).filter((j) => j >= 0)),
+          skips: new Set(
+            p.i
+              .map((_, j) => (S.xs[dk + "|" + j] ? j : -1))
+              .filter((j) => j >= 0),
+          ),
           sub: null,
           w: null,
           focus: !!fromFocus,
         };
         fin7Paint();
+        ensureWatchSplits(i);
       }
       function fin7Close() {
         fin7 = null;
@@ -21524,7 +22085,12 @@
           : p.i
               .map((t, j) => ({ t, j }))
               .filter(
-                ({ t }) => !isFiller(t) && !isLift(p.k, t) && !preWeight(p, t) && !/^Erste \d+ m nach jeder Station/.test(t) && !/Verbot schneller|Redline ab/.test(t),
+                ({ t }) =>
+                  !isFiller(t) &&
+                  !isLift(p.k, t) &&
+                  !preWeight(p, t) &&
+                  !/^Erste \d+ m nach jeder Station/.test(t) &&
+                  !/Verbot schneller|Redline ab/.test(t),
               );
       function fin7Paint() {
         if (!fin7) return;
@@ -21586,13 +22152,20 @@
                     )
                     .join("")
                 : `<input class="f7-notiz" type="text" data-fin-sp="${j}" data-k="0" value="${esc(vals[0] || "")}" placeholder="${esc(placeholder(p.k, t))}" aria-label="${esc(r.title)}">`;
-              const col = /^(Einlaufen|Auslaufen)/.test(t) ? SP_COL.warm : /Sled|Burpee|Ski|Row|Farmers|Lunges|Wall/i.test(r.title) ? SP_COL.station : SP_COL.run;
+              const col = /^(Einlaufen|Auslaufen)/.test(t)
+                ? SP_COL.warm
+                : /Sled|Burpee|Ski|Row|Farmers|Lunges|Wall/i.test(r.title)
+                  ? SP_COL.station
+                  : SP_COL.run;
               return `<div class="f7-spr" style="--c:${col}"><i class="bar"></i><div class="nm">${esc(r.title)}<div class="sb">${esc(r.val ? "Ziel " + r.val : "")}${r.subs[0] ? " · " + esc(r.subs[0]) : ""}</div></div>${fld}</div>`;
             })
             .join("");
           body = `<div><h2>Splits eintragen</h2><div class="sb2">Pro Zeile Zeit oder Split. Leer lassen, was Du nicht brauchst.</div></div><div class="f7-sp">${rows}</div><div class="acts"><button type="button" class="s6-btn gold" data-fin="sok">Übernehmen</button></div>`;
         } else {
-          const nDone = fin7.mode === "plan" ? p.i.length - fin7.skips.size : fin7.picks.size;
+          const nDone =
+            fin7.mode === "plan"
+              ? p.i.length - fin7.skips.size
+              : fin7.picks.size;
           const seg = [
             ["plan", "Wie geplant"],
             ["part", "Teilweise"],
@@ -21703,7 +22276,9 @@
           if (fin7.mode === "plan") {
             // erste Auswahl in «Wie geplant»: zu «Teilweise» wechseln, alles ausser Gestrichenem bleibt gewählt
             fin7.mode = "part";
-            fin7.picks = new Set(p.i.map((_, x) => x).filter((x) => !fin7.skips.has(x)));
+            fin7.picks = new Set(
+              p.i.map((_, x) => x).filter((x) => !fin7.skips.has(x)),
+            );
           }
           fin7.skips.delete(j);
           if (fin7.picks.has(j)) fin7.picks.delete(j);
@@ -21768,8 +22343,18 @@
             fin7Close();
             spLoad(dk0, stp);
             if (!(fcSp.t0 && fcSp.idx >= stp.length)) {
-              const t = Date.now();
-              fcSp = { dk: dk0, t0: t, s0: t, idx: stp.length, done: stp.map((s, k) => (fcSp.done[k] != null ? fcSp.done[k] : s.goal)) };
+              const t = Date.now(),
+                wr = watchSplitsFor(at, stp),
+                wt = wr ? wr.times : null;
+              fcSp = {
+                dk: dk0,
+                t0: t,
+                s0: t,
+                idx: stp.length,
+                done: stp.map((_, k) =>
+                  wt ? wt[k] : fcSp.done[k] != null ? fcSp.done[k] : null,
+                ),
+              };
               spSave();
             }
             return focusOpen(at);
@@ -22624,6 +23209,55 @@
               : "Check-in: keine Beschwerden",
           );
           return leaveCheckin(t);
+        }
+        if (d.act === "an-run") return runAnalysis(+d.i);
+        if (d.act === "an-toggle") {
+          const rec = S.analysis[keyI(+d.i)];
+          if (!rec) return;
+          rec.open = rec.open === false;
+          save();
+          return render();
+        }
+        if (d.act === "an-apply-all") {
+          const rec = S.analysis[keyI(+d.i)];
+          if (!rec || rec.state !== "open") return;
+          if (!sb || !USER) return toast("Dafür ist der Cloud-Login nötig", true);
+          const { valid } = coachCheck(rec.data.actions),
+            edits = valid.filter((a) => a.type === "edit"),
+            rest = valid.filter((a) => a.type !== "edit");
+          if (!edits.length) return;
+          if (!confirm("Die Änderung der Einheit gilt für ALLE Nutzer der Gruppe (auch " + PARTNER + "). Speichern?")) return;
+          const canon = (x) => (ME === "Jaime" ? x : String(x).split(PARTNER).join("Jimoh"));
+          for (const a of edits) {
+            const src = srcOf(a.i),
+              { error: err } = await sb.rpc("set_shared_edit", {
+                p_day: src,
+                p_data: { t: canon(a.title), k: a.kind, i: a.items.map(canon), n: canon(a.note || "") },
+              });
+            if (err) return toast("Speichern fehlgeschlagen. Bitte Verbindung prüfen.", true);
+            delete S.edit[src];
+          }
+          if (rest.length) applyCoach(rest); // Tausch, Entlasten und Ausfall bleiben persönlich
+          rec.state = "applied";
+          await loadTeamEdits();
+          save();
+          toast("Für alle gespeichert");
+          return render();
+        }
+        if (d.act === "an-apply" || d.act === "an-dismiss") {
+          const rec = S.analysis[keyI(+d.i)];
+          if (!rec || rec.state !== "open") return;
+          if (d.act === "an-apply") {
+            const { valid } = coachCheck(rec.data.actions);
+            if (!valid.length) return toast("Keine Vorschläge mehr anwendbar");
+            applyCoach(valid);
+            rec.state = "applied";
+            toast(
+              `Plan angepasst (${valid.length} ${valid.length === 1 ? "Änderung" : "Änderungen"})`,
+            );
+          } else rec.state = "dismissed";
+          save();
+          return render();
         }
         if (d.act === "all-done") return fin7Open(+d.i);
         if (d.act === "rpe-set") {
@@ -23491,9 +24125,21 @@
           if (d.act === "gem-open") {
             // Link öffnet Gemini wie bisher, vorher landet die fertige Anfrage in der Zwischenablage (dort Strg+V)
             try {
-              const req = coach.buildCoachRequest({ context: coachCtx(), chat: S.chat, message: $("#cc-in").value || ccDraft || (S.chat.filter((m) => m.role === "user").pop() || {}).text || "(Frage hier eintippen)" });
+              const req = coach.buildCoachRequest({
+                context: coachCtx(),
+                chat: S.chat,
+                message:
+                  $("#cc-in").value ||
+                  ccDraft ||
+                  (S.chat.filter((m) => m.role === "user").pop() || {}).text ||
+                  "(Frage hier eintippen)",
+              });
               ccDraft = $("#cc-in").value || ccDraft;
-              if (navigator.clipboard) navigator.clipboard.writeText(coachPrompt(req)).then(() => toast("Anfrage kopiert: in Gemini mit Strg+V einfügen"), () => {});
+              if (navigator.clipboard)
+                navigator.clipboard.writeText(coachPrompt(req)).then(
+                  () => toast("Anfrage kopiert: in Gemini mit Strg+V einfügen"),
+                  () => {},
+                );
             } catch (err) {
               toast(err.message);
             }
@@ -23507,10 +24153,26 @@
         }
         if (d.act === "gem-take") {
           const txt = ($("#gem-in") ? $("#gem-in").value : "").trim();
-          if (!txt) return toast("Bitte zuerst die Antwort von Gemini einfügen");
-          const q = ($("#cc-in") && $("#cc-in").value.trim()) || ccDraft || (S.chat.filter((m) => m.role === "user").pop() || {}).text || "(Frage in Gemini gestellt)";
-          S.chat.push({ role: "user", text: q.slice(0, coach.MAX_MSG), at: Date.now() });
-          S.chat.push({ role: "assistant", text: txt.slice(0, 4000), actions: [], state: "none", ex: ccExplain, at: Date.now() });
+          if (!txt)
+            return toast("Bitte zuerst die Antwort von Gemini einfügen");
+          const q =
+            ($("#cc-in") && $("#cc-in").value.trim()) ||
+            ccDraft ||
+            (S.chat.filter((m) => m.role === "user").pop() || {}).text ||
+            "(Frage in Gemini gestellt)";
+          S.chat.push({
+            role: "user",
+            text: q.slice(0, coach.MAX_MSG),
+            at: Date.now(),
+          });
+          S.chat.push({
+            role: "assistant",
+            text: txt.slice(0, 4000),
+            actions: [],
+            state: "none",
+            ex: ccExplain,
+            at: Date.now(),
+          });
           S.chat = S.chat.slice(-40);
           ccDraft = "";
           ccGemOpen = false;

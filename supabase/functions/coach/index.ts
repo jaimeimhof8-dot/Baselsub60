@@ -48,6 +48,37 @@ Fachbegriffe (z. B. Zone 2, RPE, Sled, Wall Balls, Topsatz) erklärst du kurz in
 
 Format: reiner Text ohne Markdown (kein **, kein #). Kurze Absätze, Aufzählungen mit „–“. Schweizer Schreibweise (ss statt ß), Du-Form, Deutsch. Höchstens ca. 250 Wörter, ausser er fragt ausdrücklich nach mehr.`;
 
+// Analyse-Modus: Auswertung einer fertigen Einheit wie durch einen erfahrenen HYROX-Coach
+const ANALYSE = `Du bist ein erfahrener HYROX-Coach in der App „Basel Sub-60“. Zwei Athleten trainieren gemeinsam für HYROX Basel (Doubles Men PRO, 13.02.2027) mit dem Ziel unter 60 Minuten. Der Athlet hat gerade eine Einheit abgeschlossen. Deine Aufgabe: ihm Wissen über SEINE Einheit geben, das er beim Training nicht sieht – so, wie ein Profi-Coach die Daten durchgehen würde. Kein Daten-Audit, keine Wiederholung dessen, was er selbst eingegeben hat.
+
+Im <plan>-Block steht der Stand als JSON. "session" beschreibt die Einheit:
+- splits: die Uhr-Runden, schon den Plan-Schritten zugeordnet: step, kind (run / station / rest / …), goal (Zielzeit in s), actual (gemessene Zeit in s), hr (Puls der Runde), pace (s/km bei Läufen). Das ist deine Hauptquelle. Ist splits null, hat die App keine zuordenbaren Runden.
+- watch: Gesamtdaten der Uhr (Zeit, Distanz, Ø-Puls, Rohrunden in laps). lapsAvailable sagt, ob Runden da sind.
+- items: geplante Zeilen mit status, value und prev (Wert/RPE beim letzten Mal). rpe (1–10), note, checkin, garmin (Erholung des Tages), soreness.
+- similar: letzte gleichartige Einheiten. week: Stand der Woche, daysToRace, block, wave. tests: Lauf-/Stations-Tests.
+"recent" und "upcoming" zeigen die Tage davor und danach (Belastungsdichte!).
+
+Was die Auswertung leisten muss:
+1. Stand: Ist er auf gutem Stand? Vergleiche gegen die Ziele im Plan (goal), gegen die letzten gleichartigen Einheiten und gegen das Ziel unter 60:00. Gib in form ein klares Urteil (rating) und 2–3 Sätze mit Zahlen.
+2. Pacing: Rechne aus splits. Erste gegen letzte Wiederholung, Streuung, Einbruch nach den Stationen (Kompromiss-Delta: Lauf nach Station gegen die frische Referenzrunde). Pacing-Fehler ehrlich benennen: zu schnell gestartet, ungleichmässig, zu defensiv. Nenne die Zahlen (z. B. „Lauf 1: 3:58/km, Lauf 4: 4:14/km, +16 s“).
+3. Stationen: Zeit gegen Ziel in Sekunden und Prozent. Welche Station kostet am meisten? Wo ist das grösste Potenzial für Sub-60?
+4. Pausen: Aus splits (kind rest: actual gegen goal) bzw. aus den Rundenlücken. Zu kurz oder zu lang, und was das für die Qualität der Folgeabschnitte bedeutet.
+5. Puls: Ø und Max gegen die Redline im Plan, Puls je Runde, Drift über die Einheit.
+6. Belastung: RPE gegen Plan und Wochentyp, Check-in/HRV/Schlaf, Dichte der letzten Tage. Ist er für die nächste harte Einheit bereit?
+7. insights: 2–4 Erkenntnisse, die nicht auf der Hand liegen (Muster, Zusammenhänge, Ursache und Wirkung). Das ist der eigentliche Mehrwert.
+8. adjustments: konkrete Änderungen an Einheit oder Plan mit Zahl und Begründung aus den Daten (z. B. „Pause nach Runde 2 von 3:00 auf 3:30 min“, „Lauf 1 bei 4:05/km statt 3:58 beginnen“, „Sled Push +2,5 kg erst, wenn Ziel 0:41 getroffen“). area: session, rest, load, tempo, plan oder recovery.
+9. actions: nur wenn ein Eingriff in kommende Tage wirklich nötig ist (gleiche Regeln wie im Chat-Modus: nur Tage aus "upcoming", Freitag Ruhetag, keine zwei harten Tage hintereinander, höchstens eine Aktion pro Tag). Im Zweifel leere Liste.
+
+Harte Regeln:
+- Fordere den Athleten nie auf, Zeiten oder Daten einzutragen, und werfe ihm keine „Eingabefehler“ vor. Die Zeiten kommen automatisch von seiner Uhr (Lap-Taste). Unplausible Werte in value ignorierst du still.
+- Fehlen Runden (splits null oder lapsAvailable false): sage das in genau einem Satz (die Rundendaten der Uhr sind noch nicht in der App, Garmin-Abruf nötig) und werte alles andere aus (Gesamtzeit, Puls, RPE, Zustand, Verlauf). data_gaps bleibt dann leer.
+- data_gaps nur für Dinge, die weder App noch Uhr wissen können (z. B. Gefühl in den Waden). Meist leer.
+- Keine Floskeln, kein Lob ohne Beleg, keine Punktzahl, nichts doppelt. „10 von 10 erledigt“ ist kein Befund.
+- Bei Schmerzen konservativ; bei starken oder anhaltenden Schmerzen zusätzlich Arzt oder Physio empfehlen.
+
+Format: Deutsch in Schweizer Schreibweise (ss statt ß), Du-Form, reiner Text ohne Markdown. headline: ein Satz Gesamturteil. summary: 3–5 Sätze Coach-Einordnung mit den wichtigsten Zahlen. strengths und weaknesses: je 1–4 Einträge (title kurz, detail 1–2 Sätze mit Zahlen). execution.pacing / rest / technique: je 1–3 Sätze, leerer String wenn die Daten nichts hergeben. Direkt, ehrlich, motivierend.`;
+
+
 const nullable = (t: Record<string, unknown>) => ({ anyOf: [t, { type: "null" }] });
 const SCHEMA = {
   type: "object",
@@ -76,9 +107,29 @@ const SCHEMA = {
   },
 };
 
+const str = { type: "string" };
+const ANALYSE_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["headline", "summary", "form", "insights", "strengths", "weaknesses", "execution", "adjustments", "next_focus", "data_gaps", "actions"],
+  properties: {
+    headline: str,
+    summary: str,
+    form: { type: "object", additionalProperties: false, required: ["rating", "text"], properties: { rating: { type: "string", enum: ["auf Kurs", "leicht dahinter", "dahinter", "über Plan", "unklar"] }, text: str } },
+    insights: { type: "array", items: { type: "object", additionalProperties: false, required: ["title", "detail"], properties: { title: str, detail: str } } },
+    strengths: { type: "array", items: { type: "object", additionalProperties: false, required: ["title", "detail"], properties: { title: str, detail: str } } },
+    weaknesses: { type: "array", items: { type: "object", additionalProperties: false, required: ["title", "detail"], properties: { title: str, detail: str } } },
+    execution: { type: "object", additionalProperties: false, required: ["pacing", "rest", "technique"], properties: { pacing: str, rest: str, technique: str } },
+    adjustments: { type: "array", items: { type: "object", additionalProperties: false, required: ["area", "change", "why"], properties: { area: { type: "string", enum: ["session", "rest", "load", "tempo", "plan", "recovery"] }, change: str, why: str } } },
+    next_focus: str,
+    data_gaps: { type: "array", items: str },
+    actions: { ...SCHEMA.properties.actions },
+  },
+};
+
 type Msg = { role: "user" | "assistant"; content: string };
 
-function readBody(b: unknown): { context: unknown; history: Msg[]; message: string; explain: boolean } | null {
+function readBody(b: unknown): { context: unknown; history: Msg[]; message: string; explain: boolean; analyse: boolean } | null {
   if (!b || typeof b !== "object") return null;
   const { context, history, message, mode } = b as Record<string, unknown>;
   if (typeof message !== "string" || !message.trim() || message.length > 2000) return null;
@@ -93,7 +144,7 @@ function readBody(b: unknown): { context: unknown; history: Msg[]; message: stri
   }
   while (clean.length && clean[0].role !== "user") clean.shift();
   while (clean.length && clean[clean.length - 1].role !== "assistant") clean.pop();
-  return { context, history: clean, message: message.trim(), explain: mode === "explain" };
+  return { context, history: clean, message: message.trim(), explain: mode === "explain", analyse: mode === "analyse" };
 }
 
 Deno.serve(async (req) => {
@@ -123,12 +174,12 @@ Deno.serve(async (req) => {
   try {
     const response = await client.beta.messages.create({
       model: "claude-sonnet-5-5",
-      max_tokens: body.explain ? 2000 : 16000,
+      max_tokens: body.explain ? 2000 : body.analyse ? 8000 : 16000,
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
-      output_config: { effort: body.explain ? "low" : "medium", format: { type: "json_schema", schema: SCHEMA } },
+      output_config: { effort: body.explain ? "low" : "medium", format: { type: "json_schema", schema: body.analyse ? ANALYSE_SCHEMA : SCHEMA } },
       // Cache-Punkt auf dem festen System-Prompt: der <plan>-Teil ändert sich bei jeder Anfrage
-      system: [{ type: "text", text: body.explain ? EXPLAIN : SYSTEM, cache_control: { type: "ephemeral" } }],
+      system: [{ type: "text", text: body.explain ? EXPLAIN : body.analyse ? ANALYSE : SYSTEM, cache_control: { type: "ephemeral" } }],
       messages,
     });
     // Token-Nutzung für die Supabase-Logs: cache_read > 0 heisst, der System-Prompt kam aus dem Cache

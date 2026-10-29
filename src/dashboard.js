@@ -23,7 +23,7 @@ export function normalizeLaps(raw) {
   const list = Array.isArray(raw) ? raw : (raw && (raw.lapDTOs || raw.laps)) || [];
   return list.slice(0, 80).map((l) => ({
     d: Math.round(+l.distance || 0),
-    t: Math.round(+l.movingDuration || +l.moving_time || +l.duration || +l.elapsed_time || 0),
+    t: Math.round(+l.duration || +l.elapsed_time || +l.movingDuration || +l.moving_time || 0),
     hr: Math.round(+l.averageHR || +l.average_heartrate || 0) || null,
     w: Math.round(+l.averagePower || +l.average_watts || 0) || null,
   })).filter((l) => l.t > 0);

@@ -10,6 +10,7 @@
 // Body: {action: "connect", tokens: {di_token, di_refresh_token, di_client_id}} → {connected, name}
 //       {action: "status"}                       → {connected, name, refreshExp, lastError}
 //       {action: "sync", from, to}               → {acts: [...], well: {datum: {...}}, name}
+//       {action: "steps", from?, to?}            → {steps: {datum: Anzahl}}  (nur Tagesschritte)
 //       {action: "push-workout", name, steps, date?} → {workoutId, scheduled}  (Lauf-Workout in Garmin Connect anlegen, optional auf den Tag legen)
 //       {action: "disconnect"}                   → {ok}
 //       {action: "refresh-all"} + x-cron-secret  → {refreshed, failed}
@@ -165,11 +166,11 @@ async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string,
 
   // Runden (Laps) für Ausdauer-Einheiten: daraus erkennt die App Intervalle und deren Zeiten. Max. 15 neueste pro Abruf.
   // have = Einheiten, deren Runden die App schon kennt (werden nicht nochmals geholt)
-  const withLaps = acts.filter((a) => ["run", "row", "ride", "ski"].includes(a.group as string) && !have.has(a.id as string))
+  const withLaps = acts.filter((a) => !have.has(a.id as string))
     .sort((x, y) => String(y.start).localeCompare(String(x.start))).slice(0, 15);
   for (let i = 0; i < withLaps.length; i += 5) {
     await Promise.all(withLaps.slice(i, i + 5).map(async (a) => {
-      try { const r = await api(ctx, `/activity-service/activity/${String(a.id).slice(1)}/splits`); a.laps = normalizeLaps(r); }
+      try { const r = await api(ctx, `/activity-service/activity/${String(a.id).slice(1)}/splits`); a.laps = normalizeLaps(r); a.lapsV = 3; }
       catch (e) { if ((e as { code?: string }).code === "relogin") throw e; }
     }));
   }
@@ -180,10 +181,11 @@ async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string,
   for (let t = wFrom; t <= wTo; t += DAY) days.push(iso(t));
   const a = days[0], b = days[days.length - 1];
   const diag: Record<string, string> = {};
-  const [hrv, rhr, bb] = await Promise.all([
+  const [hrv, rhr, bb, steps] = await Promise.all([
     soft(diag, "hrv", api(ctx, `/hrv-service/hrv/daily/${a}/${b}`)),
     soft(diag, "rhr", api(ctx, `/userstats-service/wellness/daily/${name}`, { fromDate: a, untilDate: b, metricId: "60" })),
     soft(diag, "bb", api(ctx, "/wellness-service/wellness/bodyBattery/reports/daily", { startDate: a, endDate: b })),
+    soft(diag, "steps", api(ctx, `/usersummary-service/stats/steps/daily/${a}/${b}`)),
   ]);
   const sleep: unknown[] = [], tr: unknown[] = [];
   for (let i = 0; i < days.length; i += 7) {
@@ -194,7 +196,7 @@ async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string,
     ]));
     res.forEach((r, j) => (j % 2 ? tr : sleep).push(r));
   }
-  const well = reduceWell({ hrv, rhr, bb: Array.isArray(bb) ? bb : [], sleep, tr });
+  const well = reduceWell({ hrv, rhr, bb: Array.isArray(bb) ? bb : [], sleep, tr, steps });
   const shape = { hrv: keysOf(hrv), rhr: keysOf(rhr), bb: keysOf(bb), sleep: keysOf(sleep.find(Boolean)), tr: keysOf(tr.find(Boolean)) };
   return { acts, well, diag, shape, days: Object.keys(well).length, name: ctx.tok.full || ctx.tok.name || null };
 }
@@ -277,6 +279,27 @@ Deno.serve(async (req) => {
         // Neue Tokens auch bei Fehlern sichern, sonst ist das rotierte Refresh-Token verloren
         if (ctx.dirty) await store(db, uid, ctx.tok, (e as { code?: string }).code || "error").catch(() => {});
         else await db.from("garmin_tokens").update({ last_error: (e as { code?: string }).code || "error" }).eq("user_id", uid);
+        throw e;
+      }
+    }
+    // Nur Tagesschritte (leicht, für die Ernährungs-App): {from?, to?} → {steps: {"JJJJ-MM-TT": Anzahl}}
+    if (body.action === "steps") {
+      if (!row) return json({ error: "not_connected" }, 400);
+      const to = isDate(body.to) ? body.to as string : iso(Date.now());
+      const from = isDate(body.from) ? body.from as string : iso(Date.parse(to) - 6 * DAY);
+      if (Date.parse(from) > Date.parse(to) || Date.parse(to) - Date.parse(from) > 27 * DAY) return json({ error: "bad_request" }, 400);
+      const ctx = { tok: row.tok, dirty: false };
+      try {
+        const r = await api(ctx, `/usersummary-service/stats/steps/daily/${from}/${to}`);
+        if (ctx.dirty || row.lastError) await store(db, uid, ctx.tok);
+        const steps: Record<string, number> = {};
+        for (const x of Array.isArray(r) ? r : []) {
+          const d = String(x?.calendarDate ?? "").slice(0, 10);
+          if (/^d{4}-d{2}-d{2}$/.test(d) && typeof x.totalSteps === "number") steps[d] = Math.round(x.totalSteps);
+        }
+        return json({ steps });
+      } catch (e) {
+        if (ctx.dirty) await store(db, uid, ctx.tok, (e as { code?: string }).code || "error").catch(() => {});
         throw e;
       }
     }

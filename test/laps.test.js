@@ -38,3 +38,25 @@ test("Passen die Runden nicht zur Vorgabe, bleibt es bei der bisherigen Erkennun
   const act = { laps: [fast(240), fast(241), fast(239)] };
   assert.equal(typeof repSummary(act, "Lockerer Lauf 40′"), "string");
 });
+
+import { alignSplits } from "../src/laps.js";
+const L = (...t) => t.map((x) => ({ d: 0, t: x, hr: 150 }));
+const S3 = [{ kind: "station" }, { kind: "run" }, { kind: "rest" }];
+test("alignSplits: je Schritt eine Runde", () => {
+  assert.deepEqual(alignSplits(L(40, 245, 180), S3).times, [40, 245, 180]);
+});
+test("alignSplits: Mini-Runde am Ende wird ignoriert", () => {
+  assert.deepEqual(alignSplits(L(40, 245, 180, 4), S3).times, [40, 245, 180]);
+});
+test("alignSplits: Pausen nicht gelappt, nur Arbeit", () => {
+  assert.deepEqual(alignSplits(L(40, 245), S3).times, [40, 245, null]);
+});
+test("alignSplits: Satz und Pause im Wechsel", () => {
+  const st = [{ kind: "station" }, { kind: "station" }, { kind: "station" }];
+  assert.deepEqual(alignSplits(L(40, 90, 42, 90, 41), st).times, [40, 42, 41]);
+});
+test("alignSplits: passt nichts, wird nichts geraten", () => {
+  const r = alignSplits(L(40, 245, 180, 60, 70, 80, 90), S3);
+  assert.equal(r.times, null);
+  assert.equal(r.count, 7);
+});

@@ -12,5 +12,7 @@ window.HX_CONFIG = {
   supabaseAnonKey: "sb_publishable_srJQv2rw2Njbv10g_eYioA_igQMR1vN",
   stravaClientId: "",
   vapidPublicKey: "BOwB9H2CeGF-CKjztQ6Q6t7a-NRclS8Aq_JgQ3YK_wWJSYxGWV4HWP7dxnB9sYwipUn5K0qedTnsLngHF9R5PN0",
+  // nutritionUrl (optional): Adresse der Ernährungs-App; damit gibt es unter Garmin einen Knopf, der die Tagesschritte dorthin übergibt.
+  nutritionUrl: "",
   garminLoginUrl: "https://hyrox-garmin-login.vercel.app/api/login"
 };

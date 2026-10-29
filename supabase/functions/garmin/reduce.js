@@ -7,7 +7,7 @@ const TYPES = [
   [/(cycling|biking|gravel|bmx|e_bike|virtual_ride|spinning)/, "Ride", "ride"],
   [/rowing/, "Rowing", "row"],
   [/(cross_country|skate_ski|classic_ski|backcountry|skiing)/, "NordicSki", "ski"],
-  [/^(strength_training|indoor_cardio|hiit|fitness_equipment|elliptical|stair_climbing|floor_climbing|pilates|bouldering|indoor_climbing|crossfit|mobility|training|other_fitness)$/, "Workout", "strength"],
+  [/^(strength_training|indoor_cardio|hiit|fitness_equipment|elliptical|stair_climbing|floor_climbing|pilates|bouldering|indoor_climbing|crossfit|mobility|training|other_fitness|hyrox|multi_sport|multisport|functional_fitness)$/, "Workout", "strength"],
 ];
 export function typeOf(typeKey) {
   const k = String(typeKey || "").toLowerCase();
@@ -29,7 +29,7 @@ export function normalizeAct(g) {
   return {
     id: "g" + g.activityId, name: g.activityName || "", type: t.type, group: t.group,
     date: day(local), start: local.slice(0, 16) || null,
-    dist: Math.round(+g.distance || 0), time: Math.round(+g.movingDuration || +g.duration || 0),
+    dist: Math.round(+g.distance || 0), time: Math.round(+g.duration || +g.movingDuration || 0), // Zeit wie in Garmin Connect (Summe der Runden), nicht nur die bewegte Zeit
     hr: g.averageHR ? Math.round(g.averageHR) : null, maxHr: g.maxHR ? Math.round(g.maxHR) : null, kcal: g.calories ? Math.round(g.calories) : null, watts: g.avgPower ? Math.round(g.avgPower) : null, src: "garmin",
   };
 }
@@ -38,7 +38,7 @@ export function normalizeAct(g) {
 export function normalizeLaps(raw) {
   const list = (raw && raw.lapDTOs) || [];
   return list.slice(0, 80).map((l) => ({
-    d: Math.round(+l.distance || 0), t: Math.round(+l.movingDuration || +l.duration || +l.elapsedDuration || 0),
+    d: Math.round(+l.distance || 0), t: Math.round(+l.duration || +l.elapsedDuration || +l.movingDuration || 0), // Rundenzeit wie auf der Uhr, nicht nur die bewegte Zeit
     hr: Math.round(+l.averageHR || 0) || null, w: Math.round(+l.averagePower || 0) || null,
   })).filter((l) => l.t > 0);
 }
@@ -47,8 +47,8 @@ export function normalizeLaps(raw) {
  * Erholungswerte pro Tag zusammenführen.
  * raw = {hrv: Antwort von /hrv-service/hrv/daily/{a}/{b}, rhr: Antwort von /userstats-service/wellness/daily/{name},
  *        bb: Liste aus /wellness-service/wellness/bodyBattery/reports/daily, sleep: [dailySleepData pro Tag],
- *        tr: [trainingreadiness pro Tag (Liste oder Objekt)]}
- * -> {"YYYY-MM-DD": {hrv, hrvStatus, sleepScore, sleepH, bb, readiness, rhr}}
+ *        tr: [trainingreadiness pro Tag (Liste oder Objekt)], steps: Antwort von /usersummary-service/stats/steps/daily/{a}/{b}}
+ * -> {"YYYY-MM-DD": {hrv, hrvStatus, sleepScore, sleepH, bb, readiness, rhr, steps}}
  */
 export function reduceWell(raw = {}) {
   const out = {};
@@ -86,6 +86,8 @@ export function reduceWell(raw = {}) {
     };
     for (const [k, v] of Object.entries(extra)) if (v != null) o[k] = v;
   }
+  // Tagesschritte: [{calendarDate, totalSteps}]
+  for (const x of Array.isArray(raw.steps) ? raw.steps : []) if (x && day(x.calendarDate) && x.totalSteps != null) at(day(x.calendarDate)).steps = round(x.totalSteps);
   for (const t of raw.tr || []) {
     const list = Array.isArray(t) ? t : t ? [t] : [];
     // Garmin liefert mehrere Werte pro Tag (z. B. nach dem Aufwachen und nach einer Aktivität) – der erste ist der Morgenwert

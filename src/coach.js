@@ -96,7 +96,7 @@ export function buildCoachRequest({ context, chat, message, mode }) {
   const text = String(message || "").trim();
   if (!text) throw Object.assign(new Error("Bitte beschreibe kurz, was nicht passt."), { code: "empty" });
   if (text.length > MAX_MSG) throw Object.assign(new Error(`Bitte höchstens ${MAX_MSG} Zeichen.`), { code: "too_long" });
-  return { context, history: toApiHistory(chat || []), message: text, ...(mode === "explain" ? { mode: "explain" } : {}) };
+  return { context, history: toApiHistory(chat || []), message: text, ...(mode === "explain" || mode === "analyse" ? { mode } : {}) };
 }
 
 /** Frage „Erkläre mir diese Einheit“: enthält die Einheit selbst, damit sie auch ausserhalb der Plan-Vorschau verständlich ist. */
@@ -173,4 +173,54 @@ export function validateActions(actions, ctx) {
 export function parseCoachResponse(r) {
   if (!r || typeof r.reply !== "string") throw Object.assign(new Error("Ungültige Antwort vom Coach"), { code: "bad_response" });
   return { reply: r.reply, actions: Array.isArray(r.actions) ? r.actions : [] };
+}
+
+/* ---------- Einheiten-Analyse (Modus "analyse") ---------- */
+const clip = (v, n) => String(v == null ? "" : v).slice(0, n);
+
+/**
+ * Kontext für die Analyse: Plan-Kontext + "session" (alles, was zur fertigen Einheit bekannt ist).
+ * Kürzt Texte und Rundenlisten, damit die Anfrage klein bleibt (Edge Function erlaubt 60 kB).
+ * session: {date, weekday, title, kind, planNote, wave, block, week, daysToRace, items:[{plan,status,value,prev}], rpe, note,
+ *   checkin, garmin, soreness, watch:{name,type,dist,time,hr,watts,laps:[{d,t,hr}]}, similar:[...], weekDone:{done,plan}, tests}
+ */
+export function analysisContext(base, session) {
+  const s = { ...session };
+  s.title = clip(s.title, 120); s.planNote = clip(s.planNote, 400); s.note = clip(s.note, 600);
+  s.items = (s.items || []).slice(0, 30).map((x) => ({ ...x, plan: clip(x.plan, 160), value: clip(x.value, 120),
+    ...(x.prev ? { prev: { ...x.prev, value: clip(x.prev.value, 120) } } : {}) }));
+  if (s.watch) s.watch = { ...s.watch, name: clip(s.watch.name, 80), laps: (s.watch.laps || []).slice(0, 60) };
+  s.splits = Array.isArray(s.splits) ? s.splits.slice(0, 60) : s.splits || null;
+  s.similar = (s.similar || []).slice(0, 4).map((x) => ({ ...x, values: (x.values || []).slice(0, 8) }));
+  return { ...base, session: s };
+}
+
+/** Standard-Frage an den Coach für die Analyse (die Daten stehen im Kontext). */
+export function analyseMessage(i, p) {
+  return "Analysiere meine abgeschlossene Einheit am " + DAYSF[dow(i)] + " " + isoFromIdx(i) + " („" + clip(p.t, 100) + "“) wie ein erfahrener Coach: Stärken, Schwächen, Umsetzung, Pausen, was ich am Workout oder am Plan ändern sollte.";
+}
+
+const list = (v, f) => (Array.isArray(v) ? v.map(f).filter(Boolean).slice(0, 8) : []);
+const txt = (v, n = 800) => (typeof v === "string" ? v.trim().slice(0, n) : "");
+const ADJ_AREAS = ["session", "rest", "load", "tempo", "plan", "recovery"];
+
+/** Antwort der Edge Function im Analyse-Modus prüfen und säubern. Wirft bei unbrauchbarer Antwort. */
+export function parseAnalysis(r) {
+  // Alte Edge-Function-Version kennt den Modus nicht und antwortet im Chat-Format {reply, actions}
+  if (r && typeof r.reply === "string" && typeof r.headline !== "string")
+    throw Object.assign(new Error("Die Coach-Funktion auf dem Server ist noch die alte Version. Bitte neu deployen: npx supabase functions deploy coach --no-verify-jwt"), { code: "old_function" });
+  if (!r || typeof r.headline !== "string" || typeof r.summary !== "string")
+    throw Object.assign(new Error("Ungültige Analyse vom Coach"), { code: "bad_response" });
+  const pair = (x) => (x && txt(x.title, 120) && txt(x.detail) ? { title: txt(x.title, 120), detail: txt(x.detail) } : null);
+  const ex = r.execution || {};
+  return {
+    headline: txt(r.headline, 300), summary: txt(r.summary, 1500),
+    form: r.form && txt(r.form.text) ? { rating: txt(r.form.rating, 40), text: txt(r.form.text) } : null,
+    insights: list(r.insights, pair),
+    strengths: list(r.strengths, pair), weaknesses: list(r.weaknesses, pair),
+    execution: { pacing: txt(ex.pacing), rest: txt(ex.rest), technique: txt(ex.technique) },
+    adjustments: list(r.adjustments, (x) => (x && txt(x.change) ? { area: ADJ_AREAS.includes(x.area) ? x.area : "session", change: txt(x.change), why: txt(x.why) } : null)),
+    nextFocus: txt(r.next_focus), dataGaps: list(r.data_gaps, (x) => txt(x, 300) || null),
+    actions: Array.isArray(r.actions) ? r.actions : [],
+  };
 }

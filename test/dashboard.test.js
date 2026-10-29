@@ -18,8 +18,8 @@ test("Intervall-Vorgabe aus dem Plantext", () => {
 });
 
 test("Runden aus Strava und Garmin vereinheitlichen", () => {
-  assert.deepEqual(normalizeLaps([{ distance: 1000.4, moving_time: 242, elapsed_time: 245, average_heartrate: 178.9, average_watts: 525.7 }]), [{ d: 1000, t: 242, hr: 179, w: 526 }]);
-  assert.deepEqual(garminLaps({ lapDTOs: [{ distance: 1000, movingDuration: 241.6, duration: 245, averageHR: 179, averagePower: null }] }), [{ d: 1000, t: 242, hr: 179, w: null }]);
+  assert.deepEqual(normalizeLaps([{ distance: 1000.4, moving_time: 242, elapsed_time: 245, average_heartrate: 178.9, average_watts: 525.7 }]), [{ d: 1000, t: 245, hr: 179, w: 526 }]);
+  assert.deepEqual(garminLaps({ lapDTOs: [{ distance: 1000, movingDuration: 241.6, duration: 245, averageHR: 179, averagePower: null }] }), [{ d: 1000, t: 245, hr: 179, w: null }]);
   assert.deepEqual(normalizeLaps(null), []);
 });
 

@@ -12,7 +12,7 @@ const RUN = { activityId: 20567, activityName: "Thun Intervalle", startTimeLocal
 
 test("Garmin-Aktivität normalisieren (gleiche Form wie Strava)", () => {
   assert.deepEqual(normalizeAct(RUN), { id: "g20567", name: "Thun Intervalle", type: "Run", group: "run", date: "2026-10-12",
-    start: "2026-10-12T18:01", dist: 8653, time: 2810, hr: 161, maxHr: null, kcal: null, watts: 391, src: "garmin" });
+    start: "2026-10-12T18:01", dist: 8653, time: 2993, hr: 161, maxHr: null, kcal: null, watts: 391, src: "garmin" });
 });
 
 test("Garmin-Sportarten auf die Gruppen der App abbilden", () => {

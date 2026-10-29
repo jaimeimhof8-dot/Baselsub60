@@ -53,3 +53,32 @@ export function repSummary(act, planText = "") {
   const avg = segs.reduce((x, s) => x + s.t, 0) / (segs.reduce((x, s) => x + s.d, 0) / 1000);
   return `${segs.length}×${distLabel(reps.dist)}: ${vals.join(" · ")} (Ø ${mmss(avg)}/km)`;
 }
+
+/**
+ * Lap-Runden der Uhr den Plan-Schritten zuordnen. steps: [{kind: "station"|"run"|"rest"|…}] in Plan-Reihenfolge.
+ * Erkannte Abläufe (Mini-Runden < 15 s am Ende, z. B. Stopp nach dem letzten Schritt, werden zuerst abgeschnitten):
+ *  "direct" – je Schritt eine Runde (Pausen eingeschlossen)
+ *  "work"   – nur die Arbeitsschritte haben Runden, Pausen wurden nicht gelappt
+ *  "alt"    – Arbeit und Pause im Wechsel (Lap nach dem Satz, Lap nach der Pause): Arbeit liegt auf den geraden Runden
+ * -> {times: [s|null je Schritt], hr: [Puls|null], laps: [Index der Runde|null], mode, count} oder {times: null, count} ohne Treffer.
+ * Es wird nichts geraten oder aufgefüllt: ohne passende Rundenzahl gibt es null.
+ */
+export function alignSplits(laps, steps) {
+  const n = (steps || []).length;
+  const all = (laps || []).filter((l) => l && l.t > 0);
+  if (!n) return { times: null, count: all.length };
+  const work = steps.map((st, k) => ({ st, k })).filter((x) => x.st.kind !== "rest");
+  const w = work.length;
+  const layouts = (L) => {
+    const pick = (idx, mode) => ({ times: idx.map((k) => (k == null ? null : Math.round(L[k].t))), hr: idx.map((k) => (k == null ? null : L[k].hr || null)), laps: idx, mode, count: L.length });
+    if (L.length === n) return pick(steps.map((_, k) => k), "direct");
+    if (w !== n && L.length === w) { const idx = Array(n).fill(null); work.forEach((x, m) => (idx[x.k] = m)); return pick(idx, "work"); }
+    if (w > 1 && (L.length === 2 * w || L.length === 2 * w - 1)) { const idx = Array(n).fill(null); work.forEach((x, m) => (idx[x.k] = 2 * m)); return pick(idx, "alt"); }
+    return null;
+  };
+  let T = all.slice();
+  while (T.length > 1 && T[T.length - 1].t < 15) T = T.slice(0, -1);
+  const hit = layouts(T) || layouts(all);
+  const L = T;
+  return hit || { times: null, count: L.length };
+}

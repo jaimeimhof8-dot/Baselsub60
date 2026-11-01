@@ -63,7 +63,7 @@ export function calibrateK(sims, benchSum) {
  * Prognose. Eingaben:
  *  laufPersons: [[4 Zeiten Jaime], [4 Zeiten Jimoh]] (bevorzugt) oder lauf: flache Liste; base: Schwellen-Pace in s/km (hat Vorrang)
  *  station: 8 × [ich, Partner] Solo-Zeiten · sims: siehe calibrateK · testAgeDays: Alter des letzten Tests (null = unbekannt)
- * @returns null ohne Pace, sonst {T, pace, paces[8], run, st, rox, total, lo, hi, k, calibrated, level, missing, sources[8], stations[8], basis[], warnings[]}
+ * @returns null ohne Pace, sonst {T, pace, paces[8], run, st, rox, total, lo, hi, k, bench, calibrated, level, missing, sources[8], stations[8], basis[], warnings[]}
  */
 export function buildForecast({ lauf = [], laufPersons = null, station = [], base = null, division = null, sims = [], testAgeDays = null } = {}) {
   let reps, mismatch = 0;
@@ -112,7 +112,7 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
   return {
     T, pace: run / 8, paces, run, st, rox: lv.rox, total,
     lo: total - Math.hypot(dRun, dLo, dRox), hi: total + Math.hypot(dRun, dHi, dRox),
-    k, calibrated: cal.k != null, level: lv.name, missing, sources, stations: team, basis, warnings,
+    k, bench: solo.some((v) => v != null) ? sum(solo.filter((v) => v != null)) : null, calibrated: cal.k != null, level: lv.name, missing, sources, stations: team, basis, warnings,
   };
 }
 

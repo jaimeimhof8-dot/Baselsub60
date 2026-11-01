@@ -12869,6 +12869,8 @@
       .an-dash .dt.yellow b { color: var(--warn); }
       .an-dash .dt.red b { color: var(--danger); }
       .an-dash .dt .s { font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
+      .an-dash .dp { display: grid; gap: var(--s2); }
+      .an-dash .dpl { font-size: 14px; color: var(--text); }
       .an-dash .dl { display: grid; gap: var(--s2); padding: var(--s3); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); }
       .an-dash .bars { display: flex; gap: 3px; align-items: flex-end; height: 88px; overflow-x: auto; }
       .an-dash .bar { flex: 1 0 18px; max-width: 40px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 2px; }
@@ -14230,7 +14232,7 @@
       import { safeMerge, countEntries, stable } from "./src/merge.js";
       import * as review from "./src/review.js";
       import { analyseSession } from "./src/analyse.js";
-      import { sessionDash } from "./src/session-dash.js";
+      import { sessionDash, compareToPrev } from "./src/session-dash.js";
       import { alignSplits } from "./src/laps.js";
       import {
         extractTests,
@@ -20431,6 +20433,20 @@
         const redo = rec && !busy ? btn(stale ? "Neu analysieren" : "Nochmals analysieren") : "";
         return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${s7DashHtml(i, p, rec && !busy ? rec.data : null)}${body}${acts}${tg}${open ? `<div class="s7-an-txt">${text}</div>` : ""}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}${quick}</section>`;
       }
+      /* Letzte gleiche Einheit mit Uhr-Daten: erst gleiche Art UND gleicher Plantitel, sonst gleiche Art. -> {i, act, rpe, same} oder null */
+      function s7Prev(i, p, group) {
+        let kind = null;
+        for (let x = i - 1; x >= 0 && x >= i - 180; x--) {
+          const q = dayPlan(x);
+          if (!q || q.k !== p.k || S.off[keyI(x)] || S.skip[keyI(x)]) continue;
+          const a = actsOf(x).filter((y) => y.group === group).sort((u, v) => (v.time || 0) - (u.time || 0))[0];
+          if (!a) continue;
+          const hit = { i: x, act: a, rpe: S.rpe[keyI(x)] != null ? +S.rpe[keyI(x)] : null, same: q.t === p.t };
+          if (hit.same) return hit;
+          if (!kind) kind = hit;
+        }
+        return kind;
+      }
       /* Dashboard: Punktzahl-Ring, Kennzahl-Kacheln, Rundenbalken der Uhr und Coach-Kennzahlen */
       function s7DashHtml(i, p, coachData) {
         let q;
@@ -20447,6 +20463,13 @@
         const tiles = d.tiles
           .map((t) => `<div class="dt ${t.tone}"><span class="k">${esc(t.k)}</span><b>${esc(t.v)}</b>${t.sub ? `<span class="s">${esc(t.sub)}</span>` : ""}</div>`)
           .join("");
+        const pv = act ? s7Prev(i, p, act.group) : null,
+          cmp = pv ? compareToPrev({ act, rpe: S.rpe[keyI(i)] != null ? +S.rpe[keyI(i)] : null }, pv, { easy: isEasyRun(p) }) : [],
+          cmpHtml = cmp.length
+            ? `<div class="dp"><span class="k">Vergleich mit ${pv.same ? "der letzten gleichen Einheit" : "der letzten ähnlichen Einheit"}</span><span class="dpl">${esc(shortDay(pv.i))} · ${esc(s7Title(dayPlan(pv.i).t))}</span><div class="dg">${cmp.map((t) => `<div class="dt ${t.tone}"><span class="k">${esc(t.k)}</span><b>${esc(t.v)}</b><span class="s">${esc(t.sub)}</span></div>`).join("")}</div></div>`
+            : act
+              ? `<div class="dp"><span class="k">Vergleich</span><span class="dpl">Noch keine frühere ${esc(s7Title(p.t))}-Einheit mit Uhr-Daten zum Vergleichen.</span></div>`
+              : "";
         const bars = d.laps
           ? `<div class="dl" role="img" aria-label="Rundenzeiten der Uhr"><span class="k">Runden der Uhr (${d.laps.length})</span><div class="bars">${d.laps
               .map((l, k) => `<div class="bar" title="Runde ${k + 1}: ${l.label}${l.pace ? " · " + l.pace + "/km" : ""}${l.hr ? " · " + l.hr + " bpm" : ""}"><i style="height:${l.h}%"></i><small>${l.label}</small></div>`)
@@ -20455,7 +20478,7 @@
         const chips = d.chips.length
           ? `<div class="dc">${d.chips.map((c) => `<span class="chip ${c.tone}"><small>${esc(c.k)}</small> ${esc(c.v)}</span>`).join("")}</div>`
           : "";
-        return `<div class="an-dash"><div class="dh"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="32" cy="32" r="26" fill="none" class="ring ${d.tone}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 32 32)"/></svg><div><b class="sc">${d.score}<small>/100</small></b><span class="vd">${esc(d.verdict)}</span></div></div>${tiles ? `<div class="dg">${tiles}</div>` : ""}${bars}${chips}${d.focus ? `<p class="df"><small>Nächstes Mal</small> ${esc(d.focus)}</p>` : ""}</div>`;
+        return `<div class="an-dash"><div class="dh"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="32" cy="32" r="26" fill="none" class="ring ${d.tone}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 32 32)"/></svg><div><b class="sc">${d.score}<small>/100</small></b><span class="vd">${esc(d.verdict)}</span></div></div>${tiles ? `<div class="dg">${tiles}</div>` : ""}${cmpHtml}${bars}${chips}${d.focus ? `<p class="df"><small>Nächstes Mal</small> ${esc(d.focus)}</p>` : ""}</div>`;
       }
       function s7FinCard(i, p) {
         const dk = keyI(i),

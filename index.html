@@ -12842,6 +12842,38 @@
         line-height: 19px;
         color: #9a9ba3;
       }
+      .s7-dash { display: grid; gap: 12px; margin: 6px 0 4px; }
+      .s7-dash .dh { display: flex; align-items: center; gap: 14px; }
+      .s7-dash .sc { display: block; font-size: 28px; line-height: 30px; font-weight: 700; }
+      .s7-dash .sc small { font-size: 13px; font-weight: 500; color: #9a9ba3; margin-left: 2px; }
+      .s7-dash .vd { font-size: 14px; color: #c9cad1; }
+      .s7-dash .ring { stroke: #9a9ba3; }
+      .s7-dash .ring.green { stroke: #2fb86b; }
+      .s7-dash .ring.yellow { stroke: #e0a526; }
+      .s7-dash .ring.red { stroke: #e5484d; }
+      .s7-dash .dg { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 8px; }
+      .s7-dash .dt { background: rgba(255,255,255,.06); border-radius: 12px; padding: 10px 12px; border-left: 3px solid rgba(255,255,255,.15); display: grid; gap: 2px; }
+      .s7-dash .dt.green { border-left-color: #2fb86b; }
+      .s7-dash .dt.yellow { border-left-color: #e0a526; }
+      .s7-dash .dt.red { border-left-color: #e5484d; }
+      .s7-dash .k { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #9a9ba3; }
+      .s7-dash .dt b { font-size: 20px; line-height: 24px; }
+      .s7-dash .dt .s { font-size: 12px; color: #9a9ba3; }
+      .s7-dash .dl { background: rgba(255,255,255,.06); border-radius: 12px; padding: 10px 12px; display: grid; gap: 6px; }
+      .s7-dash .bars { display: flex; gap: 3px; align-items: flex-end; height: 84px; overflow-x: auto; }
+      .s7-dash .bar { flex: 1 0 18px; max-width: 40px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 2px; }
+      .s7-dash .bar i { display: block; width: 100%; background: #e6b94d; border-radius: 3px 3px 0 0; min-height: 4px; }
+      .s7-dash .bar small { font-size: 9px; color: #9a9ba3; }
+      .s7-dash .dc { display: flex; flex-wrap: wrap; gap: 6px; }
+      .s7-dash .chip { font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.08); }
+      .s7-dash .chip small { font-weight: 400; color: #9a9ba3; margin-right: 3px; }
+      .s7-dash .chip.green { background: rgba(47,184,107,.2); }
+      .s7-dash .chip.yellow { background: rgba(224,165,38,.2); }
+      .s7-dash .chip.red { background: rgba(229,72,77,.2); }
+      .s7-dash .df { margin: 0; font-size: 14px; line-height: 21px; }
+      .s7-dash .df small { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #e6b94d; }
+      .s7-an-tg.more { margin-top: 10px; font-size: 14px; }
+      .s7-an-txt { display: grid; gap: 4px; margin-top: 6px; }
       .s7-an {
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         padding-top: 14px;
@@ -14188,6 +14220,7 @@
       import { safeMerge, countEntries, stable } from "./src/merge.js";
       import * as review from "./src/review.js";
       import { analyseSession } from "./src/analyse.js";
+      import { sessionDash } from "./src/session-dash.js";
       import { alignSplits } from "./src/laps.js";
       import {
         extractTests,
@@ -20334,12 +20367,14 @@
         } catch (e) {}
         const btn = (label) =>
           `<button type="button" class="s6-btn gold" data-act="an-run" data-i="${i}"${busy ? " disabled" : ""}>${label}</button>`;
-        const open = !rec || rec.open !== false;
-        let body;
+        const open = !!rec && rec.open === true; /* Fliesstext der Analyse: standardmässig zugeklappt, das Dashboard oben zeigt die Fakten */
+        let body = "",
+          acts = "",
+          text = "";
         if (busy)
           body = `<p class="s7-an-e">Coach liest deine Einheit und die letzten gleichartigen …</p>`;
         else if (!rec) {
-          body = `<p class="s7-an-e">Dein Coach wertet die Einheit aus: Stärken, Schwächen, Tempo, Pausen und was du am Workout oder am Plan ändern solltest.</p>${btn("Coach-Analyse starten")}`;
+          body = `<p class="s7-an-e">Für Stärken, Schwächen, Tempo, Pausen und Planänderungen wertet dein Coach die Einheit aus.</p>${btn("Coach-Analyse starten")}`;
         } else {
           const r = rec.data,
             ex = r.execution;
@@ -20357,7 +20392,6 @@
                 `<li><b>${AN_AREA[x.area] || "Einheit"}</b> ${esc(x.change)}${x.why ? ` <span class="why">${esc(x.why)}</span>` : ""}</li>`,
             )
             .join("");
-          let acts = "";
           if (r.actions.length) {
             const { valid } = coachCheck(r.actions);
             if (valid.length && rec.state === "open")
@@ -20369,11 +20403,8 @@
           const formHtml = r.form
             ? `<p class="s7-an-form"><b>${esc(r.form.rating)}</b> ${esc(r.form.text)}</p>`
             : "";
-          body = !open
-            ? `<p class="s7-an-h">${esc(r.headline)}</p>`
-            : `${stale ? `<p class="s7-an-st">Seit der Analyse hast du Werte geändert.</p>` : ""}
-          <p class="s7-an-h">${esc(r.headline)}</p>
-          <p class="s7-an-e">${esc(r.summary)}</p>
+          body = `${stale ? `<p class="s7-an-st">Seit der Analyse hast du Werte geändert.</p>` : ""}<p class="s7-an-h">${esc(r.headline)}</p>`;
+          text = `<p class="s7-an-e">${esc(r.summary)}</p>
           ${formHtml}
           ${r.insights && r.insights.length ? `<h4>Erkenntnisse</h4><ul class="n">${pair(r.insights)}</ul>` : ""}
           ${r.strengths.length ? `<h4>Stärken</h4><ul class="g">${pair(r.strengths)}</ul>` : ""}
@@ -20381,11 +20412,40 @@
           ${exRows ? `<h4>Umsetzung</h4><ul class="n">${exRows}</ul>` : ""}
           ${adj ? `<h4>Anpassen</h4><ul class="a">${adj}</ul>` : ""}
           ${r.nextFocus ? `<h4>Nächstes Mal</h4><p class="s7-an-e">${esc(r.nextFocus)}</p>` : ""}
-          ${r.dataGaps.length ? `<h4>Offene Fragen</h4><ul class="n">${li(r.dataGaps)}</ul>` : ""}
-          ${acts}
-          ${btn(stale ? "Neu analysieren" : "Nochmals analysieren")}`;
+          ${r.dataGaps.length ? `<h4>Offene Fragen</h4><ul class="n">${li(r.dataGaps)}</ul>` : ""}`;
         }
-        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top">${rec && !busy ? `<button type="button" class="s7-an-tg" data-act="an-toggle" data-i="${i}" aria-expanded="${open}"><span class="s6-kick">Coach-Analyse</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(${open ? 180 : 0}deg)"><path d="M6 9l6 6 6-6"/></svg></button>` : `<span class="s6-kick">Coach-Analyse</span>`}</div>${body}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}${quick}</section>`;
+        const tg =
+          rec && !busy
+            ? `<button type="button" class="s7-an-tg more" data-act="an-toggle" data-i="${i}" aria-expanded="${open}"><span>${open ? "Analyse einklappen" : "Ganze Analyse lesen"}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(${open ? 180 : 0}deg)"><path d="M6 9l6 6 6-6"/></svg></button>`
+            : "";
+        const redo = rec && !busy ? btn(stale ? "Neu analysieren" : "Nochmals analysieren") : "";
+        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${s7DashHtml(i, p, rec && !busy ? rec.data : null)}${body}${acts}${tg}${open ? `<div class="s7-an-txt">${text}</div>` : ""}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}${quick}</section>`;
+      }
+      /* Dashboard: Punktzahl-Ring, Kennzahl-Kacheln, Rundenbalken der Uhr und Coach-Kennzahlen */
+      function s7DashHtml(i, p, coachData) {
+        let q;
+        try {
+          q = s7Analysis(i, p);
+        } catch (e) {
+          return "";
+        }
+        const acts = actsOf(i),
+          act = acts.find((a) => a.laps && a.laps.length) || acts[0] || null,
+          d = sessionDash(q, act, coachData),
+          C = 2 * Math.PI * 26,
+          off = (C * (100 - d.score)) / 100;
+        const tiles = d.tiles
+          .map((t) => `<div class="dt ${t.tone}"><span class="k">${esc(t.k)}</span><b>${esc(t.v)}</b>${t.sub ? `<span class="s">${esc(t.sub)}</span>` : ""}</div>`)
+          .join("");
+        const bars = d.laps
+          ? `<div class="dl" role="img" aria-label="Rundenzeiten der Uhr"><span class="k">Runden der Uhr (${d.laps.length})</span><div class="bars">${d.laps
+              .map((l, k) => `<div class="bar" title="Runde ${k + 1}: ${l.label}${l.pace ? " · " + l.pace + "/km" : ""}${l.hr ? " · " + l.hr + " bpm" : ""}"><i style="height:${l.h}%"></i><small>${l.label}</small></div>`)
+              .join("")}</div></div>`
+          : "";
+        const chips = d.chips.length
+          ? `<div class="dc">${d.chips.map((c) => `<span class="chip ${c.tone}"><small>${esc(c.k)}</small> ${esc(c.v)}</span>`).join("")}</div>`
+          : "";
+        return `<div class="s7-dash"><div class="dh"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="32" cy="32" r="26" fill="none" class="ring ${d.tone}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 32 32)"/></svg><div><b class="sc">${d.score}<small>/100</small></b><span class="vd">${esc(d.verdict)}</span></div></div>${tiles ? `<div class="dg">${tiles}</div>` : ""}${bars}${chips}${d.focus ? `<p class="df"><small>Nächstes Mal</small> ${esc(d.focus)}</p>` : ""}</div>`;
       }
       function s7FinCard(i, p) {
         const dk = keyI(i),
@@ -23286,7 +23346,7 @@
         if (d.act === "an-toggle") {
           const rec = S.analysis[keyI(+d.i)];
           if (!rec) return;
-          rec.open = rec.open === false;
+          rec.open = rec.open !== true;
           save();
           return render();
         }

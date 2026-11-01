@@ -9,10 +9,13 @@ const sum = (a) => a.reduce((x, y) => x + y, 0);
 /**
  * Team-Stationszeit im Rennen = Mittel der Solo-Benchmarks × k.
  * k bündelt das Teilen der Arbeit (ca. 0,55) und die Ermüdung nach Renntempo (Puls, Grip, Wechsel).
- * Annahme, bis eine Simulation ≥ 85 % eingetragen ist: mitte 0,80 (Ermüdung ×1,45); gut/vorsichtig = Rand der Spanne.
- * Zur Einordnung: 0,66 = alles läuft, 0,95 = so langsam wie im Rennen von St. Gallen 2026 (Stationen 24:03).
+ * Geeicht am einzigen echten Rennen: St. Gallen 2026, Stationen 24:03 (1443 s) bei einer Benchmark-Summe von ca. 25:38 (Mittel beider
+ * Partner, Test vom 13.10.2026) → k ≈ 0,94. Der frühere Ansatz (k 0,80, Stationen 20:30) lag 3:30 unter dem, was ihr im Rennen real gezeigt habt.
+ * Spanne: gut 0,86 = saubere Wechsel und bessere Einteilung (Stationen ca. 22:00), vorsichtig 1,02 = ein schlechter Tag.
+ * Eine Simulation ab 85 % ersetzt die Annahme durch euren Messwert (calibrateK).
  */
-export const K = { gut: 0.72, mitte: 0.8, vorsichtig: 0.9 };
+export const ANCHOR = { total: 3801, stations: 1443 }; // St. Gallen 2026, Doubles Pro Men: 63:21, davon Stationen 24:03
+export const K = { gut: 0.86, mitte: 0.94, vorsichtig: 1.02 };
 export const DRIFT = 3; // s/km zusätzlich pro Lauf ab Lauf 5 (nach den Burpee Broad Jumps)
 export const MISMATCH = 0.025; // Abstand der Partner im selben Test, ab dem ein Messfehler vermutet wird
 export const STALE_DAYS = 35; // älter: Spanne breiter, Re-Test fällig
@@ -60,7 +63,7 @@ export function calibrateK(sims, benchSum) {
  * Prognose. Eingaben:
  *  laufPersons: [[4 Zeiten Jaime], [4 Zeiten Jimoh]] (bevorzugt) oder lauf: flache Liste; base: Schwellen-Pace in s/km (hat Vorrang)
  *  station: 8 × [ich, Partner] Solo-Zeiten · sims: siehe calibrateK · testAgeDays: Alter des letzten Tests (null = unbekannt)
- * @returns null ohne Pace, sonst {T, pace, paces[8], run, st, rox, total, lo, hi, k, calibrated, level, missing, sources[8], stations[8], basis[], warnings[]}
+ * @returns null ohne Pace, sonst {T, pace, paces[8], run, st, rox, total, lo, hi, k, bench, calibrated, level, missing, sources[8], stations[8], basis[], warnings[]}
  */
 export function buildForecast({ lauf = [], laufPersons = null, station = [], base = null, division = null, sims = [], testAgeDays = null } = {}) {
   let reps, mismatch = 0;
@@ -109,7 +112,7 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
   return {
     T, pace: run / 8, paces, run, st, rox: lv.rox, total,
     lo: total - Math.hypot(dRun, dLo, dRox), hi: total + Math.hypot(dRun, dHi, dRox),
-    k, calibrated: cal.k != null, level: lv.name, missing, sources, stations: team, basis, warnings,
+    k, bench: solo.some((v) => v != null) ? sum(solo.filter((v) => v != null)) : null, calibrated: cal.k != null, level: lv.name, missing, sources, stations: team, basis, warnings,
   };
 }
 

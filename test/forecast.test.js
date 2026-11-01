@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildForecast, resolveRuns, calibrateK, K, STALE_DAYS, delta } from "../src/forecast.js";
+import { buildForecast, resolveRuns, calibrateK, K, ANCHOR, STALE_DAYS, delta } from "../src/forecast.js";
 
 const t = (s) => { const [m, x] = s.split(":"); return +m * 60 + +x; };
 // Echte Werte vom 13.10.2026 (Pacing-Test GPS-geprüft, Stationen-Benchmark mit Renngewichten)
@@ -8,11 +8,13 @@ const JAIME = { lauf: ["3:53", "3:58", "3:55", "4:00"].map(t), st: ["3:57", "2:0
 const JIMOH = { lauf: ["3:53", "3:59", "3:56", "4:00"].map(t), st: ["3:58", "1:56", "3:22", "3:02", "3:37", "1:59", "2:38", "5:00"].map(t) };
 const REAL = { laufPersons: [JAIME.lauf, JIMOH.lauf], station: JAIME.st.map((v, r) => [v, JIMOH.st[r]]) };
 
-test("Eure echten Zahlen: Prognose um 59 Minuten, Spanne unter 7 Minuten, nicht Weltklasse", () => {
+test("Eure echten Zahlen: Prognose um 62:30 (nahe an St. Gallen), Sub 60 liegt in der Spanne, aber nicht in der Mitte", () => {
   const f = buildForecast(REAL);
-  assert.ok(f.total > t("58:00") && f.total < t("60:00"), "Mitte " + f.total);
-  assert.ok(f.lo > t("55:30") && f.lo < f.total && f.hi > f.total && f.hi < t("63:30"), `Spanne ${f.lo} bis ${f.hi}`);
-  assert.ok(f.hi - f.lo < 7 * 60, "Spanne " + (f.hi - f.lo));
+  assert.ok(f.total > t("61:00") && f.total < t("64:00"), "Mitte " + f.total);
+  assert.ok(Math.abs(f.total - ANCHOR.total) < 120, "höchstens 2 Min Abstand zum echten Rennen: " + f.total);
+  assert.ok(f.st > t("23:00") && f.st < t("25:00"), "Stationen nahe an den 24:03 vom Rennen: " + f.st);
+  assert.ok(f.lo > t("58:00") && f.lo < t("60:00") && f.hi > f.total && f.hi < t("67:00"), `Spanne ${f.lo} bis ${f.hi}`);
+  assert.ok(f.hi - f.lo < 9 * 60, "Spanne " + (f.hi - f.lo));
   assert.equal(Math.round(f.run), 2044); // 34:04, Ø 4:16/km
   assert.equal(f.missing, 0);
   assert.equal(f.k, K.mitte);
@@ -40,10 +42,10 @@ test("Uhrfehler: weichen die Partner im selben Test über 2,5 % ab, zählt der s
 
 test("Simulation ab 85 % eicht k und verengt die Spanne, eine mit 70 % nur die Untergrenze", () => {
   const base = buildForecast(REAL);
-  const strong = buildForecast({ ...REAL, sims: [{ intensity: 0.9, stations: t("21:00") }] });
+  const strong = buildForecast({ ...REAL, sims: [{ intensity: 0.9, stations: t("25:00") }] });
   const solo = JAIME.st.map((v, r) => (v + JIMOH.st[r]) / 2).reduce((a, b) => a + b, 0);
-  assert.ok(Math.abs(strong.k - 1260 / solo) < 1e-9);
-  assert.ok(strong.k > K.mitte); // 21:00 ist langsamer als die Annahme
+  assert.ok(Math.abs(strong.k - 1500 / solo) < 1e-9);
+  assert.ok(strong.k > K.mitte); // 25:00 ist langsamer als die Annahme
   assert.equal(strong.calibrated, true);
   assert.ok(strong.hi - strong.lo < base.hi - base.lo, "Spanne wird enger");
   const weak = buildForecast({ ...REAL, sims: [{ intensity: 0.7, stations: t("22:00") }] });
@@ -74,7 +76,7 @@ test("Ohne Stationswerte: Zeit aus St. Gallen statt 0:00, mit Hinweis", () => {
 });
 
 test("Veränderung zur Vorwoche", () => {
-  const a = buildForecast(REAL), b = buildForecast({ ...REAL, sims: [{ intensity: 0.9, stations: t("23:00") }] });
+  const a = buildForecast(REAL), b = buildForecast({ ...REAL, sims: [{ intensity: 0.9, stations: t("26:00") }] });
   const d = delta(b, a);
   assert.ok(d.st > 0 && d.total === d.run + d.st + d.rox);
   assert.equal(delta(null, a), null);

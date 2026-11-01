@@ -14231,6 +14231,7 @@
       } from "./src/extras.js";
       import { safeMerge, countEntries, stable } from "./src/merge.js";
       import * as review from "./src/review.js";
+      import * as progress from "./src/progress.js";
       import { analyseSession } from "./src/analyse.js";
       import { sessionDash, compareToPrev } from "./src/session-dash.js";
       import { alignSplits } from "./src/laps.js";
@@ -14352,6 +14353,7 @@
         wsplit: {},
         off: {},
         simres: {},
+        fclog: {},
         tests: {
           lauf: { j: ["", "", "", ""], m: ["", "", "", ""] },
           station: {},
@@ -14412,6 +14414,25 @@
             );
           }
           lsSet("hx:fc-last", String(t));
+        } catch (_) {}
+        fcLogSync();
+      }
+      /* Prognose-Protokoll (S.fclog): jede echte Veränderung der Prognose mit Datum und Ursache festhalten.
+         Die Wochenabschlüsse (S.review[x].fcx) stammen aus dem alten Modell und werden bewusst nicht übernommen. */
+      function fcLogSync() {
+        try {
+          const fc = rvForecast();
+          if (!fc || !fc.total) return;
+          S.fclog = S.fclog || {};
+          const nSims = Object.values(S.simres || {}).filter(simOk).length;
+          const r = progress.update(S.fclog, fc, isoD(NOW), nSims);
+          if (r.changed) {
+            S.fclog = r.log;
+            S._t = Date.now();
+            saveLocal();
+            queuePush();
+            if (view === "review") render();
+          }
         } catch (_) {}
       }
       function save() {
@@ -16979,6 +17000,73 @@
           division: S.division,
         });
       }
+      /* Ausblick bis Basel und Protokoll der Prognose. compact = Handy-Karte (zugeklappte Abschnitte), sonst Wochenrückblick. */
+      function fcProtocol(fc, weeksLeft, compact) {
+        let h = "";
+        {
+          // Abgleich mit echten Sub-60-Rennen (Pro Men Doubles): Laufen, Stationen, Roxzone gegen den Median
+          const M = review.RACE_MODEL,
+            dd = (a, b) => (a - b < 0 ? "−" : "+") + mmss(Math.abs(Math.round(a - b))),
+            stM = M.stations.reduce((a, b) => a + b, 0),
+            rowx = (l, a, b) =>
+              `<tr><td>${l}</td><td>${mmss(a)}</td><td>${mmss(b)}</td><td class="${a - b > 5 ? "rv-slow" : a - b < -5 ? "rv-fast" : ""}">${dd(a, b)}</td></tr>`;
+          h += `<div class="cap rv-gap">Abgleich mit echten Sub-60-Rennen</div><table class="rv-tab"><thead><tr><th>Teil</th><th>Ihr</th><th>Referenz</th><th>Diff.</th></tr></thead><tbody>${rowx("Laufen", fc.run, M.run)}${rowx("Stationen", fc.st, stM)}${rowx("Roxzone", fc.rox, M.rox)}</tbody><tfoot><tr><td>Gesamt</td><td>${mmss(fc.total)}</td><td>${mmss(M.run + stM + M.rox)}</td><td>${dd(fc.total, M.run + stM + M.rox)}</td></tr></tfoot></table>
+    <p class="sub mt-2">Referenz = Median von Houston 2026 (57:45), Dallas 2025 (58:23) und New York 2026 (58:36), Pro Men Doubles, Quelle hyranking.com. Nur drei Rennen und nur Summen, keine Einzelsplits. Die Stationszeiten im Rennmodell sind darum die Summe, verteilt nach den Anteilen des Plans.</p>
+    <p class="sub mt-2">Das Laufen ist der Hebel: Die Referenzteams laufen im Rennen Ø ${mmss(M.run / 8)}/km. Dafür wäre im Pacing-Test (4 × 1 km) etwa Ø ${mmss(review.neededTestPace())}/km nötig, ihr liegt bei ${mmss(fc.T)}/km.</p>`;
+        }
+        const items = progress.withDeltas(progress.list(S.fclog));
+        const adh = fcAdherence();
+        const ol = progress.outlook({
+          items,
+          cur: { t: fc.total, lo: fc.lo, hi: fc.hi },
+          weeksLeft,
+          adherence: adh,
+        });
+        const sg2 = (d) =>
+          d == null ? "" : Math.abs(d) < 1 ? "±0" : (d < 0 ? "−" : "+") + mmss(Math.abs(d));
+        h += `<div class="cap rv-gap">Ausblick bis Basel</div>`;
+        if (ol) {
+          const rt = String(Math.abs(Math.round(ol.rate))),
+            fast = ol.rate < 0;
+          h += `<div class="rv-total"><b>${mmss(ol.proj)}</b><span>am Renntag, Spanne ${mmss(ol.lo)} bis ${mmss(ol.hi)}</span></div>
+    <p class="sub mt-2">${ol.source === "gemessen" ? `Gemessen: eure Prognose wird um ca. ${rt} s pro Woche ${fast ? "schneller" : "langsamer"} (Steigung über das Protokoll unten).` : `Noch keine Messreihe, darum eine Annahme: ${rt} s pro Woche, gewichtet mit eurer Trainingstreue (${Math.round(ol.adherence * 100)} % der geplanten Einheiten).`} Der Gewinn flacht ab und die letzten ${progress.TAPER_W} Wochen vor dem Rennen bringen nichts mehr.</p>
+    <p class="sub mt-2">${ol.subWeeks === 0 ? "Die Prognose liegt schon unter 60:00." : ol.subWeeks != null ? `Unter 60:00 voraussichtlich in ca. ${ol.subWeeks} ${ol.subWeeks === 1 ? "Woche" : "Wochen"} (bei gleichem Fortschritt).` : `Mit diesem Tempo reicht es nach dem Modell nicht für 60:00. Nötig wären ca. ${Math.ceil(ol.needed)} s pro Woche.`}</p>`;
+          const cp = ol.curve.map((p) => ({ label: "+" + p.w, value: p.t / 60 }));
+          if (cp.length >= 2)
+            h += dash.lineChart(cp, { label: "Ausblick (Wochen ab heute)", fmt: (v) => mmss(v * 60), height: 110 });
+        }
+        h += `<div class="cap rv-gap">Protokoll eurer Prognose</div>`;
+        if (items.length >= 2)
+          h += dash.lineChart(
+            items.map((e) => ({ label: e.d.slice(8) + "." + e.d.slice(5, 7) + ".", value: e.t / 60 })),
+            { label: "Rennprognose im Verlauf", fmt: (v) => mmss(v * 60), height: 110 },
+          );
+        h += items.length
+          ? `<table class="rv-tab"><thead><tr><th>Datum</th><th>Prognose</th><th>Änd.</th><th>Ursache</th></tr></thead><tbody>${items
+              .slice()
+              .reverse()
+              .slice(0, 20)
+              .map(
+                (e) =>
+                  `<tr><td>${esc(e.d.slice(8) + "." + e.d.slice(5, 7) + ".")}</td><td>${mmss(e.t)}</td><td class="${e.dt == null ? "" : e.dt < 0 ? "rv-fast" : e.dt > 0 ? "rv-slow" : ""}">${e.dt == null ? "–" : sg2(e.dt)}</td><td>${esc(e.why || "")}${e.dt != null ? `<small>Laufen ${sg2(e.dr)} · Stationen ${sg2(e.ds)}</small>` : ""}</td></tr>`,
+              )
+              .join("")}</tbody></table><p class="sub mt-2">Ein Eintrag entsteht nur, wenn sich die Prognose durch einen neuen Test oder eine Simulation wirklich verändert. Das Protokoll liegt im Backup und wird zwischen den Geräten abgeglichen.</p>`
+          : `<p class="sub">Noch kein Eintrag. Er entsteht, sobald Testwerte da sind.</p>`;
+        if (!compact) return h;
+        return `<details class="s7-det" open><summary>Ausblick und Protokoll<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary><div class="fc-proto">${h}</div></details>`;
+      }
+      /* Trainingstreue der letzten bis zu 4 Wochen: erledigte / geplante Einheiten (0–1), null ohne Daten */
+      function fcAdherence() {
+        const cur = Math.max(0, Math.floor(Math.min(TODAY, LAST) / 7));
+        let done = 0,
+          planned = 0;
+        for (let w = Math.max(0, cur - 3); w <= cur; w++) {
+          const r = rvData(w);
+          done += r.done;
+          planned += r.planned;
+        }
+        return planned ? done / planned : null;
+      }
       /* Rennprognose-Karte (Wochenrückblick): eine Zahl mit Spanne, in Rennsprache erklärt */
       function forecastCard(cur) {
         const fc = rvForecast(),
@@ -17042,15 +17130,7 @@
     <label>Intensität <select id="sim-i">${[70, 80, 85, 90, 95, 100].map((x) => `<option value="${x}"${x === 85 ? " selected" : ""}>${x} %</option>`).join("")}</select></label>
     ${review.STATIONS.map((s, r) => `<label>${esc(s)} <input type="text" inputmode="numeric" data-sim="${r}" placeholder="m:ss" aria-label="${esc(s)} Teamzeit"></label>`).join("")}
     <button type="button" class="btn primary" data-act="sim-save">Speichern</button></div></details>`;
-        // Verlauf der gespeicherten Prognosen
-        const pts = [];
-        for (let x = 0; x <= cur; x++)
-          pts.push({
-            label: "W" + (x + 1),
-            value: S.review[x] && S.review[x].fc ? S.review[x].fc / 60 : null,
-          });
-        if (pts.filter((p) => p.value != null).length >= 2)
-          h += `<div class="cap rv-gap">Prognose pro Woche</div>${dash.lineChart(pts, { label: "Rennprognose", fmt: (v) => mmss(v * 60), height: 110 })}`;
+        h += fcProtocol(fc, weeksLeft, false);
         return h + `</div>`;
       }
       function vDashboard(legacy) {
@@ -20990,7 +21070,7 @@
           prog = `<section class="s6-card s7-pg" aria-label="Rennprognose"><div class="r1"><span class="s6-kick">Rennprognose</span><span class="s7-pill"><i style="background:${gap > 0 ? "#ff9f0a" : "#30d158"}"></i>${mmss(Math.abs(gap))} ${gap > 0 ? "zu langsam" : "Puffer"}</span></div><div class="big"><b>${mmss(fc.total)}</b></div><p class="cap">Spanne ${mmss(fc.lo)} bis ${mmss(fc.hi)} · Ziel 60:00</p>
         <div class="bar"><div><u style="width:${pc(fc.run)}%;background:#f5f5f7"></u><u style="width:${pc(stSum)}%;background:#9a9ba3"></u><u style="width:${pc(fc.rox)}%;background:#6d7176"></u></div><i style="left:${pc(review.GOAL_S)}%"></i></div>
         <div class="lg"><span><i style="background:#f5f5f7"></i>Laufen</span><span><i style="background:#9a9ba3"></i>Stationen</span><span><i style="background:#6d7176"></i>Roxzone</span><span><i class="m"></i>60:00 Ziel · 63:21 St. Gallen</span></div>
-        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${det}${calc}${pgw}</section>`;
+        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${det}${calc}${pgw}${fcProtocol(fc, Math.max(1, (LAST - Math.max(0, TODAY)) / 7), true)}</section>`;
         }
         return prog;
       }

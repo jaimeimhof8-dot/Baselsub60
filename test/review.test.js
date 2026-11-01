@@ -120,10 +120,10 @@ test("Prognose Zeile für Zeile gegen das Rennmodell", () => {
   const fc = review.forecast({ lauf: [232, 235, 230, 238], station: Array.from({ length: 8 }, () => [400, 420]) });
   const b = review.breakdown(fc);
   assert.equal(b.rows.length, 10);
-  assert.equal(b.rows[0].goal, 1920);
+  assert.equal(b.rows[0].goal, review.RACE_MODEL.run);
   assert.equal(Math.round(b.rows[0].est), Math.round(review.forecast({ lauf: [232, 235, 230, 238] }).run));
   assert.equal(Math.round(b.rows[1].est), Math.round(410 * review.K.mitte));
-  assert.equal(b.goal, 1920 + 1390 + 270);
+  assert.equal(b.goal, review.RACE_MODEL.run + review.RACE_MODEL.stations.reduce((a, c) => a + c, 0) + review.RACE_MODEL.rox);
   assert.ok(b.goal < 3600, "Rennmodell muss unter 60 Minuten liegen");
   assert.equal(Math.round(b.diff), Math.round(fc.total - b.goal));
   assert.equal(review.breakdown(null), null);
@@ -143,4 +143,16 @@ test("Prognose ist plausibel: Test-Pace 4:05 ergibt etwa das echte Rennen von St
   const quick = forecast({ lauf: [237] }); // GPS-Wert des Pacing-Tests vom 13.10.
   assert.ok(quick.total > 3660 && quick.total < 3800, "3:57-Test: " + quick.total); // 61–63 Minuten, nicht unter 60
   assert.ok(quick.run / 8 > 237 + 10 && quick.run / 8 < 237 + 30, "Renn-Pace 10–30 s/km über Test-Pace");
+});
+
+test("Rennmodell stammt aus echten Sub-60-Rennen (Median), Laufen ist der Hebel", () => {
+  assert.ok(review.REFERENCE.length === 3 && review.REFERENCE.every((r) => r.total < 3600));
+  assert.ok(review.REFERENCE.every((r) => Math.abs(r.run + r.st + r.rox - r.total) < 10), "Teile ergeben die Gesamtzeit");
+  const M = review.RACE_MODEL, st = M.stations.reduce((a, c) => a + c, 0);
+  assert.equal(M.run, 1891); // 31:31
+  assert.equal(st, 1431); // 23:51
+  assert.equal(M.rox, 206); // 3:26
+  assert.ok(M.run + st + M.rox < 3600 && M.run + st + M.rox > 3500, "Modell 58:48");
+  const need = review.neededTestPace();
+  assert.ok(need > 210 && need < 225, "Test-Pace " + need); // ca. 3:38/km
 });

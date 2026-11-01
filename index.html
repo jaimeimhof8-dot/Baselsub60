@@ -2952,6 +2952,42 @@
       .sbox .btn {
         margin-top: var(--s3);
       }
+      .gchk {
+        list-style: none;
+        margin: var(--s3) 0 0;
+        padding: 0;
+        display: grid;
+        gap: 6px;
+        font-size: 13px;
+      }
+      .gchk li {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+      }
+      .gchk .ic {
+        flex: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+        font-weight: 700;
+        background: rgba(128, 128, 128, 0.25);
+      }
+      .gchk .ok .ic {
+        background: #2fb86b;
+        color: #fff;
+      }
+      .gchk .bad .ic {
+        background: #e5484d;
+        color: #fff;
+      }
+      .gchk .wait .ic {
+        background: #e0a526;
+        color: #fff;
+      }
       .sbox.g {
         border-color: rgba(17, 169, 237, 0.35);
         background: rgba(17, 169, 237, 0.08);
@@ -14170,7 +14206,7 @@
       import { lockReason, canDrop, shelfStart } from "./src/shelf.js";
       import { fmtLine, lineSlots } from "./src/workout-fmt.js";
       import { normTime } from "./src/timeinput.js";
-      import { repSummary } from "./src/laps.js";
+      import { repSummary, watchCheck } from "./src/laps.js";
       import { planSteps } from "./src/garmin-workout.js";
       import {
         flatten,
@@ -14707,6 +14743,7 @@
           h += `<div class="mt-1">${esc(a.name)} – ${esc(strava.summary(a))}</div>`;
           const rs = ivText ? repSummary(a, ivText) : "";
           if (rs) h += `<div class="sub mt-1">Intervalle ${esc(rs)}</div>`;
+          h += takeCheck(i, p, a, n, done, ivText);
         }
         // Steht der Tag schon im Banner oben auf „Heute“, hier nicht noch einmal fragen
         const inBanner =
@@ -14727,6 +14764,38 @@
         else if (inBanner)
           h += `<div class="sub mt-1">Übernehmen oben im Vorschlag.</div>`;
         return h + `</div>`;
+      }
+      /* Sichtbarer Nachweis je Einheit: was von der Uhr angekommen ist und was davon im Plan steht (kein Raten mehr) */
+      function takeCheck(i, p, a, n, done, ivText) {
+        const isPlan = planAct(i) === a,
+          dk = keyI(i),
+          steps = isPlan ? s7Steps(p) : null,
+          w = watchCheck(a, { steps, intervalText: isPlan ? ivText : "" }),
+          taken = !!S.dismiss["tk:" + i],
+          src = srcName(a),
+          rows = [];
+        const row = (st, txt) =>
+          rows.push(`<li class="${st}"><span class="ic" aria-hidden="true">${st === "ok" ? "✓" : st === "bad" ? "!" : st === "wait" ? "…" : "–"}</span><span>${esc(txt)}</span></li>`);
+        row("ok", `${src}: Einheit geladen (${strava.summary(a)})`);
+        if (w.laps.state === "ok") row("ok", `${w.laps.n} ${w.laps.n === 1 ? "Runde" : "Runden"} von der Uhr geladen`);
+        else if (w.laps.state === "wait") row("wait", "Runden werden beim nächsten Garmin-Abruf geholt");
+        else row("none", "Keine Runden aufgezeichnet – nur Gesamtwerte");
+        if (w.splits) {
+          const sp = w.splits;
+          if (sp.state === "ok") {
+            const wr = S.wsplit[dk] === a.id;
+            row(wr ? "ok" : "wait", `Splits: ${sp.got} von ${sp.total} Schritten mit Uhrzeit${wr ? " – im Plan eingetragen" : " – werden beim Übernehmen eingetragen"}`);
+          } else if (sp.state === "bad")
+            row("bad", `Splits nicht zuordenbar: Uhr ${sp.count} Runden, Plan ${sp.total} Arbeitsschritte. Zeiten von Hand eintragen.`);
+          else row("none", "Splits: keine Runden, nichts zuzuordnen");
+        }
+        if (w.intervals) {
+          if (w.intervals.state === "ok") row("ok", `Intervalle erkannt: ${w.intervals.text}`);
+          else row("none", "Intervalle: Runden passen nicht zur Plan-Vorgabe");
+        }
+        if (taken) row(done >= n ? "ok" : "wait", `Plan: ${done} von ${n} Zeilen abgehakt`);
+        else row("wait", "Plan: noch nicht übernommen");
+        return `<ul class="gchk" aria-label="Prüfung der Übernahme">${rows.join("")}</ul>`;
       }
       /* Übernehmen-Auswahl: welche Übungen wurden gemacht? (Tag-Index oder null) */
       let takeOpen = null;
@@ -14761,6 +14830,7 @@
           dk = keyI(i),
           a = planAct(i);
         js.forEach((j) => (S.done[dk + "|" + j] = 1));
+        const spl = a && importWatchSplits(i); // Stationstag: Rundenzeiten der Uhr in die Planzeilen
         let msg = `${js.length === p.i.length ? "Workout erledigt" : `${js.length} von ${p.i.length} Übungen erledigt`}${a ? " – von " + srcName(a) + " übernommen" : ""}`;
         if (a) {
           const sum = strava.summary(a),
@@ -14789,6 +14859,7 @@
               S.notes[dk] = (n ? n + "\n" : "") + srcName(a) + ": " + sum;
           }
         }
+        if (spl && !silent) msg += " · Splits eingetragen";
         S.dismiss["tk:" + i] = 1; // übernommen: der Vorschlag oben verschwindet, auch bei teilweiser Übernahme
         save();
         if (!silent) toast(msg);
@@ -15265,7 +15336,8 @@
         const e = rc().byDay[i];
         if (e && (e.match || full)) {
           const a = actsOf(i)[0];
-          b.push(`<span class="badge ${srcCls(a)}">${srcName(a)}</span>`);
+          const ok = e.match && S.dismiss["tk:" + i];
+          b.push(`<span class="badge ${srcCls(a)}" title="${ok ? "Übernommen" : "Erkannt, noch nicht übernommen"}">${srcName(a)}${ok ? " ✓" : ""}</span>`);
         }
         return b.join("");
       }

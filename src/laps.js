@@ -82,3 +82,30 @@ export function alignSplits(laps, steps) {
   const L = T;
   return hit || { times: null, count: L.length };
 }
+
+/**
+ * Prüfbericht für eine Einheit von der Uhr: Was kam wirklich an? Reine Funktion, Grundlage der Anzeige „Garmin-Übernahme“.
+ *  laps:      {n, state: "ok" | "wait" | "none"} – Runden da / werden beim nächsten Sync geholt (Garmin ohne lapsV 3) / keine
+ *  splits:    nur mit steps (Stationstag): {state: "ok" | "bad" | "none", got, total, mode, count}
+ *  intervals: nur mit Intervall-Text im Plan: {state: "ok" | "none", text}
+ */
+export function watchCheck(act, { steps = null, intervalText = "" } = {}) {
+  const laps = (act && act.laps) || [];
+  const wait = !!act && act.src === "garmin" && act.lapsV !== 3;
+  const out = { laps: { n: laps.length, state: laps.length ? "ok" : wait ? "wait" : "none" }, splits: null, intervals: null };
+  if (steps && steps.length) {
+    const total = steps.filter((s) => s.kind !== "rest").length;
+    if (!laps.length) out.splits = { state: "none", got: 0, total, mode: null, count: 0 };
+    else {
+      const r = alignSplits(laps, steps);
+      out.splits = r.times
+        ? { state: "ok", got: r.times.filter((t, k) => t != null && steps[k].kind !== "rest").length, total, mode: r.mode, count: r.count }
+        : { state: "bad", got: 0, total, mode: null, count: r.count };
+    }
+  }
+  if (intervalText) {
+    const text = laps.length ? repSummary(act, intervalText) : "";
+    out.intervals = { state: text ? "ok" : "none", text };
+  }
+  return out;
+}

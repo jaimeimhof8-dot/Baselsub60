@@ -295,7 +295,7 @@ Deno.serve(async (req) => {
         const steps: Record<string, number> = {};
         for (const x of Array.isArray(r) ? r : []) {
           const d = String(x?.calendarDate ?? "").slice(0, 10);
-          if (/^d{4}-d{2}-d{2}$/.test(d) && typeof x.totalSteps === "number") steps[d] = Math.round(x.totalSteps);
+          if (/^\d{4}-\d{2}-\d{2}$/.test(d) && typeof x.totalSteps === "number") steps[d] = Math.round(x.totalSteps);
         }
         return json({ steps });
       } catch (e) {

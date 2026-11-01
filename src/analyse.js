@@ -112,5 +112,6 @@ export function analyseSession(a) {
   else if (rpe != null && target != null && rpe - target < -2) workout = "Das Workout war zu leicht.";
   else workout = "Das Workout selbst ist in Ordnung, kleine Stellschrauben unten.";
   if (!good.length) good.push("Du hast die Einheit angefangen und eingetragen – das zählt.");
-  return { score, tone, verdict, good, bad, exec, workout, adjust: [...new Set(adjust)].slice(0, 4) };
+  return { score, tone, verdict, good, bad, exec, workout, adjust: [...new Set(adjust)].slice(0, 4),
+    facts: { done, n, skipped, rpe, target, lim, up, down, same } };
 }

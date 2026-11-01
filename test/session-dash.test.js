@@ -9,8 +9,9 @@ test("sessionDash: Kacheln, Rundenbalken, Coach-Chips", () => {
   const coach = { form: { rating: "auf Kurs" }, strengths: [1, 2], weaknesses: [], adjustments: [1], nextFocus: "Ruhig bleiben" };
   const d = sessionDash(q, act, coach);
   assert.equal(d.score, q.score);
-  assert.deepEqual(d.tiles.map((t) => t.k), ["Umsetzung", "Anstrengung", "Dauer", "Ø Puls"]);
+  assert.deepEqual(d.tiles.map((t) => t.k), ["Umsetzung", "Anstrengung", "Dauer", "Ø Puls", "Beste Runde"]);
   assert.equal(d.tiles[2].v, "40:00 min");
+  assert.equal(d.tiles[4].v, "2:30");
   assert.equal(d.laps.length, 2);
   assert.equal(d.laps[0].h, 100);
   assert.equal(d.laps[1].h, 50);

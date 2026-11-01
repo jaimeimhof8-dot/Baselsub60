@@ -12855,6 +12855,13 @@
       .an-dash .ring.red { stroke: var(--danger); }
       .an-dash .dg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); }
       @media (min-width: 600px) { .an-dash .dg { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+      /* Keine Lücke im Raster: die letzte Kachel füllt die Restbreite der Zeile */
+      .an-dash .dg > .dt:last-child:nth-child(odd) { grid-column: 1 / -1; }
+      @media (min-width: 600px) {
+        .an-dash .dg > .dt:last-child:nth-child(odd) { grid-column: auto; }
+        .an-dash .dg > .dt:last-child:nth-child(3n + 1) { grid-column: 1 / -1; }
+        .an-dash .dg > .dt:last-child:nth-child(3n + 2) { grid-column: span 2; }
+      }
       .an-dash .dt { display: flex; flex-direction: column; gap: 6px; padding: var(--s3); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); min-width: 0; color: var(--muted); }
       .an-dash .k { font-size: 11px; line-height: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
       .an-dash .dt b { font-family: var(--f-head); font-weight: 700; font-size: 26px; line-height: 1; color: var(--text); }

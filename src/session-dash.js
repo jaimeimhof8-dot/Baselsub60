@@ -23,7 +23,6 @@ export function sessionDash(quick, act, coach) {
   }
   if (act && act.time) tiles.push({ k: "Dauer", v: hms(act.time), sub: act.dist ? de(act.dist / 1000) + " km" + (act.group === "run" && act.dist > 200 ? " · " + mmss(act.time / (act.dist / 1000)) + "/km" : "") : "", tone: "" });
   if (act && act.hr) tiles.push({ k: "Ø Puls", v: String(act.hr), sub: act.maxHr ? "max " + act.maxHr : "", tone: "" });
-  if (act && act.kcal) tiles.push({ k: "Kalorien", v: String(act.kcal), sub: "kcal", tone: "" });
   if (f.up || f.down || f.same) tiles.push({ k: "Gewichte", v: `▲${f.up || 0} ▼${f.down || 0}`, sub: `${f.same || 0} gleich`, tone: f.down > f.up ? "red" : f.up ? "green" : "" });
 
   let laps = null;
@@ -31,13 +30,6 @@ export function sessionDash(quick, act, coach) {
   if (L.length >= 2) {
     const max = Math.max(...L.map((l) => l.t));
     laps = L.map((l) => ({ t: l.t, label: mmss(l.t), hr: l.hr || null, pace: l.d >= 300 && paceOf(l) ? mmss(paceOf(l)) : null, h: Math.max(8, Math.round((l.t / max) * 100)) }));
-  }
-
-  // Schnellste Tempo-Runde als eigene Kachel (füllt auch die Zeile auf, wenn die Zahl der Kacheln ungerade ist)
-  if (L.length >= 2) {
-    const fast = L.map((l, k) => ({ k, p: l.d >= 300 ? paceOf(l) : null })).filter((x) => x.p).sort((a, b) => a.p - b.p)[0];
-    const slow = L.map((l) => (l.d >= 300 ? paceOf(l) : null)).filter(Boolean);
-    if (fast && slow.length >= 2) tiles.push({ k: "Beste Runde", v: mmss(fast.p), sub: `Runde ${fast.k + 1} von ${L.length} · /km`, tone: "" });
   }
 
   const chips = [];
@@ -50,4 +42,38 @@ export function sessionDash(quick, act, coach) {
     focus = coach.nextFocus || "";
   }
   return { score: quick.score, tone: quick.tone, verdict: quick.verdict, tiles, laps, chips, focus };
+}
+
+const sgn = (n) => (n > 0 ? "+" : n < 0 ? "−" : "±");
+
+/**
+ * Vergleich mit der letzten gleichen Einheit (gleiche Art und gleicher Plantitel, sonst gleiche Art).
+ * cur / prev: {act: {time, dist, hr, group} | null, rpe: number | null}; easy = lockerer Lauf (langsamer ist dann kein Minus).
+ * -> [{k, v, sub, tone}] nur mit Werten, die in beiden Einheiten vorhanden sind
+ */
+export function compareToPrev(cur, prev, { easy = false } = {}) {
+  const rows = [];
+  if (!cur || !prev) return rows;
+  const a = cur.act, b = prev.act;
+  const pace = (x) => (x && x.group === "run" && x.dist >= 1000 && x.time ? x.time / (x.dist / 1000) : null);
+  const pc = pace(a), pp = pace(b);
+  let dPace = null;
+  if (pc && pp) {
+    dPace = Math.round(pc - pp);
+    rows.push({ k: "Pace", v: `${sgn(dPace)}${Math.abs(dPace)} s/km`, sub: `vorher ${mmss(pp)}/km`, tone: easy ? "" : dPace <= -2 ? "green" : dPace >= 5 ? "yellow" : "" });
+  }
+  if (a && b && a.hr && b.hr) {
+    const d = Math.round(a.hr - b.hr);
+    const fasterNow = dPace != null && dPace <= -2; // höherer Puls bei klar schnellerem Tempo ist kein Rückschritt
+    rows.push({ k: "Ø Puls", v: `${sgn(d)}${Math.abs(d)} bpm`, sub: `vorher ${b.hr}`, tone: d <= -3 ? "green" : d >= 4 && !fasterNow ? "yellow" : "" });
+  }
+  if (cur.rpe != null && prev.rpe != null) {
+    const d = Math.round((cur.rpe - prev.rpe) * 10) / 10;
+    rows.push({ k: "Anstrengung", v: `${sgn(d)}${de(Math.abs(d), d % 1 ? 1 : 0)}`, sub: `vorher ${prev.rpe}/10`, tone: d <= -1 ? "green" : d >= 1 ? "yellow" : "" });
+  }
+  if (a && b && a.time && b.time) {
+    const d = Math.round(a.time - b.time);
+    rows.push({ k: "Dauer", v: `${sgn(d)}${mmss(Math.abs(d))} min`, sub: `vorher ${hms(b.time)}`, tone: "" });
+  }
+  return rows;
 }

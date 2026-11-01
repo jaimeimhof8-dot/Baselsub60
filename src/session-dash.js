@@ -33,6 +33,13 @@ export function sessionDash(quick, act, coach) {
     laps = L.map((l) => ({ t: l.t, label: mmss(l.t), hr: l.hr || null, pace: l.d >= 300 && paceOf(l) ? mmss(paceOf(l)) : null, h: Math.max(8, Math.round((l.t / max) * 100)) }));
   }
 
+  // Schnellste Tempo-Runde als eigene Kachel (füllt auch die Zeile auf, wenn die Zahl der Kacheln ungerade ist)
+  if (L.length >= 2) {
+    const fast = L.map((l, k) => ({ k, p: l.d >= 300 ? paceOf(l) : null })).filter((x) => x.p).sort((a, b) => a.p - b.p)[0];
+    const slow = L.map((l) => (l.d >= 300 ? paceOf(l) : null)).filter(Boolean);
+    if (fast && slow.length >= 2) tiles.push({ k: "Beste Runde", v: mmss(fast.p), sub: `Runde ${fast.k + 1} von ${L.length} · /km`, tone: "" });
+  }
+
   const chips = [];
   let focus = "";
   if (coach) {

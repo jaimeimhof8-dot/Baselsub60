@@ -60,3 +60,19 @@ test("alignSplits: passt nichts, wird nichts geraten", () => {
   assert.equal(r.times, null);
   assert.equal(r.count, 7);
 });
+
+import { watchCheck } from "../src/laps.js";
+test("watchCheck: Runden, Splits und Intervalle sichtbar prüfen", () => {
+  const ok = watchCheck({ src: "garmin", lapsV: 3, laps: L(40, 245, 180) }, { steps: S3 });
+  assert.equal(ok.laps.state, "ok");
+  assert.equal(ok.splits.state, "ok");
+  assert.equal(ok.splits.mode, "direct");
+  assert.equal(ok.splits.got, ok.splits.total);
+  const bad = watchCheck({ src: "garmin", lapsV: 3, laps: L(40, 245, 180, 50, 60) }, { steps: S3 });
+  assert.equal(bad.splits.state, "bad");
+  assert.equal(bad.splits.count, 5);
+  assert.equal(watchCheck({ src: "garmin", laps: [] }).laps.state, "wait", "Runden noch nicht geholt");
+  assert.equal(watchCheck({ src: "garmin", lapsV: 3, laps: [] }).laps.state, "none");
+  assert.equal(watchCheck({ src: "strava", laps: [] }, { steps: S3 }).splits.state, "none");
+  assert.equal(watchCheck({ src: "garmin", lapsV: 3, laps: L(40) }, { intervalText: "4×1 km @ S" }).intervals.state, "none");
+});

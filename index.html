@@ -17003,6 +17003,17 @@
       /* Ausblick bis Basel und Protokoll der Prognose. compact = Handy-Karte (zugeklappte Abschnitte), sonst Wochenrückblick. */
       function fcProtocol(fc, weeksLeft, compact) {
         let h = "";
+        {
+          // Abgleich mit echten Sub-60-Rennen (Pro Men Doubles): Laufen, Stationen, Roxzone gegen den Median
+          const M = review.RACE_MODEL,
+            dd = (a, b) => (a - b < 0 ? "−" : "+") + mmss(Math.abs(Math.round(a - b))),
+            stM = M.stations.reduce((a, b) => a + b, 0),
+            rowx = (l, a, b) =>
+              `<tr><td>${l}</td><td>${mmss(a)}</td><td>${mmss(b)}</td><td class="${a - b > 5 ? "rv-slow" : a - b < -5 ? "rv-fast" : ""}">${dd(a, b)}</td></tr>`;
+          h += `<div class="cap rv-gap">Abgleich mit echten Sub-60-Rennen</div><table class="rv-tab"><thead><tr><th>Teil</th><th>Ihr</th><th>Referenz</th><th>Diff.</th></tr></thead><tbody>${rowx("Laufen", fc.run, M.run)}${rowx("Stationen", fc.st, stM)}${rowx("Roxzone", fc.rox, M.rox)}</tbody><tfoot><tr><td>Gesamt</td><td>${mmss(fc.total)}</td><td>${mmss(M.run + stM + M.rox)}</td><td>${dd(fc.total, M.run + stM + M.rox)}</td></tr></tfoot></table>
+    <p class="sub mt-2">Referenz = Median von Houston 2026 (57:45), Dallas 2025 (58:23) und New York 2026 (58:36), Pro Men Doubles, Quelle hyranking.com. Nur drei Rennen und nur Summen, keine Einzelsplits. Die Stationszeiten im Rennmodell sind darum die Summe, verteilt nach den Anteilen des Plans.</p>
+    <p class="sub mt-2">Das Laufen ist der Hebel: Die Referenzteams laufen im Rennen Ø ${mmss(M.run / 8)}/km. Dafür wäre im Pacing-Test (4 × 1 km) etwa Ø ${mmss(review.neededTestPace())}/km nötig, ihr liegt bei ${mmss(fc.T)}/km.</p>`;
+        }
         const items = progress.withDeltas(progress.list(S.fclog));
         const adh = fcAdherence();
         const ol = progress.outlook({

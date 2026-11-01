@@ -84,9 +84,27 @@ export function weekCheck({ days = [], wave = "moderat", load = null, prev = [],
 /** Rennprognose mit Spanne, siehe src/forecast.js (buildForecast). */
 export const forecast = (opts) => buildForecast(opts);
 
-/** Rennmodell für unter 60 Minuten (Plan v9): 8 × 1 km in 4:00, Stationen geteilt, Roxzone mit 16 Wechseln */
+/**
+ * Referenz: drei echte Pro-Men-Doubles-Rennen unter 60 Minuten (hyranking.com, Daten der HYROX-Ergebnisse, abgerufen 01.11.2026).
+ * Je Rennen nur Summen, keine Einzelsplits: Laufen gesamt, Stationen gesamt, Roxzone (alle in Sekunden).
+ * Houston 2026 57:45 (AG 25–29), Dallas 2025 58:23 (AG 40–44), New York 2026 58:36 (AG 40–44). Nur drei Rennen: grobe Orientierung, keine Statistik.
+ */
+export const REFERENCE = [
+  { race: "Houston 2026", total: 3465, run: 1718, st: 1487, rox: 264 },
+  { race: "Dallas 2025", total: 3503, run: 1891, st: 1431, rox: 185 },
+  { race: "New York 2026", total: 3516, run: 1903, st: 1412, rox: 206 },
+];
+const med = (a) => [...a].sort((x, y) => x - y)[Math.floor(a.length / 2)];
+/**
+ * Rennmodell für unter 60 Minuten: Median der Referenzrennen (Laufen 31:31, Stationen 23:51, Roxzone 3:26 = 58:48, 1:12 Puffer).
+ * Die Aufteilung der Stationssumme auf die acht Stationen folgt den Anteilen des früheren Plans (v9), denn die Referenz hat keine Einzelsplits.
+ * Zeilen der Stationen sind daher Anteile, keine Messwerte.
+ */
+export const RACE_MODEL = { run: med(REFERENCE.map((r) => r.run)), stations: [227, 154, 185, 165, 232, 82, 185, 201], rox: med(REFERENCE.map((r) => r.rox)) };
 export const STATIONS = ["SkiErg", "Sled Push", "Sled Pull", "Burpee BJ", "RowErg", "Farmers", "Lunges", "Wall Balls"];
-export const RACE_MODEL = { run: 8 * 240, stations: [220, 150, 180, 160, 225, 80, 180, 195], rox: 270 };
+
+/** Test-Pace (4×1 km, s/km), mit der das Renn-Laufen des Modells herauskommt: Rennpace minus Ermüdungsaufschlag minus mittlerer Drift. */
+export const neededTestPace = (model = RACE_MODEL) => model.run / 8 - levelOf(model.run / 8).fatigue - (DRIFT * (1 + 2 + 3 + 4)) / 8;
 
 /**
  * Prognose Zeile für Zeile gegen das Rennmodell: [{label, est, goal, diff}] + Summe.

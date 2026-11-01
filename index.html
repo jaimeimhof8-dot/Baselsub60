@@ -12842,36 +12842,39 @@
         line-height: 19px;
         color: #9a9ba3;
       }
-      .s7-dash { display: grid; gap: 12px; margin: 6px 0 4px; }
-      .s7-dash .dh { display: flex; align-items: center; gap: 14px; }
-      .s7-dash .sc { display: block; font-size: 28px; line-height: 30px; font-weight: 700; }
-      .s7-dash .sc small { font-size: 13px; font-weight: 500; color: #9a9ba3; margin-left: 2px; }
-      .s7-dash .vd { font-size: 14px; color: #c9cad1; }
-      .s7-dash .ring { stroke: #9a9ba3; }
-      .s7-dash .ring.green { stroke: #2fb86b; }
-      .s7-dash .ring.yellow { stroke: #e0a526; }
-      .s7-dash .ring.red { stroke: #e5484d; }
-      .s7-dash .dg { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 8px; }
-      .s7-dash .dt { background: rgba(255,255,255,.06); border-radius: 12px; padding: 10px 12px; border-left: 3px solid rgba(255,255,255,.15); display: grid; gap: 2px; }
-      .s7-dash .dt.green { border-left-color: #2fb86b; }
-      .s7-dash .dt.yellow { border-left-color: #e0a526; }
-      .s7-dash .dt.red { border-left-color: #e5484d; }
-      .s7-dash .k { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #9a9ba3; }
-      .s7-dash .dt b { font-size: 20px; line-height: 24px; }
-      .s7-dash .dt .s { font-size: 12px; color: #9a9ba3; }
-      .s7-dash .dl { background: rgba(255,255,255,.06); border-radius: 12px; padding: 10px 12px; display: grid; gap: 6px; }
-      .s7-dash .bars { display: flex; gap: 3px; align-items: flex-end; height: 84px; overflow-x: auto; }
-      .s7-dash .bar { flex: 1 0 18px; max-width: 40px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 2px; }
-      .s7-dash .bar i { display: block; width: 100%; background: #e6b94d; border-radius: 3px 3px 0 0; min-height: 4px; }
-      .s7-dash .bar small { font-size: 9px; color: #9a9ba3; }
-      .s7-dash .dc { display: flex; flex-wrap: wrap; gap: 6px; }
-      .s7-dash .chip { font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.08); }
-      .s7-dash .chip small { font-weight: 400; color: #9a9ba3; margin-right: 3px; }
-      .s7-dash .chip.green { background: rgba(47,184,107,.2); }
-      .s7-dash .chip.yellow { background: rgba(224,165,38,.2); }
-      .s7-dash .chip.red { background: rgba(229,72,77,.2); }
-      .s7-dash .df { margin: 0; font-size: 14px; line-height: 21px; }
-      .s7-dash .df small { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #e6b94d; }
+      /* Dashboard zur Einheit: gleiche Bausteine wie die Dashboard-Kacheln (--well, Barlow-Zahlen, Ampelfarben, 4-px-Raster) */
+      .an-dash { display: grid; gap: var(--s3); margin: var(--s3) 0 var(--s2); }
+      .an-dash .dh { display: flex; align-items: center; gap: var(--s4); padding: var(--s3) var(--s4); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); }
+      .an-dash .dh svg { flex: none; }
+      .an-dash .sc { display: block; font-family: var(--f-head); font-weight: 700; font-size: 40px; line-height: 1; color: var(--text); }
+      .an-dash .sc small { font-family: var(--f-body); font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 3px; }
+      .an-dash .vd { display: block; margin-top: var(--s1); font-size: 14px; font-weight: 600; color: var(--muted); }
+      .an-dash .ring { stroke: var(--muted); }
+      .an-dash .ring.green { stroke: var(--ok); }
+      .an-dash .ring.yellow { stroke: var(--warn); }
+      .an-dash .ring.red { stroke: var(--danger); }
+      .an-dash .dg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2); }
+      @media (min-width: 600px) { .an-dash .dg { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+      .an-dash .dt { display: flex; flex-direction: column; gap: 6px; padding: var(--s3); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); min-width: 0; color: var(--muted); }
+      .an-dash .k { font-size: 11px; line-height: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .an-dash .dt b { font-family: var(--f-head); font-weight: 700; font-size: 26px; line-height: 1; color: var(--text); }
+      .an-dash .dt.green b { color: var(--ok); }
+      .an-dash .dt.yellow b { color: var(--warn); }
+      .an-dash .dt.red b { color: var(--danger); }
+      .an-dash .dt .s { font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
+      .an-dash .dl { display: grid; gap: var(--s2); padding: var(--s3); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); }
+      .an-dash .bars { display: flex; gap: 3px; align-items: flex-end; height: 88px; overflow-x: auto; }
+      .an-dash .bar { flex: 1 0 18px; max-width: 40px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 2px; }
+      .an-dash .bar i { display: block; width: 100%; background: var(--lauf); border-radius: 4px 4px 0 0; min-height: 4px; }
+      .an-dash .bar small { font-size: 10px; color: var(--muted); }
+      .an-dash .dc { display: flex; flex-wrap: wrap; gap: var(--s2); }
+      .an-dash .chip { display: inline-flex; align-items: baseline; gap: 6px; font-family: var(--f-head); font-weight: 700; font-size: 18px; line-height: 1; padding: var(--s2) var(--s3); border-radius: var(--r-s); background: var(--well); box-shadow: var(--edge); color: var(--text); }
+      .an-dash .chip small { font-family: var(--f-body); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .an-dash .chip.green { color: var(--ok); }
+      .an-dash .chip.yellow { color: var(--warn); }
+      .an-dash .chip.red { color: var(--danger); }
+      .an-dash .df { margin: 0; padding: var(--s3) var(--s4); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); font-size: 14px; line-height: 21px; }
+      .an-dash .df small { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
       .s7-an-tg.more { margin-top: 10px; font-size: 14px; }
       .s7-an-txt { display: grid; gap: 4px; margin-top: 6px; }
       .s7-an {
@@ -20445,7 +20448,7 @@
         const chips = d.chips.length
           ? `<div class="dc">${d.chips.map((c) => `<span class="chip ${c.tone}"><small>${esc(c.k)}</small> ${esc(c.v)}</span>`).join("")}</div>`
           : "";
-        return `<div class="s7-dash"><div class="dh"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="32" cy="32" r="26" fill="none" class="ring ${d.tone}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 32 32)"/></svg><div><b class="sc">${d.score}<small>/100</small></b><span class="vd">${esc(d.verdict)}</span></div></div>${tiles ? `<div class="dg">${tiles}</div>` : ""}${bars}${chips}${d.focus ? `<p class="df"><small>Nächstes Mal</small> ${esc(d.focus)}</p>` : ""}</div>`;
+        return `<div class="an-dash"><div class="dh"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="32" cy="32" r="26" fill="none" class="ring ${d.tone}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 32 32)"/></svg><div><b class="sc">${d.score}<small>/100</small></b><span class="vd">${esc(d.verdict)}</span></div></div>${tiles ? `<div class="dg">${tiles}</div>` : ""}${bars}${chips}${d.focus ? `<p class="df"><small>Nächstes Mal</small> ${esc(d.focus)}</p>` : ""}</div>`;
       }
       function s7FinCard(i, p) {
         const dk = keyI(i),

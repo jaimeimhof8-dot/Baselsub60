@@ -14232,7 +14232,7 @@
       } from "./src/extras.js";
       import { safeMerge, countEntries, stable } from "./src/merge.js";
       import * as review from "./src/review.js";
-      import { projectRaceDay } from "./src/forecast.js";
+      import { projectRaceDay, checkStation } from "./src/forecast.js";
       import { analyseSession } from "./src/analyse.js";
       import { sessionDash, compareToPrev } from "./src/session-dash.js";
       import { alignSplits } from "./src/laps.js";
@@ -15842,6 +15842,10 @@
           "Lunges",
           "Wall Balls",
         ];
+        const stBad = ST.map((s, r) =>
+          [[ME, A.station[r]], [PARTNER, B.station[r]]].map(([n, v]) => { const c = checkStation(r, v); return c.reason ? `<li>${esc(n)}, ${esc(s)}: ${esc(c.reason)}</li>` : ""; }).join(""),
+        ).join("");
+        const stBadH = stBad ? `<div class="hint" role="alert"><b>Unplausibel, bitte prüfen</b> (fliesst nicht in die Prognose ein):<ul style="margin:4px 0 0;padding-left:18px">${stBad}</ul></div>` : "";
         h += `<div class="cap">Stationen-Benchmark</div><div class="card"><table><tr><th>Station</th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th><th>Teilen</th></tr>
     ${ST.map((s, r) => {
       const a = parseT(A.station[r]),
@@ -15854,7 +15858,7 @@
       }
       return `<tr><td class="l">${s}</td><td>${pin(own ? `data-s="${r}|${mc}"` : "", A.station[r], `${s} ${ME}`)}</td><td>${pin("", B.station[r], `${s} ${PARTNER}`)}</td><td class="res" style="font-size:12px;white-space:nowrap">${rec}</td></tr>`;
     }).join("")}
-    </table><div class="hint">Mehr als 15–20 s Unterschied: der Schnellere übernimmt mehr. Sonst 50/50.</div></div>`;
+    </table><div class="hint">Mehr als 15–20 s Unterschied: der Schnellere übernimmt mehr. Sonst 50/50. Zeit der ganzen Station als m:ss (SkiErg und RowErg: 1000 m).</div>${stBadH}</div>`;
         const tr = own ? A.trans : B.trans,
           ta = avg(tr);
         h += `<div class="cap">Übergaben (Ziel &lt; 8 s)${own ? "" : " · von " + esc(PARTNER)}</div><div class="card"><div class="grid2">${tr.map((v, r) => pin(own ? `data-t="${r}"` : "", v, `Wechsel ${r + 1}`, `Wechsel ${r + 1}`)).join("")}</div>
@@ -16972,15 +16976,16 @@
           pa = partnerTests();
         const at = S.tests && S.tests.at ? Date.parse(S.tests.at) : NaN;
         return review.forecast({
-          laufPersons: [me.lauf.map(parseT), pa.lauf.map(parseT)],
-          station: me.station.map((v, r) => [parseT(v), parseT(pa.station[r])]),
+          names: [ME, PARTNER],
+          laufPersons: [me.lauf, pa.lauf],
+          station: me.station.map((v, r) => [v, pa.station[r]]),
           sims: Object.entries(S.simres || {})
             .filter(([, v]) => simOk(v))
             .sort(([a], [b]) => (a < b ? -1 : 1))
             .map(([d, v]) => ({
               intensity: v.i,
               stations: simTotal(v),
-              parts: v.st.map(parseT),
+              parts: v.st,
               run: parseT(v.run) > 0 ? parseT(v.run) : undefined,
               rox: parseT(v.rox) > 0 ? parseT(v.rox) : undefined,
               ageDays: Math.max(0, Math.floor((+NOW - Date.parse(d)) / dayMs)),
@@ -17014,6 +17019,7 @@
         if (t && t.gap > 0)
           h += `<p class="sub mt-2">Ca. ${Math.ceil(t.perWeek)} s pro Woche aufholen.</p>`;
         for (const w of fc.warnings) h += `<div class="hint">${esc(w)}</div>`;
+        h += review.forecastNotes(fc);
         // Renntag: abflachender Trend aus den gespeicherten Wochenprognosen (Faustregel, keine Messung)
         const hist = Object.entries(S.review || {})
           .filter(([, r]) => r && r.fc > 0 && r.fcv === 2) // nur Punkte aus dem aktuellen Rechenmodell, sonst entsteht ein künstlicher Trendsprung
@@ -17047,7 +17053,7 @@
             "",
           )}</tbody><tfoot><tr><td>Gesamt</td><td>${bd.est != null ? mmss(bd.est) : "–"}</td><td>${mmss(bd.goal)}</td><td class="${bd.diff == null ? "" : bd.diff > 0 ? "rv-slow" : "rv-fast"}">${sign(bd.diff != null ? Math.round(bd.diff) : null)}</td></tr></tfoot></table>`;
         h += `<div class="cap rv-gap">Tempo pro Kilometer im Rennen</div><p class="sub">${fc.paces.map((p, n) => `${n + 1}: ${mmss(p)}`).join(" · ")}</p>`;
-        h += `<details class="rv-how"><summary>Worauf basiert das?</summary><ul class="sub" style="margin:var(--s2) 0 0;padding-left:18px">${fc.basis.map((b) => `<li>${esc(b)}</li>`).join("")}</ul><p class="sub mt-2">Laufen: Team-Tempo ${mmss(fc.T)}/km aus dem 4×1-km-Test plus ${fc.paces[0] - fc.T} s/km Ermüdung (Compromised Running), ab Lauf 5 zusätzlich langsamer. Stationen: Mittel eurer Solo-Benchmarks × ${String(fc.k.toFixed(2)).replace(".", ",")} (Arbeit teilen und Ermüdung im Rennen)${fc.calibrated ? ", geeicht an euren Simulationen" : ". Dieser Faktor ist eine Annahme, bis eine Simulation ab 85 % eingetragen ist"}. Roxzone ${mmss(fc.rox)} (St. Gallen: 4:13). Die Spanne zeigt, wie unsicher die Teile sind. Genauer wird die Zahl mit jedem neuen Test und mit der ersten Simulation.</p></details>`;
+        h += `<details class="rv-how"><summary>Worauf basiert das?</summary><ul class="sub" style="margin:var(--s2) 0 0;padding-left:18px">${fc.basis.map((b) => `<li>${esc(b)}</li>`).join("")}</ul><p class="sub mt-2">Laufen: Team-Tempo ${mmss(fc.T)}/km aus dem 4×1-km-Test plus ${fc.paces[0] - fc.T} s/km Ermüdung (Compromised Running), ab Lauf 5 zusätzlich langsamer. Stationen: Mittel eurer Solo-Benchmarks × ${String(fc.k.toFixed(2)).replace(".", ",")} (Partner arbeiten nacheinander, Ermüdung im Rennen)${fc.calibrated ? ", geeicht an euren Simulationen" : ". Dieser Faktor ist eine Annahme, bis eine Simulation ab 85 % eingetragen ist"}. Roxzone ${mmss(fc.rox)} (St. Gallen: 4:13). Die Spanne zeigt, wie unsicher die Teile sind. Genauer wird die Zahl mit jedem neuen Test und mit der ersten Simulation.</p></details>`;
         // Simulation eintragen: eicht den Stationsfaktor
         const sims = Object.entries(S.simres || {})
           .filter(([, v]) => simOk(v))
@@ -21038,7 +21044,7 @@
           prog = `<section class="s6-card s7-pg" aria-label="Rennprognose"><div class="r1"><span class="s6-kick">Rennprognose</span><span class="s7-pill"><i style="background:${gap > 0 ? "#ff9f0a" : "#30d158"}"></i>${mmss(Math.abs(gap))} ${gap > 0 ? "zu langsam" : "Puffer"}</span></div><div class="big"><b>${mmss(fc.total)}</b></div><p class="cap">Spanne ${mmss(fc.lo)} bis ${mmss(fc.hi)} · Ziel 60:00</p>
         <div class="bar"><div><u style="width:${pc(fc.run)}%;background:#f5f5f7"></u><u style="width:${pc(stSum)}%;background:#9a9ba3"></u><u style="width:${pc(fc.rox)}%;background:#6d7176"></u></div><i style="left:${pc(review.GOAL_S)}%"></i></div>
         <div class="lg"><span><i style="background:#f5f5f7"></i>Laufen</span><span><i style="background:#9a9ba3"></i>Stationen</span><span><i style="background:#6d7176"></i>Roxzone</span><span><i class="m"></i>60:00 Ziel · 63:21 St. Gallen</span></div>
-        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${det}${calc}${pgw}</section>`;
+        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${review.forecastNotes(fc)}${det}${calc}${pgw}</section>`;
         }
         return prog;
       }
@@ -21252,7 +21258,7 @@
         if (fc && fc.total) {
           const gap = fc.total - review.GOAL_S;
           big = mmss(fc.total);
-          fcap = `${gap > 0 ? mmss(gap) + " zu langsam" : mmss(-gap) + " Puffer"} · berechnet aus Tests und Trainingswerten`;
+          fcap = `Spanne ${mmss(fc.lo)} bis ${mmss(fc.hi)} · ${gap > 0 ? mmss(gap) + " zu langsam" : mmss(-gap) + " Puffer"}${fc.issues && fc.issues.length ? " · " + fc.issues.length + " Eingabe(n) prüfen" : ""}`;
           fill = `<u style="width:${Math.max(0, Math.min(100, ((fc.total - lo) / (hi - lo)) * 100)).toFixed(1)}%;background:${gap > 0 ? "var(--warn)" : "var(--ok)"}"></u>`;
         }
         const forecast = `<section class="s6-card s6-fc" aria-label="Prognose"><div class="row"><div><span class="s6-kick">Prognose Basel</span><span class="big">${big}</span></div><div><span class="s6-kick">Ziel</span><span class="ziel">&lt; 60:00</span></div></div><div class="bar">${fill}<b aria-hidden="true"></b></div><span class="fcap">${fcap}</span></section>`;
@@ -23290,6 +23296,8 @@
               "Bitte alle acht Stationszeiten als m:ss eintragen",
               true,
             );
+          const simBad = st.map((x, r) => checkStation(r, x)).find((c) => !c.ok);
+          if (simBad) return toast(simBad.reason || "Unplausible Stationszeit, bitte prüfen", true);
           S.simres = S.simres || {};
           S.simres[day] = { i: pct / 100, st: st.map((x) => mmss(parseT(x))) };
           for (const [f, id] of [["run", "sim-run"], ["rox", "sim-rox"]]) {

@@ -40,7 +40,7 @@ export function stationWeight(text, division) {
   return "";
 }
 
-export const DOUBLES_SHARE = 0.55; // Anteil der Solo-Stationszeit im Doubles (Arbeit wird geteilt, Wechsel kosten)
+export const DOUBLES_SHARE = 0.95; // Teamzeit / Solo-Zeit im Doubles. Partner arbeiten nacheinander: nahe 1, nicht 0,55 (Annahme, Anker St. Gallen ~0,94)
 
 // Fallback für Stationen ohne eigenen Benchmark, verankert an einem echten Rennen: HYROX St. Gallen 2026, Doubles Pro Men
 // (Platz 58/256): Stationen zusammen 24:03, aufgeteilt nach dem Rennmodell des Plans. Als Solo-Zeit gespeichert, damit

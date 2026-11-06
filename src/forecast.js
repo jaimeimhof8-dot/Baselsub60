@@ -18,11 +18,19 @@ export const MISMATCH = 0.025; // Abstand der Partner im selben Test, ab dem ein
 export const STALE_DAYS = 35; // älter: Spanne breiter, Re-Test fällig
 export const SIM_MIN = 0.85; // erst Simulationen ab dieser Intensität eichen k
 
-/** Ermüdungsaufschlag (Compromised Running) und Roxzone-Zeit nach Niveau der Basis-Pace (s/km). */
+const lerp = (x, x0, x1, y0, y1) => y0 + (y1 - y0) * Math.min(1, Math.max(0, (x - x0) / (x1 - x0)));
+
+/**
+ * Ermüdungsaufschlag (Compromised Running) und Roxzone-Zeit nach Niveau der Basis-Pace (s/km).
+ * Stetig zwischen drei Stützpunkten (4:15 schnell, 4:30 mittel, 5:00 gemütlich), ausserhalb gilt der Rand.
+ * Unter 4:15/km (inkl. St. Gallen 4:13 und eure 3:56) bleibt alles wie vorher (15 s, Roxzone 4:15).
+ * Vorher sprang die Roxzone bei 4:15/km von 4:15 auf 5:15 (60 s Sprung durch 1 s Pace) – das war ein Rechenartefakt.
+ */
 export function levelOf(base) {
-  if (base < 255) return { name: "schnell", fatigue: 15, rox: 255 }; // 4:15 (St. Gallen 2026: 4:13)
-  if (base < 285) return { name: "mittel", fatigue: 20, rox: 315 }; // 5:15
-  return { name: "gemütlich", fatigue: 25, rox: 360 }; // 6:00
+  const lo = base <= 270;
+  const fatigue = lo ? lerp(base, 255, 270, 15, 20) : lerp(base, 270, 300, 20, 25);
+  const rox = lo ? lerp(base, 255, 270, 255, 315) : lerp(base, 270, 300, 315, 360);
+  return { name: base < 255 ? "schnell" : base < 285 ? "mittel" : "gemütlich", fatigue: Math.round(fatigue * 10) / 10, rox: Math.round(rox) };
 }
 
 /**
@@ -43,17 +51,68 @@ export function resolveRuns(persons) {
   return { reps, mismatch };
 }
 
+export const HALF_LIFE_DAYS = 21; // Gewicht einer Simulation halbiert sich alle 3 Wochen (Form ändert sich)
+export const SHRINK = 1; // Gewicht des Gesamt-k beim Glätten der Stations-k (eine Simulation zählt so viel wie das Gesamt-k)
+
+const weighted = (items) => {
+  const w = items.reduce((a, x) => a + x.w, 0);
+  return w > 0 ? items.reduce((a, x) => a + x.v * x.w, 0) / w : null;
+};
+const recency = (s) => (ok(s.ageDays) ? Math.pow(0.5, s.ageDays / HALF_LIFE_DAYS) : 1);
+
 /**
- * k aus Simulationen eichen. sims: [{intensity (0–1), stations (Team-Stationszeit der Simulation, s)}]; benchSum = Summe der Mittel aller 8 Solo-Benchmarks.
- * ≥ 85 % Intensität: k = beobachteter Wert (Mittel der letzten zwei). Darunter: nur Untergrenze («mindestens so langsam»).
- * @returns {{k: number|null, floor: number|null, n: number}}
+ * k aus Simulationen eichen. sims: [{intensity (0–1), stations (Team-Stationszeit der Simulation, s), parts?: 8 Stationszeiten,
+ * run?: Laufzeit 8 km, rox?: Roxzone, ageDays?: Alter}]; benchSum = Summe der Mittel aller 8 Solo-Benchmarks; solo = die 8 Solo-Mittel.
+ * ≥ 85 % Intensität: k = beobachteter Wert. Ohne ageDays zählen die letzten zwei gleich, mit ageDays zählen jüngere mehr.
+ * Darunter: nur Untergrenze («mindestens so langsam»).
+ * Mit parts und solo: perStation = je Station eigenes k, zum Gesamt-k hin geglättet (eine Simulation reicht nie für ein Extrem).
+ * @returns {{k: number|null, floor: number|null, n: number, perStation: number[]|null, run: number|null, rox: number|null}}
  */
-export function calibrateK(sims, benchSum) {
-  if (!ok(benchSum)) return { k: null, floor: null, n: 0 };
-  const obs = (sims || []).filter((s) => s && ok(s.stations) && ok(s.intensity)).map((s) => ({ k: s.stations / benchSum, i: s.intensity }));
-  const strong = obs.filter((s) => s.i >= SIM_MIN).slice(-2).map((s) => s.k);
+export function calibrateK(sims, benchSum, solo = null) {
+  const none = { k: null, floor: null, n: 0, perStation: null, run: null, rox: null };
+  if (!ok(benchSum)) return none;
+  const obs = (sims || []).filter((s) => s && ok(s.stations) && ok(s.intensity)).map((s) => ({ ...s, k: s.stations / benchSum, i: s.intensity, w: recency(s) }));
+  const anyAge = obs.some((s) => ok(s.ageDays));
+  const strongAll = obs.filter((s) => s.i >= SIM_MIN);
+  const strong = anyAge ? strongAll.slice(-4) : strongAll.slice(-2);
   const weak = obs.filter((s) => s.i < SIM_MIN).map((s) => s.k);
-  return { k: strong.length ? mean(strong) : null, floor: weak.length ? Math.max(...weak) : null, n: obs.length };
+  const k = strong.length ? weighted(strong.map((s) => ({ v: s.k, w: s.w }))) : null;
+  let perStation = null;
+  if (k != null && Array.isArray(solo) && solo.length === 8 && solo.every(ok)) {
+    const withParts = strong.filter((s) => Array.isArray(s.parts) && s.parts.length === 8 && s.parts.every(ok));
+    if (withParts.length) {
+      const nEff = withParts.reduce((a, s) => a + s.w, 0);
+      perStation = solo.map((v, r) => {
+        const kr = weighted(withParts.map((s) => ({ v: s.parts[r] / v, w: s.w })));
+        return (nEff * kr + SHRINK * k) / (nEff + SHRINK);
+      });
+    }
+  }
+  const pick = (f) => weighted(strong.filter((s) => ok(s[f])).map((s) => ({ v: s[f], w: s.w })));
+  return { k, floor: weak.length ? Math.max(...weak) : null, n: obs.length, perStation, run: pick("run"), rox: pick("rox") };
+}
+
+/**
+ * Prognose für den Renntag aus dem Verlauf der Wochenprognosen. history: [{day (Tag im Plan), total (s)}].
+ * Robuste Steigung (Theil–Sen: Median aller Paarsteigungen, ein Ausreisser kippt sie nicht). Der Fortschritt flacht ab
+ * (Zeitkonstante TAU Tage), gedeckelt bei MAX_GAIN der Zeit. Verschlechtert sich der Trend, wird nicht extrapoliert.
+ * Das ist eine Faustregel, kein Messwert: die Spanne wächst mit dem Abstand zum Renntag.
+ * @returns {{total, gain, lo, hi, slopePerWeek, points}|null} null bei weniger als 3 Punkten oder unter 14 Tagen Abstand
+ */
+export const TAU = 60;
+export const MAX_GAIN = 0.08;
+export function projectRaceDay(history, daysLeft) {
+  const h = (history || []).filter((x) => x && isFinite(x.day) && ok(x.total)).sort((a, b) => a.day - b.day);
+  if (h.length < 3 || h[h.length - 1].day - h[0].day < 14 || !isFinite(daysLeft) || daysLeft < 0) return null;
+  const slopes = [];
+  for (let i = 0; i < h.length; i++) for (let j = i + 1; j < h.length; j++) if (h[j].day > h[i].day) slopes.push((h[j].total - h[i].total) / (h[j].day - h[i].day));
+  slopes.sort((a, b) => a - b);
+  const m = slopes.length >> 1, slope = slopes.length % 2 ? slopes[m] : (slopes[m - 1] + slopes[m]) / 2;
+  const cur = h[h.length - 1].total;
+  const raw = slope < 0 ? -slope * TAU * (1 - Math.exp(-daysLeft / TAU)) : 0;
+  const gain = Math.min(raw, cur * MAX_GAIN);
+  const total = cur - gain, band = 30 + 0.5 * gain;
+  return { total, gain, lo: total - band, hi: cur + 30, slopePerWeek: slope * 7, points: h.length };
 }
 
 /**
@@ -71,30 +130,46 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
 
   const lv = levelOf(T), dv = normDivision(division);
   const share = dv.mode === "solo" ? 1 : DOUBLES_SHARE;
-  const paces = Array.from({ length: 8 }, (_, i) => T + lv.fatigue + (i >= 4 ? DRIFT * (i - 3) : 0));
-  const run = sum(paces);
+  let paces = Array.from({ length: 8 }, (_, i) => T + lv.fatigue + (i >= 4 ? DRIFT * (i - 3) : 0));
 
   const fb = fallbackStations(dv).map((v) => v * share); // Teamzeit aus dem Rennen von St. Gallen, wenn kein Benchmark da ist
   const sources = [], solo = [];
   for (let r = 0; r < 8; r++) {
     const v = (station[r] || []).filter(ok);
     sources.push(v.length ? "bench" : "fallback");
+    // Mittel der Partner. (Das harmonische Mittel wäre bei ungleichen Partnern theoretisch schneller, aber K ist am Mittel angesetzt
+    // und es gibt keine Messung, die den Gewinn belegt: erst die Eichung an Simulationen mit Einzelzeiten (perStation) fängt das ein.)
     solo.push(v.length ? mean(v) : null);
   }
-  const benchSum = sources.every((s) => s === "bench") ? sum(solo) : null;
-  const cal = calibrateK(sims, benchSum);
+  const allBench = sources.every((x) => x === "bench");
+  const benchSum = allBench ? sum(solo) : null;
+  const cal = calibrateK(sims, benchSum, allBench ? solo : null);
 
   let k = K.mitte, kLo = K.gut, kHi = K.vorsichtig;
   if (cal.k != null) { k = cal.k; kLo = k * 0.97; kHi = k * 1.03; }
   if (cal.floor != null) { k = Math.max(k, cal.floor); kLo = Math.max(kLo, cal.floor); kHi = Math.max(kHi, k); }
+  const kr = cal.perStation && cal.k != null && cal.floor == null ? cal.perStation : null; // je Station nur ohne widersprechende Untergrenze
 
-  const team = solo.map((v, r) => (v == null ? fb[r] : v * k));
-  const at = (kk, fbF) => sum(solo.map((v, r) => (v == null ? fb[r] * fbF : v * kk)));
+  const kOf = (r) => (kr ? kr[r] : k);
+  const team = solo.map((v, r) => (v == null ? fb[r] : v * kOf(r)));
+  const at = (kk, fbF) => sum(solo.map((v, r) => (v == null ? fb[r] * fbF : v * (kr ? kr[r] * (kk / k) : kk))));
   const st = sum(team);
+
+  // Laufen und Roxzone: aus Simulationen, wenn dort gemessen (nur ≥ 85 %), sonst Modell
+  let rox = lv.rox, runCal = false, roxCal = false;
+  const modelRun = sum(paces);
+  if (cal.run != null && cal.run > modelRun * 0.8 && cal.run < modelRun * 1.5) {
+    const f = cal.run / modelRun;
+    paces = paces.map((p) => p * f);
+    runCal = true;
+  }
+  if (cal.rox != null && cal.rox > 60 && cal.rox < 900) { rox = Math.round(cal.rox); roxCal = true; }
+  const run = sum(paces);
+
   const stale = ok(testAgeDays) && testAgeDays > STALE_DAYS, widen = stale ? 1.3 : 1;
-  const dRun = 8 * 10 * widen, dRox = 20 * widen;
+  const dRun = 8 * (runCal ? 5 : 10) * widen, dRox = (roxCal ? 10 : 20) * widen;
   const dLo = (st - at(kLo, 0.93)) * widen, dHi = (at(kHi, 1.07) - st) * widen;
-  const total = run + st + lv.rox;
+  const total = run + st + rox;
 
   const missing = sources.filter((s) => s === "fallback").length;
   const warnings = [];
@@ -104,12 +179,12 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
   const basis = [
     `Laufen: Pacing-Test, Team Ø ${Math.floor(T / 60)}:${String(Math.round(T % 60)).padStart(2, "0")}/km`,
     `Stationen: Benchmark ${8 - missing} von 8`,
-    cal.k != null ? `Simulationen: ${cal.n} eingetragen, k geeicht (${k.toFixed(2).replace(".", ",")})` : cal.floor != null ? "Simulation unter 85 %: zeigt nur eine Untergrenze" : "Noch keine Simulation ab 85 %: k ist eine Annahme",
+    cal.k != null ? `Simulationen: ${cal.n} eingetragen, k geeicht (${k.toFixed(2).replace(".", ",")})${kr ? ", je Station" : ""}${runCal ? ", Laufen gemessen" : ""}${roxCal ? ", Roxzone gemessen" : ""}` : cal.floor != null ? "Simulation unter 85 %: zeigt nur eine Untergrenze" : "Noch keine Simulation ab 85 %: k ist eine Annahme",
   ];
   return {
-    T, pace: run / 8, paces, run, st, rox: lv.rox, total,
+    T, pace: run / 8, paces, run, st, rox, total,
     lo: total - Math.hypot(dRun, dLo, dRox), hi: total + Math.hypot(dRun, dHi, dRox),
-    k, calibrated: cal.k != null, level: lv.name, missing, sources, stations: team, basis, warnings,
+    k, calibrated: cal.k != null, perStation: kr, runCal, roxCal, level: lv.name, missing, sources, stations: team, basis, warnings,
   };
 }
 

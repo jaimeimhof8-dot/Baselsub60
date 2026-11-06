@@ -17985,7 +17985,7 @@
         let h = `<div class="narrow">${vhead("Backup", "Alle Einträge als Datei sichern, z. B. vor einem Handywechsel.", true)}`;
         h += `<div class="bk-status ${lastBk ? "ok" : "warn"}" role="status"><span class="bk-ic" aria-hidden="true">${lastBk ? "✓" : "!"}</span><span><b>${lastBk ? "Letztes Backup: " + new Date(lastBk).toLocaleDateString("de-CH", { day: "numeric", month: "short", year: "numeric" }) : "Noch kein Backup auf diesem Gerät"}</b><span class="sub">${cloud ? "Angemeldet: Einträge liegen zusätzlich in der Cloud." : "Nicht angemeldet: Daten liegen nur auf diesem Gerät."}</span></span></div>`;
         h += `<div class="card"><b>Sichern</b><p class="sub mt-1">Haken, Werte, Notizen, Check-ins, Umplanungen, Tests und Strava-Aktivitäten als <b>.json</b>. Ohne Zugangsdaten.</p>
-    <div class="grid2 mt-4"><button class="btn primary" data-act="bk-export">Datei sichern</button><button class="btn" data-act="bk-share">Als Text teilen</button></div></div>`;
+    <div class="grid2 mt-4"><button class="btn primary" data-act="bk-export">Datei sichern</button><button class="btn" data-act="bk-share">Als Text teilen</button></div><p class="sub mt-3">Aktueller Plan (auch ein importierter Team-Plan):</p><div class="grid2 mt-2"><button class="btn" data-act="plan-export">Plan als Datei sichern</button><button class="btn" data-act="plan-share">Plan als Text teilen</button></div></div>`;
         if (bkp) {
           const s = bkp.summary,
             m = bkp.meta;
@@ -18037,7 +18037,7 @@
       }
       function exportBackup() {
         const blob = new Blob(
-          [JSON.stringify(makeBackup(S, { user: ME }), null, 1)],
+          [JSON.stringify({ ...makeBackup(S, { user: ME }), sharedPlan: SHARED_PLAN }, null, 1)],
           { type: "application/json" },
         );
         const a = document.createElement("a");
@@ -18052,6 +18052,34 @@
         } catch {}
         toast("Backup heruntergeladen");
         if (view === "backup") render();
+      }
+
+      /* Aktiven Plan als Datei sichern: persönlicher Plan (S.plan), sonst Team-Plan (shared_plan), sonst der eingebaute.
+         Der Team-Plan steht nicht im normalen Backup, weil er nicht zum eigenen Stand gehört. */
+      function planPayload() {
+        const own = ownPlanActive(),
+          p = PLAN();
+        return {
+          app: "basel-sub60",
+          kind: "plan",
+          exportedAt: new Date().toISOString(),
+          source: own ? "personal" : SHARED_PLAN ? "team" : "builtin",
+          name: p.name || "Plan",
+          plan: p,
+        };
+      }
+      function exportPlan() {
+        const d = new Date(),
+          pad = (n) => String(n).padStart(2, "0");
+        const blob = new Blob([JSON.stringify(planPayload(), null, 1)], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `basel-sub60-plan-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        toast(`Plan «${planPayload().name}» heruntergeladen`);
       }
 
       /* ---------- Coach-Chat ----------
@@ -21486,7 +21514,7 @@
         const age = lastBk ? (Date.now() - lastBk) / 864e5 : 99;
         const ic = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`;
         const st = `<section class="s6-card s6-bst${age < 8 ? " ok" : ""}" role="status"><span class="ic">${ic}</span><span class="tx"><b>${lastBk ? "Letztes Backup: " + new Date(lastBk).toLocaleDateString("de-CH", { day: "numeric", month: "short", year: "numeric" }) : "Noch kein Backup auf diesem Gerät"}</b><span>${cloud ? "Angemeldet: Einträge liegen zusätzlich in der Cloud." : "Nicht angemeldet: Daten liegen nur auf diesem Gerät."}</span></span></section>`;
-        const save = `<section class="s6-card s6-bk"><div class="t"><h2>Sichern</h2><p><span class="s6-m">Haken, Werte, Notizen, Check-ins, Umplanungen, Tests und Strava-Aktivitäten als .json. Ohne Zugangsdaten.</span><span class="s6-d">Haken, Werte, Notizen, Check-ins, Umplanungen, Tests und Strava-Aktivitäten als .json. Zugangsdaten sind nicht enthalten.</span></p></div><div class="acts"><button type="button" class="s6-btn gold" data-act="bk-export">Datei sichern</button><button type="button" class="s6-btn" data-act="bk-share">Als Text teilen</button></div></section>`;
+        const save = `<section class="s6-card s6-bk"><div class="t"><h2>Sichern</h2><p><span class="s6-m">Haken, Werte, Notizen, Check-ins, Umplanungen, Tests und Strava-Aktivitäten als .json. Ohne Zugangsdaten.</span><span class="s6-d">Haken, Werte, Notizen, Check-ins, Umplanungen, Tests und Strava-Aktivitäten als .json. Zugangsdaten sind nicht enthalten.</span></p></div><div class="acts"><button type="button" class="s6-btn gold" data-act="bk-export">Datei sichern</button><button type="button" class="s6-btn" data-act="bk-share">Als Text teilen</button></div><div class="t" style="margin-top:14px"><h2>Aktueller Plan</h2><p><span class="s6-m">Den Plan, nach dem die App gerade plant (auch ein importierter Team-Plan), als Datei sichern.</span><span class="s6-d">Den Plan, nach dem die App gerade plant (auch ein importierter Team-Plan), als Datei sichern. Er steht nicht im normalen Backup oben.</span></p></div><div class="acts"><button type="button" class="s6-btn" data-act="plan-export">Plan als Datei sichern</button><button type="button" class="s6-btn" data-act="plan-share">Plan als Text teilen</button></div></section>`;
         let rest;
         if (bkp) {
           const s = bkp.summary,
@@ -24229,8 +24257,16 @@ ${pr.done ? `<p class="rg-proj">Hochrechnung: <b>${mmss(pr.projected)}</b> (${rg
         if (d.act === "menu") return menu(true);
         if (d.act === "close") return menu(false);
         if (d.act === "bk-export") return exportBackup();
+        if (d.act === "plan-export") return exportPlan();
+        if (d.act === "plan-share") {
+          const txt = JSON.stringify(planPayload());
+          if (navigator.share) navigator.share({ title: "Basel Sub-60 Plan", text: txt }).catch(() => {});
+          else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => toast("Plan kopiert"));
+          else prompt("Plan:", txt);
+          return;
+        }
         if (d.act === "bk-share") {
-          const txt = JSON.stringify(makeBackup(S, { user: ME }));
+          const txt = JSON.stringify({ ...makeBackup(S, { user: ME }), sharedPlan: SHARED_PLAN });
           if (navigator.share)
             navigator
               .share({ title: "Basel Sub-60 Backup", text: txt })

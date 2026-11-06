@@ -14219,6 +14219,7 @@
       } from "./src/plan-store.js";
       import { parsePlanText } from "./src/parser.js";
       import { fileToText } from "./src/pdf-import.js";
+      import { planFromExport } from "./src/plan-export.js";
       import {
         suggest,
         swapFixes,
@@ -16309,14 +16310,14 @@
         if (imp.step === "error")
           h += `<div class="target bad" style="margin:0 0 var(--s4)">${esc(imp.err)}</div>`;
         h += `<div class="card"><div class="cap">Aktueller Plan</div><b>${esc(P.name || "Plan")}</b>${P.importedAt ? `<p class="sub mt-1">Importiert am ${new Date(P.importedAt).toLocaleString("de-CH", { dateStyle: "medium", timeStyle: "short" })}</p>` : ""}
-    <div class="btns"><label class="btn primary file">PDF auswählen<input type="file" accept="application/pdf,.pdf,.txt,.md,text/plain" data-file="plan"></label>`;
+    <div class="btns"><label class="btn primary file">PDF auswählen<input type="file" accept="application/pdf,.pdf,.txt,.md,.json,text/plain,application/json" data-file="plan"></label>`;
         if (ownPlanActive())
           h += `<button class="btn primary" data-act="imp-share-current">Meinen Plan für uns beide übernehmen</button>`;
         if (SHARED_PLAN && !ownPlanActive())
           h += `<button class="btn" data-act="imp-undo-team">Gemeinsamen Plan zurücksetzen</button>`;
         if (ownPlanActive())
           h += `<button class="btn" data-act="imp-undo">${S.plan.prev ? "Vorherigen Plan wiederherstellen" : "Eingebauten Plan wiederherstellen"}</button>`;
-        h += `</div></div><div class="note">Erwartet wird der Aufbau des Coach-PDFs: „Block A – Name (12.10. – 08.11.2026)“, „Woche 1 – …“ und Absätze wie „Montag – Kraft 1. …“. Textdateien (.txt, .md) im gleichen Aufbau gehen auch. Abgehakte Übungen, Werte und Umplanungen bleiben erhalten.</div></div>`;
+        h += `</div></div><div class="note">Erwartet wird der Aufbau des Coach-PDFs: „Block A – Name (12.10. – 08.11.2026)“, „Woche 1 – …“ und Absätze wie „Montag – Kraft 1. …“. Textdateien (.txt, .md) im gleichen Aufbau gehen auch, ebenso eine Plan-Datei (.json) aus „Plan als Datei sichern“. Abgehakte Übungen, Werte und Umplanungen bleiben erhalten.</div></div>`;
         return h;
       }
       async function importFile(file) {
@@ -16324,7 +16325,7 @@
         render();
         try {
           const text = await fileToText(file);
-          const parsed = parsePlanText(text);
+          const parsed = planFromExport(text) || parsePlanText(text);
           if (!Object.keys(parsed.days).length)
             throw new Error(
               parsed.meta.warnings[0] || "Keine Trainingstage erkannt.",

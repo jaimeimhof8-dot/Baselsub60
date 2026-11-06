@@ -73,7 +73,7 @@ test("Gesamtzeit entsperrt: nur der Split ändert sich, die Summe wandert", () =
 test("Gesperrte Splits bleiben, wenn andere geändert werden; entsperren nimmt sie zurück in den Ausgleich", () => {
   let st = { goal: 3600 };
   const r0 = buildPlan({ goal: 3600 }).splits[0].sec;
-  st = toggleLock(st, "r0"); // Lauf 1 festhalten
+  st = toggleLock(st, "r0", r0); // Lauf 1 festhalten
   st = setSplit(st, "s0", 260);
   let p = buildPlan(st);
   assert.equal(p.total, 3600);
@@ -115,11 +115,19 @@ test("Renntag: Abstand zum Plan pro Split und kumuliert, Hochrechnung", () => {
   const p = buildPlan({ goal: 3600 });
   const pr = progress(p, { r0: 235, s0: 230, r1: 245 });
   assert.equal(pr.done, 3);
-  assert.equal(pr.rows[0].delta, 235 - p.splits[0].sec);
-  assert.equal(pr.rows[1].delta, 230 - p.splits[1].sec);
-  assert.equal(pr.rows[2].deltaCum, pr.rows[2].cum - (p.splits[0].sec + p.splits[1].sec + p.splits[2].sec));
-  assert.equal(pr.projected, 3600 + pr.ahead);
+  const f = 1 + p.splits[16].sec / sum(p.splits.slice(0, 16).map((x) => x.sec)); // Roxzone steckt in den Abschnitten
+  assert.ok(Math.abs(pr.rows[0].delta - (235 - p.splits[0].sec * f)) < 1e-9);
+  assert.ok(Math.abs(pr.rows[2].deltaCum - (235 + 230 + 245 - (p.splits[0].sec + p.splits[1].sec + p.splits[2].sec) * f)) < 1e-9);
+  assert.ok(Math.abs(pr.projected - (3600 + pr.ahead)) < 1e-9);
+  // alle 16 Abschnitte exakt im Plan (inkl. Wechsel) → Abstand ±0, Hochrechnung = Zielzeit
+  const perfect = Object.fromEntries(p.splits.slice(0, 16).map((x) => [x.id, x.sec * f]));
+  const pf = progress(p, perfect);
+  assert.ok(Math.abs(pf.ahead) < 1e-6 && Math.abs(pf.projected - 3600) < 1e-6);
   assert.equal(pr.rows[3].actual, null);
+  // Lücke: nur Lauf 3 eingetragen darf nicht «14 Minuten voraus» ergeben
+  const gap = progress(p, { r2: p.splits[4].sec * f });
+  assert.ok(Math.abs(gap.ahead) < 1e-6 && Math.abs(gap.projected - 3600) < 1e-6, "Lücke verfälscht nicht: " + gap.ahead);
+  assert.equal(progress(p, { rox: 300 }).done, 0); // Roxzone wird nicht abgefragt
   const none = progress(p, {});
   assert.equal(none.ahead, 0);
   assert.equal(none.projected, null);
@@ -153,4 +161,22 @@ test("Teilen als Text enthält Gesamtzeit, alle 17 Zeilen und die kumulierte Zei
 test("roundTo trifft die Zielsumme immer", () => {
   for (const [v, n] of [[[1.4, 1.4, 1.2], 4], [[10.5, 10.5], 21], [[0.2, 0.2, 0.2, 0.2, 0.2], 1]]) assert.equal(sum(roundTo(v, n)), n);
   assert.ok(MIN_SPLIT.run > 0);
+});
+
+test("Sperren friert den aktuellen Wert ein, auch wenn Ziel oder Szenario wechseln", () => {
+  const v = buildPlan({ goal: 3600 }).splits[0].sec;
+  let st = toggleLock({ goal: 3600 }, "r0", v);
+  assert.equal(buildPlan({ ...st, goal: 3000 }).splits[0].sec, v);
+  assert.equal(buildPlan({ ...st, goal: 4200 }).splits[0].sec, v);
+  assert.equal(buildPlan({ ...st, scenario: "stretch" }).splits[0].sec, v);
+  assert.equal(buildPlan({ ...st, goal: 3600 }).total, 3600);
+  st = toggleLock(st, "r0", v); // entsperren
+  assert.notEqual(buildPlan({ ...st, goal: 3000 }).splits[0].sec, v);
+});
+
+test("setSplit lässt zu kurze Zeiten nicht zu", () => {
+  const st = { goal: 3600 };
+  assert.equal(setSplit(st, "r0", 1), st);
+  assert.equal(setSplit(st, "s0", 10), st);
+  assert.notEqual(setSplit(st, "s0", 120), st);
 });

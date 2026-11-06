@@ -22,13 +22,14 @@ const lerp = (x, x0, x1, y0, y1) => y0 + (y1 - y0) * Math.min(1, Math.max(0, (x 
 
 /**
  * Ermüdungsaufschlag (Compromised Running) und Roxzone-Zeit nach Niveau der Basis-Pace (s/km).
- * Stetig zwischen drei Stützpunkten (4:00 schnell, 4:30 mittel, 5:00 gemütlich), ausserhalb gilt der Rand.
+ * Stetig zwischen drei Stützpunkten (4:15 schnell, 4:30 mittel, 5:00 gemütlich), ausserhalb gilt der Rand.
+ * Unter 4:15/km (inkl. St. Gallen 4:13 und eure 3:56) bleibt alles wie vorher (15 s, Roxzone 4:15).
  * Vorher sprang die Roxzone bei 4:15/km von 4:15 auf 5:15 (60 s Sprung durch 1 s Pace) – das war ein Rechenartefakt.
  */
 export function levelOf(base) {
   const lo = base <= 270;
-  const fatigue = lo ? lerp(base, 240, 270, 15, 20) : lerp(base, 270, 300, 20, 25);
-  const rox = lo ? lerp(base, 240, 270, 255, 315) : lerp(base, 270, 300, 315, 360);
+  const fatigue = lo ? lerp(base, 255, 270, 15, 20) : lerp(base, 270, 300, 20, 25);
+  const rox = lo ? lerp(base, 255, 270, 255, 315) : lerp(base, 270, 300, 315, 360);
   return { name: base < 255 ? "schnell" : base < 285 ? "mittel" : "gemütlich", fatigue: Math.round(fatigue * 10) / 10, rox: Math.round(rox) };
 }
 
@@ -136,9 +137,9 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
   for (let r = 0; r < 8; r++) {
     const v = (station[r] || []).filter(ok);
     sources.push(v.length ? "bench" : "fallback");
-    // Harmonisches Mittel: teilt ihr die Arbeit im Verhältnis eurer Tempi, ist das die Zeit eines Paares aus zwei gleich Starken.
-    // Bei gleich schnellen Partnern identisch zum Mittel; bei ungleichen (3:00 gegen 6:00) ehrlicher (4:00 statt 4:30).
-    solo.push(v.length ? v.length / sum(v.map((x) => 1 / x)) : null);
+    // Mittel der Partner. (Das harmonische Mittel wäre bei ungleichen Partnern theoretisch schneller, aber K ist am Mittel angesetzt
+    // und es gibt keine Messung, die den Gewinn belegt: erst die Eichung an Simulationen mit Einzelzeiten (perStation) fängt das ein.)
+    solo.push(v.length ? mean(v) : null);
   }
   const allBench = sources.every((x) => x === "bench");
   const benchSum = allBench ? sum(solo) : null;

@@ -111,33 +111,47 @@ const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(
  * @returns neuer State (nie das Original verändern)
  */
 export function setSplit(state, id, sec) {
-  if (!slots().some((s) => s.id === id) || !ok(sec)) return state;
+  const sl = slots().find((s) => s.id === id);
+  if (!sl || !ok(sec) || sec < MIN_SPLIT[sl.kind]) return state;
   return { ...state, edits: { ...(state.edits || {}), [id]: Math.round(sec) }, locked: { ...(state.locked || {}), [id]: true } };
 }
-export function toggleLock(state, id) {
+export function toggleLock(state, id, sec) {
   if (!slots().some((s) => s.id === id)) return state;
   const locked = { ...(state.locked || {}) }, edits = { ...(state.edits || {}) };
   if (locked[id] || edits[id] != null) { delete locked[id]; delete edits[id]; } // entsperren heisst: zurück in den Ausgleich
-  else locked[id] = true;
+  else {
+    locked[id] = true;
+    if (ok(sec)) edits[id] = Math.round(sec); // Sperren friert den aktuellen Wert ein, auch wenn sich Ziel oder Szenario ändern
+  }
   return { ...state, locked, edits };
 }
 export function reset(state) {
   return { ...state, edits: {}, locked: {} };
 }
 
-/** Zwischenzeiten (kumuliert) und Abstand zum Plan: actual {id: Sekunden}. delta > 0 = langsamer als geplant. */
+/**
+ * Ist-Zeiten gegen den Plan. actual {id: Sekunden}. Die Roxzone ist im Rennen in den Abschnitten enthalten (Wechsel gehören zum
+ * Lauf bzw. zur Station, die Uhr zeigt sie dort): darum wird ihr Planwert auf die 16 Abschnitte verteilt und sie selbst nicht abgefragt.
+ * delta > 0 = langsamer als geplant. Der kumulierte Abstand zählt nur eingetragene Abschnitte, Lücken verfälschen ihn nicht.
+ */
 export function progress(plan, actual = {}) {
-  let cum = 0, cumPlan = 0, rows = [];
-  for (const s of plan.splits) {
-    cumPlan += s.sec;
+  const rox = plan.splits.find((s) => s.kind === "rox"), body = plan.splits.filter((s) => s.kind !== "rox");
+  const bodySum = body.reduce((a, s) => a + s.sec, 0) || 1;
+  const eff = (s) => (s.kind === "rox" ? 0 : s.sec * (1 + (rox ? rox.sec : 0) / bodySum));
+  let cumDelta = 0, cumPlan = 0, last = null;
+  const rows = plan.splits.map((s) => {
+    const e = eff(s);
+    cumPlan += e;
     const a = actual[s.id];
-    if (ok(a)) { cum += a; rows.push({ id: s.id, label: s.label, plan: s.sec, actual: a, delta: a - s.sec, cum, cumPlan, deltaCum: cum - cumPlan }); }
-    else rows.push({ id: s.id, label: s.label, plan: s.sec, actual: null, delta: null, cum: null, cumPlan, deltaCum: null });
-  }
-  const doneRows = rows.filter((r) => r.actual != null);
-  const last = doneRows[doneRows.length - 1] || null;
-  // Hochrechnung: Zielzeit + bisheriger Abstand (nicht mehr, sonst täuscht der Anfang)
-  return { rows, ahead: last ? last.deltaCum : 0, projected: last ? plan.total + last.deltaCum : null, done: doneRows.length };
+    if (s.kind !== "rox" && ok(a)) {
+      cumDelta += a - e;
+      last = { id: s.id };
+      return { id: s.id, label: s.label, plan: e, actual: a, delta: a - e, cumPlan, deltaCum: cumDelta };
+    }
+    return { id: s.id, label: s.label, plan: e, actual: null, delta: null, cumPlan, deltaCum: null };
+  });
+  const done = rows.filter((r) => r.actual != null).length;
+  return { rows, ahead: last ? cumDelta : 0, projected: last ? plan.total + cumDelta : null, done };
 }
 
 /**

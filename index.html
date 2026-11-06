@@ -17059,7 +17059,7 @@
         for (const w of fc.warnings) h += `<div class="hint">${esc(w)}</div>`;
         // Renntag: abflachender Trend aus den gespeicherten Wochenprognosen (Faustregel, keine Messung)
         const hist = Object.entries(S.review || {})
-          .filter(([, r]) => r && r.fc > 0)
+          .filter(([, r]) => r && r.fc > 0 && r.fcv === 2) // nur Punkte aus dem aktuellen Rechenmodell, sonst entsteht ein künstlicher Trendsprung
           .map(([x, r]) => ({ day: +x * 7, total: r.fc }));
         hist.push({ day: Math.max(0, TODAY), total: fc.total });
         const rd = projectRaceDay(hist, Math.max(0, Math.ceil((RACE - midnight(NOW)) / dayMs)));
@@ -17855,7 +17855,7 @@
           S.review[w] = {
             at: Date.now(),
             level: r.level,
-            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total) } : {}),
+            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 2 } : {}),
           };
           save();
         }
@@ -21242,7 +21242,7 @@
           S.review[w] = {
             at: Date.now(),
             level: r.level,
-            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total) } : {}),
+            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 2 } : {}),
           };
           save();
         }
@@ -22676,11 +22676,13 @@
             }
             return `<div class="rg-row ${x.kind}${x.locked ? " lk" : ""}"><div class="rg-l"><b>${esc(x.label)}</b>${extra}</div>
 <input type="text" inputmode="numeric" id="rg-${x.id}" data-rg="${x.id}" value="${mmss(x.sec)}" aria-label="${esc(x.label)} Zeit (m:ss)">
-<button type="button" class="rg-lock" data-rg-act="lock" data-k="${x.id}" aria-pressed="${x.locked}" aria-label="${esc(x.label)} ${x.locked ? "entsperren" : "sperren"}">${lock(x.locked)}</button></div>`;
+<button type="button" class="rg-lock" data-rg-act="lock" data-k="${x.id}" data-sec="${x.sec}" aria-pressed="${x.locked}" aria-label="${esc(x.label)} ${x.locked ? "entsperren" : "sperren"}">${lock(x.locked)}</button></div>`;
           })
           .join("");
         const live = plan.splits
-          .map((x, n) => {
+          .map((x, n) => (x.kind === "rox" ? "" : [x, n]))
+          .filter(Boolean)
+          .map(([x, n]) => {
             const r = pr.rows[n];
             return `<div class="rg-row live"><div class="rg-l"><b>${esc(x.label)}</b><div class="rg-sub">Plan ${mmss(x.sec)} · ${mmss(r.cumPlan)}</div></div>
 <input type="text" inputmode="numeric" id="rga-${x.id}" data-rga="${x.id}" value="${r.actual != null ? mmss(r.actual) : ""}" placeholder="m:ss" aria-label="${esc(x.label)} Ist-Zeit">
@@ -22704,8 +22706,8 @@ ${plan.error ? `<div class="hint" role="alert">${esc(plan.error)}</div>` : ""}
 <label class="rg-chk"><input type="checkbox" data-rg-act="locktotal" ${plan.lockTotal ? "checked" : ""}> Gesamtzeit sperren</label>
 <div class="rg-list">${rows}</div>
 <div class="btns"><button type="button" class="btn ghost sm" data-rg-act="reset">Zurücksetzen</button><button type="button" class="btn sm" data-rg-act="share">Plan teilen</button></div></section>
-<details class="s6-card rv-how"${pr.done ? " open" : ""}><summary>Renntag oder Simulation: Ist-Zeiten eintragen${pr.done ? ` (${pr.done}/17)` : ""}</summary>
-<p class="sub">Trag nach jedem Abschnitt die Zeit ein. Der Abstand ist kumuliert: plus heisst langsamer als der Plan.</p>
+<details class="s6-card rv-how"${pr.done ? " open" : ""}><summary>Renntag oder Simulation: Ist-Zeiten eintragen${pr.done ? ` (${pr.done}/16)` : ""}</summary>
+<p class="sub">Trag nach jedem Abschnitt die Zeit ein, Wechsel (Roxzone) gehören zum Abschnitt, wie ihn die Uhr zeigt. Die Roxzone-Zeit des Plans ist darum in den Plan-Zeiten unten schon enthalten. Der Abstand ist kumuliert: plus heisst langsamer als der Plan.</p>
 ${pr.done ? `<p class="rg-proj">Hochrechnung: <b>${mmss(pr.projected)}</b> (${rgSigned(pr.ahead)} zum Plan)</p>` : ""}
 <div class="rg-list">${live}</div>
 <div class="btns"><button type="button" class="btn ghost sm" data-rg-act="clear-actual">Ist-Zeiten löschen</button></div></details>
@@ -22722,7 +22724,7 @@ ${pr.done ? `<p class="rg-proj">Hochrechnung: <b>${mmss(pr.projected)}</b> (${rg
         const a = t.dataset.rgAct,
           st = rgState();
         if (a === "scn") return rgSave({ scenario: t.dataset.k });
-        if (a === "lock") return rgSave(rg.toggleLock(st, t.dataset.k));
+        if (a === "lock") return rgSave(rg.toggleLock(st, t.dataset.k, +t.dataset.sec));
         if (a === "locktotal") return rgSave({ lockTotal: !!t.checked });
         if (a === "reset") return rgSave(rg.reset(st));
         if (a === "clear-actual") return rgSave({ actual: {} });
@@ -24273,6 +24275,7 @@ ${pr.done ? `<p class="rg-proj">Hochrechnung: <b>${mmss(pr.projected)}</b> (${rg
           S.review[w].level = rvData(w).level;
           if (fc && fc.total) {
             S.review[w].fc = Math.round(fc.total);
+            S.review[w].fcv = 2;
             S.review[w].fcx = {
               total: Math.round(fc.total),
               run: Math.round(fc.run),

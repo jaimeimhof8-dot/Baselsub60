@@ -6,7 +6,7 @@ const t = (s) => { const [m, x] = s.split(":"); return +m * 60 + +x; };
 // Echte Werte vom 13.10.2026 (Pacing-Test GPS-geprüft, Stationen-Benchmark mit Renngewichten)
 const JAIME = { lauf: ["3:53", "3:58", "3:55", "4:00"].map(t), st: ["3:57", "2:03", "3:30", "3:12", "3:44", "1:49", "2:25", "5:04"].map(t) };
 const JIMOH = { lauf: ["3:53", "3:59", "3:56", "4:00"].map(t), st: ["3:58", "1:56", "3:22", "3:02", "3:37", "1:59", "2:38", "5:00"].map(t) };
-const harm = (a, b) => 2 / (1 / a + 1 / b); // Station geteilt im Verhältnis der Tempi
+const harm = (a, b) => (a + b) / 2; // Mittel der Partner (K ist daran angesetzt)
 const SOLO = JAIME.st.map((v, r) => harm(v, JIMOH.st[r])).reduce((a, b) => a + b, 0);
 const REAL = { laufPersons: [JAIME.lauf, JIMOH.lauf], station: JAIME.st.map((v, r) => [v, JIMOH.st[r]]) };
 
@@ -82,21 +82,18 @@ test("Veränderung zur Vorwoche", () => {
 });
 
 test("Niveau ist stetig: 1 s Pace verschiebt die Roxzone nicht um eine Minute", () => {
-  for (let b = 235; b < 310; b++) {
+  for (let b = 235; b < 330; b++) {
     const a = levelOf(b), c = levelOf(b + 1);
-    assert.ok(Math.abs(c.rox - a.rox) <= 3 && Math.abs(c.fatigue - a.fatigue) <= 0.3, `Sprung bei ${b}: ${a.rox} → ${c.rox}`);
+    assert.ok(Math.abs(c.rox - a.rox) <= 4.1 && Math.abs(c.fatigue - a.fatigue) <= 0.41, `Sprung bei ${b}: ${a.rox} → ${c.rox}`);
   }
-  assert.deepEqual([levelOf(200).fatigue, levelOf(200).rox], [15, 255]); // Rand links
+  for (const b of [200, 236, 253, 255]) assert.deepEqual([levelOf(b).fatigue, levelOf(b).rox], [15, 255], "wie vorher bis 4:15 (St. Gallen 4:13)");
   assert.deepEqual([levelOf(270).fatigue, levelOf(270).rox], [20, 315]);
   assert.deepEqual([levelOf(400).fatigue, levelOf(400).rox], [25, 360]); // Rand rechts
 });
 
-test("Ungleiche Partner: harmonisches Mittel statt Durchschnitt", () => {
-  const same = buildForecast({ laufPersons: [[240], [240]], station: Array.from({ length: 8 }, () => [240, 240]) });
+test("Ungleiche Partner: Mittel wie bisher (keine unbelegte Optimierung)", () => {
   const diff = buildForecast({ laufPersons: [[240], [240]], station: Array.from({ length: 8 }, () => [180, 360]) });
-  assert.equal(Math.round(same.stations[0]), Math.round(240 * K.mitte)); // gleich stark: wie bisher
-  assert.equal(Math.round(diff.stations[0]), Math.round(240 * K.mitte)); // 180/360 teilt sich wie 2×240
-  assert.ok(diff.stations[0] < 270 * K.mitte, "Durchschnitt 4:30 wäre zu langsam");
+  assert.equal(Math.round(diff.stations[0]), Math.round(270 * K.mitte));
 });
 
 const bench = JAIME.st.map((v, r) => harm(v, JIMOH.st[r]));
@@ -110,7 +107,7 @@ test("Simulation mit Einzelzeiten eicht je Station, geglättet zum Gesamt-k", ()
   assert.ok(kWB > kAll && kSki < kAll, "Wall Balls langsamer, SkiErg schneller als der Schnitt");
   assert.ok(kWB < 1.3, "geglättet: eine Simulation setzt kein Extrem");
   assert.ok(Math.abs(f.perStation[7] - (1.3 + kAll) / 2) < 1e-9, "eine Simulation zählt so viel wie das Gesamt-k");
-  assert.ok(Math.abs(f.st - total) < 1, "Summe bleibt bei der Simulation, wenn sie die einzige ist? " + (f.st - total));
+  assert.ok(Math.abs(f.st - total) < 1, "Die Glättung ändert die Summe nicht: sie bleibt bei der Simulation (" + (f.st - total) + ")");
 });
 
 test("Jüngere Simulationen zählen mehr als alte", () => {

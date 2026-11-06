@@ -15843,9 +15843,9 @@
           "Wall Balls",
         ];
         const stBad = ST.map((s, r) =>
-          [[ME, A.station[r]], [PARTNER, B.station[r]]].map(([n, v]) => { const c = checkStation(r, v); return c.reason ? `<li>${esc(n)}, ${esc(s)}: ${esc(c.reason)}</li>` : ""; }).join(""),
+          [[ME, A.station[r]], [PARTNER, B.station[r]]].map(([n, v]) => { const c = checkStation(r, v); return c.reason ? `<div>• ${esc(n)}, ${esc(s)}: ${esc(c.reason)}</div>` : ""; }).join(""),
         ).join("");
-        const stBadH = stBad ? `<div class="hint" role="alert"><b>Unplausibel, bitte prüfen</b> (fliesst nicht in die Prognose ein):<ul style="margin:4px 0 0;padding-left:18px">${stBad}</ul></div>` : "";
+        const stBadH = stBad ? `<div class="hint" role="alert"><b>Unplausibel, bitte prüfen</b> (fliesst nicht in die Prognose ein):<div style="margin-top:4px">${stBad}</div></div>` : "";
         h += `<div class="cap">Stationen-Benchmark</div><div class="card"><table><tr><th>Station</th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th><th>Teilen</th></tr>
     ${ST.map((s, r) => {
       const a = parseT(A.station[r]),

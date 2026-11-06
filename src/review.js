@@ -89,7 +89,7 @@ export function forecastNotes(fc) {
   if (!fc) return "";
   let h = '<div class="rv-notes">';
   if (fc.issues && fc.issues.length)
-    h += `<div class="hint" role="alert"><b>Unplausibel, bitte prüfen</b> (fliesst nicht in die Prognose ein):<ul style="margin:4px 0 0;padding-left:18px">${fc.issues.map((i) => `<li>${esc((i.who ? i.who + ", " : "") + i.label)}: ${esc(i.reason)}</li>`).join("")}</ul></div>`;
+    h += `<div class="hint" role="alert"><b>Unplausibel, bitte prüfen</b> (fliesst nicht in die Prognose ein):<div style="margin-top:4px">${fc.issues.map((i) => `<div>• ${esc((i.who ? i.who + ", " : "") + i.label)}: ${esc(i.reason)}</div>`).join("")}</div></div>`;
   if (fc.scenarios) {
     const sc = fc.scenarios, row = (n, x) => `<tr><td>${n}</td><td>${mmss(x.run)}</td><td>${mmss(x.st)}</td><td>${mmss(x.rox)}</td><td><b>${mmss(x.total)}</b></td></tr>`;
     h += `<div class="cap rv-gap">Szenarien</div><table class="rv-tab"><thead><tr><th></th><th>Laufen</th><th>Stationen</th><th>Rox</th><th>Gesamt</th></tr></thead><tbody>${row("Gut", sc.gut)}${row("Mittel", sc.mitte)}${row("Vorsichtig", sc.vorsichtig)}</tbody></table>

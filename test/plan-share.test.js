@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { parsePlanText } from "../src/parser.js";
 import { builtinPlan, activePlan, mergeImport, changesByWeek, undoImport, weekInfo, blockOverview, LAST } from "../src/plan-store.js";
+import { OVERRIDE, APPEND, WEEK_KM } from "../src/plan-v10.js";
 import { weekSnapshot, weekText, encodeSnapshot, decodeSnapshot, shareLink, linkCode } from "../src/share.js";
 
 const parsed = parsePlanText(readFileSync(new URL("./fixtures/plan-provisorisch.txt", import.meta.url), "utf8"));
@@ -27,8 +28,13 @@ test("PDF-Import ab heute lässt die Vergangenheit unverändert", () => {
   const { plan, changed } = mergeImport(cur, parsed, { from: 30, name: "Test.pdf", now: 1 });
   assert.deepEqual(plan.days[1], cur.days[1]);
   assert.ok(changed.every((i) => i >= 30));
-  // Der eingebaute Plan ab Woche 5 stammt aus demselben PDF – der Import ändert dort kaum etwas
-  for (let i = 30; i < 119; i++) assert.deepEqual(plan.days[i].i, cur.days[i].i, "Tag " + i);
+  // Der eingebaute Plan ab Woche 5 stammt aus demselben PDF; Plan v10 (plan-v10.js) ändert einzelne Tage bewusst.
+  // Der Import stellt dort die PDF-Fassung wieder her, überall sonst bleibt alles gleich.
+  const v10 = (i) => i in OVERRIDE || i in APPEND;
+  for (let i = 30; i < 119; i++) {
+    if (v10(i)) assert.notDeepEqual(plan.days[i].i, cur.days[i].i, "v10-Tag " + i + " wird durch den Import zurückgesetzt");
+    else assert.deepEqual(plan.days[i].i, cur.days[i].i, "Tag " + i);
+  }
   assert.equal(plan.days[120].t, cur.days[120].t, "nicht erkannte Tage bleiben");
   assert.equal(plan.blocks.length, 5);
   assert.equal(plan.prev, null);

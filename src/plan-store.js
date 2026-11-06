@@ -2,6 +2,7 @@
 // Gespeicherte Form (S.plan): {source, name, importedAt, from, days: {idx: day}, blocks, weeks, prev}
 import { buildBuiltinPlan, BLOCKS, BLOCK_ORDER, WAVE, WEEKS_A, RACE_IDX } from "./plan-data.js";
 import { NWEEKS } from "./dates.js";
+import { WEEK_KM } from "./plan-v10.js";
 import { sameDay, clone } from "./util.js";
 
 export const LAST = NWEEKS * 7 - 1;
@@ -10,12 +11,18 @@ let builtin = null;
 export function builtinPlan() {
   if (!builtin) {
     const p = buildBuiltinPlan();
-    p.name = "Eingebauter Plan (Stand 18.09.2026)";
+    p.name = "Eingebauter Plan (v10, Stand 06.11.2026)";
     p.blocks = BLOCK_ORDER.map((id, j) => ({
       id, name: BLOCKS[id].name, start: BLOCKS[id].start,
       end: j + 1 < BLOCK_ORDER.length ? BLOCKS[BLOCK_ORDER[j + 1]].start - 1 : RACE_IDX
     }));
     p.weeks = WEEKS_A.map((w, n) => ({ n: n + 1, name: w.name, start: n * 7 }));
+    // Wochen 5–18: Name wie der Block (Deload-Wochen heissen so), dazu die geplanten Lauf-km (Plan v10)
+    for (let w = 4; w < NWEEKS; w++) {
+      const b = p.blocks.filter((x) => w * 7 >= x.start).pop();
+      const off = Math.floor((w * 7 - b.start) / 7);
+      p.weeks.push({ n: w + 1, name: b.id !== "T" && off === 3 ? "Deload" : b.name, start: w * 7, km: WEEK_KM[w + 1] });
+    }
     builtin = p;
   }
   return builtin;

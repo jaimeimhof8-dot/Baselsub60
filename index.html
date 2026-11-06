@@ -5522,6 +5522,34 @@
           transition: none !important;
         }
       }
+      /* Race Goals */
+      .s6-rg { display: flex; flex-direction: column; gap: 14px; padding: 12px 16px 96px; color: #f5f5f7; }
+      .s6-rg .s6-card, .s6-rg details.rv-how { padding: 18px; gap: var(--s3); border-radius: 22px; background: #0e1016; box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06); }
+      .s6-rg .s6-card h2 { margin: 0; font-size: 1.1em; }
+      .s6-rg .btns { display: flex; gap: var(--s3); flex-wrap: wrap; }
+      .s6-rg summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+      .s6-rg .rg-top { display: flex; gap: var(--s4); align-items: flex-end; justify-content: space-between; }
+      .s6-rg .rg-goal { display: flex; flex-direction: column; gap: 4px; font-size: 0.85em; }
+      .s6-rg input[type="text"] { padding: var(--s3); border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: inherit; font: inherit; min-height: 44px; width: 100%; box-sizing: border-box; }
+      .s6-rg .rg-goal input { width: 7.5em; font-size: 1.3em; font-weight: 700; }
+      .s6-rg .rg-tot { text-align: right; }
+      .s6-rg .rg-tot span { display: block; font-size: 0.8em; color: var(--muted); }
+      .s6-rg .rg-tot b { font-family: var(--f-head); font-size: 2.2em; line-height: 1; }
+      .s6-rg .rg-sum { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); margin-top: var(--s3); font-size: 0.9em; color: var(--muted); }
+      .s6-rg .rg-sum b { color: inherit; font-weight: 700; }
+      .s6-rg .rg-list { display: flex; flex-direction: column; gap: var(--s2); margin-top: var(--s3); }
+      .s6-rg .rg-row { display: grid; grid-template-columns: 1fr 6.2em 44px; gap: var(--s3); align-items: center; padding: var(--s2) 0; border-top: 1px solid var(--line); }
+      .s6-rg .rg-row.live { grid-template-columns: 1fr 6.2em 4.6em; }
+      .s6-rg .rg-row.run .rg-l b { color: var(--lauf); }
+      .s6-rg .rg-row.station .rg-l b { color: var(--station); }
+      .s6-rg .rg-sub { font-size: 0.8em; color: var(--muted); font-weight: 400; }
+      .s6-rg .rg-lock { min-width: 44px; min-height: 44px; border-radius: 12px; border: 1px solid var(--line); background: transparent; color: var(--muted); }
+      .s6-rg .rg-lock[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+      .s6-rg .rg-d { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+      .s6-rg .rg-d.slow { color: var(--danger); }
+      .s6-rg .rg-d.fast { color: var(--ok); }
+      .s6-rg .rg-chk { display: flex; gap: var(--s3); align-items: center; min-height: 44px; }
+      .s6-rg .rg-proj { font-size: 1.05em; }
       .sim-f {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -14083,6 +14111,20 @@
             <path d="M4 19h16M7 16v-5M12 16V7M17 16v-3" /></svg
           ><span class="l">Wochenrückblick</span>
         </button>
+        <button class="mi" data-v="racegoal">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="8" />
+            <circle cx="12" cy="12" r="3" /></svg
+          ><span class="l">Race Goals</span>
+        </button>
         <button class="mi" data-v="plan">
           <svg
             viewBox="0 0 24 24"
@@ -14231,6 +14273,8 @@
       } from "./src/extras.js";
       import { safeMerge, countEntries, stable } from "./src/merge.js";
       import * as review from "./src/review.js";
+      import * as rg from "./src/racegoals.js";
+      import { projectRaceDay } from "./src/forecast.js";
       import { analyseSession } from "./src/analyse.js";
       import { sessionDash, compareToPrev } from "./src/session-dash.js";
       import { alignSplits } from "./src/laps.js";
@@ -14352,6 +14396,7 @@
         wsplit: {},
         off: {},
         simres: {},
+        racegoal: { goal: 3600, scenario: "ziel", edits: {}, locked: {}, lockTotal: true, actual: {} },
         tests: {
           lauf: { j: ["", "", "", ""], m: ["", "", "", ""] },
           station: {},
@@ -16972,9 +17017,17 @@
         return review.forecast({
           laufPersons: [me.lauf.map(parseT), pa.lauf.map(parseT)],
           station: me.station.map((v, r) => [parseT(v), parseT(pa.station[r])]),
-          sims: Object.values(S.simres || {})
-            .filter(simOk)
-            .map((v) => ({ intensity: v.i, stations: simTotal(v) })),
+          sims: Object.entries(S.simres || {})
+            .filter(([, v]) => simOk(v))
+            .sort(([a], [b]) => (a < b ? -1 : 1))
+            .map(([d, v]) => ({
+              intensity: v.i,
+              stations: simTotal(v),
+              parts: v.st.map(parseT),
+              run: parseT(v.run) > 0 ? parseT(v.run) : undefined,
+              rox: parseT(v.rox) > 0 ? parseT(v.rox) : undefined,
+              ageDays: Math.max(0, Math.floor((+NOW - Date.parse(d)) / dayMs)),
+            })),
           testAgeDays: isNaN(at) ? null : Math.floor((+NOW - at) / dayMs),
           division: S.division,
         });
@@ -17004,6 +17057,15 @@
         if (t && t.gap > 0)
           h += `<p class="sub mt-2">Ca. ${Math.ceil(t.perWeek)} s pro Woche aufholen.</p>`;
         for (const w of fc.warnings) h += `<div class="hint">${esc(w)}</div>`;
+        // Renntag: abflachender Trend aus den gespeicherten Wochenprognosen (Faustregel, keine Messung)
+        const hist = Object.entries(S.review || {})
+          .filter(([, r]) => r && r.fc > 0)
+          .map(([x, r]) => ({ day: +x * 7, total: r.fc }));
+        hist.push({ day: Math.max(0, TODAY), total: fc.total });
+        const rd = projectRaceDay(hist, Math.max(0, Math.ceil((RACE - midnight(NOW)) / dayMs)));
+        if (rd)
+          h += `<p class="sub mt-2">Am Renntag bei gleichem Trend: ca. <b>${mmss(rd.total)}</b> (${mmss(rd.lo)} bis ${mmss(rd.hi)}). ${rd.slopePerWeek < -1 ? "Der Fortschritt flacht ab, darum weniger als linear." : "Kein Aufwärtstrend, darum nicht schöngerechnet."}</p>`;
+        h += `<div class="btns"><button class="btn" data-v="racegoal">Race Goals: Plan pro Split →</button></div>`;
         // Was hat sich seit der letzten gespeicherten Woche bewegt?
         for (let x = cur - 1; x >= 0; x--) {
           const p = S.review[x] && S.review[x].fcx;
@@ -17041,6 +17103,8 @@
     <div class="sim-f"><label>Datum <input type="date" id="sim-d" value="${isoD(NOW)}"></label>
     <label>Intensität <select id="sim-i">${[70, 80, 85, 90, 95, 100].map((x) => `<option value="${x}"${x === 85 ? " selected" : ""}>${x} %</option>`).join("")}</select></label>
     ${review.STATIONS.map((s, r) => `<label>${esc(s)} <input type="text" inputmode="numeric" data-sim="${r}" placeholder="m:ss" aria-label="${esc(s)} Teamzeit"></label>`).join("")}
+    <label>Laufen gesamt, 8 km (optional) <input type="text" inputmode="numeric" id="sim-run" data-sim-x placeholder="m:ss" aria-label="Laufzeit gesamt"></label>
+    <label>Roxzone gesamt (optional) <input type="text" inputmode="numeric" id="sim-rox" data-sim-x placeholder="m:ss" aria-label="Roxzone gesamt"></label>
     <button type="button" class="btn primary" data-act="sim-save">Speichern</button></div></details>`;
         // Verlauf der gespeicherten Prognosen
         const pts = [];
@@ -22581,6 +22645,114 @@
           (fin7.sub ? ((fin7.sub = null), fin7Paint()) : fin7Close()),
       );
       /* S6-JS-END */
+
+      /* ===== Race Goals: Zielzeit → Split-Plan (8 Läufe, 8 Stationen, Roxzone), Doubles-Aufteilung, Renntag-Abstand ===== */
+      const rgState = () => {
+        if (!S.racegoal || typeof S.racegoal !== "object") S.racegoal = { goal: 3600, scenario: "ziel", edits: {}, locked: {}, lockTotal: true, actual: {} };
+        return S.racegoal;
+      };
+      const rgSigned = (d) => (Math.abs(d) < 1 ? "±0:00" : (d > 0 ? "+" : "−") + mmss(Math.abs(d)));
+      function s6RaceGoal() {
+        const st = rgState(),
+          fc = rvForecast(),
+          plan = rg.buildPlan(st, fc),
+          pr = rg.progress(plan, st.actual || {}),
+          dv = S.division || {},
+          doubles = dv.mode !== "solo",
+          me = myTests(),
+          pa = partnerTests();
+        const lock = (on) =>
+          `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${on ? '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>' : '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/>'}</svg>`;
+        const sum = (kind) => plan.splits.filter((x) => x.kind === kind).reduce((a, x) => a + x.sec, 0);
+        const scn = Object.entries(rg.SCENARIOS)
+          .map(([k, v]) => `<button type="button" class="chip${(st.scenario || "ziel") === k ? " on" : ""}" data-rg-act="scn" data-k="${k}" aria-pressed="${(st.scenario || "ziel") === k}" title="${esc(v.hint)}">${esc(v.label)}</button>`)
+          .join("");
+        const rows = plan.splits
+          .map((x) => {
+            let extra = "";
+            if (x.kind === "station" && doubles) {
+              const d = rg.doublesShare(x.i, parseT(me.station[x.i]), parseT(pa.station[x.i]), x.sec);
+              if (d) extra = `<div class="rg-sub">${esc(ME)} ${d.me} ${d.unit} · ${esc(PARTNER)} ${d.pa} ${d.unit}</div>`;
+            }
+            return `<div class="rg-row ${x.kind}${x.locked ? " lk" : ""}"><div class="rg-l"><b>${esc(x.label)}</b>${extra}</div>
+<input type="text" inputmode="numeric" id="rg-${x.id}" data-rg="${x.id}" value="${mmss(x.sec)}" aria-label="${esc(x.label)} Zeit (m:ss)">
+<button type="button" class="rg-lock" data-rg-act="lock" data-k="${x.id}" aria-pressed="${x.locked}" aria-label="${esc(x.label)} ${x.locked ? "entsperren" : "sperren"}">${lock(x.locked)}</button></div>`;
+          })
+          .join("");
+        const live = plan.splits
+          .map((x, n) => {
+            const r = pr.rows[n];
+            return `<div class="rg-row live"><div class="rg-l"><b>${esc(x.label)}</b><div class="rg-sub">Plan ${mmss(x.sec)} · ${mmss(r.cumPlan)}</div></div>
+<input type="text" inputmode="numeric" id="rga-${x.id}" data-rga="${x.id}" value="${r.actual != null ? mmss(r.actual) : ""}" placeholder="m:ss" aria-label="${esc(x.label)} Ist-Zeit">
+<span class="rg-d ${r.deltaCum == null ? "" : r.deltaCum > 2 ? "slow" : r.deltaCum < -2 ? "fast" : ""}" aria-label="Abstand zum Plan">${r.deltaCum == null ? "–" : rgSigned(r.deltaCum)}</span></div>`;
+          })
+          .join("");
+        const goalIn = `<label class="rg-goal">Zielzeit<input type="text" inputmode="numeric" id="rg-goal" data-rggoal value="${mmss(st.goal || 3600)}" aria-label="Zielzeit (m:ss)"></label>`;
+        const basis = plan.personal
+          ? "Die Verhältnisse kommen aus euren Tests (Prognose): Lauf-Drift, Stationen und Roxzone wie bei euch gemessen."
+          : "Noch keine Testwerte: Die Verhältnisse kommen vom Rennmodell der App (gleichmässig für 60:00). Mit Tests wird der Plan persönlich.";
+        const fcLine = fc ? `<p class="sub">Aktuelle Prognose: <b>${mmss(fc.total)}</b> (Spanne ${mmss(fc.lo)} bis ${mmss(fc.hi)}). ${plan.target < fc.lo ? "Das Ziel liegt unter der Spanne: der Plan ist ein Stretch, kein Selbstläufer." : plan.target > fc.hi ? "Das Ziel liegt über der Spanne: ihr hättet Luft." : "Das Ziel liegt in der Spanne."}</p>` : "";
+        return `<div class="s6 s6-rg">${s6Head("Rennstrategie", "Race Goals", `${esc(doubles ? "Doubles" : "Solo")} · ${plan.personal ? "persönlich" : "Standardplan"}`)}
+<section class="s6-card" aria-label="Ziel"><div class="rg-top">${goalIn}<div class="rg-tot"><span>Plan</span><b>${mmss(plan.total)}</b></div></div>
+<div class="chips" role="group" aria-label="Szenario">${scn}</div>
+${fcLine}
+<div class="rg-sum"><span>Laufen <b>${mmss(sum("run"))}</b></span><span>Stationen <b>${mmss(sum("station"))}</b></span><span>Roxzone <b>${mmss(sum("rox"))}</b></span></div>
+${plan.error ? `<div class="hint" role="alert">${esc(plan.error)}</div>` : ""}
+<p class="sub">${esc(basis)}</p></section>
+<section class="s6-card" aria-label="Splits"><h2>Splits</h2>
+<p class="sub">Zeit antippen und ändern: der Split wird gesperrt, die übrigen gleichen aus${plan.lockTotal ? ", die Gesamtzeit bleibt" : ""}. Mit dem Schloss hältst du einen Split fest.</p>
+<label class="rg-chk"><input type="checkbox" data-rg-act="locktotal" ${plan.lockTotal ? "checked" : ""}> Gesamtzeit sperren</label>
+<div class="rg-list">${rows}</div>
+<div class="btns"><button type="button" class="btn ghost sm" data-rg-act="reset">Zurücksetzen</button><button type="button" class="btn sm" data-rg-act="share">Plan teilen</button></div></section>
+<details class="s6-card rv-how"${pr.done ? " open" : ""}><summary>Renntag oder Simulation: Ist-Zeiten eintragen${pr.done ? ` (${pr.done}/17)` : ""}</summary>
+<p class="sub">Trag nach jedem Abschnitt die Zeit ein. Der Abstand ist kumuliert: plus heisst langsamer als der Plan.</p>
+${pr.done ? `<p class="rg-proj">Hochrechnung: <b>${mmss(pr.projected)}</b> (${rgSigned(pr.ahead)} zum Plan)</p>` : ""}
+<div class="rg-list">${live}</div>
+<div class="btns"><button type="button" class="btn ghost sm" data-rg-act="clear-actual">Ist-Zeiten löschen</button></div></details>
+<details class="rv-how"><summary>Wie wird gerechnet?</summary><p class="sub">Die Zielzeit wird im Verhältnis eurer Prognose auf 8 Läufe, 8 Stationen und die Roxzone verteilt (auf die Sekunde genau). Szenarien: Bequem +3 %, Stretch −3 %, Prognose = aktuelle Rennprognose. Doubles-Aufteilung: Der Schnellere einer Station übernimmt mehr, im Verhältnis eurer Benchmark-Tempi, gerundet auf einen Block (SkiErg/Row 50 m, Sleds 12,5 m, Burpees 5 m, Farmers 25 m, Lunges 10 m, Wall Balls 5 Wdh.). Das ist ein Vorschlag: ob ihr in einem Rennen so teilen dürft und wie oft ihr wechselt, bestimmt das Reglement, nicht die App. Die Splits sind Planwerte, keine Garantie.</p></details></div>`;
+      }
+      function rgSave(next) {
+        S.racegoal = Object.assign({}, rgState(), next);
+        save();
+        render();
+      }
+      document.addEventListener("click", (e) => {
+        const t = e.target.closest("[data-rg-act]");
+        if (!t) return;
+        const a = t.dataset.rgAct,
+          st = rgState();
+        if (a === "scn") return rgSave({ scenario: t.dataset.k });
+        if (a === "lock") return rgSave(rg.toggleLock(st, t.dataset.k));
+        if (a === "locktotal") return rgSave({ lockTotal: !!t.checked });
+        if (a === "reset") return rgSave(rg.reset(st));
+        if (a === "clear-actual") return rgSave({ actual: {} });
+        if (a === "share") {
+          const txt = rg.planText(rg.buildPlan(st, rvForecast()), { name: `Race Goals ${ME} & ${PARTNER}` });
+          if (navigator.share) navigator.share({ text: txt }).catch(() => {});
+          else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => toast("Plan kopiert"), () => toast("Kopieren nicht möglich", true));
+        }
+      });
+      document.addEventListener("change", (e) => {
+        const t = e.target;
+        if (!t.matches || !t.matches("input[data-rg],input[data-rga],input[data-rggoal]")) return;
+        const st = rgState(),
+          n = normTime(t.value),
+          v = parseT(n);
+        if (t.dataset.rggoal !== undefined) {
+          if (!(v >= 1800 && v <= 10800)) return toast("Zielzeit zwischen 30:00 und 3:00:00 eintragen", true), render();
+          return rgSave({ goal: Math.round(v) });
+        }
+        if (t.dataset.rga) {
+          const actual = Object.assign({}, st.actual || {});
+          if (!n) delete actual[t.dataset.rga];
+          else if (v > 0 && v < 3600) actual[t.dataset.rga] = Math.round(v);
+          else return toast("Zeit als m:ss eintragen", true), render();
+          return rgSave({ actual });
+        }
+        const sl = rg.slots().find((x) => x.id === t.dataset.rg);
+        if (!sl || !(v >= (rg.MIN_SPLIT[sl.kind] || 30)) || v > 3600) return toast("Zeit als m:ss eintragen (nicht zu kurz)", true), render();
+        rgSave(rg.setSplit(st, t.dataset.rg, v));
+      });
       const VIEWS = {
         today: s6Today,
         week: s6Week,
@@ -22596,6 +22768,7 @@
         onb: vOnb,
         dashboard: s6Dashboard,
         review: s6Review,
+        racegoal: s6RaceGoal,
       };
       function render() {
         if (drag && drag.on) return void (renderHeld = true); // während des Ziehens nicht neu aufbauen
@@ -22621,6 +22794,7 @@
             "coach",
             "dashboard",
             "review",
+            "racegoal",
             "plan",
             "profile",
             "backup",
@@ -23243,6 +23417,10 @@
             );
           S.simres = S.simres || {};
           S.simres[day] = { i: pct / 100, st: st.map((x) => mmss(parseT(x))) };
+          for (const [f, id] of [["run", "sim-run"], ["rox", "sim-rox"]]) {
+            const v = parseT((($("#" + id) || {}).value || "").trim());
+            if (v > 0) S.simres[day][f] = mmss(v);
+          }
           save();
           toast("Simulation gespeichert – die Prognose ist angepasst");
           return render();
@@ -24379,7 +24557,7 @@
         if (
           !t.matches ||
           !t.matches(
-            "input[data-vs],input[data-sim],input[data-l],input[data-s]",
+            "input[data-vs],input[data-sim],input[data-sim-x],input[data-l],input[data-s]",
           )
         )
           return;

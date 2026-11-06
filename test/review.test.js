@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { weekCheck, forecast, onTrack, trackText, cleanSelf, reviewDue, DOUBLES_SHARE, K } from "../src/review.js";
+import { DOUBLES_RATIO, FATIGUE_F } from "../src/forecast.js";
 import * as review from "../src/review.js";
 import { suggestExtras, makeExtra, extraLabel, extraAsDay } from "../src/extras.js";
 
@@ -43,7 +44,7 @@ test("Prognose: Compromised Running, Drift ab Lauf 5, Fallback statt fehlender S
   assert.ok(half.stations.every((v) => v > 0));
   const full = forecast({ lauf: [240], station: Array.from({ length: 8 }, () => [200, null]) });
   assert.equal(full.missing, 0);
-  assert.equal(full.total, full.run + 1600 * K.mitte + 255);
+  assert.ok(Math.abs(full.total - (full.run + 200 * FATIGUE_F.mitte * DOUBLES_RATIO.reduce((a, b) => a + b, 0) + 255)) < 1e-6);
 });
 
 test("Prognose: Basis-Pace hat Vorrang, Niveau steuert Roxzone und Division die Fallbacks", () => {
@@ -122,7 +123,7 @@ test("Prognose Zeile für Zeile gegen das Rennmodell", () => {
   assert.equal(b.rows.length, 10);
   assert.equal(b.rows[0].goal, 1920);
   assert.equal(Math.round(b.rows[0].est), Math.round(review.forecast({ lauf: [232, 235, 230, 238] }).run));
-  assert.equal(Math.round(b.rows[1].est), Math.round(410 * review.K.mitte));
+  assert.equal(Math.round(b.rows[1].est), Math.round(410 * DOUBLES_RATIO[0] * FATIGUE_F.mitte));
   assert.equal(b.goal, 1920 + 1390 + 270);
   assert.ok(b.goal < 3600, "Rennmodell muss unter 60 Minuten liegen");
   assert.equal(Math.round(b.diff), Math.round(fc.total - b.goal));

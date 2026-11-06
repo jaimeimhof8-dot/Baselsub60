@@ -7,12 +7,22 @@ const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
 const sum = (a) => a.reduce((x, y) => x + y, 0);
 
 /**
- * Team-Stationszeit im Rennen = Mittel der Solo-Benchmarks × k.
- * k bündelt das Teilen der Arbeit (ca. 0,55) und die Ermüdung nach Renntempo (Puls, Grip, Wechsel).
- * Annahme, bis eine Simulation ≥ 85 % eingetragen ist: mitte 0,80 (Ermüdung ×1,45); gut/vorsichtig = Rand der Spanne.
- * Zur Einordnung: 0,66 = alles läuft, 0,95 = so langsam wie im Rennen von St. Gallen 2026 (Stationen 24:03).
+ * Team-Stationszeit im Rennen = Solo-Benchmark der Station × DOUBLES_RATIO[Station] × FATIGUE_F.
+ *
+ * DOUBLES_RATIO: gemessen an 151 Athleten, die im selben Event Men Pro Solo UND Men Pro Doubles gelaufen sind (hyranking.com,
+ * Saison 2025/26): Teamzeit im Doubles geteilt durch die eigene Solo-Rennzeit, Median je Station. Gesamt 0,75 (P10 0,66, P90 0,83).
+ * Das ist weit weg von «halbe Arbeit = 0,5»: abgewechselt wird nacheinander, geschoben/gezogen wird teils zusammen.
+ *
+ * FATIGUE_F: Eure Benchmarks sind frisch gemessen, die Solo-Rennzeiten oben schon vom Laufen ermüdet. F rechnet frisch → Rennen um.
+ * Eichpunkt: euer Rennen HYROX St. Gallen 16.01.2026 (Platz 58, Stationen 24:03 = 1443 s) gegen das Benchmark-Mittel vom 13.10.2026
+ * (25:38 = 1538 s): 1443 / (1538 × 0,759) = 1,24. Das setzt voraus, dass die Oktober-Benchmarks eurer Form im Januar entsprechen.
+ * Wart ihr im Januar schlechter, ist F kleiner (gut: 1,10 = Stationen 11 % schneller als im Januar); schlechter als im Januar
+ * (vorsichtig 1,35). Eine Simulation ab 85 % ersetzt das alles (calibrateK).
  */
-export const K = { gut: 0.72, mitte: 0.8, vorsichtig: 0.9 };
+export const DOUBLES_RATIO = [0.89, 0.6, 0.73, 0.64, 0.92, 0.81, 0.72, 0.7]; // SkiErg, Push, Pull, Burpee BJ, RowErg, Farmers, Lunges, Wall Balls
+export const FATIGUE_F = { gut: 1.1, mitte: 1.24, vorsichtig: 1.35 };
+/** Zusammenfassung als einzelnes k für typische Benchmarks (Anzeige): mitte ≈ 0,94, vorher geraten 0,80. */
+export const K = { gut: 0.84, mitte: 0.94, vorsichtig: 1.02 };
 export const DRIFT = 3; // s/km zusätzlich pro Lauf ab Lauf 5 (nach den Burpee Broad Jumps)
 export const MISMATCH = 0.025; // Abstand der Partner im selben Test, ab dem ein Messfehler vermutet wird
 export const STALE_DAYS = 35; // älter: Spanne breiter, Re-Test fällig
@@ -145,14 +155,24 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
   const benchSum = allBench ? sum(solo) : null;
   const cal = calibrateK(sims, benchSum, allBench ? solo : null);
 
-  let k = K.mitte, kLo = K.gut, kHi = K.vorsichtig;
-  if (cal.k != null) { k = cal.k; kLo = k * 0.97; kHi = k * 1.03; }
-  if (cal.floor != null) { k = Math.max(k, cal.floor); kLo = Math.max(kLo, cal.floor); kHi = Math.max(kHi, k); }
-  const kr = cal.perStation && cal.k != null && cal.floor == null ? cal.perStation : null; // je Station nur ohne widersprechende Untergrenze
-
-  const kOf = (r) => (kr ? kr[r] : k);
+  // Ohne Simulation: je Station Verhältnis aus den Paardaten × Ermüdung. Mit Simulation: gemessen (perStation oder Gesamt-k).
+  let kr = DOUBLES_RATIO.map((x) => x * FATIGUE_F.mitte), k, kLo, kHi;
+  const have = solo.map((v) => v != null);
+  const wk = (vec) => (have.some(Boolean) ? sum(solo.map((v, r) => (v == null ? 0 : v * vec[r]))) / sum(solo.map((v) => v || 0)) : K.mitte);
+  k = wk(kr);
+  kLo = k * (FATIGUE_F.gut / FATIGUE_F.mitte);
+  kHi = k * (FATIGUE_F.vorsichtig / FATIGUE_F.mitte);
+  if (cal.k != null) {
+    k = cal.k; kLo = k * 0.97; kHi = k * 1.03;
+    kr = cal.perStation && cal.floor == null ? cal.perStation : Array(8).fill(k);
+  }
+  if (cal.floor != null && cal.floor > k) { // eine lockere Simulation zeigt nur eine Untergrenze
+    const f = cal.floor / k;
+    kr = kr.map((x) => x * f); k = cal.floor; kLo = Math.max(kLo, cal.floor); kHi = Math.max(kHi, k);
+  }
+  const kOf = (r) => kr[r];
   const team = solo.map((v, r) => (v == null ? fb[r] : v * kOf(r)));
-  const at = (kk, fbF) => sum(solo.map((v, r) => (v == null ? fb[r] * fbF : v * (kr ? kr[r] * (kk / k) : kk))));
+  const at = (kk, fbF) => sum(solo.map((v, r) => (v == null ? fb[r] * fbF : v * kr[r] * (kk / k))));
   const st = sum(team);
 
   // Laufen und Roxzone: aus Simulationen, wenn dort gemessen (nur ≥ 85 %), sonst Modell
@@ -179,12 +199,12 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
   const basis = [
     `Laufen: Pacing-Test, Team Ø ${Math.floor(T / 60)}:${String(Math.round(T % 60)).padStart(2, "0")}/km`,
     `Stationen: Benchmark ${8 - missing} von 8`,
-    cal.k != null ? `Simulationen: ${cal.n} eingetragen, k geeicht (${k.toFixed(2).replace(".", ",")})${kr ? ", je Station" : ""}${runCal ? ", Laufen gemessen" : ""}${roxCal ? ", Roxzone gemessen" : ""}` : cal.floor != null ? "Simulation unter 85 %: zeigt nur eine Untergrenze" : "Noch keine Simulation ab 85 %: k ist eine Annahme",
+    cal.k != null ? `Simulationen: ${cal.n} eingetragen, k geeicht (${k.toFixed(2).replace(".", ",")})${cal.perStation && cal.floor == null ? ", je Station" : ""}${runCal ? ", Laufen gemessen" : ""}${roxCal ? ", Roxzone gemessen" : ""}` : cal.floor != null ? "Simulation unter 85 %: zeigt nur eine Untergrenze" : "Noch keine Simulation ab 85 %: k ist eine Annahme",
   ];
   return {
     T, pace: run / 8, paces, run, st, rox, total,
     lo: total - Math.hypot(dRun, dLo, dRox), hi: total + Math.hypot(dRun, dHi, dRox),
-    k, calibrated: cal.k != null, perStation: kr, runCal, roxCal, level: lv.name, missing, sources, stations: team, basis, warnings,
+    k, calibrated: cal.k != null, perStation: cal.perStation && cal.k != null && cal.floor == null ? cal.perStation : null, runCal, roxCal, level: lv.name, missing, sources, stations: team, basis, warnings,
   };
 }
 

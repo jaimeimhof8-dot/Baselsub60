@@ -122,3 +122,11 @@ test("Erklär-Anfrage: enthält die Einheit und setzt mode", async () => {
   assert.equal(buildCoachRequest({ context: {}, chat: [], message: "x" }).mode, undefined);
   assert.ok(explainMessage(0, { t: "A", i: Array(500).fill("sehr lange Übung ".repeat(5)) }).length <= 2000);
 });
+
+test("Backup mit Team-Plan (sharedPlan) wird weiterhin gelesen und der Zusatz stört den Import nicht", async () => {
+  const { makeBackup, readBackup } = await import("../src/backup.js");
+  const b = { ...makeBackup({ done: { a: 1 } }, { user: "Jaime" }), sharedPlan: { name: "13c", days: { 0: { t: "x", k: "rest", i: [] } } } };
+  const r = readBackup(JSON.stringify(b));
+  assert.deepEqual(r.data, { done: { a: 1 } });
+  assert.equal(r.meta.user, "Jaime");
+});

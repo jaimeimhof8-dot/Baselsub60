@@ -226,3 +226,9 @@ test("Gesamtzeit = Laufen + Stationen + Roxzone, Szenarien geordnet, ehrliche Su
   assert.ok(bad.issues.some((i) => i.kind === "sim"));
   assert.ok(Math.abs(bad.total - f.total) < 1);
 });
+
+test("Simulation ohne Teilzeiten: unmögliche Summe eicht nicht (kein k = 0,2)", () => {
+  const f = buildForecast({ ...REAL, sims: [{ intensity: 0.95, stations: 300 }] });
+  assert.equal(f.calibrated, false);
+  assert.ok(f.issues.some((i) => i.kind === "sim"));
+});

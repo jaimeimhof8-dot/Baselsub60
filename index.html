@@ -14232,7 +14232,7 @@
       } from "./src/extras.js";
       import { safeMerge, countEntries, stable } from "./src/merge.js";
       import * as review from "./src/review.js";
-      import { projectRaceDay, checkStation } from "./src/forecast.js";
+      import { projectRaceDay, checkStation, checkRun, parseTimeStrict } from "./src/forecast.js";
       import { analyseSession } from "./src/analyse.js";
       import { sessionDash, compareToPrev } from "./src/session-dash.js";
       import { alignSplits } from "./src/laps.js";
@@ -15777,7 +15777,12 @@
       /* Partnerwerte: aus seinem Konto. Ohne Cloud (Vorschau) die alten Einträge der Partnerspalte auf diesem Gerät – ebenfalls nur lesen. */
       const partnerTests = () =>
         PP ? PP.tests : personTests(S.tests, colOf(PARTNER));
-      const teamT = () => avg([...myTests().lauf, ...partnerTests().lauf]);
+      /* Nur plausible Laufzeiten zählen (wie in der Prognose): "13" ist keine Kilometerzeit */
+      const avgRun = (a) => {
+        const v = a.map(checkRun).filter((c) => c.ok).map((c) => c.s);
+        return v.length ? v.reduce((x, y) => x + y, 0) / v.length : NaN;
+      };
+      const teamT = () => avgRun([...myTests().lauf, ...partnerTests().lauf]);
 
       /* Eingabefeld: bearbeitbar nur mit attr (eigener Wert), sonst gesperrt und ohne data-Attribut (der Input-Handler ignoriert es) */
       const pin = (attr, val, label, ph) =>
@@ -15822,8 +15827,8 @@
           B = partnerTests(),
           mc = myCol(),
           T = teamT(),
-          aa = avg(A.lauf),
-          ab = avg(B.lauf);
+          aa = avgRun(A.lauf),
+          ab = avgRun(B.lauf);
         let h = `<div class="vh" style="margin-top:var(--s8)"><h2>Tests &amp; Benchmarks</h2></div>
   <div class="cap">Pacing-Test 4×1 km</div><div class="card">
     <table><tr><th></th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th></tr>
@@ -15848,8 +15853,10 @@
         const stBadH = stBad ? `<div class="hint" role="alert"><b>Unplausibel, bitte prüfen</b> (fliesst nicht in die Prognose ein):<div style="margin-top:4px">${stBad}</div></div>` : "";
         h += `<div class="cap">Stationen-Benchmark</div><div class="card"><table><tr><th>Station</th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th><th>Teilen</th></tr>
     ${ST.map((s, r) => {
-      const a = parseT(A.station[r]),
-        b = parseT(B.station[r]);
+      const ca = checkStation(r, A.station[r]),
+        cb = checkStation(r, B.station[r]),
+        a = ca.ok ? ca.s : NaN,
+        b = cb.ok ? cb.s : NaN;
       let rec = "";
       if (!isNaN(a) && !isNaN(b)) {
         const df = Math.abs(a - b);
@@ -17022,7 +17029,7 @@
         h += review.forecastNotes(fc);
         // Renntag: abflachender Trend aus den gespeicherten Wochenprognosen (Faustregel, keine Messung)
         const hist = Object.entries(S.review || {})
-          .filter(([, r]) => r && r.fc > 0 && r.fcv === 2) // nur Punkte aus dem aktuellen Rechenmodell, sonst entsteht ein künstlicher Trendsprung
+          .filter(([, r]) => r && r.fc > 0 && r.fcv === 3) // nur Punkte aus dem aktuellen Rechenmodell, sonst entsteht ein künstlicher Trendsprung
           .map(([x, r]) => ({ day: +x * 7, total: r.fc }));
         hist.push({ day: Math.max(0, TODAY), total: fc.total });
         const rd = projectRaceDay(hist, Math.max(0, Math.ceil((RACE - midnight(NOW)) / dayMs)));
@@ -17817,7 +17824,7 @@
           S.review[w] = {
             at: Date.now(),
             level: r.level,
-            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 2 } : {}),
+            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 3 } : {}),
           };
           save();
         }
@@ -21232,7 +21239,7 @@
           S.review[w] = {
             at: Date.now(),
             level: r.level,
-            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 2 } : {}),
+            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 3 } : {}),
           };
           save();
         }
@@ -23299,7 +23306,7 @@
           const simBad = st.map((x, r) => checkStation(r, x)).find((c) => !c.ok);
           if (simBad) return toast(simBad.reason || "Unplausible Stationszeit, bitte prüfen", true);
           S.simres = S.simres || {};
-          S.simres[day] = { i: pct / 100, st: st.map((x) => mmss(parseT(x))) };
+          S.simres[day] = { i: pct / 100, st: st.map((x) => mmss(parseTimeStrict(x))) };
           for (const [f, id] of [["run", "sim-run"], ["rox", "sim-rox"]]) {
             const v = parseT((($("#" + id) || {}).value || "").trim());
             if (v > 0) S.simres[day][f] = mmss(v);
@@ -24164,7 +24171,7 @@
           S.review[w].level = rvData(w).level;
           if (fc && fc.total) {
             S.review[w].fc = Math.round(fc.total);
-            S.review[w].fcv = 2;
+            S.review[w].fcv = 3;
             S.review[w].fcx = {
               total: Math.round(fc.total),
               run: Math.round(fc.run),

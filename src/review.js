@@ -93,7 +93,7 @@ export function forecastNotes(fc) {
   if (fc.scenarios) {
     const sc = fc.scenarios, row = (n, x) => `<tr><td>${n}</td><td>${mmss(x.run)}</td><td>${mmss(x.st)}</td><td>${mmss(x.rox)}</td><td><b>${mmss(x.total)}</b></td></tr>`;
     h += `<div class="cap rv-gap">Szenarien</div><table class="rv-tab"><thead><tr><th></th><th>Laufen</th><th>Stationen</th><th>Rox</th><th>Gesamt</th></tr></thead><tbody>${row("Gut", sc.gut)}${row("Mittel", sc.mitte)}${row("Vorsichtig", sc.vorsichtig)}</tbody></table>
-    <p class="sub mt-2">Gut = alle Teile laufen gleichzeitig gut, Vorsichtig = alle gleichzeitig schlecht. Eckfälle, keine Wahrscheinlichkeit. ${esc(fc.sub60.text)}</p>`;
+    <p class="sub mt-2">Gut = alle Teile laufen gleichzeitig gut, Vorsichtig = alle gleichzeitig schlecht. Eckfälle, keine Wahrscheinlichkeit; sie sind breiter als die Spanne oben (die rechnet Unsicherheiten der Teile als unabhängig). ${esc(fc.sub60.text)} Die Faktoren (Teamfaktor, Ermüdung, Roxzone) sind Annahmen, nur St. Gallen 2026 stützt den mittleren.</p>`;
   }
   if (fc.parts) h += `<div class="cap rv-gap">Gemessen oder geschätzt?</div><ul class="sub" style="margin:4px 0 0;padding-left:18px">${fc.parts.map((x) => `<li><b>${esc(x.name)}:</b> ${esc(x.source)}. ${esc(x.note)}</li>`).join("")}</ul>`;
   return h + "</div>";

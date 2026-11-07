@@ -213,7 +213,8 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
       if (bad >= 0) { issues.push({ kind: "sim", who: "", label: `Simulation ${i + 1}: ${STATION_NAMES[bad]}`, raw: String(parts[bad]), reason: cs[bad].reason || "unplausibel" }); return; }
       parts = cs.map((c) => c.s);
       simsOk.push({ ...sm, parts, stations: sum(parts) });
-    } else simsOk.push(sm);
+    } else if (ok(sm.stations) && sm.stations >= sum(STATION_BOUNDS.map((b) => b[0])) && sm.stations <= sum(STATION_BOUNDS.map((b) => b[1]))) simsOk.push(sm);
+    else issues.push({ kind: "sim", who: "", label: `Simulation ${i + 1}`, raw: String(sm.stations), reason: "Stationssumme unplausibel, bitte prüfen." });
   });
   const cal = calibrateK(simsOk, benchSum, allBench ? solo : null);
 

@@ -26,7 +26,7 @@ export const weightForReps = (est, reps) => (reps <= 1 ? est : est / (1 + reps /
  * Läufe, Zeiten und Strecken ("4×1 km", "3×50″", "20 m") sind kein Satzschema → null.
  */
 export function parseRx(text) {
-  const m = String(text || "").match(/(?:^|[^\d×x])(\d{1,2})\s*[×x]\s*(\d{1,2})(?:\s*[–-]\s*(\d{1,2}))?(?![\d,.]*\s*(?:km|m\b|min|[′'″"]|s\b|sek))/i);
+  const m = String(text || "").match(/(?:^|[^\d×x.,])(\d{1,2})\s*[×x]\s*(\d{1,2})(?:\s*[–-]\s*(\d{1,2}))?(?![\d,.]*\s*(?:km|m\b|min|[′'″"]|s\b|sek|sec))/i);
   if (!m) return null;
   const sets = +m[1], lo = +m[2], hi = m[3] ? +m[3] : lo;
   return sets > 0 && lo > 0 && hi >= lo ? { sets, lo, hi } : null;
@@ -95,6 +95,7 @@ export function suggestWeight(text, history) {
     return { kind: "direct", kg, text: `${src}, gleiche Struktur${kg !== base ? ` → ${fmtKg(kg)}` : ""}${why ? ` (${why})` : ""}`, note: "", from: describePerformed(same.p) };
   }
 
+  const stale = comparable(last.p, rx) === true && last.h.age > COMPARABLE_MAX_AGE ? ` (jene Einheit ist über ${COMPARABLE_MAX_AGE / 7} Wochen her)` : "";
   // 2) Struktur unbekannt oder zu verschieden → nur mit Schema und Wdh. auf beiden Seiten umrechnen
   if (!rx && !parseRx(last.h.t)) { // Plan nennt nie ein Schema (z. B. "Topsatz"): nichts zu vergleichen, bisherige Regel
     const base = last.p.top.kg, kg = parseKg(nextWeight(`${base} kg`, last.h.rpe, text));
@@ -113,7 +114,7 @@ export function suggestWeight(text, history) {
   if (!(kg > 0)) return none(`${lastTxt} – Umrechnung ergibt kein sinnvolles Gewicht.`);
   return {
     kind: "converted", kg,
-    text: `${lastTxt}, Schätzung für ${want}: ${fmtKg(kg)}${deload ? " (Entlastung −10 %)" : ""}`,
+    text: `${lastTxt}${stale}, Schätzung für ${want}: ${fmtKg(kg)}${deload ? " (Entlastung −10 %)" : ""}`,
     note: "Schätzung über das 1RM (Epley), kann um 5–10 % danebenliegen. Erster Satz prüft, ob es passt.",
     from: describePerformed(last.p),
   };

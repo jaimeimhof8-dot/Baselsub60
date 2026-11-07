@@ -24,3 +24,5 @@
 - Die RPE gilt für die ganze Einheit, nicht je Übung. Sie fliesst nur in die Progression bei gleicher Struktur ein, nicht in die Umrechnung.
 - Ohne eingetragene Wiederholungen wird der Plan als gemacht angenommen (untere Grenze des Bereichs).
 - Schwellen (±1 Wdh., ±1 Satz, 8 Wochen, max. 12 Wdh.) sind Annahmen, Konstanten oben in `src/progression.js`.
+- Pro-Satz-Eingabe gibt es im Gewichts-Sheet nach der Einheit. Liste und Fokusmodus haben weiter ein Feld; dort ist pro Satz nur per Text („80/85/85“) möglich, die ±-Tasten verschieben alle Sätze gleich.
+- Zurück auf „ein Wert für alle“ übernimmt den schwersten Satz (mit Hinweis, Unterschiede gehen verloren).

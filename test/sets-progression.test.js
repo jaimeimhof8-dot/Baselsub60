@@ -136,3 +136,10 @@ test("Plan ohne Satzschema auf beiden Seiten: bisherige Regel", () => {
   const s = suggestWeight("Back Squat Topsatz", [{ v: "100 kg", rpe: 7, t: "Back Squat Topsatz", age: 7 }]);
   assert.equal(s.kind, "direct"); assert.equal(s.kg, 102.5);
 });
+
+test("Randfälle: Wdh. 0, Zeitangaben, Dezimal-Satzzahl, Stepper behält Sätze", () => {
+  assert.deepEqual(parseSets("80 kg x 0"), []);
+  assert.equal(parseRx("Plank 3×45 sec"), null);
+  assert.equal(parseRx("2.5×8"), null);
+  assert.equal(stepValue("80 kg × 5 / 2.5 kg", -1), "77.5 kg × 5 / 2.5 kg");
+});

@@ -22663,7 +22663,7 @@
               fin7.wm[j] = true;
               fin7.wps[j] = sets.map((x) => ({ ...x }));
             }
-            fin7.w0[j] = fin7Out(j);
+            fin7.w0[j] = raw ? fin7Out(j) : ""; // geplantes Gewicht wird wie bisher gespeichert
           }
           fin7.sub = "w";
           return fin7Paint();
@@ -22673,6 +22673,15 @@
           if (!fin7.wm[j] && !fin7.wps[j]) {
             const rp = parseRx(p.i[j]);
             fin7.wps[j] = Array.from({ length: Math.min(10, (rp && rp.sets) || 3) }, () => ({ kg: fin7.w[j], reps: fin7.wr[j] }));
+          }
+          if (fin7.wm[j] && fin7.wps[j]) {
+            // zurück auf „ein Wert für alle“: schwerster Satz zählt, Unterschiede gehen dabei verloren – deshalb ausdrücklich melden
+            const L = fin7.wps[j].filter((x) => x.kg > 0),
+              diff = L.some((x) => x.kg !== L[0].kg || x.reps !== L[0].reps);
+            fin7.w[j] = L.length ? Math.max(...L.map((x) => x.kg)) : null;
+            fin7.wr[j] = null;
+            fin7.wps[j] = null;
+            if (diff) toast("Ein Wert für alle Sätze: schwerster Satz übernommen");
           }
           fin7.wm[j] = !fin7.wm[j];
           return fin7Paint();

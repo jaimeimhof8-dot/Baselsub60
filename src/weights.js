@@ -79,7 +79,7 @@ export function parseSets(v) {
     const m = part.replace(/,/g, ".").match(/^(\d{1,3}(?:\.\d{1,2})?)\s*(kg)?(?:\s*[×x*]\s*(\d{1,3}))?\s*(kg)?$/i);
     if (!m) return [];
     const kg = +m[1], unit = m[2] || m[4];
-    if (!(kg > 0 && kg <= 400) || (!unit && kg < 10)) return []; // "3×5" ist ein Satzschema, kein Gewicht
+    if (!(kg > 0 && kg <= 400) || (!unit && kg < 10) || (m[3] != null && (+m[3] < 1 || +m[3] > 50))) return []; // "3×5" ist ein Satzschema, kein Gewicht
     out.push({ kg, reps: m[3] != null ? +m[3] : null });
   }
   return out;
@@ -107,7 +107,7 @@ export function parseKg(v) {
 export function stepValue(v, dir) {
   const sets = parseSets(v);
   if (!sets.length) { const kg = parseKg(v); return isNaN(kg) ? "" : formatSets([{ kg: Math.max(0, kg + dir * 2.5), reps: null }]); }
-  return formatSets(sets.map((x) => ({ kg: Math.max(0, +(x.kg + dir * 2.5).toFixed(2)), reps: x.reps })));
+  return formatSets(sets.map((x) => ({ kg: Math.max(2.5, +(x.kg + dir * 2.5).toFixed(2)), reps: x.reps }))); // nie 0: sonst fiele ein Satz weg
 }
 
 /**

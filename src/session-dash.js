@@ -190,7 +190,7 @@ export function splitPhases(laps, { steps = null, planText = "" } = {}) {
     fillAround(iv.work);
     out.mode = "pace";
     out.conf = "unsure";
-    out.note = "Arbeitsrunden nach Tempo geschätzt (keine passende Plan-Vorgabe) – Werte mit Vorsicht lesen.";
+    out.note = reps ? "Runden passen nicht zur Plan-Vorgabe (z. B. Auto-Lap): Arbeitsrunden nach Tempo geschätzt – Werte mit Vorsicht lesen." : "Arbeitsrunden nach Tempo geschätzt (keine Plan-Vorgabe) – Werte mit Vorsicht lesen.";
     return out;
   }
   out.note = "Zu wenige Runden mit Distanz – Phasen nicht erkennbar.";
@@ -222,7 +222,7 @@ export function phaseStats(ph, { steps = null, maxHr = null } = {}) {
   const sum = (a) => a.reduce((s, l) => s + l.t, 0);
   const ok = ph.conf === "sure" || ph.conf === "likely" || ph.conf === "unsure";
   const st = {
-    conf: ph.conf, note: ph.note,
+    conf: ph.conf, mode: ph.mode, note: ph.note, zoneRef: maxHr || null,
     time: { work: sum(work), rest: sum(rest), warm: sum(warm), cool: sum(cool), all: sum(L) },
     n: { work: work.length, rest: rest.length },
     total: { hr: wavg(L, "hr") && Math.round(wavg(L, "hr")), pace: paceSum(L) },
@@ -307,7 +307,7 @@ export function workDash(st) {
   if (st.time.all) tot.push(`${hms(st.time.all)} gesamt`);
   out.totals = tot.length ? `Ganzes Training inkl. Pausen: ${tot.join(" · ")}` : "";
   if (st.conf === "none") { out.warn = st.note || "Phasen nicht erkennbar."; return out; }
-  if (st.conf === "unsure" || st.conf === "likely") out.warn = st.note;
+  if (st.conf === "unsure" || st.conf === "likely" || st.mode === "steady") out.warn = st.note;
   const w = st.work;
   if (!w) return out;
   const diff = st.total.hr && w.hr ? w.hr - st.total.hr : null;
@@ -323,10 +323,10 @@ export function workDash(st) {
   out.main = out.main.slice(0, 6);
 
   const D = out.details;
-  if (st.zones && st.zones.some((z) => z.s)) D.push({ k: "Zeit in Zonen", v: st.zones.filter((z) => z.pct).map((z) => `${z.k} ${z.pct} %`).join(" · "), why: "Anteil der Arbeitszeit je Pulsbereich, nach dem Rundenschnitt zugeordnet (grob, kurze Spitzen fehlen).", tone: "" });
+  if (st.zones && st.zoneRef && st.zones.some((z) => z.s)) D.push({ k: "Zeit in Zonen", v: st.zones.filter((z) => z.pct).map((z) => `${z.k} ${z.pct} %`).join(" · "), why: `Anteil der Arbeitszeit je Pulsbereich (Grenzen 60/70/80/90 % von ${st.zoneRef} bpm = höchster je gemessener Puls deiner Uhr-Daten), nach Rundenschnitt zugeordnet – grob, kurze Spitzen fehlen.`, tone: "" });
   if (st.drift) D.push({ k: "Puls-Drift", v: `${sg(st.drift.bpm, "bpm")} (${st.drift.pct > 0 ? "+" : st.drift.pct < 0 ? "−" : "±"}${de(Math.abs(st.drift.pct))} %)`, why: `Rundenschnitt-Puls im letzten gegen das erste Drittel der ${st.drift.n} Arbeitsläufe${st.drift.slower != null && st.drift.slower > 0.02 ? " – bei langsamerem Tempo, also echte Ermüdung" : st.drift.slower != null && st.drift.slower < -0.02 ? " – bei schnellerem Tempo, Anstieg teils erklärt" : ""}; unter 3 % ist ein gutes Zeichen.`, tone: st.drift.pct < 3 ? "green" : st.drift.pct < 6 ? "yellow" : "red" });
   if (st.spread) D.push({ k: "Streuung der Läufe", v: `${mmss(st.spread.min)}–${mmss(st.spread.max)}/km`, why: `Spanne ${st.spread.range} s/km über ${st.spread.n} Läufe; je kleiner, desto gleichmässiger gepaced.`, tone: st.spread.cv <= 2 ? "green" : st.spread.cv <= 4 ? "yellow" : "red" });
-  if (st.recovery) D.push({ k: "Erholung in der Pause", v: `−${Math.max(0, st.recovery.drop)} bpm`, why: `Ø Puls der Pause (${hms(st.recovery.restS)}) gegen die Runde davor, über ${st.recovery.n} Pausen; grösser heisst besser erholt.`, tone: "" });
+  if (st.recovery) D.push({ k: "Erholung in der Pause", v: sg(-st.recovery.drop, "bpm"), why: `Rundenschnitt der Pause (${hms(st.recovery.restS)}) minus Runde davor, über ${st.recovery.n} Pausen (kein Puls-Abfall nach Belastungsende); stärker negativ heisst besser erholt.`, tone: "" });
   if (st.compromise) D.push({ k: "Lauf nach Station", v: `${sg(st.compromise.avg, "s/km")} zur Referenz ${mmss(st.compromise.ref)}`, why: `Pace der Läufe direkt nach einer Station minus frischer Referenzkilometer (${st.compromise.n} Läufe).`, tone: "" });
   if (st.plan) D.push({ k: "Plan gegen Ist", v: `${st.plan.hit} von ${st.plan.n} im Ziel`, why: `Rundenzeit gegen die Zielzeit je Schritt; insgesamt ${sg(st.plan.sum, "s")}.`, tone: st.plan.hit === st.plan.n ? "green" : st.plan.hit >= st.plan.n / 2 ? "yellow" : "red", rows: st.plan.rows.map((r) => ({ a: r.name, b: `${mmss(r.t)} (Ziel ${mmss(r.goal)}, ${sg(r.diff, "s")})`, tone: r.diff <= 0 ? "green" : r.diff <= r.goal * 0.05 ? "yellow" : "red" })) });
   return out;

@@ -225,3 +225,12 @@ test("sessionDash: mit erkannten Phasen keine Gesamt-Kacheln, Rundenbalken trage
   const plain = sessionDash(q, act, null, splitPhases(LAPS.slice(0, 12), { steps: SP }));
   assert.ok(plain.tiles.some((t) => t.k === "Ø Puls"));
 });
+
+test("workDash: gleichmässiger Lauf warnt, dass Ein-/Auslaufen nicht abgetrennt ist; Erholung zeigt auch steigenden Puls", () => {
+  const laps = [330, 320, 315, 312, 318, 340].map((t, k) => mk(1000, t, 120 + k * 6));
+  const d = workDash(phaseStats(splitPhases(laps, { planText: "Lockerer Lauf 40′" }), {}));
+  assert.match(d.warn, /nicht abgetrennt/);
+  const iv = [mk(1000, 240, 150), mk(200, 90, 160), mk(1000, 240, 160), mk(200, 90, 165), mk(1000, 240, 170)];
+  const dd = workDash(phaseStats(splitPhases(iv, { planText: "3×1 km" }), {}));
+  assert.ok(dd.details.some((x) => x.k.startsWith("Erholung") && x.v.startsWith("+")), JSON.stringify(dd.details.map((x) => x.v)));
+});

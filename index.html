@@ -20566,8 +20566,8 @@
           pw = pv ? s7Work(dayPlan(pv.i), pv.act) : null,
           cmp = pv
             ? compareToPrev(
-                { act, rpe: S.rpe[keyI(i)] != null ? +S.rpe[keyI(i)] : null, work: W && W.ph.conf !== "none" ? W.st.work : null },
-                { ...pv, work: pw && pw.ph.conf !== "none" ? pw.st.work : null },
+                { act, rpe: S.rpe[keyI(i)] != null ? +S.rpe[keyI(i)] : null, work: W && ["sure", "likely"].includes(W.ph.conf) ? W.st.work : null },
+                { ...pv, work: pw && ["sure", "likely"].includes(pw.ph.conf) ? pw.st.work : null },
                 { easy: isEasyRun(p) },
               )
             : [],
@@ -24008,6 +24008,7 @@
         }
         // Laufende Aktivität erneut bei Garmin abrufen (Runden/Puls nachladen): Runden-Marke löschen, Sync holt sie wieder
         if (d.act === "gm-refetch") {
+          if (gmBusy) return;
           const a = S.strava.acts[d.id];
           if (a) delete a.lapsV;
           return garminSync(false);

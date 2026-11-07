@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { parseSets, formatSets, parseKg, stepValue } from "../src/weights.js";
-import { parseRx, rxLabel, performed, comparable, suggestWeight, e1rm, weightForReps } from "../src/progression.js";
+import { parseRx, rxLabel, performed, comparable, suggestWeight } from "../src/progression.js";
 import { makeBackup, readBackup } from "../src/backup.js";
 
 // Referenz: so las parseKg vor der Änderung (Migrationsorakel)
@@ -62,10 +62,12 @@ test("Plan-Schema lesen, Läufe und Zeiten sind keins", () => {
   for (const t of ["4×1 km @ R", "Plank 3×50″", "Sled Push 4×20m", "Back Squat Topsatz", "Bike 45′"]) assert.equal(parseRx(t), null, t);
 });
 
-test("Vergleichbarkeit: 3×5 vs 3×6 ja, 3×5 vs 2×8 nein", () => {
+test("Vergleichbarkeit: nur gleiche Sätze×Wdh. (3×5 vs 3×5 ja, vs 3×6 / 4×5 / 2×8 nein)", () => {
   const p35 = performed("80 kg", "Back Squat 3×5 RPE 7");
-  assert.equal(comparable(p35, parseRx("Back Squat 3×6")), true);
-  assert.equal(comparable(p35, parseRx("Back Squat 4×5")), true);
+  assert.equal(comparable(p35, parseRx("Back Squat 3×5")), true);
+  assert.equal(comparable(p35, parseRx("Back Squat 3×4–6")), true); // Plan-Bereich enthält die Wdh.
+  assert.equal(comparable(p35, parseRx("Back Squat 3×6")), false);
+  assert.equal(comparable(p35, parseRx("Back Squat 4×5")), false);
   assert.equal(comparable(p35, parseRx("Back Squat 2×8")), false);
   assert.equal(comparable(p35, parseRx("Back Squat 5×3")), false);
   assert.equal(comparable(p35, null), null);
@@ -79,12 +81,6 @@ test("Ein Wert gilt für alle geplanten Sätze, fehlende Wdh. aus dem Plan", () 
   assert.equal(q.n, 2); assert.equal(q.top.kg, 85); assert.equal(q.top.reps, 3); assert.ok(!q.uniform);
 });
 
-test("Epley: Hin- und Rückrechnung", () => {
-  assert.equal(e1rm(100, 1), 100);
-  assert.ok(Math.abs(e1rm(80, 5) - 93.33) < 0.01);
-  assert.ok(Math.abs(weightForReps(e1rm(80, 5), 5) - 80) < 1e-9);
-});
-
 test("Vorschlag: gleiche Struktur → bisherige RPE-Regel", () => {
   const s = suggestWeight("Back Squat 3×5 RPE 7", [{ v: "80 kg", rpe: 7, t: "Back Squat 3×5 RPE 7", age: 7 }]);
   assert.equal(s.kind, "direct"); assert.equal(s.kg, 82.5);
@@ -92,15 +88,15 @@ test("Vorschlag: gleiche Struktur → bisherige RPE-Regel", () => {
   assert.equal(h.kg, 77.5);
 });
 
-test("Vorschlag: 3×5 mit 80 kg gestern → 2×8 heute wird NICHT 80 kg", () => {
+test("Vorschlag: 3×5 mit 80 kg gestern → 2×8 heute: KEIN Vorschlag, nur Hinweis, keine Umrechnung", () => {
   const s = suggestWeight("Back Squat 2×8 RPE 7", [{ v: "80 kg", rpe: 7, t: "Back Squat 3×5 RPE 7", age: 7 }]);
-  assert.equal(s.kind, "converted");
-  assert.equal(s.kg, 72.5); // 80×(1+5/30)=93.3 → /(1+8/30)=73.7 → 72.5
-  assert.match(s.text, /letztes Mal 3×5 mit 80 kg, Schätzung für 2×8: 72\.5 kg/);
-  assert.match(s.note, /Schätzung/);
-  // umgekehrt: 2×8 mit 72.5 → 3×5 ergibt mehr
-  const r = suggestWeight("Back Squat 3×5", [{ v: "72.5 kg", rpe: 7, t: "Back Squat 2×8", age: 7 }]);
-  assert.equal(r.kind, "converted"); assert.ok(r.kg > 72.5 && r.kg <= 80);
+  assert.equal(s.kind, "none"); assert.equal(s.kg, null);
+  assert.match(s.text, /letztes Mal anders: 3×5 mit 80 kg/);
+  assert.doesNotMatch(s.text, /Schätzung|1RM|Epley/);
+  assert.equal(suggestWeight("Back Squat 3×5", [{ v: "72.5 kg", rpe: 7, t: "Back Squat 2×8", age: 7 }]).kg, null);
+  // 3×6 gegen 3×5 und 4×5 gegen 3×5 sind ebenfalls nicht gleich
+  assert.equal(suggestWeight("Back Squat 3×6", [{ v: "80 kg", rpe: 7, t: "Back Squat 3×5", age: 7 }]).kg, null);
+  assert.equal(suggestWeight("Back Squat 4×5", [{ v: "80 kg", rpe: 7, t: "Back Squat 3×5", age: 7 }]).kg, null);
 });
 
 test("Vorschlag: lieber eine ältere vergleichbare Einheit als eine Umrechnung, aber nicht uralt", () => {
@@ -108,12 +104,13 @@ test("Vorschlag: lieber eine ältere vergleichbare Einheit als eine Umrechnung, 
   const s = suggestWeight("Back Squat 3×5", hist);
   assert.equal(s.kind, "direct"); assert.equal(s.kg, 82.5);
   const old = suggestWeight("Back Squat 3×5", [hist[0], { ...hist[1], age: 120 }]);
-  assert.equal(old.kind, "converted");
+  assert.equal(old.kind, "none");
 });
 
-test("Vorschlag: unterschiedliche Sätze → Arbeitssatz und bestes 1RM zählen", () => {
-  const s = suggestWeight("Back Squat 3×5", [{ v: "80 kg × 5 / 85 kg × 3", rpe: 8, t: "Back Squat 3×5", age: 7 }]);
-  assert.equal(s.kind, "converted"); assert.equal(s.kg, 80); // 85×3 → 1RM 93.5 → 5 Wdh. ≈ 80.1
+test("Vorschlag: unterschiedliche Sätze → schwerster Satz ist Basis, Schema muss gleich sein", () => {
+  const s = suggestWeight("Back Squat 3×5", [{ v: "80 kg × 5 / 85 kg × 5 / 85 kg × 5", rpe: 8, t: "Back Squat 3×5", age: 7 }]);
+  assert.equal(s.kind, "direct"); assert.equal(s.kg, 85);
+  assert.equal(suggestWeight("Back Squat 3×5", [{ v: "80 kg × 5 / 85 kg × 3", rpe: 8, t: "Back Squat 3×5", age: 7 }]).kg, null);
 });
 
 test("Vorschlag: fehlende Daten → kein erfundener Wert", () => {
@@ -121,15 +118,7 @@ test("Vorschlag: fehlende Daten → kein erfundener Wert", () => {
   assert.equal(none.kg, null); assert.equal(none.kind, "none"); assert.match(none.text, /Noch kein Gewicht/);
   const noRx = suggestWeight("Back Squat 3×5", [{ v: "80 kg", rpe: 7, t: "Back Squat Topsatz", age: 7 }]);
   assert.equal(noRx.kg, null); assert.match(noRx.text, /kein Vorschlag/);
-  const many = suggestWeight("Wadenheben 3×20", [{ v: "40 kg", rpe: 7, t: "Wadenheben 3×12", age: 7 }]);
-  assert.equal(many.kg, null); assert.match(many.text, /zu ungenau/);
   assert.equal(suggestWeight("Back Squat 3×5", [{ v: "4:12", rpe: 7, t: "Back Squat 3×5", age: 7 }]).kg, null);
-});
-
-test("Vorschlag: Entlastung (RPE 5) senkt auch umgerechnete Werte", () => {
-  const s = suggestWeight("Back Squat 2×8 RPE 5–6", [{ v: "80 kg", rpe: 7, t: "Back Squat 3×5", age: 7 }]);
-  assert.equal(s.kg, 67.5); // 73.7 × 0.9 = 66.3 → 67.5
-  assert.match(s.text, /Entlastung/);
 });
 
 test("Plan ohne Satzschema auf beiden Seiten: bisherige Regel", () => {

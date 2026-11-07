@@ -14783,7 +14783,7 @@
         }
         return out;
       }
-      /* Gewichtsvorschlag nur aus vergleichbaren Einheiten, sonst als Schätzung (src/progression.js) */
+      /* Gewichtsvorschlag nur aus vergleichbaren Einheiten, sonst nur ein Hinweis (src/progression.js) */
       const weightSug = (i, t) => suggestWeight(t, entriesBefore(i, t));
       function dayStatus(i) {
         const p = dayPlan(i),
@@ -15318,15 +15318,14 @@
               le = lastEntry(i, t),
               last = le ? le.v : "",
               pre = !S.val[id] ? preWeight(p, t) : "";
-            // Vorschlag nur bei Kraftübungen: aus vergleichbarer Einheit, sonst als Schätzung – oder ein Hinweis statt eines erfundenen Werts
+            // Vorschlag nur bei Kraftübungen: nur aus vergleichbarer Einheit, sonst ein Hinweis statt eines Werts
             const sg = lift && !S.val[id] ? weightSug(i, t) : null,
               up = sg && sg.kg ? `${sg.kg} kg` : "";
             h += lineSlots(t)
               ? slotsField(id, lineSlots(t), S.val[id])
               : `<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id] || pre)}"${pre ? ` class="pre" title="Geplantes Gewicht – zum Ändern antippen"` : ""}${lift ? ` inputmode="decimal"` : ""} placeholder="${placeholder(lift ? "kraft" : p.k, t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
-            if (!lineSlots(t) && (last || sg)) {
-              const cv = sg && sg.kind === "converted";
-              h += `<div class="quick">${last ? `<button type="button" class="last" data-last="${id}" data-lv="${esc(last)}" aria-label="Letzten Wert ${esc(last)} übernehmen">zuletzt: ${esc(last)} ↵</button>` : ""}${up ? `<button type="button" class="last up" data-last="${id}" data-lv="${esc(up)}" aria-label="${cv ? "Schätzung" : "Vorschlag"} ${esc(up)} übernehmen: ${esc(sg.text)}">${cv ? "≈" : parseKg(up) > parseKg(last) ? "↗" : "↘"} ${esc(up)} <small>${cv ? "Schätzung" : "Vorschlag"}</small></button>` : ""}</div>${sg ? `<p class="sug-why">${esc(sg.text)}${sg.note ? ` <em>${esc(sg.note)}</em>` : ""}</p>` : ""}`;
+            if (!lineSlots(t) && ((last && !(sg && sg.kind === "none")) || sg)) {
+              h += `<div class="quick">${last && !(sg && sg.kind === "none") ? `<button type="button" class="last" data-last="${id}" data-lv="${esc(last)}" aria-label="Letzten Wert ${esc(last)} übernehmen">zuletzt: ${esc(last)} ↵</button>` : ""}${up ? `<button type="button" class="last up" data-last="${id}" data-lv="${esc(up)}" aria-label="Vorschlag ${esc(up)} übernehmen: ${esc(sg.text)}">${parseKg(up) > parseKg(last) ? "↗" : "↘"} ${esc(up)} <small>Vorschlag</small></button>` : ""}</div>${sg ? `<p class="sug-why">${esc(sg.text)}${sg.note ? ` <em>${esc(sg.note)}</em>` : ""}</p>` : ""}`;
             }
           }
           h += `</div>`;
@@ -19388,7 +19387,7 @@
         const sg1 = lift ? weightSug(focusI, t) : null;
         const last = sg1
           ? sg1.kg && S.val[id] !== `${sg1.kg} kg`
-            ? `<button type="button" class="fc-last" data-fc="last" data-v="${esc(sg1.kg + " kg")}">${sg1.kind === "converted" ? "Schätzung" : "Vorschlag"} ${sg1.kg} kg · übernehmen</button><p class="sug-why">${esc(sg1.text)}</p>`
+            ? `<button type="button" class="fc-last" data-fc="last" data-v="${esc(sg1.kg + " kg")}">${"Vorschlag"} ${sg1.kg} kg · übernehmen</button><p class="sug-why">${esc(sg1.text)}</p>`
             : !sg1.kg && !S.val[id]
               ? `<p class="sug-why">${esc(sg1.text)}</p>`
               : ""
@@ -21783,7 +21782,7 @@
               sgv = sg.kg ? `${sg.kg} kg` : "";
             note =
               sg.kg && S.val[id] !== sgv && !pre
-                ? `<button type="button" class="f7-last" data-fc="last" data-v="${esc(sgv)}">${sg.kind === "converted" ? "Schätzung" : "Vorschlag"} ${esc(sgv)} übernehmen</button><p class="f7-note">${esc(sg.text)}${sg.note ? ` ${esc(sg.note)}` : ""}</p>`
+                ? `<button type="button" class="f7-last" data-fc="last" data-v="${esc(sgv)}">${"Vorschlag"} ${esc(sgv)} übernehmen</button><p class="f7-note">${esc(sg.text)}${sg.note ? ` ${esc(sg.note)}` : ""}</p>`
                 : !sg.kg && !S.val[id] && !pre
                   ? `<p class="f7-note">${esc(sg.text)}</p>`
                   : le && le.v && S.val[id] !== le.v && !pre
@@ -22473,7 +22472,7 @@
                     .join("") +
                   `<div class="wtools"><button type="button" data-fin="wsadd" data-j="${j}"${fin7.wps[j].length >= 10 ? " disabled" : ""}>+ Satz</button><button type="button" data-fin="wsdel" data-j="${j}"${fin7.wps[j].length <= 1 ? " disabled" : ""}>− Satz</button></div>`;
               }
-              const tools = `<div class="wtools"><button type="button" class="wm${per ? " on" : ""}" data-fin="wmode" data-j="${j}" aria-pressed="${per}">Pro Satz eintragen</button>${sg.kg ? `<button type="button" class="wsug" data-fin="wsug" data-j="${j}" data-v="${sg.kg}">${sg.kind === "converted" ? "Schätzung" : "Vorschlag"} ${String(sg.kg).replace(".", ",")} kg übernehmen</button>` : ""}</div>`;
+              const tools = `<div class="wtools"><button type="button" class="wm${per ? " on" : ""}" data-fin="wmode" data-j="${j}" aria-pressed="${per}">Pro Satz eintragen</button>${sg.kg ? `<button type="button" class="wsug" data-fin="wsug" data-j="${j}" data-v="${sg.kg}">${"Vorschlag"} ${String(sg.kg).replace(".", ",")} kg übernehmen</button>` : ""}</div>`;
               const why = `<p class="sug-why">${esc(sg.text)}${sg.note ? ` <em>${esc(sg.note)}</em>` : ""}</p>`;
               return `<div class="wx">${inner}${tools}${why}</div>`;
             })

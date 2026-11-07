@@ -1,25 +1,17 @@
 // Gewichtsvorschlag für Kraftübungen. Reine Funktionen, ohne DOM. Hintergrund und Grenzen: docs/gewichtsvorschlag.md
 //
-// Regel: Ein Gewicht ist nur mit einem anderen vergleichbar, wenn Sätze × Wiederholungen ähnlich sind.
+// Regel: Ein Gewicht ist nur mit einem anderen vergleichbar, wenn Sätze × Wiederholungen gleich sind.
 //  • vergleichbar  → bisherige Progression (RPE der letzten Einheit: ≤7 +2,5 kg, ≥9 −2,5 kg)
-//  • nicht vergleichbar → Umrechnung über geschätztes 1RM (Epley), ausdrücklich als Schätzung markiert
+//  • nicht vergleichbar → KEIN Vorschlag und keine Umrechnung, nur der Hinweis „letztes Mal anders: 3×5 mit 80 kg“
 //  • keine brauchbaren Daten → kein Wert, nur ein Hinweis
 import { parseSets, parseKg, nextWeight } from "./weights.js";
 
-/** Obergrenze der Wiederholungen, bis zu der die Epley-Umrechnung noch halbwegs taugt. */
-export const MAX_REPS_ESTIMATE = 12;
-/** Vergleichbar: Wiederholungen höchstens so weit auseinander, Satzzahl höchstens so weit. */
-export const REPS_TOL = 1, SETS_TOL = 1;
+/** Vergleichbar = gleiche Sätze×Wiederholungen (3×5 gegen 3×5; bei Plan-Bereich "3×6–8" zählt jede Wdh. darin). Toleranz bewusst 0. */
+export const REPS_TOL = 0, SETS_TOL = 0;
 /** Ältere vergleichbare Einheiten gelten nur innerhalb dieser Tage als Basis (sonst eher veraltet). */
 export const COMPARABLE_MAX_AGE = 56;
 
-const r25 = (kg) => Math.round(kg / 2.5) * 2.5;
 const fmtKg = (kg) => `${+kg.toFixed(1)} kg`;
-
-/** Geschätztes 1RM nach Epley: kg × (1 + Wdh/30). Bei 1 Wiederholung = das Gewicht selbst. */
-export const e1rm = (kg, reps) => (reps <= 1 ? kg : kg * (1 + reps / 30));
-/** Gewicht, das für `reps` Wiederholungen zu einem 1RM passt (Umkehrung von Epley). */
-export const weightForReps = (est, reps) => (reps <= 1 ? est : est / (1 + reps / 30));
 
 /**
  * Soll-Schema aus dem Plantext: "Back Squat 3×5 @75% RPE 7" → {sets:3, lo:5, hi:5}; "3×6–8" → lo 6, hi 8.
@@ -73,11 +65,11 @@ export function comparable(p, rx) {
  * Vorschlag fürs Gewicht der Übung `text` (Plantext des heutigen Tags).
  * @param {string} text Plantext der heutigen Zeile
  * @param {{v:string, rpe?:number, t:string, age:number}[]} history frühere Einträge derselben Übung, neueste zuerst (age = Tage her)
- * @returns {{kind:"direct"|"converted"|"none", kg:number|null, text:string, note:string, from:string}}
+ * @returns {{kind:"direct"|"none", kg:number|null, text:string, note:string, from:string}}
  *   kg ist null, wenn nichts Seriöses vorgeschlagen werden kann – dann steht der Grund in `text`.
  */
 export function suggestWeight(text, history) {
-  const rx = parseRx(text), want = rxLabel(rx);
+  const rx = parseRx(text);
   const entries = (history || []).map((h) => ({ h, p: performed(h.v, h.t) })).filter((e) => e.p);
   const none = (msg) => ({ kind: "none", kg: null, text: msg, note: "", from: "" });
   if (!entries.length) return none("Noch kein Gewicht für diese Übung eingetragen – bitte selbst eintragen.");
@@ -95,27 +87,11 @@ export function suggestWeight(text, history) {
     return { kind: "direct", kg, text: `${src}, gleiche Struktur${kg !== base ? ` → ${fmtKg(kg)}` : ""}${why ? ` (${why})` : ""}`, note: "", from: describePerformed(same.p) };
   }
 
-  const stale = comparable(last.p, rx) === true && last.h.age > COMPARABLE_MAX_AGE ? ` (jene Einheit ist über ${COMPARABLE_MAX_AGE / 7} Wochen her)` : "";
-  // 2) Struktur unbekannt oder zu verschieden → nur mit Schema und Wdh. auf beiden Seiten umrechnen
-  if (!rx && !parseRx(last.h.t)) { // Plan nennt nie ein Schema (z. B. "Topsatz"): nichts zu vergleichen, bisherige Regel
+  // Plan nennt nie ein Schema (z. B. "Topsatz"): nichts zu vergleichen, bisherige Regel
+  if (!rx && !parseRx(last.h.t)) {
     const base = last.p.top.kg, kg = parseKg(nextWeight(`${base} kg`, last.h.rpe, text));
     return { kind: "direct", kg, text: `${lastTxt}, Satzschema im Plan nicht angegeben${kg !== base ? ` → ${fmtKg(kg)}` : ""}`, note: "", from: describePerformed(last.p) };
   }
-  if (!rx) return none(`${lastTxt} – für diese Übung steht im Plan kein Satzschema, daher kein Vorschlag.`);
-  if (!last.p.repsKnown) return none(`${lastTxt} – Wiederholungen jener Einheit unbekannt, daher kein Vorschlag.`);
-  const target = rx.hi; // Obergrenze: mehr Wdh. → leichter, die vorsichtigere Seite
-  const srcReps = last.p.top.reps;
-  if (srcReps > MAX_REPS_ESTIMATE || target > MAX_REPS_ESTIMATE)
-    return none(`${lastTxt} – über ${MAX_REPS_ESTIMATE} Wiederholungen ist die Umrechnung zu ungenau, daher kein Vorschlag.`);
-  const est = Math.max(...last.p.sets.map((s) => e1rm(s.kg, s.reps)));
-  let kg = weightForReps(est, target);
-  if (deload) kg *= 0.9;
-  kg = r25(kg);
-  if (!(kg > 0)) return none(`${lastTxt} – Umrechnung ergibt kein sinnvolles Gewicht.`);
-  return {
-    kind: "converted", kg,
-    text: `${lastTxt}${stale}, Schätzung für ${want}: ${fmtKg(kg)}${deload ? " (Entlastung −10 %)" : ""}`,
-    note: "Schätzung über das 1RM (Epley), kann um 5–10 % danebenliegen. Erster Satz prüft, ob es passt.",
-    from: describePerformed(last.p),
-  };
+  // 2) Keine vergleichbare Einheit: kein Vorschlag und keine Umrechnung, nur der getrennte Hinweis auf die letzte, andere Einheit
+  return none(`letztes Mal anders: ${describePerformed(last.p)} – nicht vergleichbar, daher kein Vorschlag.`);
 }

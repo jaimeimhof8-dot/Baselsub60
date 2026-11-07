@@ -173,3 +173,15 @@ test("Eingangsfilter: Walking und Einheiten unter 12 Minuten werden nicht aufgen
   assert.equal(mergeActs(store, [run, short, walk]), 1);
   assert.deepEqual(Object.keys(store), ["g1"]);
 });
+
+test("mergeActs: Übernahme-Zeitpunkt (got) wird gesetzt und bei späteren Abrufen beibehalten", async () => {
+  const { mergeActs } = await import("../src/garmin.js");
+  const store = {};
+  const a = { id: "g1", src: "garmin", date: "2026-10-20", group: "run", time: 2400, dist: 8000, start: "2026-10-20T18:00:00" };
+  mergeActs(store, [a], "2026-10-01");
+  const first = store.g1.got;
+  assert.ok(first > 0);
+  mergeActs(store, [{ ...a, laps: [{ d: 1000, t: 300 }], lapsV: 3 }], "2026-10-01");
+  assert.equal(store.g1.got, first);
+  assert.equal(store.g1.laps.length, 1);
+});

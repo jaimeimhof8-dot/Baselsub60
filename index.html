@@ -12883,6 +12883,36 @@
       .an-dash .chip.yellow { color: var(--warn); }
       .an-dash .chip.red { color: var(--danger); }
       .an-dash .df { margin: 0; padding: var(--s3) var(--s4); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); font-size: 14px; line-height: 21px; }
+      .an-dash .dsrc { display: grid; gap: var(--s2); padding: var(--s3); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); border-left: 3px solid var(--ok); }
+      .an-dash .dsrc.partial { border-left-color: var(--warn); }
+      .an-dash .dsrc.none { border-left-color: var(--danger); }
+      .an-dash .dsh { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); flex-wrap: wrap; }
+      .an-dash .dsh b { font-size: 15px; color: var(--text); }
+      .an-dash .dsrc ul { display: flex; flex-wrap: wrap; gap: 4px var(--s3); margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--muted); }
+      .an-dash li { list-style: none; padding: 0; }
+      .an-dash li::before { content: none; }
+      .an-dash .dsrc li.ok span { color: var(--ok); }
+      .an-dash .dsrc li.bad span { color: var(--danger); font-weight: 700; }
+      .an-dash .dw { display: grid; gap: var(--s2); }
+      .an-dash .dwarn { margin: 0; padding: var(--s2) var(--s3); border-radius: var(--r-s); background: var(--well); box-shadow: var(--edge); font-size: 13px; line-height: 19px; color: var(--warn); }
+      .an-dash .dtot { margin: 0; font-size: 12px; line-height: 17px; color: var(--muted); }
+      .an-dash .pbar { display: flex; gap: 2px; height: 10px; border-radius: 5px; overflow: hidden; }
+      .an-dash .pbar i, .an-dash .pleg i { display: inline-block; background: var(--muted); opacity: 0.45; }
+      .an-dash .pbar i.ph-work, .an-dash .pleg i.ph-work, .an-dash .bar.ph-work i { background: var(--lauf); opacity: 1; }
+      .an-dash .pleg { display: flex; flex-wrap: wrap; gap: 2px var(--s3); font-size: 12px; color: var(--muted); }
+      .an-dash .pleg i { width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
+      .an-dash .bar.ph-rest i, .an-dash .bar.ph-warm i, .an-dash .bar.ph-cool i, .an-dash .bar.ph-other i { background: var(--muted); opacity: 0.4; }
+      .an-dash .dmore { border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); }
+      .an-dash .dmore > summary { cursor: pointer; padding: var(--s3); font-size: 14px; font-weight: 600; color: var(--text); min-height: 44px; display: flex; align-items: center; }
+      .an-dash .dd { padding: var(--s2) var(--s3) var(--s3); border-top: 1px solid rgba(255, 255, 255, 0.08); }
+      .an-dash .ddh { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s2); flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+      .an-dash .ddh b { font-family: var(--f-head); font-size: 17px; color: var(--text); }
+      .an-dash .dd.green .ddh b, .an-dash .ddr .green span:last-child { color: var(--ok); }
+      .an-dash .dd.yellow .ddh b, .an-dash .ddr .yellow span:last-child { color: var(--warn); }
+      .an-dash .dd.red .ddh b, .an-dash .ddr .red span:last-child { color: var(--danger); }
+      .an-dash .dd p { margin: 2px 0 0; font-size: 12px; line-height: 17px; color: var(--muted); }
+      .an-dash .ddr { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 2px; font-size: 13px; }
+      .an-dash .ddr li { display: flex; justify-content: space-between; gap: var(--s2); color: var(--text); }
       .an-dash .df small { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
       .s7-an-tg.more { margin-top: 10px; font-size: 14px; }
       .s7-an-txt { display: grid; gap: 4px; margin-top: 6px; }
@@ -14234,7 +14264,7 @@
       import * as review from "./src/review.js";
       import { projectRaceDay } from "./src/forecast.js";
       import { analyseSession } from "./src/analyse.js";
-      import { sessionDash, compareToPrev } from "./src/session-dash.js";
+      import { sessionDash, compareToPrev, splitPhases, phaseStats, workDash, sourceInfo, dashSections } from "./src/session-dash.js";
       import { alignSplits } from "./src/laps.js";
       import {
         extractTests,
@@ -20495,7 +20525,15 @@
         }
         return kind;
       }
-      /* Dashboard: Punktzahl-Ring, Kennzahl-Kacheln, Rundenbalken der Uhr und Coach-Kennzahlen */
+      /* Phasen (Arbeit/Pause/Ein-/Auslaufen) und Kennzahlen einer Uhr-Aktivität; maxHr = höchster je gemessener Puls (Zonen-Referenz) */
+      function s7Work(p, act) {
+        const steps = s7Steps(p),
+          planText = (p.i || []).find((t) => dash.parseReps(t)) || "",
+          ph = splitPhases(act && act.laps, { steps, planText }),
+          maxHr = Math.max(0, ...Object.values(S.strava.acts).map((a) => a.maxHr || 0)) || null;
+        return { ph, st: phaseStats(ph, { steps, maxHr }) };
+      }
+      /* Dashboard: Punktzahl-Ring, Quelle der Uhr-Daten, Kennzahlen nur über Arbeitsphasen, Vergleich, Rundenbalken, Coach-Kennzahlen */
       function s7DashHtml(i, p, coachData) {
         let q;
         try {
@@ -20505,14 +20543,34 @@
         }
         const acts = actsOf(i),
           act = acts.find((a) => a.laps && a.laps.length) || acts[0] || null,
-          d = sessionDash(q, act, coachData),
+          W = act ? s7Work(p, act) : null,
+          d = sessionDash(q, act, coachData, W && W.ph),
           C = 2 * Math.PI * 26,
           off = (C * (100 - d.score)) / 100;
+        const sec = dashSections(
+          {
+            src: sourceInfo(act, {
+              garmin: { on: gmOn(), err: S.garmin.conn && S.garmin.conn.err, at: S.garmin.at },
+              strava: { on: !!stTok(), at: S.strava.at },
+              dayLabel: shortDay(i),
+            }),
+            wd: W ? workDash(W.st) : { main: [], totals: "", phaseBar: [], details: [], warn: "" },
+            actId: act ? act.id : "",
+          },
+          esc,
+        );
         const tiles = d.tiles
           .map((t) => `<div class="dt ${t.tone}"><span class="k">${esc(t.k)}</span><b>${esc(t.v)}</b>${t.sub ? `<span class="s">${esc(t.sub)}</span>` : ""}</div>`)
           .join("");
         const pv = act ? s7Prev(i, p, act.group) : null,
-          cmp = pv ? compareToPrev({ act, rpe: S.rpe[keyI(i)] != null ? +S.rpe[keyI(i)] : null }, pv, { easy: isEasyRun(p) }) : [],
+          pw = pv ? s7Work(dayPlan(pv.i), pv.act) : null,
+          cmp = pv
+            ? compareToPrev(
+                { act, rpe: S.rpe[keyI(i)] != null ? +S.rpe[keyI(i)] : null, work: W && W.ph.conf !== "none" ? W.st.work : null },
+                { ...pv, work: pw && pw.ph.conf !== "none" ? pw.st.work : null },
+                { easy: isEasyRun(p) },
+              )
+            : [],
           cmpHtml = cmp.length
             ? `<div class="dp"><span class="k">Vergleich mit ${pv.same ? "der letzten gleichen Einheit" : "der letzten ähnlichen Einheit"}</span><span class="dpl">${esc(shortDay(pv.i))} · ${esc(s7Title(dayPlan(pv.i).t))}</span><div class="dg">${cmp.map((t) => `<div class="dt ${t.tone}"><span class="k">${esc(t.k)}</span><b>${esc(t.v)}</b><span class="s">${esc(t.sub)}</span></div>`).join("")}</div></div>`
             : act
@@ -20520,13 +20578,13 @@
               : "";
         const bars = d.laps
           ? `<div class="dl" role="img" aria-label="Rundenzeiten der Uhr"><span class="k">Runden der Uhr (${d.laps.length})</span><div class="bars">${d.laps
-              .map((l, k) => `<div class="bar" title="Runde ${k + 1}: ${l.label}${l.pace ? " · " + l.pace + "/km" : ""}${l.hr ? " · " + l.hr + " bpm" : ""}"><i style="height:${l.h}%"></i><small>${l.label}</small></div>`)
+              .map((l, k) => `<div class="bar${l.phase ? " ph-" + l.phase : ""}" title="Runde ${k + 1}${l.phase ? " · " + {warm:"Einlaufen",work:"Arbeit",rest:"Pause",cool:"Auslaufen",other:"Sonstiges"}[l.phase] : ""}: ${l.label}${l.pace ? " · " + l.pace + "/km" : ""}${l.hr ? " · " + l.hr + " bpm" : ""}"><i style="height:${l.h}%"></i><small>${l.label}</small></div>`)
               .join("")}</div></div>`
           : "";
         const chips = d.chips.length
           ? `<div class="dc">${d.chips.map((c) => `<span class="chip ${c.tone}"><small>${esc(c.k)}</small> ${esc(c.v)}</span>`).join("")}</div>`
           : "";
-        return `<div class="an-dash"><div class="dh"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="32" cy="32" r="26" fill="none" class="ring ${d.tone}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 32 32)"/></svg><div><b class="sc">${d.score}<small>/100</small></b><span class="vd">${esc(d.verdict)}</span></div></div>${tiles ? `<div class="dg">${tiles}</div>` : ""}${cmpHtml}${bars}${chips}${d.focus ? `<p class="df"><small>Nächstes Mal</small> ${esc(d.focus)}</p>` : ""}</div>`;
+        return `<div class="an-dash"><div class="dh"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="32" cy="32" r="26" fill="none" class="ring ${d.tone}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 32 32)"/></svg><div><b class="sc">${d.score}<small>/100</small></b><span class="vd">${esc(d.verdict)}</span></div></div>${sec.src}${tiles ? `<div class="dg">${tiles}</div>` : ""}${sec.work}${sec.more}${cmpHtml}${bars}${chips}${d.focus ? `<p class="df"><small>Nächstes Mal</small> ${esc(d.focus)}</p>` : ""}</div>`;
       }
       function s7FinCard(i, p) {
         const dk = keyI(i),
@@ -23946,6 +24004,12 @@
         }
         if (d.act === "gm-full") {
           S.garmin.at = 0;
+          return garminSync(false);
+        }
+        // Laufende Aktivität erneut bei Garmin abrufen (Runden/Puls nachladen): Runden-Marke löschen, Sync holt sie wieder
+        if (d.act === "gm-refetch") {
+          const a = S.strava.acts[d.id];
+          if (a) delete a.lapsV;
           return garminSync(false);
         }
         if (d.act === "gm-off") return garminOff();

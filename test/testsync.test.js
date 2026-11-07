@@ -48,3 +48,22 @@ test("In die Testtabelle schreiben: eigene Spalte, Partner unberührt, onlyEmpty
   assert.deepEqual(tests.station[1], { m: "2:20", j: "2:31" });
   assert.equal(applyTests(tests, "j", null), 0);
 });
+
+import { parseTimeStrict } from "../src/forecast.js";
+import { parseT } from "../src/util.js";
+test("Strava-/Eintrags-Übernahme: unplausible Stationszeiten kommen nicht ins Profil, sondern als Hinweis", () => {
+  const day = { k: "station", test: true, t: "Stationen-Benchmark", i: ["SkiErg 1000m", "Sled Push", "RowErg 1000m"] };
+  const f = extractTests(day, ["1:13", "2:03", "2:56"]);
+  assert.deepEqual(f.station, { 1: "2:03" });
+  assert.equal(f.rejected.length, 2);
+  assert.match(f.rejected[0].reason, /unplausibel schnell/);
+  const tests = {};
+  applyTests(tests, "j", f);
+  assert.equal(tests.station[0], undefined);
+  assert.equal(tests.station[1].j, "2:03");
+  assert.equal(extractTests(day, ["3:57", "2:03", "3:44"]).rejected, undefined);
+});
+test("Einheit «357»: Speichern und Prognose lesen dieselbe Zeit (3:57), nicht 5:57", () => {
+  assert.equal(parseTimeStrict("357"), 237);
+  assert.equal(parseT("357"), 357, "alt: parseT liest 357 s – darf für Stationszeiten nicht mehr benutzt werden");
+});

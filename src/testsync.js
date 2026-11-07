@@ -2,6 +2,7 @@
 // Testtage werden am Flag (eingebauter Plan) oder am Titel erkannt – importierte PDF-Pläne setzen kein Flag.
 // Reine Funktionen, ohne DOM.
 import { mmss } from "./util.js";
+import { checkStation, STATION_NAMES } from "./forecast.js";
 
 /** Lauf-Test (4×1 km): Pacing-Test, T-Test, Lauf-Test T */
 export const isRunTest = (p) => !!p && p.k === "lauf" && (!!p.test || /pacing.?test|lauf.?test|\bt.?test\b/i.test(p.t || ""));
@@ -22,7 +23,7 @@ export const timesIn = (v) =>
 /**
  * Testwerte aus den Einträgen einer Einheit.
  * day = Plan-Einheit {t, k, i, test}, vals = Einträge je Übungszeile (Index wie day.i).
- * @returns null (kein Testtag oder nichts gefunden) oder {lauf?: [4 × "m:ss"|""], station?: {index: "m:ss"}}
+ * @returns null (kein Testtag oder nichts gefunden) oder {lauf?: [4 × "m:ss"|""], station?: {index: "m:ss"}, rejected?: [{label, raw, reason}] unplausible Stationszeiten, nicht übernommen}
  */
 export function extractTests(day, vals) {
   if (isRunTest(day)) {
@@ -35,12 +36,16 @@ export function extractTests(day, vals) {
     return { lauf: Array.from({ length: 4 }, (_, x) => (T[x] ? mmss(T[x]) : "")) };
   }
   if (isStationTest(day)) {
-    const station = {};
+    const station = {}, rejected = [];
     (day.i || []).forEach((t, j) => {
       const r = stationIndex(t), s = timesIn(vals[j])[0];
-      if (r >= 0 && s > 0 && !(r in station)) station[r] = mmss(s);
+      if (r < 0 || !(s > 0) || r in station) return;
+      const c = checkStation(r, s); // unplausible Zeiten nicht ins Profil schreiben, sondern melden
+      if (c.ok) station[r] = mmss(s);
+      else rejected.push({ label: STATION_NAMES[r], raw: mmss(s), reason: c.reason });
     });
-    return Object.keys(station).length ? { station } : null;
+    if (!Object.keys(station).length && !rejected.length) return null;
+    return rejected.length ? { station, rejected } : { station };
   }
   return null;
 }

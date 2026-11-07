@@ -14652,15 +14652,15 @@
         const p = dayPlan(i);
         if (!p) return 0;
         const dk = keyI(i);
-        const n = applyTests(
-          S.tests,
-          myCol(),
-          extractTests(
-            p,
-            p.i.map((_, j) => S.val[dk + "|" + j]),
-          ),
-          { onlyEmpty },
+        const found = extractTests(
+          p,
+          p.i.map((_, j) => S.val[dk + "|" + j]),
         );
+        const n = applyTests(S.tests, myCol(), found, { onlyEmpty });
+        if (found && found.rejected && found.rejected.length && !testToast["rej" + i]) {
+          testToast["rej" + i] = 1;
+          toast("Nicht übernommen, unplausibel: " + found.rejected.map((x) => `${x.label} ${x.raw}`).join(", ") + ". Bitte prüfen.", true);
+        }
         if (n) S.tests.at = isoD(NOW);
         return n;
       }

@@ -14344,7 +14344,7 @@
       } from "./src/extras.js";
       import { safeMerge, countEntries, stable } from "./src/merge.js";
       import * as review from "./src/review.js";
-      import { projectRaceDay } from "./src/forecast.js";
+      import { projectRaceDay, checkStation, checkRun, parseTimeStrict } from "./src/forecast.js";
       import { analyseSession } from "./src/analyse.js";
       import { sessionDash, compareToPrev, splitPhases, phaseStats, workDash, sourceInfo, dashSections } from "./src/session-dash.js";
       import { alignSplits } from "./src/laps.js";
@@ -14765,15 +14765,15 @@
         const p = dayPlan(i);
         if (!p) return 0;
         const dk = keyI(i);
-        const n = applyTests(
-          S.tests,
-          myCol(),
-          extractTests(
-            p,
-            p.i.map((_, j) => S.val[dk + "|" + j]),
-          ),
-          { onlyEmpty },
+        const found = extractTests(
+          p,
+          p.i.map((_, j) => S.val[dk + "|" + j]),
         );
+        const n = applyTests(S.tests, myCol(), found, { onlyEmpty });
+        if (found && found.rejected && found.rejected.length && !testToast["rej" + i]) {
+          testToast["rej" + i] = 1;
+          toast("Nicht übernommen, unplausibel: " + found.rejected.map((x) => `${x.label} ${x.raw}`).join(", ") + ". Bitte prüfen.", true);
+        }
         if (n) S.tests.at = isoD(NOW);
         return n;
       }
@@ -15906,7 +15906,12 @@
       /* Partnerwerte: aus seinem Konto. Ohne Cloud (Vorschau) die alten Einträge der Partnerspalte auf diesem Gerät – ebenfalls nur lesen. */
       const partnerTests = () =>
         PP ? PP.tests : personTests(S.tests, colOf(PARTNER));
-      const teamT = () => avg([...myTests().lauf, ...partnerTests().lauf]);
+      /* Nur plausible Laufzeiten zählen (wie in der Prognose): "13" ist keine Kilometerzeit */
+      const avgRun = (a) => {
+        const v = a.map(checkRun).filter((c) => c.ok).map((c) => c.s);
+        return v.length ? v.reduce((x, y) => x + y, 0) / v.length : NaN;
+      };
+      const teamT = () => avgRun([...myTests().lauf, ...partnerTests().lauf]);
 
       /* Eingabefeld: bearbeitbar nur mit attr (eigener Wert), sonst gesperrt und ohne data-Attribut (der Input-Handler ignoriert es) */
       const pin = (attr, val, label, ph) =>
@@ -15951,15 +15956,15 @@
           B = partnerTests(),
           mc = myCol(),
           T = teamT(),
-          aa = avg(A.lauf),
-          ab = avg(B.lauf);
+          aa = avgRun(A.lauf),
+          ab = avgRun(B.lauf);
         let h = `<div class="vh" style="margin-top:var(--s8)"><h2>Tests &amp; Benchmarks</h2></div>
   <div class="cap">Pacing-Test 4×1 km</div><div class="card">
     <table><tr><th></th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th></tr>
     ${A.lauf.map((v, r) => `<tr><td class="l" style="white-space:nowrap">Rep ${r + 1}</td><td>${pin(own ? `data-l="${mc}|${r}"` : "", v, `${ME} Rep ${r + 1}`, "4:20")}</td><td>${pin("", B.lauf[r], `${PARTNER} Rep ${r + 1}`)}</td></tr>`).join("")}
     </table>
     <p class="mt-3">Ø ${esc(ME)} <span class="res">${isNaN(aa) ? "–" : mmss(aa)}</span> · Ø ${esc(PARTNER)} <span class="res">${isNaN(ab) ? "–" : mmss(ab)}</span>${!isNaN(aa) && !isNaN(ab) ? ` · Abstand <span class="res">${Math.abs(Math.round(aa - ab))} s</span>` : ""}</p>
-    <p class="mt-1">Team-Tempo T <span class="res">${isNaN(T) ? "–" : mmss(T) + "/km"}</span></p>
+    ${[...A.lauf.map((v) => [ME, v]), ...B.lauf.map((v) => [PARTNER, v])].map(([n, v], x) => { const c = checkRun(v); return c.reason ? `<div class="hint" role="alert">${esc(n)}, Rep ${(x % 4) + 1}: ${esc(c.reason)} Zählt nicht für T.</div>` : ""; }).join("")}<p class="mt-1">Team-Tempo T <span class="res">${isNaN(T) ? "–" : mmss(T) + "/km"}</span></p>
     <div class="hint">Sub-60 braucht im Rennen ca. 3:58/km. Abstand zwischen euch: 5–15 s.</div></div>`;
         const ST = [
           "SkiErg",
@@ -15971,10 +15976,16 @@
           "Lunges",
           "Wall Balls",
         ];
+        const stBad = ST.map((s, r) =>
+          [[ME, A.station[r]], [PARTNER, B.station[r]]].map(([n, v]) => { const c = checkStation(r, v); return c.reason ? `<div>• ${esc(n)}, ${esc(s)}: ${esc(c.reason)}</div>` : ""; }).join(""),
+        ).join("");
+        const stBadH = stBad ? `<div class="hint" role="alert"><b>Unplausibel, bitte prüfen</b> (fliesst nicht in die Prognose ein):<div style="margin-top:4px">${stBad}</div></div>` : "";
         h += `<div class="cap">Stationen-Benchmark</div><div class="card"><table><tr><th>Station</th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th><th>Teilen</th></tr>
     ${ST.map((s, r) => {
-      const a = parseT(A.station[r]),
-        b = parseT(B.station[r]);
+      const ca = checkStation(r, A.station[r]),
+        cb = checkStation(r, B.station[r]),
+        a = ca.ok ? ca.s : NaN,
+        b = cb.ok ? cb.s : NaN;
       let rec = "";
       if (!isNaN(a) && !isNaN(b)) {
         const df = Math.abs(a - b);
@@ -15983,7 +15994,7 @@
       }
       return `<tr><td class="l">${s}</td><td>${pin(own ? `data-s="${r}|${mc}"` : "", A.station[r], `${s} ${ME}`)}</td><td>${pin("", B.station[r], `${s} ${PARTNER}`)}</td><td class="res" style="font-size:12px;white-space:nowrap">${rec}</td></tr>`;
     }).join("")}
-    </table><div class="hint">Mehr als 15–20 s Unterschied: der Schnellere übernimmt mehr. Sonst 50/50.</div></div>`;
+    </table><div class="hint">Mehr als 15–20 s Unterschied: der Schnellere übernimmt mehr. Sonst 50/50. Zeit der ganzen Station als m:ss (SkiErg und RowErg: 1000 m).</div>${stBadH}</div>`;
         const tr = own ? A.trans : B.trans,
           ta = avg(tr);
         h += `<div class="cap">Übergaben (Ziel &lt; 8 s)${own ? "" : " · von " + esc(PARTNER)}</div><div class="card"><div class="grid2">${tr.map((v, r) => pin(own ? `data-t="${r}"` : "", v, `Wechsel ${r + 1}`, `Wechsel ${r + 1}`)).join("")}</div>
@@ -17101,15 +17112,16 @@
           pa = partnerTests();
         const at = S.tests && S.tests.at ? Date.parse(S.tests.at) : NaN;
         return review.forecast({
-          laufPersons: [me.lauf.map(parseT), pa.lauf.map(parseT)],
-          station: me.station.map((v, r) => [parseT(v), parseT(pa.station[r])]),
+          names: [ME, PARTNER],
+          laufPersons: [me.lauf, pa.lauf],
+          station: me.station.map((v, r) => [v, pa.station[r]]),
           sims: Object.entries(S.simres || {})
             .filter(([, v]) => simOk(v))
             .sort(([a], [b]) => (a < b ? -1 : 1))
             .map(([d, v]) => ({
               intensity: v.i,
               stations: simTotal(v),
-              parts: v.st.map(parseT),
+              parts: v.st,
               run: parseT(v.run) > 0 ? parseT(v.run) : undefined,
               rox: parseT(v.rox) > 0 ? parseT(v.rox) : undefined,
               ageDays: Math.max(0, Math.floor((+NOW - Date.parse(d)) / dayMs)),
@@ -17143,9 +17155,10 @@
         if (t && t.gap > 0)
           h += `<p class="sub mt-2">Ca. ${Math.ceil(t.perWeek)} s pro Woche aufholen.</p>`;
         for (const w of fc.warnings) h += `<div class="hint">${esc(w)}</div>`;
+        h += review.forecastNotes(fc);
         // Renntag: abflachender Trend aus den gespeicherten Wochenprognosen (Faustregel, keine Messung)
         const hist = Object.entries(S.review || {})
-          .filter(([, r]) => r && r.fc > 0 && r.fcv === 2) // nur Punkte aus dem aktuellen Rechenmodell, sonst entsteht ein künstlicher Trendsprung
+          .filter(([, r]) => r && r.fc > 0 && r.fcv === 3) // nur Punkte aus dem aktuellen Rechenmodell, sonst entsteht ein künstlicher Trendsprung
           .map(([x, r]) => ({ day: +x * 7, total: r.fc }));
         hist.push({ day: Math.max(0, TODAY), total: fc.total });
         const rd = projectRaceDay(hist, Math.max(0, Math.ceil((RACE - midnight(NOW)) / dayMs)));
@@ -17176,7 +17189,7 @@
             "",
           )}</tbody><tfoot><tr><td>Gesamt</td><td>${bd.est != null ? mmss(bd.est) : "–"}</td><td>${mmss(bd.goal)}</td><td class="${bd.diff == null ? "" : bd.diff > 0 ? "rv-slow" : "rv-fast"}">${sign(bd.diff != null ? Math.round(bd.diff) : null)}</td></tr></tfoot></table>`;
         h += `<div class="cap rv-gap">Tempo pro Kilometer im Rennen</div><p class="sub">${fc.paces.map((p, n) => `${n + 1}: ${mmss(p)}`).join(" · ")}</p>`;
-        h += `<details class="rv-how"><summary>Worauf basiert das?</summary><ul class="sub" style="margin:var(--s2) 0 0;padding-left:18px">${fc.basis.map((b) => `<li>${esc(b)}</li>`).join("")}</ul><p class="sub mt-2">Laufen: Team-Tempo ${mmss(fc.T)}/km aus dem 4×1-km-Test plus ${fc.paces[0] - fc.T} s/km Ermüdung (Compromised Running), ab Lauf 5 zusätzlich langsamer. Stationen: Mittel eurer Solo-Benchmarks × ${String(fc.k.toFixed(2)).replace(".", ",")} (Arbeit teilen und Ermüdung im Rennen)${fc.calibrated ? ", geeicht an euren Simulationen" : ". Dieser Faktor ist eine Annahme, bis eine Simulation ab 85 % eingetragen ist"}. Roxzone ${mmss(fc.rox)} (St. Gallen: 4:13). Die Spanne zeigt, wie unsicher die Teile sind. Genauer wird die Zahl mit jedem neuen Test und mit der ersten Simulation.</p></details>`;
+        h += `<details class="rv-how"><summary>Worauf basiert das?</summary><ul class="sub" style="margin:var(--s2) 0 0;padding-left:18px">${fc.basis.map((b) => `<li>${esc(b)}</li>`).join("")}</ul><p class="sub mt-2">Laufen: Team-Tempo ${mmss(fc.T)}/km aus dem 4×1-km-Test plus ${fc.paces[0] - fc.T} s/km Ermüdung (Compromised Running), ab Lauf 5 zusätzlich langsamer. Stationen: Mittel eurer Solo-Benchmarks × ${String(fc.k.toFixed(2)).replace(".", ",")} (Partner arbeiten nacheinander, Ermüdung im Rennen)${fc.calibrated ? ", geeicht an euren Simulationen" : ". Dieser Faktor ist eine Annahme, bis eine Simulation ab 85 % eingetragen ist"}. Roxzone ${mmss(fc.rox)} (St. Gallen: 4:13). Die Spanne zeigt, wie unsicher die Teile sind. Genauer wird die Zahl mit jedem neuen Test und mit der ersten Simulation.</p></details>`;
         // Simulation eintragen: eicht den Stationsfaktor
         const sims = Object.entries(S.simres || {})
           .filter(([, v]) => simOk(v))
@@ -17940,7 +17953,7 @@
           S.review[w] = {
             at: Date.now(),
             level: r.level,
-            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 2 } : {}),
+            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 3 } : {}),
           };
           save();
         }
@@ -21202,7 +21215,7 @@
           prog = `<section class="s6-card s7-pg" aria-label="Rennprognose"><div class="r1"><span class="s6-kick">Rennprognose</span><span class="s7-pill"><i style="background:${gap > 0 ? "#ff9f0a" : "#30d158"}"></i>${mmss(Math.abs(gap))} ${gap > 0 ? "zu langsam" : "Puffer"}</span></div><div class="big"><b>${mmss(fc.total)}</b></div><p class="cap">Spanne ${mmss(fc.lo)} bis ${mmss(fc.hi)} · Ziel 60:00</p>
         <div class="bar"><div><u style="width:${pc(fc.run)}%;background:#f5f5f7"></u><u style="width:${pc(stSum)}%;background:#9a9ba3"></u><u style="width:${pc(fc.rox)}%;background:#6d7176"></u></div><i style="left:${pc(review.GOAL_S)}%"></i></div>
         <div class="lg"><span><i style="background:#f5f5f7"></i>Laufen</span><span><i style="background:#9a9ba3"></i>Stationen</span><span><i style="background:#6d7176"></i>Roxzone</span><span><i class="m"></i>60:00 Ziel · 63:21 St. Gallen</span></div>
-        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${det}${calc}${pgw}</section>`;
+        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${review.forecastNotes(fc)}${det}${calc}${pgw}</section>`;
         }
         return prog;
       }
@@ -21390,7 +21403,7 @@
           S.review[w] = {
             at: Date.now(),
             level: r.level,
-            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 2 } : {}),
+            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 3 } : {}),
           };
           save();
         }
@@ -21416,7 +21429,7 @@
         if (fc && fc.total) {
           const gap = fc.total - review.GOAL_S;
           big = mmss(fc.total);
-          fcap = `${gap > 0 ? mmss(gap) + " zu langsam" : mmss(-gap) + " Puffer"} · berechnet aus Tests und Trainingswerten`;
+          fcap = `Spanne ${mmss(fc.lo)} bis ${mmss(fc.hi)} · ${gap > 0 ? mmss(gap) + " zu langsam" : mmss(-gap) + " Puffer"}${fc.issues && fc.issues.length ? " · " + fc.issues.length + " Eingabe(n) prüfen" : ""}`;
           fill = `<u style="width:${Math.max(0, Math.min(100, ((fc.total - lo) / (hi - lo)) * 100)).toFixed(1)}%;background:${gap > 0 ? "var(--warn)" : "var(--ok)"}"></u>`;
         }
         const forecast = `<section class="s6-card s6-fc" aria-label="Prognose"><div class="row"><div><span class="s6-kick">Prognose Basel</span><span class="big">${big}</span></div><div><span class="s6-kick">Ziel</span><span class="ziel">&lt; 60:00</span></div></div><div class="bar">${fill}<b aria-hidden="true"></b></div><span class="fcap">${fcap}</span></section>`;
@@ -23553,12 +23566,18 @@
               "Bitte alle acht Stationszeiten als m:ss eintragen",
               true,
             );
-          S.simres = S.simres || {};
-          S.simres[day] = { i: pct / 100, st: st.map((x) => mmss(parseT(x))) };
+          const simBad = st.map((x, r) => checkStation(r, x)).find((c) => !c.ok);
+          if (simBad) return toast(simBad.reason || "Unplausible Stationszeit, bitte prüfen", true);
+          const extra = {};
           for (const [f, id] of [["run", "sim-run"], ["rox", "sim-rox"]]) {
-            const v = parseT((($("#" + id) || {}).value || "").trim());
-            if (v > 0) S.simres[day][f] = mmss(v);
+            const raw = (($("#" + id) || {}).value || "").trim();
+            if (!raw) continue;
+            const v = parseTimeStrict(raw); // wie die Prognose: "357" = 3:57, "13" ist keine Zeit
+            if (!(v > 0)) return toast(`«${raw}» (${f === "run" ? "Laufen" : "Roxzone"}) ist keine Zeit. Bitte als m:ss eintragen.`, true);
+            extra[f] = mmss(v);
           }
+          S.simres = S.simres || {};
+          S.simres[day] = { i: pct / 100, st: st.map((x) => mmss(parseTimeStrict(x))), ...extra };
           save();
           toast("Simulation gespeichert – die Prognose ist angepasst");
           return render();
@@ -24426,7 +24445,7 @@
           S.review[w].level = rvData(w).level;
           if (fc && fc.total) {
             S.review[w].fc = Math.round(fc.total);
-            S.review[w].fcv = 2;
+            S.review[w].fcv = 3;
             S.review[w].fcx = {
               total: Math.round(fc.total),
               run: Math.round(fc.run),

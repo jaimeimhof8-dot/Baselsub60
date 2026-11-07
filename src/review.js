@@ -2,7 +2,7 @@
 // Drei Teile: (1) automatische Zahlen der Woche, (2) Rennprognose aus den Tests, (3) eigene Einschätzung.
 // Gespeicherte Form (S.review): {wochenIndex: {feel, prog, pain, note, at, level, fc}} – fc = Prognose in Sekunden zum Zeitpunkt des Checks.
 // Reine Funktionen, ohne DOM.
-import { mmss } from "./util.js";
+import { mmss, esc } from "./util.js";
 import { buildForecast, K, DRIFT, levelOf } from "./forecast.js";
 import { DOUBLES_SHARE } from "./divisions.js";
 export { DOUBLES_SHARE, DRIFT, levelOf, K };
@@ -79,6 +79,24 @@ export function weekCheck({ days = [], wave = "moderat", load = null, prev = [],
   }
   if (!focus.length) focus.push(level === "green" ? "Weiter so – Plan wie vorgesehen durchziehen." : "Kleine Stellschraube: die gelben Punkte oben im Blick behalten.");
   return { level, planned: sessions.length, done, missedKey, avgRpe, rpeMax, reds, yellows, runRamp, extraN: extras.length, extraMin, notes, focus: [...new Set(focus)].slice(0, 3) };
+}
+
+/**
+ * Ehrliche Zusatzinfos zur Prognose als HTML (Klassen rv-notes, ohne eigenes Layout): Eingabefehler, Szenarien, Sub-60-Aussage,
+ * was gemessen und was geschätzt ist. fc = Ergebnis von buildForecast.
+ */
+export function forecastNotes(fc) {
+  if (!fc) return "";
+  let h = '<div class="rv-notes">';
+  if (fc.issues && fc.issues.length)
+    h += `<div class="hint" role="alert"><b>Unplausibel, bitte prüfen</b> (fliesst nicht in die Prognose ein):<div style="margin-top:4px">${fc.issues.map((i) => `<div>• ${esc((i.who ? i.who + ", " : "") + i.label)}: ${esc(i.reason)}</div>`).join("")}</div></div>`;
+  if (fc.scenarios) {
+    const sc = fc.scenarios, row = (n, x) => `<tr><td>${n}</td><td>${mmss(x.run)}</td><td>${mmss(x.st)}</td><td>${mmss(x.rox)}</td><td><b>${mmss(x.total)}</b></td></tr>`;
+    h += `<div class="cap rv-gap">Szenarien</div><table class="rv-tab"><thead><tr><th></th><th>Laufen</th><th>Stationen</th><th>Rox</th><th>Gesamt</th></tr></thead><tbody>${row("Gut", sc.gut)}${row("Mittel", sc.mitte)}${row("Vorsichtig", sc.vorsichtig)}</tbody></table>
+    <p class="sub mt-2">Gut = alle Teile laufen gleichzeitig gut, Vorsichtig = alle gleichzeitig schlecht. Eckfälle, keine Wahrscheinlichkeit; sie sind breiter als die Spanne oben (die rechnet Unsicherheiten der Teile als unabhängig). ${esc(fc.sub60.text)} Die Faktoren (Teamfaktor, Ermüdung, Roxzone) sind Annahmen, nur St. Gallen 2026 stützt den mittleren.</p>`;
+  }
+  if (fc.parts) h += `<div class="cap rv-gap">Gemessen oder geschätzt?</div><ul class="sub" style="margin:4px 0 0;padding-left:18px">${fc.parts.map((x) => `<li><b>${esc(x.name)}:</b> ${esc(x.source)}. ${esc(x.note)}</li>`).join("")}</ul>`;
+  return h + "</div>";
 }
 
 /** Rennprognose mit Spanne, siehe src/forecast.js (buildForecast). */

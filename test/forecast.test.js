@@ -232,3 +232,8 @@ test("Simulation ohne Teilzeiten: unmögliche Summe eicht nicht (kein k = 0,2)",
   assert.equal(f.calibrated, false);
   assert.ok(f.issues.some((i) => i.kind === "sim"));
 });
+
+test("Simulation: «357» und «13» in Laufen/Roxzone werden wie überall gelesen (3:57 bzw. keine Zeit)", () => {
+  assert.equal(parseTimeStrict("357"), 237);
+  assert.ok(Number.isNaN(parseTimeStrict("13")));
+});

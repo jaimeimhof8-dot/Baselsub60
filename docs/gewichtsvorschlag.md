@@ -13,7 +13,7 @@
    `"80 kg"` = ein Wert für alle Sätze (Standard), `"80 kg × 5 / 85 kg × 5 / 85 kg × 3"` = je Satz Gewicht und Wiederholungen.
    `parseKg` liefert weiter das schwerste Gewicht, alle bisherigen Leser funktionieren unverändert.
 2. **Vergleichbar** (`comparable`, progression.js) heisst: gleiche Übung und **gleiche Sätze×Wiederholungen** (3×5 gegen 3×5; bei einem Plan-Bereich wie 3×6–8 zählt jede Wdh. darin). Der Arbeitssatz ist der schwerste Satz. Dann gilt die bisherige RPE-Regel (≤7 +2,5 kg, ≥9 −2,5 kg). Eine ältere vergleichbare Einheit (max. 8 Wochen) wird mit herangezogen.
-3. **Keine vergleichbare Einheit → kein Vorschlag, keine Umrechnung** (kein 1RM, kein Epley). Es erscheint nur der getrennte Hinweis „letztes Mal anders: 3×5 mit 80 kg“.
+3. **Keine vergleichbare Einheit → kein Vorschlag.** Es erscheint nur der getrennte Hinweis „letztes Mal anders: 3×5 mit 80 kg“.
 4. **Fehlende Daten → kein Wert**, nur ein Hinweis („Noch kein Gewicht … eintragen“, „Wiederholungen unbekannt“, „im Plan kein Satzschema“).
 5. Das Gewichts-Sheet belegt Felder nie mit dem Gewicht der letzten Einheit vor (nur mit eingetragenem oder geplantem Gewicht).
 

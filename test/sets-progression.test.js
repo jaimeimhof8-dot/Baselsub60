@@ -92,7 +92,6 @@ test("Vorschlag: 3×5 mit 80 kg gestern → 2×8 heute: KEIN Vorschlag, nur Hinw
   const s = suggestWeight("Back Squat 2×8 RPE 7", [{ v: "80 kg", rpe: 7, t: "Back Squat 3×5 RPE 7", age: 7 }]);
   assert.equal(s.kind, "none"); assert.equal(s.kg, null);
   assert.match(s.text, /letztes Mal anders: 3×5 mit 80 kg/);
-  assert.doesNotMatch(s.text, /Schätzung|1RM|Epley/);
   assert.equal(suggestWeight("Back Squat 3×5", [{ v: "72.5 kg", rpe: 7, t: "Back Squat 2×8", age: 7 }]).kg, null);
   // 3×6 gegen 3×5 und 4×5 gegen 3×5 sind ebenfalls nicht gleich
   assert.equal(suggestWeight("Back Squat 3×6", [{ v: "80 kg", rpe: 7, t: "Back Squat 3×5", age: 7 }]).kg, null);

@@ -53,7 +53,7 @@ export function describePerformed(p) {
 
 /**
  * Sind Gewicht der letzten Einheit und neues Soll vergleichbar? Verglichen wird der Arbeitssatz (schwerster Satz):
- * seine Wdh. müssen im Soll-Bereich ±1 liegen, die Satzzahl ±1.
+ * seine Wdh. müssen im Soll-Bereich liegen, die Satzzahl gleich sein (Toleranz 0).
  * @returns {boolean|null} null = nicht entscheidbar (Schema fehlt auf einer Seite)
  */
 export function comparable(p, rx) {

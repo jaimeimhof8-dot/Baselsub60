@@ -15325,7 +15325,7 @@
               ? slotsField(id, lineSlots(t), S.val[id])
               : `<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id] || pre)}"${pre ? ` class="pre" title="Geplantes Gewicht – zum Ändern antippen"` : ""}${lift ? ` inputmode="decimal"` : ""} placeholder="${placeholder(lift ? "kraft" : p.k, t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
             if (!lineSlots(t) && ((last && !(sg && sg.kind === "none")) || sg)) {
-              h += `<div class="quick">${last && !(sg && sg.kind === "none") ? `<button type="button" class="last" data-last="${id}" data-lv="${esc(last)}" aria-label="Letzten Wert ${esc(last)} übernehmen">zuletzt: ${esc(last)} ↵</button>` : ""}${up ? `<button type="button" class="last up" data-last="${id}" data-lv="${esc(up)}" aria-label="Vorschlag ${esc(up)} übernehmen: ${esc(sg.text)}">${parseKg(up) > parseKg(last) ? "↗" : "↘"} ${esc(up)} <small>Vorschlag</small></button>` : ""}</div>${sg ? `<p class="sug-why">${esc(sg.text)}${sg.note ? ` <em>${esc(sg.note)}</em>` : ""}</p>` : ""}`;
+              h += `<div class="quick">${last && !(sg && sg.kind === "none") ? `<button type="button" class="last" data-last="${id}" data-lv="${esc(last)}" aria-label="Letzten Wert ${esc(last)} übernehmen">zuletzt: ${esc(last)} ↵</button>` : ""}${up ? `<button type="button" class="last up" data-last="${id}" data-lv="${esc(up)}" aria-label="Vorschlag ${esc(up)} übernehmen: ${esc(sg.text)}">${parseKg(up) > parseKg(last) ? "↗" : parseKg(up) < parseKg(last) ? "↘" : "="} ${esc(up)} <small>Vorschlag</small></button>` : ""}</div>${sg ? `<p class="sug-why">${esc(sg.text)}${sg.note ? ` <em>${esc(sg.note)}</em>` : ""}</p>` : ""}`;
             }
           }
           h += `</div>`;
@@ -22439,7 +22439,7 @@
               : null,
           keepSel =
             ae && ae.dataset && ae.dataset.fin
-              ? ["fin", "j", "r", "m", "d"]
+              ? ["fin", "j", "s", "r", "m", "d"]
                   .filter((k) => ae.dataset[k] != null)
                   .map((k) => `[data-${k}="${ae.dataset[k]}"]`)
                   .join("")
@@ -22696,7 +22696,13 @@
           const j = +b.dataset.j,
             kg = +b.dataset.v;
           fin7.w[j] = kg;
-          if (fin7.wps[j]) fin7.wps[j].forEach((x) => (x.kg = kg));
+          if (fin7.wps[j]) {
+            // Staffel nicht plattmachen: nur der schwerste Satz (Basis des Vorschlags) bekommt den Wert, bei gleichen/leeren Sätzen alle
+            const L = fin7.wps[j],
+              mx = Math.max(0, ...L.map((x) => x.kg || 0)),
+              flat = L.every((x) => (x.kg || 0) === (L[0].kg || 0));
+            L.forEach((x) => { if (flat || (x.kg || 0) === mx) x.kg = kg; });
+          }
           return fin7Paint();
         }
         if (a === "wst") {

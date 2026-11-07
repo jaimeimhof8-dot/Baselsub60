@@ -1,5 +1,6 @@
 -- Feedback-Modus (Admin-Kommentare zu Elementen der App). Einmal im Supabase SQL Editor ausführen (gefahrlos wiederholbar).
--- Voraussetzung: supabase/schema.sql wurde schon ausgeführt (is_member()).
+-- «Besitzer» heisst hier: jede Zeile gehört dem Mitglied, das sie angelegt hat (user_id = auth.uid()); niemand sieht fremde Zeilen.
+-- Die App zeigt den Feedback-Modus nur Jaime. Voraussetzung: supabase/schema.sql wurde schon ausgeführt (is_member()).
 create table if not exists public.app_feedback (
   id         uuid primary key,
   user_id    uuid not null default auth.uid() references auth.users on delete cascade,

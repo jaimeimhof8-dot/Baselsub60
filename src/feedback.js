@@ -36,7 +36,7 @@ export function describeElement(el, maxDepth = 5) {
     const tag = String(e.tagName || "").toLowerCase();
     if (!tag) return "";
     if (e.id) return `${tag}#${e.id}`;
-    const cls = [...(e.classList || [])].filter((c) => !/^(on|open|hide|active|fb-)/.test(c)).slice(0, 2);
+    const cls = [...(e.classList || [])].filter((c) => !/^(on|open|hide|hidden|active|fb-.*)$/.test(c)).slice(0, 2);
     let s = tag + cls.map((c) => "." + c).join("");
     const par = e.parentElement;
     if (par && par.children) {
@@ -108,7 +108,7 @@ export function removeItem(st, id) {
 
 export function filterItems(items, f) {
   const l = f === "offen" || f === "erledigt" ? items.filter((x) => x.status === f) : items.slice();
-  return l.sort((a, b) => (a.created_at < b.created_at ? 1 : a.created_at > b.created_at ? -1 : 0));
+  return l.sort((a, b) => ts(b.created_at) - ts(a.created_at));
 }
 
 /* ---- Cloud ---- */
@@ -148,7 +148,7 @@ export function reconcile(local, remote, del = []) {
     }
   }
   for (const r of rm.values()) items.push({ ...r, sy: r.updated_at });
-  return { items: items.sort((a, b) => (a.created_at < b.created_at ? 1 : -1)), push, remove: [...gone] };
+  return { items: items.sort((a, b) => ts(b.created_at) - ts(a.created_at)), push, remove: [...gone] };
 }
 
 export const markSynced = (items, ids, at) => items.map((x) => (ids.includes(x.id) ? { ...x, sy: at } : x));
@@ -272,7 +272,7 @@ const CSS = `
 .fb-chips button,.fb-btn{min-height:44px;padding:0 14px;border:0;border-radius:12px;background:#1b1e29;color:#f5f5f7;font:inherit;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
 .fb-chips button.on,.fb-btn.gold{background:#e0bf6a;color:#16181a;box-shadow:none}
 .fb-btn.red{color:#ff6961}
-.fb-ui textarea{width:100%;min-height:84px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:#161922;color:#f5f5f7;font:500 16px/1.4 inherit;resize:vertical}
+.fb-ui textarea{width:100%;min-height:84px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:#161922;color:#f5f5f7;font-size:16px;line-height:1.4;font-weight:500;font-family:inherit;resize:vertical}
 .fb-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .fb-row .fb-btn{flex:1 1 auto}
 .fb-panel{inset:0;background:#06070a;overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 12px) 14px calc(env(safe-area-inset-bottom,0px) + 24px)}
@@ -358,10 +358,17 @@ function paint() {
     panel = null;
     editor = null;
   }
+  const sc = panEl ? panEl.scrollTop : 0;
+  const hadFocus = document.activeElement && document.activeElement.id === "fb-text";
   panEl = mountOnly(panEl, panel && on ? panelHtml() : "");
+  if (panEl && sc) panEl.scrollTop = sc;
   const keep = edEl && editor ? (document.getElementById("fb-text") || {}).value : undefined;
   if (editor && keep !== undefined) editor.text = keep;
   edEl = mountOnly(edEl, editor && on ? editorHtml() : "");
+  if (hadFocus && edEl) {
+    const t = document.getElementById("fb-text");
+    if (t) t.focus({ preventScroll: true });
+  }
   const mi = document.getElementById("fb-menu");
   if (mi) mi.hidden = !on;
 }
@@ -395,9 +402,11 @@ function pick(target) {
 
 function onCapture(e) {
   if (!mode || !owner() || isUi(e.target)) return;
-  e.preventDefault();
+  // pointerdown/touchstart/mousedown nur stoppen (Halten-/Zieh-Aktionen der App); preventDefault bliebe sonst ohne den Folgeklick
   e.stopPropagation();
   e.stopImmediatePropagation();
+  if (e.type === "pointerdown" || e.type === "touchstart" || e.type === "mousedown") return;
+  e.preventDefault();
   if (e.type === "click") pick(e.target);
 }
 
@@ -419,8 +428,10 @@ function onUi(e) {
     clearSel();
   } else if (a === "save") {
     const text = (document.getElementById("fb-text") || {}).value;
-    if (editor.id) store = setText(store, editor.id, text);
-    else {
+    if (editor.id) {
+      if (!String(text || "").trim()) return env.toast && env.toast("Bitte einen Kommentar eingeben", true);
+      store = setText(store, editor.id, text);
+    } else {
       const it = newItem({ text, cat: editor.cat, ctx: editor.ctx });
       if (!it) return env.toast && env.toast("Bitte einen Kommentar eingeben", true);
       store = addItem(store, it);
@@ -500,7 +511,7 @@ export function init(e) {
     nav.appendChild(b);
   }
   // Abfangen nur, solange der Modus an ist (das prüft onCapture selbst); sonst läuft nichts dazwischen
-  for (const t of ["click", "auxclick", "submit", "dblclick"]) document.addEventListener(t, onCapture, true);
+  for (const t of ["click", "auxclick", "submit", "dblclick", "pointerdown", "touchstart", "mousedown"]) document.addEventListener(t, onCapture, true);
   document.addEventListener("click", onUi);
   window.addEventListener("online", scheduleSync);
   refresh();
@@ -511,12 +522,14 @@ export function refresh() {
   load();
   // Leichtgewichtig (läuft bei jedem render()): Menüpunkt und Knopf nachführen, offene Eingabe in Ruhe lassen
   if (!owner()) {
-    panel = null;
-    editor = null;
-    paint();
+    if (panel || editor || fabEl || panEl || edEl) {
+      panel = null;
+      editor = null;
+      paint();
+    }
   } else {
     const fh = mode ? fabHtml() : "";
-    if (!fabEl || fabEl.dataset.h !== fh) paint();
+    if ((fabEl ? fabEl.dataset.h : "") !== fh) paint();
     const mi = document.getElementById("fb-menu");
     if (mi) mi.hidden = false;
   }

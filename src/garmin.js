@@ -82,11 +82,12 @@ export function mergeActs(store, list, minDate = "") {
   for (const a of list) {
     if (!a || !a.date || a.date < minDate || !relevant(a)) continue;
     // Bereits geladene Runden behalten, wenn die neue Version keine mitbringt
-    if (store[a.id]) { store[a.id] = !a.laps && store[a.id].laps ? { ...a, laps: store[a.id].laps, lapsV: store[a.id].lapsV } : a; continue; }
+    // got = Zeitpunkt der ersten Übernahme (bleibt bei späteren Abrufen erhalten, für die Anzeige «Übernommen am»)
+    if (store[a.id]) { const got = store[a.id].got || a.got; store[a.id] = { ...(!a.laps && store[a.id].laps ? { ...a, laps: store[a.id].laps, lapsV: store[a.id].lapsV } : a), ...(got ? { got } : {}) }; continue; }
     const dups = Object.values(store).filter((x) => sameAct(x, a));
     if (dups.length && a.src !== "garmin") continue;
     for (const d of dups) delete store[d.id];
-    store[a.id] = a;
+    store[a.id] = a.got ? a : { ...a, got: Date.now() };
     if (!dups.length) n++;
   }
   return n;

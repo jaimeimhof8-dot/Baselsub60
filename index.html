@@ -14273,6 +14273,7 @@
         parseHeartRate,
         buildHeartRate,
       } from "./src/ftms.js";
+      import * as fb from "./src/feedback.js";
       /* Lauf- und Stationszeilen als Bausteine; erkennt die Zeile nichts sicher, bleibt der Originaltext */
       const lineHtml = (t) => fmtLine(t) || esc(t);
       /* Übung auslassen (✗): bleibt sichtbar, durchgestrichen, zählt nicht als „nicht gemacht“. Nochmal tippen = wieder offen. */
@@ -22706,6 +22707,7 @@
           .querySelectorAll("[data-partner]")
           .forEach((x) => (x.textContent = PARTNER));
         $("#acct").innerHTML = s6MenuAcct();
+        fb.refresh();
         const mc = $("#mi-conn");
         if (mc)
           mc.textContent =
@@ -24624,6 +24626,36 @@
         }
       });
 
+      /* Feedback-Modus (nur Jaime): Elemente antippen und kommentieren, siehe src/feedback.js */
+      fb.init({
+        isOwner: () =>
+          ME === "Jaime" && authed() && !["login", "shared", "onb"].includes(view),
+        key: () => LSK,
+        sb: () => sb,
+        user: () => USER,
+        toast: (m, w) => toast(m, w),
+        closeMenu: () => menu(false),
+        ctx: () => {
+          const foc = focusI != null;
+          const i = foc
+            ? focusI
+            : view === "today"
+              ? sel != null
+                ? sel
+                : Math.max(0, Math.min(LAST, TODAY))
+              : null;
+          const p = i != null ? dayPlan(i) : null;
+          return {
+            view: foc ? "focus" : view,
+            day: i,
+            date: i != null ? isoI(i) : null,
+            week: view === "week" ? wk : null,
+            plan: p ? p.t : null,
+            kind: p ? p.k : null,
+            step: foc ? focusJ + 1 : null,
+          };
+        },
+      });
       // Falls der Start scheitert, nicht ewig auf dem Splash hängen bleiben
       boot().catch((e) => {
         console.error(e);

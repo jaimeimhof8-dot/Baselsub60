@@ -41,9 +41,9 @@ test("Prognose: Compromised Running, Drift ab Lauf 5, Fallback statt fehlender S
   assert.deepEqual(half.sources, ["bench", ...Array(7).fill("fallback")]);
   assert.ok(half.total > 0 && half.st > 0, "nie 0:00, auch ohne Benchmarks");
   assert.ok(half.stations.every((v) => v > 0));
-  const full = forecast({ lauf: [240], station: Array.from({ length: 8 }, () => [200, null]) });
+  const full = forecast({ lauf: [240], station: [250, 120, 180, 150, 250, 90, 150, 250].map((v) => [v, null]) });
   assert.equal(full.missing, 0);
-  assert.equal(full.total, full.run + 1600 * K.mitte + 255);
+  assert.ok(Math.abs(full.total - (full.run + 1440 * K.mitte + 255)) < 1e-6);
 });
 
 test("Prognose: Basis-Pace hat Vorrang, Niveau steuert Roxzone und Division die Fallbacks", () => {
@@ -117,12 +117,12 @@ test("Wochenbericht-Push: Text aus der Kurzfassung, Erinnerung ohne Daten", asyn
 });
 
 test("Prognose Zeile für Zeile gegen das Rennmodell", () => {
-  const fc = review.forecast({ lauf: [232, 235, 230, 238], station: Array.from({ length: 8 }, () => [400, 420]) });
+  const fc = review.forecast({ lauf: [232, 235, 230, 238], station: [[250, 270], [120, 130], [180, 200], [150, 170], [250, 270], [90, 100], [150, 170], [250, 270]] });
   const b = review.breakdown(fc);
   assert.equal(b.rows.length, 10);
   assert.equal(b.rows[0].goal, 1920);
   assert.equal(Math.round(b.rows[0].est), Math.round(review.forecast({ lauf: [232, 235, 230, 238] }).run));
-  assert.equal(Math.round(b.rows[1].est), Math.round(410 * review.K.mitte));
+  assert.equal(Math.round(b.rows[1].est), Math.round(260 * review.K.mitte));
   assert.equal(b.goal, 1920 + 1390 + 270);
   assert.ok(b.goal < 3600, "Rennmodell muss unter 60 Minuten liegen");
   assert.equal(Math.round(b.diff), Math.round(fc.total - b.goal));

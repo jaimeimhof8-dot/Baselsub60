@@ -62,8 +62,39 @@ export function plannedWeight(text, { lift = false, test = false, weights, divis
   return lift ? defaultWeight(text, weights) : "";
 }
 
+/**
+ * Sätze aus einem gespeicherten Wert lesen. Gespeichert bleibt ein Text pro Übung (S.val), daher bleiben alle
+ * alten Werte und Backups gültig. Formen:
+ *   "80 kg"                      → ein Wert für alle Sätze (alt, bleibt Standard)   → [{kg:80, reps:null}]
+ *   "82,5 kg × 5"                → ein Satz mit Wiederholungen (alt)               → [{kg:82.5, reps:5}]
+ *   "80/85/85" oder "80 kg × 5 / 85 kg × 5 / 85 kg × 3" → je Satz ein Gewicht, optional mit Wdh.
+ * Alles andere (Zeiten, Pace, Freitext) → [] (kein Gewicht erkennbar).
+ * @returns {{kg:number, reps:number|null}[]}
+ */
+export function parseSets(v) {
+  const s = String(v || "").trim();
+  if (!s || /\d:\d/.test(s)) return [];
+  const out = [];
+  for (const part of s.split(/\s*\/\s*/)) {
+    const m = part.replace(/,/g, ".").match(/^(\d{1,3}(?:\.\d{1,2})?)\s*(kg)?(?:\s*[×x*]\s*(\d{1,3}))?\s*(kg)?$/i);
+    if (!m) return [];
+    const kg = +m[1], unit = m[2] || m[4];
+    if (!(kg > 0 && kg <= 400) || (!unit && kg < 10) || (m[3] != null && (+m[3] < 1 || +m[3] > 50))) return []; // "3×5" ist ein Satzschema, kein Gewicht
+    out.push({ kg, reps: m[3] != null ? +m[3] : null });
+  }
+  return out;
+}
+
+/** Sätze → gespeicherter Text. Ein Satz ohne Wdh. bleibt "80 kg" (altes Format); Sätze ohne Gewicht fallen weg. */
+export function formatSets(sets) {
+  const ok = (sets || []).filter((x) => x && x.kg > 0);
+  return ok.map((x) => `${+(+x.kg).toFixed(2)} kg${x.reps > 0 ? ` × ${x.reps}` : ""}`).join(" / ");
+}
+
 /** Gewicht aus einem Eintrag lesen: "82,5 kg × 5" → 82.5, "80/85/85" → 85 (schwerster Satz), sonst NaN. */
 export function parseKg(v) {
+  const sets = parseSets(v);
+  if (sets.length) return Math.max(...sets.map((x) => x.kg));
   const s = String(v || "").replace(",", ".");
   const kg = s.match(/(\d{1,3}(?:\.\d+)?)\s*kg/i);
   if (kg) return +kg[1];
@@ -71,6 +102,14 @@ export function parseKg(v) {
   const nums = (s.match(/\d{1,3}(?:\.\d+)?/g) || []).map(Number).filter((n) => n >= 10 && n <= 400);
   return nums.length ? Math.max(...nums) : NaN;
 }
+
+/** Wert um dir × 2.5 kg verschieben (alle Sätze gleich), Struktur und Wdh. bleiben. "" wenn kein Gewicht erkennbar. */
+export function stepValue(v, dir) {
+  const sets = parseSets(v);
+  if (!sets.length) { const kg = parseKg(v); return isNaN(kg) ? "" : formatSets([{ kg: Math.max(0, kg + dir * 2.5), reps: null }]); }
+  return formatSets(sets.map((x) => ({ kg: Math.max(2.5, +(x.kg + dir * 2.5).toFixed(2)), reps: x.reps }))); // nie 0: sonst fiele ein Satz weg
+}
+
 /**
  * Gewicht fürs nächste Mal aus dem letzten Wert und der RPE jener Einheit:
  * RPE ≤ 7 → +2.5 kg, RPE ≥ 9 → −2.5 kg, sonst gleich. Deload-Zeilen (RPE 5–6 im Text) → −10 %.

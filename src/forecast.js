@@ -1,6 +1,7 @@
 // Rennprognose Doubles: Laufen + Stationen + Roxzone aus euren echten Testwerten, mit Spanne, und sie eicht sich an Simulationen.
 // Reine Funktionen, ohne DOM. Ausgangslage und Herleitung der Faktoren: siehe Plan «Rennprognose, die zu euren echten Daten passt».
 import { fallbackStations, normDivision, DOUBLES_SHARE } from "./divisions.js";
+import { normTime } from "./timeinput.js";
 
 const ok = (v) => typeof v === "number" && isFinite(v) && v > 0;
 const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
@@ -8,11 +9,15 @@ const sum = (a) => a.reduce((x, y) => x + y, 0);
 
 /**
  * Team-Stationszeit im Rennen = Mittel der Solo-Benchmarks × k.
- * k bündelt das Teilen der Arbeit (ca. 0,55) und die Ermüdung nach Renntempo (Puls, Grip, Wechsel).
- * Annahme, bis eine Simulation ≥ 85 % eingetragen ist: mitte 0,80 (Ermüdung ×1,45); gut/vorsichtig = Rand der Spanne.
- * Zur Einordnung: 0,66 = alles läuft, 0,95 = so langsam wie im Rennen von St. Gallen 2026 (Stationen 24:03).
+ * WICHTIG (Korrektur v3): Im Doubles arbeiten die Partner an einer Station nacheinander, nicht gleichzeitig. Die Teamzeit liegt
+ * deshalb nahe an EINER Solo-Zeit (Pause des Partners hilft etwas, Ermüdung und Wechsel kosten), nicht bei ~0,55 davon.
+ * Das frühere k = 0,80 ergab SkiErg 3:10 und RowErg 2:56 für die ganzen 1000 m, unter jeder plausiblen Grenze (und unter euren
+ * eigenen Solo-Tests). Einziger echter Ankerpunkt: St. Gallen 2026, Stationen 24:03 = k ≈ 0,94 gegen die Solo-Summe von heute.
+ * Alle drei Werte sind ANNAHMEN, keine Messung, bis Simulationen ab 85 % eingetragen sind: gut 0,88 = alles läuft,
+ * mitte 0,95 = wie St. Gallen, vorsichtig 1,05 = Ermüdung deutlich grösser. Solo-Rennen: K_SOLO (keine Teilung, nur Ermüdung).
  */
-export const K = { gut: 0.72, mitte: 0.8, vorsichtig: 0.9 };
+export const K = { gut: 0.88, mitte: 0.95, vorsichtig: 1.05 };
+export const K_SOLO = { gut: 0.98, mitte: 1.06, vorsichtig: 1.15 };
 export const DRIFT = 3; // s/km zusätzlich pro Lauf ab Lauf 5 (nach den Burpee Broad Jumps)
 export const MISMATCH = 0.025; // Abstand der Partner im selben Test, ab dem ein Messfehler vermutet wird
 export const STALE_DAYS = 35; // älter: Spanne breiter, Re-Test fällig
@@ -31,6 +36,44 @@ export function levelOf(base) {
   const fatigue = lo ? lerp(base, 255, 270, 15, 20) : lerp(base, 270, 300, 20, 25);
   const rox = lo ? lerp(base, 255, 270, 255, 315) : lerp(base, 270, 300, 315, 360);
   return { name: base < 255 ? "schnell" : base < 285 ? "mittel" : "gemütlich", fatigue: Math.round(fatigue * 10) / 10, rox: Math.round(rox) };
+}
+
+/** Plausibilitätsgrenzen für die GANZE Station, Men Pro, Sekunden [min, max]. Gilt für Solo-Eingaben und für Teamzeiten.
+ * Reihenfolge wie review.STATIONS. Ausserhalb = Eingabefehler (oder Modellwert, der nicht stimmen kann), nicht Prognose. */
+export const STATION_BOUNDS = [[200, 330], [60, 210], [90, 270], [120, 270], [200, 330], [50, 120], [120, 270], [180, 360]];
+export const STATION_NAMES = ["SkiErg", "Sled Push", "Sled Pull", "Burpee BJ", "RowErg", "Farmers", "Lunges", "Wall Balls"];
+export const RUN_BOUNDS = [150, 420]; // 1 km Laufen: 2:30 bis 7:00
+const fmt = (s) => Math.floor(s / 60) + ":" + String(Math.round(s % 60)).padStart(2, "0");
+
+/** Zeit streng lesen: "m:ss", "h:mm:ss" oder 3–5 Ziffern ("256" = 2:56). Alles andere (auch "13") ist KEINE Zeit → NaN.
+ * Bewusst nicht wie util.parseT: dort ist "13" = 13 Sekunden, das hat die unmöglichen Stationswerte erzeugt. Zahlen gelten als Sekunden. */
+export function parseTimeStrict(v) {
+  if (typeof v === "number") return ok(v) ? v : NaN;
+  const s = normTime(String(v == null ? "" : v).trim());
+  let m = s.match(/^(\d{1,2}):([0-5]\d)$/);
+  if (m) return +m[1] * 60 + +m[2];
+  m = s.match(/^(\d):([0-5]\d):([0-5]\d)$/);
+  return m ? +m[1] * 3600 + +m[2] * 60 + +m[3] : NaN;
+}
+
+/** Eine Stationszeit prüfen. @returns {ok, s, reason?} reason = verständlicher Hinweis für die Anzeige */
+export function checkStation(r, raw) {
+  const txt = String(raw == null ? "" : raw).trim();
+  if (!txt) return { ok: false, s: NaN, empty: true };
+  const s = parseTimeStrict(raw), [lo, hi] = STATION_BOUNDS[r] || [0, Infinity];
+  if (!ok(s)) return { ok: false, s: NaN, reason: `«${txt}» ist keine Zeit. Bitte als m:ss eintragen (z. B. ${fmt((lo + hi) / 2)}), nicht als nackte Zahl.` };
+  if (s < lo) return { ok: false, s, reason: `${fmt(s)} ist unplausibel schnell für ${STATION_NAMES[r]} (ganze Station, schnellstens ${fmt(lo)}), bitte prüfen. ${r === 0 || r === 4 ? "Wahrscheinlich pro 500 m oder falsche Einheit." : "Wahrscheinlich nur ein Teil der Strecke oder falsche Einheit."}` };
+  if (s > hi) return { ok: false, s, reason: `${fmt(s)} ist unplausibel langsam für ${STATION_NAMES[r]} (ganze Station, langsamstens ${fmt(hi)}), bitte prüfen.` };
+  return { ok: true, s };
+}
+/** Laufzeit pro km prüfen (2:30 bis 7:00). */
+export function checkRun(raw) {
+  const txt = String(raw == null ? "" : raw).trim();
+  if (!txt) return { ok: false, s: NaN, empty: true };
+  const s = parseTimeStrict(raw);
+  if (!ok(s)) return { ok: false, s: NaN, reason: `«${txt}» ist keine Zeit. Bitte als m:ss eintragen.` };
+  if (s < RUN_BOUNDS[0] || s > RUN_BOUNDS[1]) return { ok: false, s, reason: `${fmt(s)} pro km ist unplausibel (erwartet ${fmt(RUN_BOUNDS[0])} bis ${fmt(RUN_BOUNDS[1])}), bitte prüfen.` };
+  return { ok: true, s };
 }
 
 /**
@@ -118,42 +161,79 @@ export function projectRaceDay(history, daysLeft) {
 /**
  * Prognose. Eingaben:
  *  laufPersons: [[4 Zeiten Jaime], [4 Zeiten Jimoh]] (bevorzugt) oder lauf: flache Liste; base: Schwellen-Pace in s/km (hat Vorrang)
- *  station: 8 × [ich, Partner] Solo-Zeiten · sims: siehe calibrateK · testAgeDays: Alter des letzten Tests (null = unbekannt)
- * @returns null ohne Pace, sonst {T, pace, paces[8], run, st, rox, total, lo, hi, k, calibrated, level, missing, sources[8], stations[8], basis[], warnings[]}
+ *  station: 8 × [ich, Partner] Solo-Zeiten für die GANZE Station · sims: siehe calibrateK · testAgeDays: Alter des letzten Tests
+ *  Zeiten dürfen Sekunden (Zahl) oder Text ("3:57", "357") sein. Unplausibles (siehe STATION_BOUNDS, RUN_BOUNDS) fliesst NICHT ein
+ *  und steht in issues. names: Anzeigenamen der Partner für die Hinweise.
+ * @returns null ohne Pace, sonst {T, pace, paces[8], run, st, rox, total, lo, hi, k, calibrated, level, missing, sources[8], stations[8], basis[], warnings[],
+ *   issues[{kind,who,label,raw,reason}], scenarios{gut,mitte,vorsichtig:{k,run,st,rox,total}}, sub60{text,level,gap}, parts[{name,source,note}]}
  */
-export function buildForecast({ lauf = [], laufPersons = null, station = [], base = null, division = null, sims = [], testAgeDays = null } = {}) {
+export function buildForecast({ lauf = [], laufPersons = null, station = [], base = null, division = null, sims = [], testAgeDays = null, names = ["Jaime", "Jimoh"] } = {}) {
+  const issues = [];
+  const cleanRuns = (arr, who) => (arr || []).map((raw, i) => {
+    const c = checkRun(raw);
+    if (c.reason) issues.push({ kind: "lauf", who, label: `Lauf ${i + 1}`, raw: String(raw), reason: c.reason });
+    return c.ok ? c.s : NaN;
+  });
   let reps, mismatch = 0;
-  if (laufPersons) ({ reps, mismatch } = resolveRuns(laufPersons));
-  else reps = lauf.filter(ok);
+  if (laufPersons) ({ reps, mismatch } = resolveRuns(laufPersons.map((p, i) => cleanRuns(p, names[i] || ""))));
+  else reps = cleanRuns(lauf, "").filter(ok);
   const T = ok(base) ? base : reps.length ? mean(reps) : null;
   if (T == null) return null;
 
-  const lv = levelOf(T), dv = normDivision(division);
-  const share = dv.mode === "solo" ? 1 : DOUBLES_SHARE;
+  const lv = levelOf(T), dv = normDivision(division), isSolo = dv.mode === "solo";
+  const KS = isSolo ? K_SOLO : K;
+  const share = isSolo ? 1 : DOUBLES_SHARE;
   let paces = Array.from({ length: 8 }, (_, i) => T + lv.fatigue + (i >= 4 ? DRIFT * (i - 3) : 0));
 
-  const fb = fallbackStations(dv).map((v) => v * share); // Teamzeit aus dem Rennen von St. Gallen, wenn kein Benchmark da ist
-  const sources = [], solo = [];
+  const fb = fallbackStations(dv).map((v) => v * share); // Teamzeit aus dem Rennen von St. Gallen, wenn kein gültiger Benchmark da ist
+  const sources = [], solo = [], badStations = [];
   for (let r = 0; r < 8; r++) {
-    const v = (station[r] || []).filter(ok);
+    const v = [];
+    (station[r] || []).forEach((raw, p) => {
+      const c = checkStation(r, raw);
+      if (c.reason) issues.push({ kind: "station", who: names[p] || "", label: STATION_NAMES[r], raw: String(raw), reason: c.reason });
+      if (c.ok) v.push(c.s);
+    });
+    if (!v.length && (station[r] || []).some((x) => String(x == null ? "" : x).trim())) badStations.push(r);
     sources.push(v.length ? "bench" : "fallback");
-    // Mittel der Partner. (Das harmonische Mittel wäre bei ungleichen Partnern theoretisch schneller, aber K ist am Mittel angesetzt
-    // und es gibt keine Messung, die den Gewinn belegt: erst die Eichung an Simulationen mit Einzelzeiten (perStation) fängt das ein.)
+    // Mittel der Partner (K ist am Mittel angesetzt; erst die Eichung an Simulationen mit Einzelzeiten fängt Unterschiede ein).
     solo.push(v.length ? mean(v) : null);
   }
   const allBench = sources.every((x) => x === "bench");
   const benchSum = allBench ? sum(solo) : null;
-  const cal = calibrateK(sims, benchSum, allBench ? solo : null);
 
-  let k = K.mitte, kLo = K.gut, kHi = K.vorsichtig;
+  // Simulationen: Teilzeiten prüfen; eine Simulation mit unmöglichem Wert eicht nichts
+  const simsOk = [];
+  (sims || []).forEach((sm, i) => {
+    if (!sm) return;
+    let parts = sm.parts;
+    if (Array.isArray(parts) && parts.length === 8) {
+      const cs = parts.map((x, r) => checkStation(r, x));
+      const bad = cs.findIndex((c) => !c.ok);
+      if (bad >= 0) { issues.push({ kind: "sim", who: "", label: `Simulation ${i + 1}: ${STATION_NAMES[bad]}`, raw: String(parts[bad]), reason: cs[bad].reason || "unplausibel" }); return; }
+      parts = cs.map((c) => c.s);
+      simsOk.push({ ...sm, parts, stations: sum(parts) });
+    } else if (ok(sm.stations) && sm.stations >= sum(STATION_BOUNDS.map((b) => b[0])) && sm.stations <= sum(STATION_BOUNDS.map((b) => b[1]))) simsOk.push(sm);
+    else issues.push({ kind: "sim", who: "", label: `Simulation ${i + 1}`, raw: String(sm.stations), reason: "Stationssumme unplausibel, bitte prüfen." });
+  });
+  const cal = calibrateK(simsOk, benchSum, allBench ? solo : null);
+
+  let k = KS.mitte, kLo = KS.gut, kHi = KS.vorsichtig;
   if (cal.k != null) { k = cal.k; kLo = k * 0.97; kHi = k * 1.03; }
   if (cal.floor != null) { k = Math.max(k, cal.floor); kLo = Math.max(kLo, cal.floor); kHi = Math.max(kHi, k); }
   const kr = cal.perStation && cal.k != null && cal.floor == null ? cal.perStation : null; // je Station nur ohne widersprechende Untergrenze
 
-  const kOf = (r) => (kr ? kr[r] : k);
-  const team = solo.map((v, r) => (v == null ? fb[r] : v * kOf(r)));
-  const at = (kk, fbF) => sum(solo.map((v, r) => (v == null ? fb[r] * fbF : v * (kr ? kr[r] * (kk / k) : kk))));
+  // Teamzeit je Station bei Faktor kk. Modellwerte ausserhalb der Plausibilitätsgrenze werden auf die Grenze gesetzt (nie schneller).
+  const clamped = new Set();
+  const teamAt = (kk, fbF, note) => solo.map((v, r) => {
+    if (v == null) return fb[r] * fbF;
+    const x = v * (kr ? kr[r] * (kk / k) : kk), [lo, hi] = STATION_BOUNDS[r];
+    if (x < lo || x > hi) { if (note) clamped.add(r); return Math.min(hi, Math.max(lo, x)); }
+    return x;
+  });
+  const team = teamAt(k, 1, true);
   const st = sum(team);
+  const stAt = (kk, fbF) => sum(teamAt(kk, fbF));
 
   // Laufen und Roxzone: aus Simulationen, wenn dort gemessen (nur ≥ 85 %), sonst Modell
   let rox = lv.rox, runCal = false, roxCal = false;
@@ -168,23 +248,41 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
 
   const stale = ok(testAgeDays) && testAgeDays > STALE_DAYS, widen = stale ? 1.3 : 1;
   const dRun = 8 * (runCal ? 5 : 10) * widen, dRox = (roxCal ? 10 : 20) * widen;
-  const dLo = (st - at(kLo, 0.93)) * widen, dHi = (at(kHi, 1.07) - st) * widen;
+  const dLo = (st - stAt(kLo, 0.93)) * widen, dHi = (stAt(kHi, 1.07) - st) * widen;
   const total = run + st + rox;
+
+  // Szenarien: alle Teile gleichzeitig gut / mittel / vorsichtig (Eckfälle, kein Wahrscheinlichkeitsmass)
+  const scen = (kk, fbF, d) => { const s2 = stAt(kk, fbF); return { k: kk, run: run + d * dRun, st: s2, rox: rox + d * dRox, total: run + d * dRun + s2 + rox + d * dRox }; };
+  const scenarios = { gut: scen(kLo, 0.93, -1), mitte: scen(k, 1, 0), vorsichtig: scen(kHi, 1.07, 1) };
+  const GOAL = 3600;
+  const sub60 = scenarios.mitte.total <= GOAL
+    ? { level: "mitte", gap: scenarios.mitte.total - GOAL, text: "Sub-60 schon im mittleren Szenario." }
+    : scenarios.gut.total <= GOAL
+      ? { level: "gut", gap: scenarios.mitte.total - GOAL, text: `Sub-60 nur im besten Szenario (alles läuft). Mittleres Szenario: ${fmt(scenarios.mitte.total - GOAL)} über 60:00.` }
+      : { level: "nein", gap: scenarios.gut.total - GOAL, text: `Auch im besten Szenario ${fmt(scenarios.gut.total - GOAL)} über 60:00. Sub-60 braucht mehr als der heutige Stand hergibt.` };
 
   const missing = sources.filter((s) => s === "fallback").length;
   const warnings = [];
   if (mismatch) warnings.push("Die Uhren weichen im Test ab (über 2,5 %). Es zählt der schnellere Wert.");
   if (stale) warnings.push("Der letzte Test ist über 5 Wochen alt: Re-Test fällig, die Spanne ist breiter.");
-  if (missing) warnings.push(`${missing} von 8 Stationen ohne Benchmark: dafür gilt die Zeit aus dem Rennen von St. Gallen (mit ~).`);
+  if (missing) warnings.push(`${missing} von 8 Stationen ohne gültigen Benchmark: dafür gilt die Zeit aus dem Rennen von St. Gallen (mit ~).`);
+  if (issues.length) warnings.push(`${issues.length} Eingabe${issues.length > 1 ? "n" : ""} unplausibel, bitte prüfen. ${issues.length > 1 ? "Sie fliessen" : "Sie fliesst"} nicht in die Prognose ein.`);
+  if (clamped.size) warnings.push(`Modellwert für ${[...clamped].map((r) => STATION_NAMES[r]).join(", ")} lag ausserhalb des Plausiblen und wurde auf die Grenze gesetzt.`);
   const basis = [
-    `Laufen: Pacing-Test, Team Ø ${Math.floor(T / 60)}:${String(Math.round(T % 60)).padStart(2, "0")}/km`,
-    `Stationen: Benchmark ${8 - missing} von 8`,
+    `Laufen: Pacing-Test, Team Ø ${fmt(T)}/km`,
+    `Stationen: gültiger Benchmark ${8 - missing} von 8`,
     cal.k != null ? `Simulationen: ${cal.n} eingetragen, k geeicht (${k.toFixed(2).replace(".", ",")})${kr ? ", je Station" : ""}${runCal ? ", Laufen gemessen" : ""}${roxCal ? ", Roxzone gemessen" : ""}` : cal.floor != null ? "Simulation unter 85 %: zeigt nur eine Untergrenze" : "Noch keine Simulation ab 85 %: k ist eine Annahme",
+  ];
+  const parts = [
+    { name: "Laufen", source: runCal ? "gemessen (Simulation)" : "gemessen + geschätzt", note: runCal ? "aus Simulation" : `Test 4×1 km gemessen, Ermüdung (+${Math.round(lv.fatigue)} s/km) und Tempoverlust geschätzt` },
+    { name: "Stationen", source: cal.k != null ? (missing ? "teils gemessen" : "gemessen (Simulation)") : missing ? "teils geschätzt" : "Solo gemessen, Teamfaktor geschätzt", note: cal.k != null ? "Faktor an Simulation geeicht" : `Solo-Benchmark gemessen, Teamfaktor k ${k.toFixed(2).replace(".", ",")} ist eine Annahme${missing ? `, ${missing} Station(en) aus St. Gallen geschätzt` : ""}` },
+    { name: "Roxzone", source: roxCal ? "gemessen (Simulation)" : "geschätzt", note: roxCal ? "aus Simulation" : "Pauschale nach Niveau, nicht gemessen" },
   ];
   return {
     T, pace: run / 8, paces, run, st, rox, total,
     lo: total - Math.hypot(dRun, dLo, dRox), hi: total + Math.hypot(dRun, dHi, dRox),
     k, calibrated: cal.k != null, perStation: kr, runCal, roxCal, level: lv.name, missing, sources, stations: team, basis, warnings,
+    issues, badStations, scenarios, sub60, parts,
   };
 }
 

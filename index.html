@@ -12779,6 +12779,85 @@
         font-weight: 500;
         color: #9a9ba3;
       }
+      .f7-wl .wx {
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding-bottom: 10px;
+      }
+      .f7-wl .wx:first-child {
+        border-top: 0;
+      }
+      .f7-wl .wx .r {
+        border-top: 0;
+      }
+      .f7-wl .vi,
+      .f7-wl .ri {
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+        color: inherit;
+        font: inherit;
+        text-align: center;
+        padding: 0;
+        width: 100%;
+        min-height: 28px;
+        border-radius: 0;
+      }
+      .f7-wl .ri {
+        flex: none;
+        width: 56px;
+        font-family: var(--f-head);
+        font-size: 20px;
+        font-weight: 700;
+        min-height: 40px;
+      }
+      .f7-wl .ws {
+        min-height: 56px;
+        gap: 8px;
+      }
+      .f7-wl .ws .sn {
+        flex: 1;
+        min-width: 0;
+        font-size: 14px;
+        color: #9a9ba3;
+      }
+      .f7-wl .ws .x {
+        flex: none;
+        color: #9a9ba3;
+      }
+      .f7-wl .wtools {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 2px 0 0;
+      }
+      .f7-wl .wtools button {
+        min-height: 44px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 999px;
+        background: #161922;
+        color: #f5f5f7;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .f7-wl .wtools button.on {
+        outline: 2px solid var(--accent, #fc6a2c);
+      }
+      .f7-wl .wtools button:disabled {
+        opacity: 0.4;
+      }
+      .sug-why {
+        margin: 6px 0 0;
+        font-size: 13px;
+        line-height: 1.35;
+        color: #9a9ba3;
+      }
+      .sug-why em {
+        font-style: normal;
+        display: block;
+        margin-top: 2px;
+        font-size: 12px;
+      }
       .f7-sp {
         display: flex;
         flex-direction: column;
@@ -12883,6 +12962,36 @@
       .an-dash .chip.yellow { color: var(--warn); }
       .an-dash .chip.red { color: var(--danger); }
       .an-dash .df { margin: 0; padding: var(--s3) var(--s4); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); font-size: 14px; line-height: 21px; }
+      .an-dash .dsrc { display: grid; gap: var(--s2); padding: var(--s3); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); border-left: 3px solid var(--ok); }
+      .an-dash .dsrc.partial { border-left-color: var(--warn); }
+      .an-dash .dsrc.none { border-left-color: var(--danger); }
+      .an-dash .dsh { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); flex-wrap: wrap; }
+      .an-dash .dsh b { font-size: 15px; color: var(--text); }
+      .an-dash .dsrc ul { display: flex; flex-wrap: wrap; gap: 4px var(--s3); margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--muted); }
+      .an-dash li { list-style: none; padding: 0; }
+      .an-dash li::before { content: none; }
+      .an-dash .dsrc li.ok span { color: var(--ok); }
+      .an-dash .dsrc li.bad span { color: var(--danger); font-weight: 700; }
+      .an-dash .dw { display: grid; gap: var(--s2); }
+      .an-dash .dwarn { margin: 0; padding: var(--s2) var(--s3); border-radius: var(--r-s); background: var(--well); box-shadow: var(--edge); font-size: 13px; line-height: 19px; color: var(--warn); }
+      .an-dash .dtot { margin: 0; font-size: 12px; line-height: 17px; color: var(--muted); }
+      .an-dash .pbar { display: flex; gap: 2px; height: 10px; border-radius: 5px; overflow: hidden; }
+      .an-dash .pbar i, .an-dash .pleg i { display: inline-block; background: var(--muted); opacity: 0.45; }
+      .an-dash .pbar i.ph-work, .an-dash .pleg i.ph-work, .an-dash .bar.ph-work i { background: var(--lauf); opacity: 1; }
+      .an-dash .pleg { display: flex; flex-wrap: wrap; gap: 2px var(--s3); font-size: 12px; color: var(--muted); }
+      .an-dash .pleg i { width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
+      .an-dash .bar.ph-rest i, .an-dash .bar.ph-warm i, .an-dash .bar.ph-cool i, .an-dash .bar.ph-other i { background: var(--muted); opacity: 0.4; }
+      .an-dash .dmore { border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); }
+      .an-dash .dmore > summary { cursor: pointer; padding: var(--s3); font-size: 14px; font-weight: 600; color: var(--text); min-height: 44px; display: flex; align-items: center; }
+      .an-dash .dd { padding: var(--s2) var(--s3) var(--s3); border-top: 1px solid rgba(255, 255, 255, 0.08); }
+      .an-dash .ddh { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s2); flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+      .an-dash .ddh b { font-family: var(--f-head); font-size: 17px; color: var(--text); }
+      .an-dash .dd.green .ddh b, .an-dash .ddr .green span:last-child { color: var(--ok); }
+      .an-dash .dd.yellow .ddh b, .an-dash .ddr .yellow span:last-child { color: var(--warn); }
+      .an-dash .dd.red .ddh b, .an-dash .ddr .red span:last-child { color: var(--danger); }
+      .an-dash .dd p { margin: 2px 0 0; font-size: 12px; line-height: 17px; color: var(--muted); }
+      .an-dash .ddr { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 2px; font-size: 13px; }
+      .an-dash .ddr li { display: flex; justify-content: space-between; gap: var(--s2); color: var(--text); }
       .an-dash .df small { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
       .s7-an-tg.more { margin-top: 10px; font-size: 14px; }
       .s7-an-txt { display: grid; gap: 4px; margin-top: 6px; }
@@ -14208,10 +14317,13 @@
         cleanWeight,
         plannedWeight,
         parseKg,
-        nextWeight,
+        parseSets,
+        formatSets,
+        stepValue,
         targetRpe,
         isLift,
       } from "./src/weights.js";
+      import { suggestWeight, parseRx } from "./src/progression.js";
       import { colOf, personTests, partnerProfile } from "./src/profile.js";
       import * as sore from "./src/soreness.js";
       import { makeBackup, backupFileName, readBackup } from "./src/backup.js";
@@ -14232,9 +14344,9 @@
       } from "./src/extras.js";
       import { safeMerge, countEntries, stable } from "./src/merge.js";
       import * as review from "./src/review.js";
-      import { projectRaceDay } from "./src/forecast.js";
+      import { projectRaceDay, checkStation, checkRun, parseTimeStrict } from "./src/forecast.js";
       import { analyseSession } from "./src/analyse.js";
-      import { sessionDash, compareToPrev } from "./src/session-dash.js";
+      import { sessionDash, compareToPrev, splitPhases, phaseStats, workDash, sourceInfo, dashSections } from "./src/session-dash.js";
       import { alignSplits } from "./src/laps.js";
       import {
         extractTests,
@@ -14273,6 +14385,7 @@
         parseHeartRate,
         buildHeartRate,
       } from "./src/ftms.js";
+      import * as fb from "./src/feedback.js";
       /* Lauf- und Stationszeilen als Bausteine; erkennt die Zeile nichts sicher, bleibt der Originaltext */
       const lineHtml = (t) => fmtLine(t) || esc(t);
       /* Übung auslassen (✗): bleibt sichtbar, durchgestrichen, zählt nicht als „nicht gemacht“. Nochmal tippen = wieder offen. */
@@ -14652,15 +14765,15 @@
         const p = dayPlan(i);
         if (!p) return 0;
         const dk = keyI(i);
-        const n = applyTests(
-          S.tests,
-          myCol(),
-          extractTests(
-            p,
-            p.i.map((_, j) => S.val[dk + "|" + j]),
-          ),
-          { onlyEmpty },
+        const found = extractTests(
+          p,
+          p.i.map((_, j) => S.val[dk + "|" + j]),
         );
+        const n = applyTests(S.tests, myCol(), found, { onlyEmpty });
+        if (found && found.rejected && found.rejected.length && !testToast["rej" + i]) {
+          testToast["rej" + i] = 1;
+          toast("Nicht übernommen, unplausibel: " + found.rejected.map((x) => `${x.label} ${x.raw}`).join(", ") + ". Bitte prüfen.", true);
+        }
         if (n) S.tests.at = isoD(NOW);
         return n;
       }
@@ -14683,10 +14796,26 @@
           const dk = keyI(j);
           for (let x = 0; x < p.i.length; x++)
             if (exName(p.i[x]) === n && S.val[dk + "|" + x])
-              return { v: S.val[dk + "|" + x], rpe: S.rpe[dk] };
+              return { v: S.val[dk + "|" + x], rpe: S.rpe[dk], t: p.i[x] };
         }
         return null;
       }
+      /* Frühere Einträge derselben Übung (neueste zuerst) mit Plantext jener Einheit und Alter in Tagen */
+      function entriesBefore(i, t, max = 8) {
+        const n = exName(t),
+          out = [];
+        for (let j = i - 1; j >= 0 && out.length < max; j--) {
+          const p = dayPlan(j);
+          if (!p) continue;
+          const dk = keyI(j);
+          for (let x = 0; x < p.i.length; x++)
+            if (exName(p.i[x]) === n && S.val[dk + "|" + x])
+              out.push({ v: S.val[dk + "|" + x], rpe: S.rpe[dk], t: p.i[x], age: i - j });
+        }
+        return out;
+      }
+      /* Gewichtsvorschlag nur aus vergleichbaren Einheiten, sonst nur ein Hinweis (src/progression.js) */
+      const weightSug = (i, t) => suggestWeight(t, entriesBefore(i, t));
       function dayStatus(i) {
         const p = dayPlan(i),
           dk = keyI(i);
@@ -15220,15 +15349,15 @@
               le = lastEntry(i, t),
               last = le ? le.v : "",
               pre = !S.val[id] ? preWeight(p, t) : "";
-            // Progression nur bei Kraftübungen und nur, wenn sie vom letzten Wert abweicht
-            const nx = lift && le ? nextWeight(le.v, le.rpe, t) : "",
-              up = nx && parseKg(nx) !== parseKg(last) ? nx : "";
-            const why = le && le.rpe != null ? `letzte RPE ${le.rpe}` : "";
+            // Vorschlag nur bei Kraftübungen: nur aus vergleichbarer Einheit, sonst ein Hinweis statt eines Werts
+            const sg = lift && !S.val[id] ? weightSug(i, t) : null,
+              up = sg && sg.kg ? `${sg.kg} kg` : "";
             h += lineSlots(t)
               ? slotsField(id, lineSlots(t), S.val[id])
               : `<div class="ex-v"><input type="text" data-v2="${id}" value="${esc(S.val[id] || pre)}"${pre ? ` class="pre" title="Geplantes Gewicht – zum Ändern antippen"` : ""}${lift ? ` inputmode="decimal"` : ""} placeholder="${placeholder(lift ? "kraft" : p.k, t)}" enterkeyhint="next" aria-label="Wert für ${esc(t)}"></div>`;
-            if (last && !lineSlots(t))
-              h += `<div class="quick"><button type="button" class="last" data-last="${id}" data-lv="${esc(last)}" aria-label="Letzten Wert ${esc(last)} übernehmen">zuletzt: ${esc(last)} ↵</button>${up ? `<button type="button" class="last up" data-last="${id}" data-lv="${esc(up)}" aria-label="Vorschlag ${esc(up)} übernehmen${why ? ", " + why : ""}">${parseKg(up) > parseKg(last) ? "↗" : "↘"} ${esc(up)}${why ? ` <small>(${why})</small>` : ""}</button>` : ""}</div>`;
+            if (!lineSlots(t) && ((last && !(sg && sg.kind === "none")) || sg)) {
+              h += `<div class="quick">${last && !(sg && sg.kind === "none") ? `<button type="button" class="last" data-last="${id}" data-lv="${esc(last)}" aria-label="Letzten Wert ${esc(last)} übernehmen">zuletzt: ${esc(last)} ↵</button>` : ""}${up ? `<button type="button" class="last up" data-last="${id}" data-lv="${esc(up)}" aria-label="Vorschlag ${esc(up)} übernehmen: ${esc(sg.text)}">${parseKg(up) > parseKg(last) ? "↗" : parseKg(up) < parseKg(last) ? "↘" : "="} ${esc(up)} <small>Vorschlag</small></button>` : ""}</div>${sg ? `<p class="sug-why">${esc(sg.text)}${sg.note ? ` <em>${esc(sg.note)}</em>` : ""}</p>` : ""}`;
+            }
           }
           h += `</div>`;
         });
@@ -15777,7 +15906,12 @@
       /* Partnerwerte: aus seinem Konto. Ohne Cloud (Vorschau) die alten Einträge der Partnerspalte auf diesem Gerät – ebenfalls nur lesen. */
       const partnerTests = () =>
         PP ? PP.tests : personTests(S.tests, colOf(PARTNER));
-      const teamT = () => avg([...myTests().lauf, ...partnerTests().lauf]);
+      /* Nur plausible Laufzeiten zählen (wie in der Prognose): "13" ist keine Kilometerzeit */
+      const avgRun = (a) => {
+        const v = a.map(checkRun).filter((c) => c.ok).map((c) => c.s);
+        return v.length ? v.reduce((x, y) => x + y, 0) / v.length : NaN;
+      };
+      const teamT = () => avgRun([...myTests().lauf, ...partnerTests().lauf]);
 
       /* Eingabefeld: bearbeitbar nur mit attr (eigener Wert), sonst gesperrt und ohne data-Attribut (der Input-Handler ignoriert es) */
       const pin = (attr, val, label, ph) =>
@@ -15822,15 +15956,15 @@
           B = partnerTests(),
           mc = myCol(),
           T = teamT(),
-          aa = avg(A.lauf),
-          ab = avg(B.lauf);
+          aa = avgRun(A.lauf),
+          ab = avgRun(B.lauf);
         let h = `<div class="vh" style="margin-top:var(--s8)"><h2>Tests &amp; Benchmarks</h2></div>
   <div class="cap">Pacing-Test 4×1 km</div><div class="card">
     <table><tr><th></th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th></tr>
     ${A.lauf.map((v, r) => `<tr><td class="l" style="white-space:nowrap">Rep ${r + 1}</td><td>${pin(own ? `data-l="${mc}|${r}"` : "", v, `${ME} Rep ${r + 1}`, "4:20")}</td><td>${pin("", B.lauf[r], `${PARTNER} Rep ${r + 1}`)}</td></tr>`).join("")}
     </table>
     <p class="mt-3">Ø ${esc(ME)} <span class="res">${isNaN(aa) ? "–" : mmss(aa)}</span> · Ø ${esc(PARTNER)} <span class="res">${isNaN(ab) ? "–" : mmss(ab)}</span>${!isNaN(aa) && !isNaN(ab) ? ` · Abstand <span class="res">${Math.abs(Math.round(aa - ab))} s</span>` : ""}</p>
-    <p class="mt-1">Team-Tempo T <span class="res">${isNaN(T) ? "–" : mmss(T) + "/km"}</span></p>
+    ${[...A.lauf.map((v) => [ME, v]), ...B.lauf.map((v) => [PARTNER, v])].map(([n, v], x) => { const c = checkRun(v); return c.reason ? `<div class="hint" role="alert">${esc(n)}, Rep ${(x % 4) + 1}: ${esc(c.reason)} Zählt nicht für T.</div>` : ""; }).join("")}<p class="mt-1">Team-Tempo T <span class="res">${isNaN(T) ? "–" : mmss(T) + "/km"}</span></p>
     <div class="hint">Sub-60 braucht im Rennen ca. 3:58/km. Abstand zwischen euch: 5–15 s.</div></div>`;
         const ST = [
           "SkiErg",
@@ -15842,10 +15976,16 @@
           "Lunges",
           "Wall Balls",
         ];
+        const stBad = ST.map((s, r) =>
+          [[ME, A.station[r]], [PARTNER, B.station[r]]].map(([n, v]) => { const c = checkStation(r, v); return c.reason ? `<div>• ${esc(n)}, ${esc(s)}: ${esc(c.reason)}</div>` : ""; }).join(""),
+        ).join("");
+        const stBadH = stBad ? `<div class="hint" role="alert"><b>Unplausibel, bitte prüfen</b> (fliesst nicht in die Prognose ein):<div style="margin-top:4px">${stBad}</div></div>` : "";
         h += `<div class="cap">Stationen-Benchmark</div><div class="card"><table><tr><th>Station</th><th>${esc(ME)}</th><th>${esc(PARTNER)}</th><th>Teilen</th></tr>
     ${ST.map((s, r) => {
-      const a = parseT(A.station[r]),
-        b = parseT(B.station[r]);
+      const ca = checkStation(r, A.station[r]),
+        cb = checkStation(r, B.station[r]),
+        a = ca.ok ? ca.s : NaN,
+        b = cb.ok ? cb.s : NaN;
       let rec = "";
       if (!isNaN(a) && !isNaN(b)) {
         const df = Math.abs(a - b);
@@ -15854,7 +15994,7 @@
       }
       return `<tr><td class="l">${s}</td><td>${pin(own ? `data-s="${r}|${mc}"` : "", A.station[r], `${s} ${ME}`)}</td><td>${pin("", B.station[r], `${s} ${PARTNER}`)}</td><td class="res" style="font-size:12px;white-space:nowrap">${rec}</td></tr>`;
     }).join("")}
-    </table><div class="hint">Mehr als 15–20 s Unterschied: der Schnellere übernimmt mehr. Sonst 50/50.</div></div>`;
+    </table><div class="hint">Mehr als 15–20 s Unterschied: der Schnellere übernimmt mehr. Sonst 50/50. Zeit der ganzen Station als m:ss (SkiErg und RowErg: 1000 m).</div>${stBadH}</div>`;
         const tr = own ? A.trans : B.trans,
           ta = avg(tr);
         h += `<div class="cap">Übergaben (Ziel &lt; 8 s)${own ? "" : " · von " + esc(PARTNER)}</div><div class="card"><div class="grid2">${tr.map((v, r) => pin(own ? `data-t="${r}"` : "", v, `Wechsel ${r + 1}`, `Wechsel ${r + 1}`)).join("")}</div>
@@ -16972,15 +17112,16 @@
           pa = partnerTests();
         const at = S.tests && S.tests.at ? Date.parse(S.tests.at) : NaN;
         return review.forecast({
-          laufPersons: [me.lauf.map(parseT), pa.lauf.map(parseT)],
-          station: me.station.map((v, r) => [parseT(v), parseT(pa.station[r])]),
+          names: [ME, PARTNER],
+          laufPersons: [me.lauf, pa.lauf],
+          station: me.station.map((v, r) => [v, pa.station[r]]),
           sims: Object.entries(S.simres || {})
             .filter(([, v]) => simOk(v))
             .sort(([a], [b]) => (a < b ? -1 : 1))
             .map(([d, v]) => ({
               intensity: v.i,
               stations: simTotal(v),
-              parts: v.st.map(parseT),
+              parts: v.st,
               run: parseT(v.run) > 0 ? parseT(v.run) : undefined,
               rox: parseT(v.rox) > 0 ? parseT(v.rox) : undefined,
               ageDays: Math.max(0, Math.floor((+NOW - Date.parse(d)) / dayMs)),
@@ -17014,9 +17155,10 @@
         if (t && t.gap > 0)
           h += `<p class="sub mt-2">Ca. ${Math.ceil(t.perWeek)} s pro Woche aufholen.</p>`;
         for (const w of fc.warnings) h += `<div class="hint">${esc(w)}</div>`;
+        h += review.forecastNotes(fc);
         // Renntag: abflachender Trend aus den gespeicherten Wochenprognosen (Faustregel, keine Messung)
         const hist = Object.entries(S.review || {})
-          .filter(([, r]) => r && r.fc > 0 && r.fcv === 2) // nur Punkte aus dem aktuellen Rechenmodell, sonst entsteht ein künstlicher Trendsprung
+          .filter(([, r]) => r && r.fc > 0 && r.fcv === 3) // nur Punkte aus dem aktuellen Rechenmodell, sonst entsteht ein künstlicher Trendsprung
           .map(([x, r]) => ({ day: +x * 7, total: r.fc }));
         hist.push({ day: Math.max(0, TODAY), total: fc.total });
         const rd = projectRaceDay(hist, Math.max(0, Math.ceil((RACE - midnight(NOW)) / dayMs)));
@@ -17047,7 +17189,7 @@
             "",
           )}</tbody><tfoot><tr><td>Gesamt</td><td>${bd.est != null ? mmss(bd.est) : "–"}</td><td>${mmss(bd.goal)}</td><td class="${bd.diff == null ? "" : bd.diff > 0 ? "rv-slow" : "rv-fast"}">${sign(bd.diff != null ? Math.round(bd.diff) : null)}</td></tr></tfoot></table>`;
         h += `<div class="cap rv-gap">Tempo pro Kilometer im Rennen</div><p class="sub">${fc.paces.map((p, n) => `${n + 1}: ${mmss(p)}`).join(" · ")}</p>`;
-        h += `<details class="rv-how"><summary>Worauf basiert das?</summary><ul class="sub" style="margin:var(--s2) 0 0;padding-left:18px">${fc.basis.map((b) => `<li>${esc(b)}</li>`).join("")}</ul><p class="sub mt-2">Laufen: Team-Tempo ${mmss(fc.T)}/km aus dem 4×1-km-Test plus ${fc.paces[0] - fc.T} s/km Ermüdung (Compromised Running), ab Lauf 5 zusätzlich langsamer. Stationen: Mittel eurer Solo-Benchmarks × ${String(fc.k.toFixed(2)).replace(".", ",")} (Arbeit teilen und Ermüdung im Rennen)${fc.calibrated ? ", geeicht an euren Simulationen" : ". Dieser Faktor ist eine Annahme, bis eine Simulation ab 85 % eingetragen ist"}. Roxzone ${mmss(fc.rox)} (St. Gallen: 4:13). Die Spanne zeigt, wie unsicher die Teile sind. Genauer wird die Zahl mit jedem neuen Test und mit der ersten Simulation.</p></details>`;
+        h += `<details class="rv-how"><summary>Worauf basiert das?</summary><ul class="sub" style="margin:var(--s2) 0 0;padding-left:18px">${fc.basis.map((b) => `<li>${esc(b)}</li>`).join("")}</ul><p class="sub mt-2">Laufen: Team-Tempo ${mmss(fc.T)}/km aus dem 4×1-km-Test plus ${fc.paces[0] - fc.T} s/km Ermüdung (Compromised Running), ab Lauf 5 zusätzlich langsamer. Stationen: Mittel eurer Solo-Benchmarks × ${String(fc.k.toFixed(2)).replace(".", ",")} (Partner arbeiten nacheinander, Ermüdung im Rennen)${fc.calibrated ? ", geeicht an euren Simulationen" : ". Dieser Faktor ist eine Annahme, bis eine Simulation ab 85 % eingetragen ist"}. Roxzone ${mmss(fc.rox)} (St. Gallen: 4:13). Die Spanne zeigt, wie unsicher die Teile sind. Genauer wird die Zahl mit jedem neuen Test und mit der ersten Simulation.</p></details>`;
         // Simulation eintragen: eicht den Stationsfaktor
         const sims = Object.entries(S.simres || {})
           .filter(([, v]) => simOk(v))
@@ -17811,7 +17953,7 @@
           S.review[w] = {
             at: Date.now(),
             level: r.level,
-            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 2 } : {}),
+            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 3 } : {}),
           };
           save();
         }
@@ -19286,8 +19428,14 @@
           const started = fcT.spec && fcElapsed() > 0;
           timer = `<div class="fc-timer" data-ph="${v.ph}"><div><div class="fc-time" id="fc-time">${v.time}</div><div class="fc-tlabel" id="fc-tlabel">${esc(v.label)}</div></div><div class="fc-tbtn"><button type="button" class="${fcT.run ? "stop" : "go"}" data-fc="tstart">${fcT.run ? "Pause" : started && v.ph !== "done" ? "Weiter" : "Start"}</button>${started && !fcT.run ? `<button type="button" data-fc="treset">Neu</button>` : ""}</div></div>`;
         }
-        const last =
-          le && le.v
+        const sg1 = lift ? weightSug(focusI, t) : null;
+        const last = sg1
+          ? sg1.kg && S.val[id] !== `${sg1.kg} kg`
+            ? `<button type="button" class="fc-last" data-fc="last" data-v="${esc(sg1.kg + " kg")}">${"Vorschlag"} ${sg1.kg} kg · übernehmen</button><p class="sug-why">${esc(sg1.text)}</p>`
+            : !sg1.kg && !S.val[id]
+              ? `<p class="sug-why">${esc(sg1.text)}</p>`
+              : ""
+          : le && le.v
             ? `<button type="button" class="fc-last" data-fc="last" data-v="${esc(le.v)}">zuletzt ${esc(le.v)} · übernehmen</button>`
             : "";
         // Wer das Weiterklicken vergessen hat: hier steht, was als Nächstes dran ist, ein Tipp springt hin
@@ -19390,9 +19538,10 @@
         const p = dayPlan(focusI),
           id = keyI(focusI) + "|" + focusJ,
           t = p.i[focusJ];
-        const kg = parseKg(S.val[id] || preWeight(p, t));
-        if (isNaN(kg)) return toast("Gib zuerst ein Gewicht ein", true);
-        S.val[id] = `${+Math.max(0, kg + dir * 2.5).toFixed(1)} kg`;
+        const nv = stepValue(S.val[id] || preWeight(p, t), dir); // alle Sätze gleich verschieben, Struktur bleibt
+        if (isNaN(parseKg(S.val[id] || preWeight(p, t)))) return toast("Gib zuerst ein Gewicht ein", true);
+        if (nv) S.val[id] = nv;
+        else delete S.val[id];
         save();
         focusRender();
       }
@@ -20495,7 +20644,15 @@
         }
         return kind;
       }
-      /* Dashboard: Punktzahl-Ring, Kennzahl-Kacheln, Rundenbalken der Uhr und Coach-Kennzahlen */
+      /* Phasen (Arbeit/Pause/Ein-/Auslaufen) und Kennzahlen einer Uhr-Aktivität; maxHr = höchster je gemessener Puls (Zonen-Referenz) */
+      function s7Work(p, act) {
+        const steps = s7Steps(p),
+          planText = (p.i || []).find((t) => dash.parseReps(t)) || "",
+          ph = splitPhases(act && act.laps, { steps, planText }),
+          maxHr = Math.max(0, ...Object.values(S.strava.acts).map((a) => a.maxHr || 0)) || null;
+        return { ph, st: phaseStats(ph, { steps, maxHr }) };
+      }
+      /* Dashboard: Punktzahl-Ring, Quelle der Uhr-Daten, Kennzahlen nur über Arbeitsphasen, Vergleich, Rundenbalken, Coach-Kennzahlen */
       function s7DashHtml(i, p, coachData) {
         let q;
         try {
@@ -20505,14 +20662,34 @@
         }
         const acts = actsOf(i),
           act = acts.find((a) => a.laps && a.laps.length) || acts[0] || null,
-          d = sessionDash(q, act, coachData),
+          W = act ? s7Work(p, act) : null,
+          d = sessionDash(q, act, coachData, W && W.ph),
           C = 2 * Math.PI * 26,
           off = (C * (100 - d.score)) / 100;
+        const sec = dashSections(
+          {
+            src: sourceInfo(act, {
+              garmin: { on: gmOn(), err: S.garmin.conn && S.garmin.conn.err, at: S.garmin.at },
+              strava: { on: !!stTok(), at: S.strava.at },
+              dayLabel: shortDay(i),
+            }),
+            wd: W ? workDash(W.st) : { main: [], totals: "", phaseBar: [], details: [], warn: "" },
+            actId: act ? act.id : "",
+          },
+          esc,
+        );
         const tiles = d.tiles
           .map((t) => `<div class="dt ${t.tone}"><span class="k">${esc(t.k)}</span><b>${esc(t.v)}</b>${t.sub ? `<span class="s">${esc(t.sub)}</span>` : ""}</div>`)
           .join("");
         const pv = act ? s7Prev(i, p, act.group) : null,
-          cmp = pv ? compareToPrev({ act, rpe: S.rpe[keyI(i)] != null ? +S.rpe[keyI(i)] : null }, pv, { easy: isEasyRun(p) }) : [],
+          pw = pv ? s7Work(dayPlan(pv.i), pv.act) : null,
+          cmp = pv
+            ? compareToPrev(
+                { act, rpe: S.rpe[keyI(i)] != null ? +S.rpe[keyI(i)] : null, work: W && ["sure", "likely"].includes(W.ph.conf) ? W.st.work : null },
+                { ...pv, work: pw && ["sure", "likely"].includes(pw.ph.conf) ? pw.st.work : null },
+                { easy: isEasyRun(p) },
+              )
+            : [],
           cmpHtml = cmp.length
             ? `<div class="dp"><span class="k">Vergleich mit ${pv.same ? "der letzten gleichen Einheit" : "der letzten ähnlichen Einheit"}</span><span class="dpl">${esc(shortDay(pv.i))} · ${esc(s7Title(dayPlan(pv.i).t))}</span><div class="dg">${cmp.map((t) => `<div class="dt ${t.tone}"><span class="k">${esc(t.k)}</span><b>${esc(t.v)}</b><span class="s">${esc(t.sub)}</span></div>`).join("")}</div></div>`
             : act
@@ -20520,13 +20697,13 @@
               : "";
         const bars = d.laps
           ? `<div class="dl" role="img" aria-label="Rundenzeiten der Uhr"><span class="k">Runden der Uhr (${d.laps.length})</span><div class="bars">${d.laps
-              .map((l, k) => `<div class="bar" title="Runde ${k + 1}: ${l.label}${l.pace ? " · " + l.pace + "/km" : ""}${l.hr ? " · " + l.hr + " bpm" : ""}"><i style="height:${l.h}%"></i><small>${l.label}</small></div>`)
+              .map((l, k) => `<div class="bar${l.phase ? " ph-" + l.phase : ""}" title="Runde ${k + 1}${l.phase ? " · " + {warm:"Einlaufen",work:"Arbeit",rest:"Pause",cool:"Auslaufen",other:"Sonstiges"}[l.phase] : ""}: ${l.label}${l.pace ? " · " + l.pace + "/km" : ""}${l.hr ? " · " + l.hr + " bpm" : ""}"><i style="height:${l.h}%"></i><small>${l.label}</small></div>`)
               .join("")}</div></div>`
           : "";
         const chips = d.chips.length
           ? `<div class="dc">${d.chips.map((c) => `<span class="chip ${c.tone}"><small>${esc(c.k)}</small> ${esc(c.v)}</span>`).join("")}</div>`
           : "";
-        return `<div class="an-dash"><div class="dh"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="32" cy="32" r="26" fill="none" class="ring ${d.tone}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 32 32)"/></svg><div><b class="sc">${d.score}<small>/100</small></b><span class="vd">${esc(d.verdict)}</span></div></div>${tiles ? `<div class="dg">${tiles}</div>` : ""}${cmpHtml}${bars}${chips}${d.focus ? `<p class="df"><small>Nächstes Mal</small> ${esc(d.focus)}</p>` : ""}</div>`;
+        return `<div class="an-dash"><div class="dh"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="32" cy="32" r="26" fill="none" class="ring ${d.tone}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 32 32)"/></svg><div><b class="sc">${d.score}<small>/100</small></b><span class="vd">${esc(d.verdict)}</span></div></div>${sec.src}${tiles ? `<div class="dg">${tiles}</div>` : ""}${sec.work}${sec.more}${cmpHtml}${bars}${chips}${d.focus ? `<p class="df"><small>Nächstes Mal</small> ${esc(d.focus)}</p>` : ""}</div>`;
       }
       function s7FinCard(i, p) {
         const dk = keyI(i),
@@ -21038,7 +21215,7 @@
           prog = `<section class="s6-card s7-pg" aria-label="Rennprognose"><div class="r1"><span class="s6-kick">Rennprognose</span><span class="s7-pill"><i style="background:${gap > 0 ? "#ff9f0a" : "#30d158"}"></i>${mmss(Math.abs(gap))} ${gap > 0 ? "zu langsam" : "Puffer"}</span></div><div class="big"><b>${mmss(fc.total)}</b></div><p class="cap">Spanne ${mmss(fc.lo)} bis ${mmss(fc.hi)} · Ziel 60:00</p>
         <div class="bar"><div><u style="width:${pc(fc.run)}%;background:#f5f5f7"></u><u style="width:${pc(stSum)}%;background:#9a9ba3"></u><u style="width:${pc(fc.rox)}%;background:#6d7176"></u></div><i style="left:${pc(review.GOAL_S)}%"></i></div>
         <div class="lg"><span><i style="background:#f5f5f7"></i>Laufen</span><span><i style="background:#9a9ba3"></i>Stationen</span><span><i style="background:#6d7176"></i>Roxzone</span><span><i class="m"></i>60:00 Ziel · 63:21 St. Gallen</span></div>
-        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${det}${calc}${pgw}</section>`;
+        <div class="rows">${row("Laufen", fc.run, `8 × 1 km · ${mmss(Math.round(fc.run / 8))} /km`)}${row("Stationen", stSum)}${row("Roxzone", fc.rox)}</div>${review.forecastNotes(fc)}${det}${calc}${pgw}</section>`;
         }
         return prog;
       }
@@ -21226,7 +21403,7 @@
           S.review[w] = {
             at: Date.now(),
             level: r.level,
-            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 2 } : {}),
+            ...(fc0 && fc0.total ? { fc: Math.round(fc0.total), fcv: 3 } : {}),
           };
           save();
         }
@@ -21252,7 +21429,7 @@
         if (fc && fc.total) {
           const gap = fc.total - review.GOAL_S;
           big = mmss(fc.total);
-          fcap = `${gap > 0 ? mmss(gap) + " zu langsam" : mmss(-gap) + " Puffer"} · berechnet aus Tests und Trainingswerten`;
+          fcap = `Spanne ${mmss(fc.lo)} bis ${mmss(fc.hi)} · ${gap > 0 ? mmss(gap) + " zu langsam" : mmss(-gap) + " Puffer"}${fc.issues && fc.issues.length ? " · " + fc.issues.length + " Eingabe(n) prüfen" : ""}`;
           fill = `<u style="width:${Math.max(0, Math.min(100, ((fc.total - lo) / (hi - lo)) * 100)).toFixed(1)}%;background:${gap > 0 ? "var(--warn)" : "var(--ok)"}"></u>`;
         }
         const forecast = `<section class="s6-card s6-fc" aria-label="Prognose"><div class="row"><div><span class="s6-kick">Prognose Basel</span><span class="big">${big}</span></div><div><span class="s6-kick">Ziel</span><span class="ziel">&lt; 60:00</span></div></div><div class="bar">${fill}<b aria-hidden="true"></b></div><span class="fcap">${fcap}</span></section>`;
@@ -21673,8 +21850,14 @@
           else if (lift) {
             const num = String(val || "").replace(/\s*kg\s*$/i, "");
             field = `<div class="f7-w"><button type="button" data-fc="dec" aria-label="Gewicht verringern">${F7_CHEV("M5 12h14")}</button><div class="f7-wv"><div class="f7-n"><input class="f7-in${pre ? " pre" : ""}" type="text" data-v2="${id}" value="${esc(num)}" inputmode="decimal" placeholder="–" enterkeyhint="done" aria-label="Gewicht für ${esc(r.title)} in Kilogramm"><span>kg</span></div><span class="s6-kick">Gewicht</span></div><button type="button" data-fc="inc" aria-label="Gewicht erhöhen">${F7_CHEV("M12 5v14M5 12h14")}</button></div>`;
+            const sg = weightSug(focusI, t),
+              sgv = sg.kg ? `${sg.kg} kg` : "";
             note =
-              le && le.v && S.val[id] !== le.v && !pre
+              sg.kg && S.val[id] !== sgv && !pre
+                ? `<button type="button" class="f7-last" data-fc="last" data-v="${esc(sgv)}">${"Vorschlag"} ${esc(sgv)} übernehmen</button><p class="f7-note">${esc(sg.text)}${sg.note ? ` ${esc(sg.note)}` : ""}</p>`
+                : !sg.kg && !S.val[id] && !pre
+                  ? `<p class="f7-note">${esc(sg.text)}</p>`
+                  : le && le.v && S.val[id] !== le.v && !pre
                 ? `<button type="button" class="f7-last" data-fc="last" data-v="${esc(le.v)}">Zuletzt ${esc(le.v)} übernehmen</button>`
                 : le && le.v
                   ? `<p class="f7-note"><span class="f7-de">Zuletzt ${esc(le.v)}, bereits übernommen. Ändern mit − und +.</span><span class="f7-mo">Zuletzt ${esc(le.v)}, übernommen.</span></p>`
@@ -22328,7 +22511,7 @@
               : null,
           keepSel =
             ae && ae.dataset && ae.dataset.fin
-              ? ["fin", "j", "r", "m", "d"]
+              ? ["fin", "j", "s", "r", "m", "d"]
                   .filter((k) => ae.dataset[k] != null)
                   .map((k) => `[data-${k}="${ae.dataset[k]}"]`)
                   .join("")
@@ -22338,19 +22521,35 @@
           const rows = fin7Lifts(p)
             .map(({ t, j }) => {
               const r = s7Row(t),
-                le = lastEntry(fin7.i, t),
-                v = fin7.w[j];
-              const sb = [
-                r.val,
-                r.subs[0] && /je Seite/.test(r.subs[0]) ? "je Seite" : "",
-                le && le.v ? `zuletzt ${le.v}` : "",
-              ]
+                sg = weightSug(fin7.i, t),
+                per = !!fin7.wm[j];
+              const sb = [r.val, r.subs[0] && /je Seite/.test(r.subs[0]) ? "je Seite" : "", per ? "pro Satz" : ""]
                 .filter(Boolean)
                 .join(" · ");
-              return `<div class="r"><div class="nm">${esc(r.title)}<div class="sb">${esc(sb)}</div></div><button type="button" class="b" data-fin="wst" data-j="${j}" data-d="-1" aria-label="weniger">${F7_CHEV("M5 12h14")}</button><div class="v${v == null ? " e" : ""}">${v == null ? "–" : String(v).replace(".", ",")}<br><small>kg</small></div><button type="button" class="b" data-fin="wst" data-j="${j}" data-d="1" aria-label="mehr">${F7_CHEV("M12 5v14M5 12h14")}</button></div>`;
+              const ctl = (kg, sk, lbl) =>
+                `<button type="button" class="b" data-fin="wst" data-j="${j}" data-s="${sk}" data-d="-1" aria-label="${lbl} weniger">${F7_CHEV("M5 12h14")}</button><div class="v${kg == null ? " e" : ""}"><input class="vi" type="text" inputmode="decimal" data-fin-wk="${j}" data-s="${sk}" value="${kg == null ? "" : esc(String(kg).replace(".", ","))}" placeholder="–" aria-label="${lbl} in Kilogramm"><br><small>kg</small></div><button type="button" class="b" data-fin="wst" data-j="${j}" data-s="${sk}" data-d="1" aria-label="${lbl} mehr">${F7_CHEV("M12 5v14M5 12h14")}</button>`;
+              let inner;
+              if (!per)
+                inner = `<div class="r"><div class="nm">${esc(r.title)}<div class="sb">${esc(sb)}</div></div>${ctl(fin7.w[j], "u", r.title)}</div>`;
+              else {
+                const rp = parseRx(t),
+                  ph = rp ? (rp.lo === rp.hi ? rp.lo : rp.lo + "–" + rp.hi) : "Wdh";
+                inner =
+                  `<div class="r"><div class="nm">${esc(r.title)}<div class="sb">${esc(sb)}</div></div></div>` +
+                  fin7.wps[j]
+                    .map(
+                      (st, k) =>
+                        `<div class="r ws"><span class="sn">Satz ${k + 1}</span>${ctl(st.kg, k, "Satz " + (k + 1))}<span class="x" aria-hidden="true">×</span><input class="ri" type="text" inputmode="numeric" data-fin-wr="${j}" data-s="${k}" value="${st.reps == null ? "" : st.reps}" placeholder="${ph}" aria-label="Wiederholungen Satz ${k + 1}"></div>`,
+                    )
+                    .join("") +
+                  `<div class="wtools"><button type="button" data-fin="wsadd" data-j="${j}"${fin7.wps[j].length >= 10 ? " disabled" : ""}>+ Satz</button><button type="button" data-fin="wsdel" data-j="${j}"${fin7.wps[j].length <= 1 ? " disabled" : ""}>− Satz</button></div>`;
+              }
+              const tools = `<div class="wtools"><button type="button" class="wm${per ? " on" : ""}" data-fin="wmode" data-j="${j}" aria-pressed="${per}">Pro Satz eintragen</button>${sg.kg ? `<button type="button" class="wsug" data-fin="wsug" data-j="${j}" data-v="${sg.kg}">${"Vorschlag"} ${String(sg.kg).replace(".", ",")} kg übernehmen</button>` : ""}</div>`;
+              const why = `<p class="sug-why">${esc(sg.text)}${sg.note ? ` <em>${esc(sg.note)}</em>` : ""}</p>`;
+              return `<div class="wx">${inner}${tools}${why}</div>`;
             })
             .join("");
-          body = `<div><h2>Gewichte eintragen</h2><div class="sb2">Pro Übung das Arbeitsgewicht. Leer lassen, was Du nicht brauchst.</div></div><div class="f7-wl">${rows}</div><div class="acts"><button type="button" class="s6-btn gold" data-fin="wok">Übernehmen</button></div>`;
+          body = `<div><h2>Gewichte eintragen</h2><div class="sb2">Pro Übung ein Gewicht für alle Sätze, oder „Pro Satz eintragen“ für unterschiedliche Gewichte und Wiederholungen. Leer lassen, was Du nicht brauchst.</div></div><div class="f7-wl">${rows}</div><div class="acts"><button type="button" class="s6-btn gold" data-fin="wok">Übernehmen</button></div>`;
         } else if (fin7.sub === "s") {
           const rows = fin7Splits(p)
             .map(({ t, j }) => {
@@ -22417,6 +22616,12 @@
         const again = keepSel ? el.querySelector(keepSel) : null;
         if (again) again.focus({ preventScroll: true });
         else if (first) sh.focus({ preventScroll: true });
+      }
+      /* Gespeicherter Text einer Gewichtszeile aus dem Sheet-Zustand: ein Wert für alle Sätze ("80 kg") oder je Satz ("80 kg × 5 / 85 kg × 5") */
+      function fin7Out(j) {
+        if (fin7.wm[j]) return formatSets(fin7.wps[j]);
+        const kg = fin7.w[j];
+        return kg > 0 ? formatSets([{ kg, reps: fin7.wr[j] }]) : "";
       }
       function fin7Save() {
         if (!fin7) return;
@@ -22514,34 +22719,83 @@
         if (a === "wopen") {
           const dk = keyI(fin7.i);
           fin7.w = {};
+          fin7.wr = {};
+          fin7.wps = {};
+          fin7.wm = {};
           fin7.w0 = {};
           for (const { t, j } of fin7Lifts(p)) {
-            const le = lastEntry(fin7.i, t),
-              kg = parseKg(
-                S.val[dk + "|" + j] || preWeight(p, t) || (le && le.v) || "",
-              );
+            // vorbelegt wird nur, was eingetragen oder geplant ist – nie das Gewicht der letzten Einheit (anderes Schema, anderes Gewicht)
+            const raw = S.val[dk + "|" + j] || "",
+              sets = parseSets(raw),
+              kg = parseKg(raw || preWeight(p, t));
             fin7.w[j] = isNaN(kg) ? null : kg;
-            fin7.w0[j] = S.val[dk + "|" + j] ? fin7.w[j] : null;
+            fin7.wr[j] = sets.length === 1 ? sets[0].reps : null;
+            if (sets.length > 1) {
+              fin7.wm[j] = true;
+              fin7.wps[j] = sets.map((x) => ({ ...x }));
+            }
+            fin7.w0[j] = raw ? fin7Out(j) : ""; // geplantes Gewicht wird wie bisher gespeichert
           }
           fin7.sub = "w";
           return fin7Paint();
         }
+        if (a === "wmode") {
+          const j = +b.dataset.j;
+          if (!fin7.wm[j] && !fin7.wps[j]) {
+            const rp = parseRx(p.i[j]);
+            fin7.wps[j] = Array.from({ length: Math.min(10, (rp && rp.sets) || 3) }, () => ({ kg: fin7.w[j], reps: fin7.wr[j] }));
+          }
+          if (fin7.wm[j] && fin7.wps[j]) {
+            // zurück auf „ein Wert für alle“: schwerster Satz zählt, Unterschiede gehen dabei verloren – deshalb ausdrücklich melden
+            const L = fin7.wps[j].filter((x) => x.kg > 0),
+              diff = L.some((x) => x.kg !== L[0].kg || x.reps !== L[0].reps);
+            fin7.w[j] = L.length ? Math.max(...L.map((x) => x.kg)) : null;
+            fin7.wr[j] = null;
+            fin7.wps[j] = null;
+            if (diff) toast("Ein Wert für alle Sätze: schwerster Satz übernommen");
+          }
+          fin7.wm[j] = !fin7.wm[j];
+          return fin7Paint();
+        }
+        if (a === "wsadd" || a === "wsdel") {
+          const j = +b.dataset.j,
+            L = fin7.wps[j];
+          if (a === "wsadd" && L.length < 10) L.push({ ...L[L.length - 1] });
+          if (a === "wsdel" && L.length > 1) L.pop();
+          return fin7Paint();
+        }
+        if (a === "wsug") {
+          const j = +b.dataset.j,
+            kg = +b.dataset.v;
+          fin7.w[j] = kg;
+          if (fin7.wps[j]) {
+            // Staffel nicht plattmachen: nur der schwerste Satz (Basis des Vorschlags) bekommt den Wert, bei gleichen/leeren Sätzen alle
+            const L = fin7.wps[j],
+              mx = Math.max(0, ...L.map((x) => x.kg || 0)),
+              flat = L.every((x) => (x.kg || 0) === (L[0].kg || 0));
+            L.forEach((x) => { if (flat || (x.kg || 0) === mx) x.kg = kg; });
+          }
+          return fin7Paint();
+        }
         if (a === "wst") {
           const j = +b.dataset.j,
-            cur = fin7.w[j];
-          const nv = Math.max(
-            0,
-            +((cur == null ? 0 : cur) + +b.dataset.d * 2.5).toFixed(1),
-          );
-          fin7.w[j] = nv > 0 ? nv : null;
+            sk = b.dataset.s,
+            d = +b.dataset.d;
+          const cur = sk === "u" ? fin7.w[j] : fin7.wps[j][+sk].kg;
+          // leerer Satz startet beim vorigen Satz statt bei 0
+          const from = cur != null ? cur : sk !== "u" && +sk > 0 ? fin7.wps[j][+sk - 1].kg || 0 : 0;
+          const nv = Math.max(0, +(from + d * 2.5).toFixed(1));
+          if (sk === "u") fin7.w[j] = nv > 0 ? nv : null;
+          else fin7.wps[j][+sk].kg = nv > 0 ? nv : null;
           return fin7Paint();
         }
         if (a === "wok") {
           const dk = keyI(fin7.i);
-          for (const [j, kg] of Object.entries(fin7.w)) {
-            if (kg === fin7.w0[j]) continue; // nur Geändertes schreiben
-            if (kg == null) delete S.val[dk + "|" + j];
-            else S.val[dk + "|" + j] = `${kg} kg`;
+          for (const j of Object.keys(fin7.w0)) {
+            const out = fin7Out(j);
+            if (out === fin7.w0[j]) continue; // nur Geändertes schreiben
+            if (!out) delete S.val[dk + "|" + j];
+            else S.val[dk + "|" + j] = out;
           }
           save();
           fin7.sub = null;
@@ -22614,6 +22868,27 @@
           const j = +e.target.dataset.finSp,
             k = +e.target.dataset.k;
           (fin7.s[j] = fin7.s[j] || [])[k] = e.target.value;
+        }
+      });
+      /* Getippte Gewichte und Wiederholungen im Gewichts-Sheet: nur Zustand merken, kein Neuaufbau (sonst verliert der Tipp auf „Übernehmen“ das Ziel) */
+      document.addEventListener("change", (e) => {
+        const t = e.target;
+        if (!fin7 || fin7.sub !== "w" || !t || !t.matches) return;
+        const isK = t.matches("[data-fin-wk]"),
+          isR = t.matches("[data-fin-wr]");
+        if (!isK && !isR) return;
+        const j = +(isK ? t.dataset.finWk : t.dataset.finWr),
+          sk = t.dataset.s;
+        if (isK) {
+          const kg = cleanWeight(t.value);
+          const v = kg ? +kg : null;
+          if (sk === "u") fin7.w[j] = v;
+          else fin7.wps[j][+sk].kg = v;
+          t.value = v == null ? "" : String(v).replace(".", ",");
+        } else {
+          const n = parseInt(t.value, 10);
+          fin7.wps[j][+sk].reps = n >= 1 && n <= 99 ? n : null;
+          t.value = fin7.wps[j][+sk].reps == null ? "" : fin7.wps[j][+sk].reps;
         }
       });
       document.addEventListener("change", (e) => {
@@ -22706,6 +22981,7 @@
           .querySelectorAll("[data-partner]")
           .forEach((x) => (x.textContent = PARTNER));
         $("#acct").innerHTML = s6MenuAcct();
+        fb.refresh();
         const mc = $("#mi-conn");
         if (mc)
           mc.textContent =
@@ -23290,12 +23566,18 @@
               "Bitte alle acht Stationszeiten als m:ss eintragen",
               true,
             );
-          S.simres = S.simres || {};
-          S.simres[day] = { i: pct / 100, st: st.map((x) => mmss(parseT(x))) };
+          const simBad = st.map((x, r) => checkStation(r, x)).find((c) => !c.ok);
+          if (simBad) return toast(simBad.reason || "Unplausible Stationszeit, bitte prüfen", true);
+          const extra = {};
           for (const [f, id] of [["run", "sim-run"], ["rox", "sim-rox"]]) {
-            const v = parseT((($("#" + id) || {}).value || "").trim());
-            if (v > 0) S.simres[day][f] = mmss(v);
+            const raw = (($("#" + id) || {}).value || "").trim();
+            if (!raw) continue;
+            const v = parseTimeStrict(raw); // wie die Prognose: "357" = 3:57, "13" ist keine Zeit
+            if (!(v > 0)) return toast(`«${raw}» (${f === "run" ? "Laufen" : "Roxzone"}) ist keine Zeit. Bitte als m:ss eintragen.`, true);
+            extra[f] = mmss(v);
           }
+          S.simres = S.simres || {};
+          S.simres[day] = { i: pct / 100, st: st.map((x) => mmss(parseTimeStrict(x))), ...extra };
           save();
           toast("Simulation gespeichert – die Prognose ist angepasst");
           return render();
@@ -23948,6 +24230,13 @@
           S.garmin.at = 0;
           return garminSync(false);
         }
+        // Laufende Aktivität erneut bei Garmin abrufen (Runden/Puls nachladen): Runden-Marke löschen, Sync holt sie wieder
+        if (d.act === "gm-refetch") {
+          if (gmBusy) return;
+          const a = S.strava.acts[d.id];
+          if (a) delete a.lapsV;
+          return garminSync(false);
+        }
         if (d.act === "gm-off") return garminOff();
         if (d.act === "gm-mfa-x") return garminMfaCancel();
         if (d.act === "gm-copy") {
@@ -24156,7 +24445,7 @@
           S.review[w].level = rvData(w).level;
           if (fc && fc.total) {
             S.review[w].fc = Math.round(fc.total);
-            S.review[w].fcv = 2;
+            S.review[w].fcv = 3;
             S.review[w].fcx = {
               total: Math.round(fc.total),
               run: Math.round(fc.run),
@@ -24624,6 +24913,36 @@
         }
       });
 
+      /* Feedback-Modus (nur Jaime): Elemente antippen und kommentieren, siehe src/feedback.js */
+      fb.init({
+        isOwner: () =>
+          ME === "Jaime" && authed() && !["login", "shared", "onb"].includes(view),
+        key: () => LSK,
+        sb: () => sb,
+        user: () => USER,
+        toast: (m, w) => toast(m, w),
+        closeMenu: () => menu(false),
+        ctx: () => {
+          const foc = focusI != null;
+          const i = foc
+            ? focusI
+            : view === "today"
+              ? sel != null
+                ? sel
+                : Math.max(0, Math.min(LAST, TODAY))
+              : null;
+          const p = i != null ? dayPlan(i) : null;
+          return {
+            view: foc ? "focus" : view,
+            day: i,
+            date: i != null ? isoI(i) : null,
+            week: view === "week" ? wk : null,
+            plan: p ? p.t : null,
+            kind: p ? p.k : null,
+            step: foc ? focusJ + 1 : null,
+          };
+        },
+      });
       // Falls der Start scheitert, nicht ewig auf dem Splash hängen bleiben
       boot().catch((e) => {
         console.error(e);

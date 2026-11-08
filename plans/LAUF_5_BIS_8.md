@@ -86,6 +86,34 @@ Was die Änderung **nicht** ist: Gleiche Kilometer sind nicht gleiche Belastung,
 
 Anwenden: Die Tage in `changes.json` unter `days` in den Plan übernehmen. `weeks` ist leer, die Wochenkilometer ändern sich nicht.
 
+## 5. Nachtrag mit deinen App-Daten (Backup vom 08.11.2026)
+
+Quelle: dein Backup (Eingaben und Garmin-Runden). Die Datei liegt nicht im Repo. Die 1-km-Zeiten der Stationseinheiten stammen aus Lap-Tasten der Uhr; die Uhr misst dort keine brauchbare Distanz (Krafttyp: 20 bis 90 m, Laufband: 757 bis 772 m pro "Kilometer"). Ob jede Runde genau 1 km war, kann ich nicht prüfen.
+
+| Datum | Einheit | Läufe (Reihenfolge) | Letzter minus erster |
+|---|---|---|---|
+| 13.10. | Pacing-Test 4×1 km (mit Jimoh) | 4:02, 4:10, 4:08, 4:18 | +16 s |
+| 20.10. | Schwelle 2×2 km (Ziel 4:14) | 4:07, 4:06 | - |
+| 23.10. | Mi-Einheit (Laufband) | 3:55 (frisch), 3:55, 3:55, 4:11 | +16 s |
+| 25.10. | Halb-Simulation A (Run 1-4, Sled 175 kg, Burpees 80 m) | 3:56, 4:05, 4:15, 4:20 | **+24 s** |
+| 27.10. | Schwelle 3×1,5 km (Ziel 4:10) | 4:13, 4:09, 4:08 pro km | - |
+| 28.10. | Mi-Einheit | 3:58 (frisch), 4:02, 4:02, 4:07 | +9 s |
+| 31.10. | Stationen-Ökonomie 1 (Garmin-Runden, Zuordnung zu Runde 1-4 unsicher) | 3:56, 4:21, 4:06, 4:12, 4:06 | - |
+| 04.11. | Mi-Einheit (Entlastung) | 4:01 (frisch), 4:01, 3:58, 3:56 | -5 s |
+| ohne Datum | "Tests" in der App (Lauf-Test) | 3:53, 3:58, 3:55, 4:00 (Ø 3:56,5) | +7 s |
+
+Befunde:
+
+1. **Dein frisches Tempo liegt bei etwa 3:55 bis 4:01 pro km**, nicht bei 4:24. Der St.-Gallen-Wert stammt aus Januar 2026 und ist für heute nicht mehr der richtige Ausgangspunkt. Der letzte Test-Kilometer ist 4:00, nicht 4:05 (ich hatte dich falsch gelesen).
+2. **Mittwoch: kaum Kompromiss-Delta.** Läufe nach Station gegen die Referenz: +0, +0, +16 (23.10.), +4, +4, +9 (28.10.), 0, -3, -5 (04.11.), im Mittel etwa +3 s. Das Planziel ist höchstens 15 s. Einzige Ausnahme: der Lauf nach den 80 m Burpees (+16 s).
+3. **Der Abfall zeigt sich in der Simulation, nicht am Mittwoch:** Halb-Simulation A mit Rennlasten (Sled 175 kg, Burpees 80 m) +24 s von Lauf 1 auf Lauf 4. Du bist mit 3:56 zu schnell gestartet (Plan: nicht schneller als 4:05). Sub-60-Teams verlieren von Lauf 1 auf Lauf 4 im Mittel 7 s. Die Mittwochs-Stationen sind kürzer (12,5 m Sled, 40 m Burpees) und erzeugen den Abfall vermutlich kaum. Das ist eine Vermutung, kein Beleg.
+4. **Dein Tempo-Sprung ist kleiner als gerechnet.** Plan-Ziel 59:05 braucht 4:09 im Schnitt, 8×4:05 entsprechen 32:40. Dein frisches Niveau (ca. 3:57) plus der Abstand der Sub-60-Teams (frisch gegen Schnitt aller 8 Läufe etwa +7 s) ergäbe rund 4:04 bis 4:05. Wenn du so abfällst wie in Halb-Simulation A (Schnitt der vier Läufe 4:09, und mit 8 Läufen vermutlich mehr), liegst du eher bei 4:10 und mehr. Die Spanne 4:04 bis 4:12 ist eine Schätzung aus wenigen Werten.
+5. **Die Stationen sind der grössere Hebel:** In der App-Analyse zur Stationen-Ökonomie 1 (31.10.) liegen Farmers, Lunges und Wall Balls 45 bis 58 s über Ziel, am 28.10. die Burpees (1:56 gegen 1:28). Das Laufen ist dort nahe am Plan.
+
+Folgen für den Vorschlag in Abschnitt 4: Er bleibt, weil die Läufe 5 und 6 mit Vorermüdung sonst erst am 09.01. vorkommen. Wichtiger als die Kettenlänge ist, den ersten Lauf der Simulationen nicht schneller als 4:05 zu laufen. `changes.json` ändere ich deshalb nicht.
+
+Offen: Die vier Test-Werte (3:53 bis 4:00) haben in der App kein Datum und ich finde keine passende Garmin-Aktivität. Der 03.11. war laut App ein Rad-Intervall (Nase). Von welchem Tag stammen sie?
+
 ## Offen
 
 - Deine 8 Lauf-Splits aus St. Gallen fehlen mir im Repo, ohne sie ist dein Wert für Läufe 5-8 nicht überprüfbar. Der Sub-60-Vergleichswert aus St. Gallen beruht nur auf 10 Teams; der Plantext nennt dort 12 Teams, die Datei enthält 10 (alter v3-Text, nicht von mir geprüft).

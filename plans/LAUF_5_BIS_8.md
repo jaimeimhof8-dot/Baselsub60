@@ -50,11 +50,11 @@ Alle Zahlen aus `teams_stgallen_etc_clean.json`, Mittelwerte der Teams in Sekund
 Befunde:
 
 1. **Die Zahlen "+9 bis +14 s" aus der früheren Auswertung lassen sich bestätigen** (Median +8,9 und +14,0 über alle Events).
-2. **Dein "-1 s" ist kein Beweis, dass du nicht einbrichst.** In St. Gallen ist Lauf 8 bei allen Teams etwa 36 s schneller als Lauf 7, in den anderen Events ist er langsamer. Warum, sehe ich in den Daten nicht (möglich: kürzere oder anders gelegte letzte Strecke, Endspurt; das ist eine Vermutung). Vergleichen darfst du dich nur mit dem St.-Gallen-Feld: dort liegt Δ 5-8 bei -2,3 s (alle) und -5,0 s (Sub-60). Dein -1 s ist also **normal für diesen Austragungsort**, nicht besser.
+2. **Dein "-1 s" ist kein Beweis, dass du nicht einbrichst.** In St. Gallen ist Lauf 8 bei allen Teams etwa 36 s schneller als Lauf 7, in den anderen Events ist er langsamer. Warum, sehe ich in den Daten nicht (möglich: kürzere oder anders gelegte letzte Strecke, Endspurt; das ist eine Vermutung). Vergleichen darfst du dich nur mit dem St.-Gallen-Feld: dort liegt Δ 5-8 bei -2,3 s (alle) und -5,0 s (Sub-60). Dein -1 s ist also **normal für diesen Austragungsort**, nicht besser (Vergleich Sub-60 mit n = 10).
 3. **Ohne Lauf 8** verlieren Sub-60-Teams in den Läufen 5-7 gut 4 bis 6 s pro Kilometer gegenüber 2-4. Der grosse Sprung liegt zwischen Lauf 2 und Lauf 3 (+13 s), danach ist die Kurve flach: Lauf 5 gegen Lauf 4 +2,8 s, Lauf 7 gegen Lauf 4 +2,8 s.
-4. **Deine eigenen Splits (Lauf 5-7 gegen 2-4) kann ich nicht nachrechnen:** dein Rennen (63:21) steht nicht in der Datei, sie enthält 39 St.-Gallen-Teams bis 60:50. Deine Werte (-1 s, +29 s Lauf 3, 4:24 pro km) stammen aus der früheren Auswertung in `PLAN_13C_PLUS_V3.md`. Wenn du mir deine 8 Lauf-Splits gibst, rechne ich Läufe 5-7 sauber nach.
+4. **Deine eigenen Splits (Läufe 5-8 gegen 2-4, wie in `PLAN_13C_PLUS_V3.md`) kann ich nicht nachrechnen:** dein Rennen (63:21) steht nicht in der Datei, sie enthält 39 St.-Gallen-Teams bis 60:50. Deine Werte (-1 s, +29 s Lauf 3, 4:24 pro km) stammen aus der früheren Auswertung in `PLAN_13C_PLUS_V3.md`. Wenn du mir deine 8 Lauf-Splits gibst, rechne ich Läufe 5-7 und 5-8 sauber nach.
 
-**Ehrliches Urteil:** Ein echter Einbruch in Läufen 5-8 ist in den Daten **nicht** zu sehen, auch nicht bei den schnellen Teams. Der Verlust ist klein (etwa 4 bis 6 s pro km in Lauf 5-7, das sind rund 15 bis 20 s über drei Läufe) und flach. Gegen deine Hauptlücken ist das klein: Tempo-Niveau 4:24 gegen etwa 3:58 sind 26 s pro km, über 8 Läufe etwa 3:28 min, dazu Lauf 3 mit +29 s statt +13 s. "Läufe 5-8 trainieren" ist also **kein Scheinproblem, aber ein kleines**. Das Tempo-Niveau und Lauf 3 bleiben vorrangig. Was die Daten nicht sagen: ob Training mit längeren Ketten den Verlust verkleinert. Das ist aus Renndaten nicht ableitbar.
+**Ehrliches Urteil:** Ein abrupter Einbruch ist in den Daten **nicht** zu sehen, aber ein stetiger kleiner Verlust: etwa 4 bis 6 s pro km in Lauf 5-7 (rund 12 bis 18 s über drei Läufe), und ausserhalb von St. Gallen ist Lauf 8 im Mittel zusätzlich 7 s (Sub-60) bis 14 s (62-64) langsamer als Lauf 7. Die St.-Gallen-Werte für Lauf 8 sind auffällig und mit n = 10 wenig belastbar. Gegen deine Hauptlücken ist das klein: Tempo-Niveau 4:24 gegen etwa 3:58 sind 26 s pro km, über 8 Läufe etwa 3:28 min, dazu Lauf 3 mit +29 s statt +13 s. "Läufe 5-8 trainieren" ist also **kein Scheinproblem, aber ein kleines**. Das Tempo-Niveau und Lauf 3 bleiben vorrangig. Was die Daten nicht sagen: ob Training mit längeren Ketten den Verlust verkleinert. Das ist aus Renndaten nicht ableitbar.
 
 ## 3. Für und gegen längere Ketten
 
@@ -80,14 +80,14 @@ Struktur Mo Kraft / Di Lauf / Mi Kompromiss / Do Rad oder Lauf / Fr Ruhe / Sa St
 | 09.01. und 23.01. | **unverändert** | Sie sind die Läufe-5-bis-8-Einheiten. |
 | 12.12. Halb-Simulation B | **unverändert** | Nur ein Hinweis: Sie misst Stationen 5-8, nicht Vorermüdung. |
 
-Abbruchregel, in `n` geschrieben: Bei Schmerz 3 oder mehr von 10 in Fuss, Wade oder Achillessehne, bei Hinken oder Puls über der Redline in Runde 4: nach Runde 4 aufhören, das war der v3-Umfang.
+Abbruchregel, in `n` geschrieben: Vor Runde 5 prüfen. Bei Schmerz 3 oder mehr von 10 in Fuss, Wade oder Achillessehne, bei Hinken oder Puls über der Redline in Runde 4 nach Runde 4 aufhören, das war der v3-Umfang.
 
-Was die Änderung **nicht** ist: Gleiche Kilometer sind nicht gleiche Belastung, weil 2 km Zone 2 durch 2 km bei 4:05 ersetzt werden (Samstag in W10 mit 32 km). Wenn du nach dem Di 15.12. (Über-Rennpace) müde bist, nimm die Änderung nicht an und bleib bei 4 Runden. Eine Wirkung auf deine Zielzeit oder die Erfolgschance behaupte ich nicht. Die Zielzeiten 1:30 und 1:36 sind eine Annahme (gleiche Verbesserung wie die anderen Stationen von Sa 14.11. zu Sa 19.12.).
+Was die Änderung **nicht** ist: Gleiche Kilometer sind nicht gleiche Belastung, weil 2 km Zone 2 durch 2 km bei 4:05 ersetzt werden (Woche 10 mit 32 km Umfang). Wenn du nach dem Di 15.12. (Über-Rennpace) müde bist, nimm die Änderung nicht an und bleib bei 4 Runden. Eine Wirkung auf deine Zielzeit oder die Erfolgschance behaupte ich nicht. Die Zielzeiten 1:30 und 1:36 sind eine Annahme: je 8 s schneller als am Sa 21.11. (1:38 und 1:44), so viel wie bei den Burpees; SkiErg und RowErg verbesserten sich nur um 2 s, Farmers um 4 s.
 
 Anwenden: Die Tage in `changes.json` unter `days` in den Plan übernehmen. `weeks` ist leer, die Wochenkilometer ändern sich nicht.
 
 ## Offen
 
-- Deine 8 Lauf-Splits aus St. Gallen fehlen mir im Repo, ohne sie ist dein Läufe-5-7-Wert nicht überprüfbar.
+- Deine 8 Lauf-Splits aus St. Gallen fehlen mir im Repo, ohne sie ist dein Wert für Läufe 5-8 nicht überprüfbar. Der Sub-60-Vergleichswert aus St. Gallen beruht nur auf 10 Teams; der Plantext nennt dort 12 Teams, die Datei enthält 10 (alter v3-Text, nicht von mir geprüft).
 - Warum Lauf 8 in St. Gallen 36 s schneller ist, weiss ich nicht.
 - Jimohs Daten fehlen, im Doubles zählt der Langsamere.

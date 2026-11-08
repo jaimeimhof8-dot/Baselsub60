@@ -1,0 +1,35 @@
+{
+ "days": {
+  "68": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18)",
+    "Runde 1: SkiErg 500 m @ 1:47/500 m (Ziel 1:47, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 2: Burpee Broad Jumps 40 m (Ziel 1:15, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 3: RowErg 500 m @ 1:52/500 m (Ziel 1:52, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 4: Farmers Carry 100 m mit 2×34 kg (Ziel 0:39, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 5: Sandbag Lunges 50 m mit 30 kg (Ziel 1:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 6: Wall Balls 50 mit 9 kg auf 3 m (Ziel 1:36, 3 Sätze zu 20, 15 und 15, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Auslaufen 600 m @ 5:30/km (3:18)"
+   ],
+   "k": "station",
+   "n": "Lap nach jeder Runde manuell drücken und das Delta gegen die frische Runde vom Mittwoch notieren. Puls bleibt unter der Redline. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Einmalig sechs Runden am Stück: Lauf 5 und 6 mit aufgebauter Ermüdung (Runde 5 und 6 sind neu gegenüber v3, Ziele Lunges 1:30 und Wall Balls 1:36 sind eine Annahme: gleiche Verbesserung wie bei den anderen Stationen seit dem 14.11.). Abbruchregel: Schmerz in Fuss, Wade oder Achillessehne 3 oder mehr von 10, Hinken oder Puls über der Redline in Runde 4: nach Runde 4 aufhören (das war der Umfang in v3). Der lockere Lauf am Sonntag 20.12. ist dafür von 8 auf 6 km gekürzt, die Wochenkilometer bleiben gleich.",
+   "t": "Stationen-Ökonomie 2 (6 Runden)",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "69": {
+   "i": [
+    "6 km Zone 2 @ 5:20/km (32:00), Puls 135–150 bpm",
+    "Farmers Hold 2×40 s mit 2×40 kg, Pause 90 s"
+   ],
+   "k": "lauf",
+   "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln. Von 8 auf 6 km gekürzt, weil die Stationen-Ökonomie am Samstag 19.12. zwei Läufe mehr hat (Wochenkilometer bleiben gleich).",
+   "t": "Lockerer Lauf",
+   "key": false,
+   "src": "pdf",
+   "joint": false
+  }
+ },
+ "weeks": {}
+}

@@ -19892,28 +19892,39 @@
         );
       }
       /* Strava im Hintergrund aktualisieren, wenn die letzte Synchronisierung über eine Stunde her ist. */
-      /* Einmalig (So 08.11.2026): Rad von gestern (Tag 26) heute zusätzlich zum Lauf (Tag 27) machen.
-         Die Tauschfunktion sperrt die Vergangenheit, darum: Tag 27 = Lauf + Rad, Tag 26 gestrichen. Läuft genau einmal, dann nie wieder. */
+      /* Einmalig (So 08.11.2026): Sa 07.11. (Tag 26, Rad) gestrichen, So 08.11. (Tag 27) = Lauf + Rad Zone 2.
+         Die Tauschfunktion sperrt die Vergangenheit, darum direkt hier. Räumt auch einen früheren Tausch 26↔27 und die erste Fassung dieses Eingriffs auf.
+         Läuft genau einmal (Flag), dann nie wieder. */
+      const LR_TITLE = "Lockerer Lauf + Rad Zone 2";
       function onceLaufRad() {
-        const FLAG = "hx:once:lauf-rad-27";
+        const FLAG = "hx:once:lauf-rad-27b";
         if (TODAY !== 27 || lsGet(FLAG)) return false;
         const a = basePlan(26), b = basePlan(27);
-        if (
-          !a || !b || a.k !== "bike" || b.k !== "lauf" ||
-          (b.i || []).length !== 1 || S.edit[27] || S.edit[26] ||
-          S.sched[26] || S.sched[27]
-        )
-          return false;
-        S.edit[27] = {
-          t: "Lockerer Lauf + Rad Zone 2",
-          i: [b.i[0], a.i[0]],
-          n:
-            "Heute zwei Einheiten: erst der lockere Lauf, danach Rad Zone 2 (Ersatz für die gestern ausgefallene Rad-Einheit). Zwischen beiden mindestens 30 Minuten Pause mit Trinken und einer Kleinigkeit essen. Das Rad belastet den Fuss weniger als der Lauf, bleibt aber locker in Zone 2. " +
-            (b.n || ""),
-        };
-        const k26 = keyI(26);
+        if (!a || !b || a.k !== "bike" || b.k !== "lauf") return false; // nur mit dem Plan, in dem Tag 26 Rad und Tag 27 Lauf ist
+        const k26 = keyI(26), k27 = keyI(27);
+        // 1) früherer Tausch 26↔27 zurück
+        if (srcOf(26) === 27 && srcOf(27) === 26) {
+          delete S.sched[26];
+          delete S.sched[27];
+          swapDayData(S, k26, k27);
+        }
+        // 2) erste Fassung dieses Eingriffs entfernen
+        for (const x of [26, 27])
+          if (S.edit[x] && S.edit[x].t === LR_TITLE) delete S.edit[x];
+        // 3) Tag 27 = Lauf + Rad
+        if ((b.i || []).length === 1 && !S.edit[27])
+          S.edit[27] = {
+            t: LR_TITLE,
+            i: [b.i[0], a.i[0]],
+            n:
+              "Heute zwei Einheiten: erst der lockere Lauf, danach Rad Zone 2 (Ersatz für die gestern ausgefallene Rad-Einheit). Zwischen beiden mindestens 30 Minuten Pause mit Trinken und einer Kleinigkeit essen. Das Rad belastet den Fuss weniger als der Lauf, bleibt aber locker in Zone 2. " +
+              (b.n || ""),
+          };
+        // 4) Sa 07.11. streichen, So 08.11. aktiv
         const done26 = Object.keys(S.done).some((x) => x.startsWith(k26 + "|"));
         if (!done26) S.off[k26] = 1;
+        delete S.off[k27];
+        delete S.skip[k27];
         lsSet(FLAG, "1");
         save();
         return true;

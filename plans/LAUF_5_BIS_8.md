@@ -205,6 +205,14 @@ Wall Balls bleiben in den Samstagen, den Simulationen und im Block am Donnerstag
 
 **Anwenden:** Nach `changes_stationen.json` übernehmen (sonst fehlen dort die neuen Stationsziele; die Tage 30 bis 114 hier bauen schon darauf auf). Geprüft habe ich das nur selbst: Die zusammengeführte Plan-Datei liest die App-Funktion ohne Warnung, und jede Runde hat das Zeilenformat mit Kachel.
 
+## 9. Prognose-Code: Ermüdung von 15 auf 8 s
+
+Geändert (auf Wunsch von Jaime): `src/forecast.js`, `levelOf`: für Basis-Paces unter 4:15 sind es **8 s Ermüdung** statt 15 s, dazwischen steigt der Wert bis 4:30 (270 s) wie vorher auf 20 s. Die 3 s Drift je Lauf ab Lauf 5 und die Roxzone (4:15) sind unverändert. `sw.js` auf v113. Tests angepasst (`test/forecast.test.js`, `test/review.test.js`), 339 von 339 laufen.
+
+Folge mit euren Testwerten (Jaime und Jimoh): Läufe **33:08 statt 34:04** (Ø 4:09 statt 4:16), mittleres Szenario **61:44 statt 62:40**, Spanne 59:28 bis 64:35. Das Sub-60-Szenario bleibt "nur im besten Szenario". Die 8 s sind eine Annahme aus deinen gemessenen Mittwochs-Läufen (+3 s) und den Sub-60-Teams (+7 s frisch gegen Schnitt), nicht aus einer Messung der Vollen Simulation. Die Eichung an der Simulation vom 23.01. überschreibt den Wert, sobald sie eingetragen ist.
+
+**Offener Punkt zur Datenqualität:** Im Testcode steht der Pacing-Test vom 13.10. als "GPS-geprüft" mit 3:53, 3:58, 3:55, 4:00. In deinem Garmin-Import desselben Tests stehen 4:02, 4:10, 4:08, 4:18 (1000-m-Runden deiner Uhr). Wenn deine Uhr Distanz zu kurz misst, sind deine Uhr-Zeiten bis etwa 4 % zu langsam. Dann wären auch die Mittwochs- und Schwellenzeiten aus Abschnitt 5 eher zu langsam. Das habe ich nicht geklärt.
+
 ## Offen
 
 - Deine 8 Lauf-Splits aus St. Gallen fehlen mir im Repo, ohne sie ist dein Wert für Läufe 5-8 nicht überprüfbar. Der Sub-60-Vergleichswert aus St. Gallen beruht nur auf 10 Teams; der Plantext nennt dort 12 Teams, die Datei enthält 10 (alter v3-Text, nicht von mir geprüft).

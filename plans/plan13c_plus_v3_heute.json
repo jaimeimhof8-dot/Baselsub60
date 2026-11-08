@@ -1,0 +1,1826 @@
+{
+  "app": "basel-sub60",
+  "kind": "plan",
+  "exportedAt": "2026-11-06T23:45:45.164Z",
+  "source": "team",
+  "name": "HYROX_Basel2027_Plan_v13c_plus_v3",
+  "plan": {
+    "days": {
+      "0": {
+        "i": [
+          "Romanian Deadlift 3×8 RPE 6",
+          "Hip Thrust 3×10 RPE 6",
+          "Pull-ups 3×6 RPE 6",
+          "Shoulder Press 3×8 RPE 6",
+          "Wadenheben einbeinig 2×15, langsam absenken",
+          "Plank 3×40″"
+        ],
+        "k": "kraft",
+        "n": "Vorher Rad einfahren und Mobility. Nur Technik und Startgewichte finden, kein Testsatz. Bench Press und Shoulder Press wechseln sich wöchentlich ab, das Startgewicht für Bench Press findest du nächste Woche.",
+        "t": "Kraft 1 – Startgewichte",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "1": {
+        "i": [
+          "15′ Einlaufen und Mobility",
+          "4×1 km mit Jimoh, RPE 8–9, kein Sprint, 2′ Trabpause, alle Splits notieren",
+          "10′ Auslaufen"
+        ],
+        "k": "lauf",
+        "n": "Aus dem Lauftest entsteht das Team-Tempo T, bitte im Profil eintragen. Danach die Entscheidungsregel auf der ersten Seite prüfen.",
+        "t": "Lauf-Pacing-Test",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "2": {
+        "i": [
+          "Rad 75–90′ Zone 2"
+        ],
+        "k": "bike",
+        "n": "Nach dem Lauftest nur locker, damit der Benchmark am Samstag frisch ist.",
+        "t": "Rad Zone 2 lang",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "3": {
+        "i": [
+          "Rad 60′ Zone 2, locker, Trittfrequenz 85–95"
+        ],
+        "k": "bike",
+        "n": "",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "4": {
+        "i": [],
+        "k": "rest",
+        "n": "Fix Ruhetag.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "5": {
+        "i": [
+          "SkiErg 1000 m",
+          "Sled Push 50 m",
+          "Sled Pull 50 m",
+          "Burpee Broad Jumps 80 m",
+          "RowErg 1000 m",
+          "Farmers Carry 200 m",
+          "Sandbag Lunges 100 m",
+          "100 Wall Balls"
+        ],
+        "k": "station",
+        "n": "Zwischen den Stationen volle Erholung, im Wechsel testet einer und einer stoppt. Ein Test, kein Erschöpfungs-Circuit.",
+        "t": "Stationen-Benchmark",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "6": {
+        "i": [],
+        "k": "rest",
+        "n": "Echte Erholung, nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "7": {
+        "i": [
+          "Romanian Deadlift 3×6, Pause 150 s",
+          "Hip Thrust 3×8, Pause 120 s",
+          "Pull-ups 4×6, Pause 120 s",
+          "Langhantel-Rudern vorgebeugt 3×8, Pause 120 s",
+          "Bench Press 3×8, Pause 120 s",
+          "Shoulder Press 3×8, Pause 120 s",
+          "Farmers Carry 4×40 m mit 2×32 kg, Pause 90 s",
+          "Wadenheben einbeinig 3×15 je Seite (3 s absenken, Pause 60 s) → Pallof Press 3×10 je Seite, Pause 60 s"
+        ],
+        "k": "kraft",
+        "n": "Referenzwoche für den Kraft-Meilenstein. Arbeitsgewicht aus dem Profil verwenden, Startgewicht über Reserve finden, Gewicht steigt nur nach Sätzen mit Reserve und ohne Muskelversagen. Bench Press und Shoulder Press wechseln sich wöchentlich ab. Vorher Rad einfahren und Mobility.",
+        "t": "Kraft 1 Maximalkraft hintere Kette",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "8": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30)",
+          "2×2 km @ 4:14/km (8:28), Trabpause 400 m @ 6:30/km (2:36)",
+          "Auslaufen 600 m @ 5:30/km (3:18)"
+        ],
+        "k": "lauf",
+        "n": "Mit Jimoh nebeneinander laufen, Lap manuell drücken, Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor.",
+        "t": "Extensive Schwelle Intervall",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "9": {
+        "i": [
+          "Back Squat 3×6, Pause 150 s",
+          "Bulgarian Split Squat 3×8 je Seite, Pause 90 s",
+          "Einlaufen 500 m @ 5:30/km (2:45)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz",
+          "Runde 2 mit Jimoh: Sled Push 25 m mit 175 kg (125 kg Platten, Ziel 1:23, Wechsel alle 7 m in Bewegung) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Runde 3 mit Jimoh: Sled Pull 25 m mit 130 kg (80 kg Platten, Ziel 1:40, Wechsel jede 12,5-m-Bahn) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Runde 4 mit Jimoh: Burpee Broad Jumps 80 m (Ziel 2:55, Wechsel alle 5 Sprünge) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Auslaufen 500 m @ 5:30/km (2:45)"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken und das Delta notieren. Erst die Kniebeugen in frischem Zustand, anschliessend mit Jimoh laufen.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "10": {
+        "i": [
+          "Rad 60 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich bleiben.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "11": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "12": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30)",
+          "Run 1: 1 km @ 4:05/km (4:05) → SkiErg 1000 m @ 1:47/500 m (Ziel 3:35, Wechsel bei 350 m und 700 m)",
+          "Run 2: 1 km @ 4:05/km (4:05) → Sled Push 50 m mit 175 kg (125 kg Platten, Ziel 2:45, Wechsel alle 7 m in Bewegung)",
+          "Run 3: 1 km @ 4:05/km (4:05) → Sled Pull 50 m mit 130 kg (80 kg Platten, Ziel 3:20, Wechsel jede 12,5-m-Bahn)",
+          "Run 4: 1 km @ 4:05/km (4:05) → Burpee Broad Jumps 80 m (Ziel 2:55, Wechsel alle 5 Sprünge)"
+        ],
+        "k": "sim",
+        "n": "Zwischen Lauf und Station zügig gehen, Wechsel exakt wie notiert ausführen, alle Splits und Stationszeiten notieren.",
+        "t": "Halb-Simulation A",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "13": {
+        "i": [
+          "5 km Zone 2 @ 5:20/km (26:40), Puls 135–150 bpm"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lockerer Lauf",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "14": {
+        "i": [
+          "Back Squat 4×5, Pause 150 s",
+          "Bulgarian Split Squat 3×8 je Seite, Pause 90 s",
+          "Romanian Deadlift 4×5, Pause 150 s",
+          "Pull-ups 4×5, Pause 120 s",
+          "Langhantel-Rudern vorgebeugt 3×8, Pause 120 s",
+          "Shoulder Press 4×6, Pause 120 s",
+          "Sled Push 12,5 m mit 200 kg (150 kg Platten, 6 Wiederholungen, Pause 30 s)",
+          "Wadenheben einbeinig 3×15 je Seite (3 s absenken, Pause 60 s) → Pallof Press 3×10 je Seite, Pause 60 s"
+        ],
+        "k": "kraft",
+        "n": "Arbeitsgewicht aus dem Profil verwenden, Startgewicht über Reserve finden, Gewicht steigt nur nach Sätzen mit Reserve und ohne Muskelversagen. Bench Press und Shoulder Press wechseln sich wöchentlich ab. Vorher Rad einfahren und Mobility. Schlitten-Wiederholungen maximal schnell, zwischen den Bahnen volle Pause. Zum Abschluss auf dem Rad ausrollen.",
+        "t": "Kraft 1 Maximalkraft Unterkörper",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "15": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30)",
+          "3×1,5 km @ 4:10/km (6:15), Trabpause 2×200 m @ 6:30/km (1:18)",
+          "Auslaufen 600 m @ 5:30/km (3:18)"
+        ],
+        "k": "lauf",
+        "n": "Allein laufen, Lap manuell drücken, Auto-Lap bleibt Aus und der HRM Pro Plus steht fest auf Nur Indoor. Ohne Windschatten bei Pulsüberschreitung das Tempo leicht drosseln.",
+        "t": "Extensive Schwelle Intervall",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "16": {
+        "i": [
+          "Einlaufen 500 m @ 5:30/km (2:45)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz (Verbot schneller als 4:05/km!), Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Sled Push 12,5 m mit 175 kg (125 kg Platten, Ziel 0:41, 1 Bahn, 20 s Standzeit vor der Bahn als Ghost-Partner, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Runde 3: Sled Pull 12,5 m mit 130 kg (80 kg Platten, Ziel 0:50, 1 Bahn, 20 s Standzeit vor der Bahn als Ghost-Partner, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:28, 15 s Standzeit vor den letzten 5 Sprüngen als Ghost-Partner, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Auslaufen 500 m @ 5:30/km (2:45)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Stehzeiten nach Stoppuhr ersetzen Jimohs Anteil und werden nie verkürzt, nach der letzten Bahn sofort laufen. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "17": {
+        "i": [
+          "Rad 60 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min",
+          "Farmers Hold 2×40 s mit 2×36 kg, Pause 90 s"
+        ],
+        "k": "bike",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich bleiben.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "18": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "19": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Runde 1: RowErg 500 m @ 1:56/500 m (Ziel 1:56, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Runde 2: Farmers Carry 100 m mit 2×34 kg (Ziel 0:45, 20 s Standzeit nach 50 m als Ghost-Partner, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Runde 3: Sandbag Lunges 50 m mit 30 kg (Ziel 1:43, 15 s Standzeit nach 25 m als Ghost-Partner, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Runde 4: Wall Balls 50 mit 9 kg auf 3 m (Ziel 1:53, 3 Sätze zu 20, 15 und 15, 15 s Standzeit vor dem letzten Satz als Ghost-Partner, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Auslaufen 600 m @ 5:30/km (3:18)",
+          "Allein arbeiten, am Ergometer 500 m am Stück durchziehen, an den übrigen Stationen Standzeit des Ghost-Partners nach Stoppuhr, nach der Station sofort laufen (erste 200 m kontrolliert bei 4:15/km anrollen)"
+        ],
+        "k": "station",
+        "n": "Lap nach jeder Runde manuell drücken und das Delta gegen die frische Runde vom Mittwoch notieren. Puls bleibt unter der Redline. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen.",
+        "t": "Stationen-Ökonomie 1",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "20": {
+        "i": [
+          "6 km Zone 2 @ 5:20/km (32:00), Puls 135–150 bpm",
+          "Farmers Hold 2×40 s mit 2×36 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lockerer Lauf",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "21": {
+        "i": [
+          "Back Squat 2×5, Pause 150 s",
+          "Romanian Deadlift 2×5, Pause 120 s",
+          "Pull-ups 2×6, Pause 120 s",
+          "Bench Press 2×6, Pause 120 s",
+          "Sled Pull 12,5 m mit 130 kg (80 kg Platten, 4 Wiederholungen, Pause 30 s)",
+          "Wadenheben einbeinig 2×15 je Seite (3 s absenken, Pause 60 s) → Plank 2×45 s, Pause 45 s"
+        ],
+        "k": "kraft",
+        "n": "Deload mit sauberer Ausführung. Bench Press und Shoulder Press wechseln sich wöchentlich ab. Zum Abschluss auf dem Rad ausrollen.",
+        "t": "Kraft 1 Deload",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "22": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30)",
+          "4×1 km @ 3:55/km (3:55) mit Jimoh auf 400-m-Bahn, manueller Lap (Ziel höchstens 3:55 pro km oder 3:57 pro km bei Ø Puls bis 183 bpm), Trabpause 3×200 m @ 7:30/km (1:30)",
+          "Auslaufen 600 m @ 5:30/km (3:18)"
+        ],
+        "k": "lauf",
+        "n": "Neues Team-Tempo im Profil eintragen. Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor.",
+        "t": "Lauf-Test T",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "23": {
+        "i": [
+          "Einlaufen 300 m @ 5:30/km (1:39)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Sled Push 12,5 m mit 175 kg (125 kg Platten, Ziel 0:41, 1 Bahn, 20 s Standzeit vor der Bahn als Ghost-Partner, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Runde 3: Sled Pull 12,5 m mit 130 kg (80 kg Platten, Ziel 0:50, 1 Bahn, 20 s Standzeit vor der Bahn als Ghost-Partner, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:28, 15 s Standzeit vor den letzten 5 Sprüngen als Ghost-Partner, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 3 Min Pause",
+          "Auslaufen 300 m @ 5:30/km (1:39)"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Stehzeiten nach Stoppuhr ersetzen Jimohs Anteil und werden nie verkürzt, nach der letzten Bahn sofort laufen. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "24": {
+        "i": [
+          "Rad 45 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich bleiben.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "25": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "26": {
+        "i": [
+          "Rad 45 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Wer wann wohin, abklatschen und direkt weiter. Einmalig im ganzen Plan, ab jetzt üben die Simulationen die Wechsel mit.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "27": {
+        "i": [
+          "5 km Zone 2 @ 5:20/km (26:40), Puls 135–150 bpm",
+          "Rad 45 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "lauf",
+        "n": "Heute zwei Einheiten: erst der lockere Lauf, danach Rad Zone 2 (als Ersatz für die gestern ausgefallene Rad-Einheit). Zwischen beiden mindestens 30 Minuten Pause mit Trinken und einer Kleinigkeit essen. Das Rad belastet den Fuss weniger als der Lauf, bleibt aber locker in Zone 2 ohne Zusatzdruck auf dem Vorfuss. Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf.",
+        "t": "Lockerer Lauf + Rad Zone 2",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "28": {
+        "i": [
+          "Back Squat 4×5, Pause 150 s",
+          "Bulgarian Split Squat 3×8 je Seite, Pause 90 s",
+          "Romanian Deadlift 4×5, Pause 150 s",
+          "Pull-ups 4×5, Pause 120 s",
+          "Langhantel-Rudern vorgebeugt 3×8, Pause 120 s",
+          "Shoulder Press 4×6, Pause 120 s",
+          "Sled Push 12,5 m mit 200 kg (150 kg Platten, 6 Wiederholungen, Pause 30 s)",
+          "Wadenheben einbeinig 3×15 je Seite (3 s absenken, Pause 60 s) → Pallof Press 3×10 je Seite, Pause 60 s"
+        ],
+        "k": "kraft",
+        "n": "Arbeitsgewicht aus dem Profil verwenden, Startgewicht über Reserve finden, Gewicht steigt nur nach Sätzen mit Reserve und ohne Muskelversagen. Bench Press und Shoulder Press wechseln sich wöchentlich ab. Vorher Rad einfahren und Mobility. Schlitten-Wiederholungen maximal schnell, zwischen den Bahnen volle Pause. Zum Abschluss auf dem Rad ausrollen.",
+        "t": "Kraft 1 Maximalkraft Unterkörper",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "29": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "Leiter 600 m @ 4:05/km (2:27), 1 km @ 4:05/km (4:05), 1,4 km @ 4:05/km (5:43), 1 km @ 4:05/km (4:05), 600 m @ 4:05/km (2:27), Trabpause 4×200 m @ 6:30/km (1:18)",
+          "Auslaufen 800 m @ 5:30/km (4:24)"
+        ],
+        "k": "lauf",
+        "n": "Allein laufen, Lap manuell drücken, Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor. Ohne Windschatten bei Pulsüberschreitung das Tempo leicht drosseln. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf. Erster Qualitaetslauf nach den zwei ersetzten Laeufen: Bei Schmerz 3-4 die Leiter auf 600 m, 1 km, 600 m @ 4:05/km kuerzen.",
+        "t": "Intensive Schwelle Intervall",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "30": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Sled Push 25 m mit 200 kg (150 kg Platten, Ziel 1:04, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+          "Runde 3: Wall Balls 50 mit 9 kg auf 3 m (Ziel 2:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+          "Runde 4: Sled Push 25 m mit 200 kg (150 kg Platten, Ziel 1:04, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+          "Runde 5: Wall Balls 50 mit 9 kg auf 3 m (Ziel 2:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+          "Auslaufen 600 m @ 5:30/km (3:18)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Wall Balls in 3 Sätzen zu 20, 15 und 15. Sled Push in Stufen: 25 m, später 37,5 m, 50 m, jede Stufe nur bei Go.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "31": {
+        "i": [
+          "Rad 60 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min",
+          "Einlage: 4×4 Min bei 65 U/min im grossen Gang (Puls bis 160 bpm), Pause 4 Min bei 90 U/min im kleinen Gang",
+          "Farmers Hold 2×40 s mit 2×36 kg, Pause 90 s",
+          "Lunges-Wall-Ball-Block (erst nach Go): 3× (25 m Sandbag Lunges mit 30 kg, direkt danach 15 Wall Balls mit 9 kg auf 3 m), 90 s Pause"
+        ],
+        "k": "bike",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich bleiben. Wenig Laufbelastung, trainiert die Stationen mit dem groessten Rueckstand zu schnellen Teams.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "32": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "33": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Runde 1: SkiErg 500 m @ 1:49/500 m (Ziel 1:49, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+          "Runde 2: Burpee Broad Jumps 40 m (Ziel 1:23, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+          "Runde 3: RowErg 500 m @ 1:54/500 m (Ziel 1:54, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+          "Runde 4: Farmers Carry 100 m mit 2×34 kg (Ziel 0:43, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+          "Auslaufen 600 m @ 5:30/km (3:18)"
+        ],
+        "k": "station",
+        "n": "Lap nach jeder Runde manuell drücken und das Delta gegen die frische Runde vom Mittwoch notieren. Puls bleibt unter der Redline. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast.",
+        "t": "Stationen-Ökonomie 2",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "34": {
+        "i": [
+          "6 km Zone 2 @ 5:20/km (32:00), Puls 135–150 bpm",
+          "Farmers Hold 2×40 s mit 2×36 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf.",
+        "t": "Lockerer Lauf",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "35": {
+        "i": [
+          "Back Squat 2×3 leicht (RPE 5), Pause 120 s zum Aktivieren",
+          "Pull-ups 4×5, Pause 120 s",
+          "Langhantel-Rudern vorgebeugt 3×8, Pause 120 s",
+          "Bench Press 4×6, Pause 120 s",
+          "Pallof Press 3×10 je Seite, Pause 60 s"
+        ],
+        "k": "kraft",
+        "n": "Statt Maximalkraft Unterkoerper (13c): Beine frisch fuer den Cruise am Dienstag. Die Unterkoerper-Einheit entfaellt in dieser Woche; Wadenheben, Romanian Deadlift und Sled Pull kommen in Woche 7 wieder wie in 13c.",
+        "t": "Kraft 1 Oberkoerper, Beine leicht (vor dem Cruise)",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "36": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "4×1,5 km @ 4:04/km (6:06), Trabpause 3×200 m @ 6:30/km (1:18)",
+          "Auslaufen 800 m @ 5:30/km (4:24)"
+        ],
+        "k": "lauf",
+        "n": "Allein laufen, Lap manuell drücken, Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor. Ohne Windschatten bei Pulsüberschreitung das Tempo leicht drosseln. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf.",
+        "t": "Cruise Intervall",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "37": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Sled Pull 50 m mit 155 kg (105 kg Platten, Ziel 3:15, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause",
+          "Runde 3: Sandbag Lunges 100 m mit 30 kg (Ziel 2:50, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause",
+          "Runde 4: Sled Pull 50 m mit 155 kg (105 kg Platten, Ziel 3:15, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause",
+          "Runde 5: Sandbag Lunges 100 m mit 30 kg (Ziel 2:50, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause",
+          "Auslaufen 600 m @ 5:30/km (3:18)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken und das Delta notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Pull über die volle Renndistanz. Lunges ohne Ablegen des Sandbags.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "38": {
+        "i": [
+          "Rad 60 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min",
+          "Einlage: 4×4 Min bei 65 U/min im grossen Gang (Puls bis 160 bpm), Pause 4 Min bei 90 U/min im kleinen Gang",
+          "Farmers Hold 2×40 s mit 2×36 kg, Pause 90 s",
+          "Lunges-Wall-Ball-Block (erst nach Go): 3× (25 m Sandbag Lunges mit 30 kg, direkt danach 15 Wall Balls mit 9 kg auf 3 m), 90 s Pause"
+        ],
+        "k": "bike",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich bleiben. Wenig Laufbelastung, trainiert die Stationen mit dem groessten Rueckstand zu schnellen Teams.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "39": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "40": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Runde 1: RowErg 500 m @ 1:54/500 m (Ziel 1:54, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause",
+          "Runde 2: Farmers Carry 100 m mit 2×34 kg (Ziel 0:43, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause",
+          "Runde 3: Sandbag Lunges 50 m mit 30 kg (Ziel 1:38, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause",
+          "Runde 4: Wall Balls 50 mit 9 kg auf 3 m (Ziel 1:44, 3 Sätze zu 20, 15 und 15, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause",
+          "Auslaufen 600 m @ 5:30/km (3:18)"
+        ],
+        "k": "station",
+        "n": "Lap nach jeder Runde manuell drücken und das Delta gegen die frische Runde vom Mittwoch notieren. Puls bleibt unter der Redline. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast.",
+        "t": "Stationen-Ökonomie 1",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "41": {
+        "i": [
+          "7 km Zone 2 @ 5:20/km (37:20), Puls 135–150 bpm",
+          "Farmers Hold 2×40 s mit 2×36 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf.",
+        "t": "Lockerer Lauf",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "42": {
+        "i": [
+          "Back Squat 5×3, Pause 180 s",
+          "Bulgarian Split Squat 3×6 je Seite, Pause 90 s",
+          "Romanian Deadlift 4×4, Pause 150 s",
+          "Pull-ups 4×4, Pause 120 s",
+          "Langhantel-Rudern vorgebeugt 3×8, Pause 120 s",
+          "Shoulder Press 4×5, Pause 120 s",
+          "Sled Push 12,5 m mit 200 kg (150 kg Platten, 6 Wiederholungen, Pause 30 s)",
+          "Wadenheben einbeinig 3×15 je Seite (3 s absenken, Pause 60 s) → Pallof Press 3×10 je Seite, Pause 60 s"
+        ],
+        "k": "kraft",
+        "n": "Arbeitsgewicht aus dem Profil verwenden, Startgewicht über Reserve finden, Gewicht steigt nur nach Sätzen mit Reserve und ohne Muskelversagen. Bench Press und Shoulder Press wechseln sich wöchentlich ab. Vorher Rad einfahren und Mobility. Schlitten-Wiederholungen maximal schnell, zwischen den Bahnen volle Pause. Zum Abschluss auf dem Rad ausrollen.",
+        "t": "Kraft 1 Maximalkraft Unterkörper",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "43": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "3×2 km @ 4:01/km (8:02), Trabpause 2×200 m @ 7:30/km (1:30)",
+          "Auslaufen 800 m @ 5:30/km (4:24)"
+        ],
+        "k": "lauf",
+        "n": "Allein laufen, Lap manuell drücken, Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor. Ohne Windschatten bei Pulsüberschreitung das Tempo leicht drosseln. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf.",
+        "t": "Cruise Intervall",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "44": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Sled Push 37,5 m mit 200 kg (150 kg Platten, Ziel 1:35, 3 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+          "Runde 3: Burpee Broad Jumps 40 m (Ziel 1:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+          "Runde 4: Sled Push 37,5 m mit 200 kg (150 kg Platten, Ziel 1:35, 3 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+          "Runde 5: Burpee Broad Jumps 40 m (Ziel 1:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+          "Auslaufen 600 m @ 5:30/km (3:18)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Delta-Audit 1: Delta nach dem Push getrennt von dem nach den Burpees notieren, Ziel Delta höchstens 20 s.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "45": {
+        "i": [
+          "Rad 60 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min",
+          "Einlage: 4×4 Min bei 55 U/min im grossen Gang (Puls bis 160 bpm), Pause 4 Min bei 90 U/min im kleinen Gang",
+          "Farmers Hold 2×40 s mit 2×38 kg, Pause 90 s",
+          "Lunges-Wall-Ball-Block (erst nach Go): 3× (25 m Sandbag Lunges mit 30 kg, direkt danach 15 Wall Balls mit 9 kg auf 3 m), 90 s Pause"
+        ],
+        "k": "bike",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich bleiben. Wenig Laufbelastung, trainiert die Stationen mit dem groessten Rueckstand zu schnellen Teams.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "46": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "47": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "Aufteilung 60 zu 40 testen: Der Stärkere übernimmt bei Schlitten schieben und ziehen den grösseren Anteil, Abstand zur Zielzeit der Station mit dem Abstand in der letzten Simulation vergleichen",
+          "Run 1: 1 km @ 4:05/km (4:05) (Verbot schneller als 4:05/km!) → Sled Push 50 m mit 225 kg (175 kg Platten, Ziel 3:03, Wechsel alle 7 m in Bewegung)",
+          "Run 2: 1 km @ 4:05/km (4:05) → Sled Pull 50 m mit 175 kg (125 kg Platten, Ziel 3:40, Wechsel jede 12,5-m-Bahn)",
+          "Run 3: 1 km @ 4:05/km (4:05) → Sandbag Lunges 100 m mit 30 kg (Ziel 3:15, Wechsel alle 25 m ohne Ablegen)",
+          "Run 4: 1 km @ 4:05/km (4:05) → Wall Balls 100 mit 9 kg auf 3 m (Ziel 3:28, Aufteilung 20/20/15/15/15/15)",
+          "Nach jeder Station führt der frischere Partner und läuft die ersten 200 m kontrolliert bei 4:15/km an, bis der andere im Rhythmus ist"
+        ],
+        "k": "sim",
+        "n": "Zwischen Lauf und Station zügig gehen, Wechsel exakt wie notiert ausführen, alle Splits und Stationszeiten notieren. Schlitten mit Überlast als Reserve für zähen Belag. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59).",
+        "t": "Brick-Simulation",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "48": {
+        "i": [
+          "8 km Zone 2 @ 5:20/km (42:40), Puls 135–150 bpm",
+          "Farmers Hold 2×40 s mit 2×38 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf.",
+        "t": "Lockerer Lauf",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "49": {
+        "i": [
+          "Back Squat 1×5 (Kraft-Meilenstein: W2-Gewicht plus 12,5 kg), Pause 180 s",
+          "Romanian Deadlift 1×5 (Kraft-Meilenstein: W2-Gewicht plus 12,5 kg), Pause 180 s",
+          "Bench Press 1×5 (Kraft-Meilenstein: W2-Gewicht plus 5 kg), Pause 180 s",
+          "Shoulder Press 1×5 (Kraft-Meilenstein: W2-Gewicht plus 5 kg), Pause 180 s",
+          "Pull-ups 2×5, Pause 120 s",
+          "Wadenheben einbeinig 2×15 je Seite (3 s absenken, Pause 60 s) → Plank 2×45 s, Pause 45 s",
+          "Referenzsätze für den Kraft-Meilenstein (zwischen Bench Press und Shoulder Press volle 3 Min Pause halten), anschliessend Volumen minimal halten"
+        ],
+        "k": "kraft",
+        "n": "",
+        "t": "Kraft 1 Deload",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "50": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30)",
+          "4×1 km @ 3:52/km (3:52) mit Jimoh auf 400-m-Bahn, manueller Lap (Ziel höchstens 3:52 pro km), Trabpause 3×200 m @ 7:30/km (1:30)",
+          "Auslaufen 600 m @ 5:30/km (3:18)"
+        ],
+        "k": "lauf",
+        "n": "Neues Team-Tempo im Profil eintragen. Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf.",
+        "t": "Lauf-Test T",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "51": {
+        "i": [
+          "Einlaufen 300 m @ 5:30/km (1:39)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Sled Push 12,5 m mit 200 kg (150 kg Platten, Ziel 0:42, 1 Bahn, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+          "Runde 3: Sled Pull 12,5 m mit 155 kg (105 kg Platten, Ziel 0:50, 1 Bahn, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+          "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:23, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+          "Auslaufen 300 m @ 5:30/km (1:39)"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Stehzeiten nach Stoppuhr ersetzen Jimohs Anteil und werden nie verkürzt, nach der letzten Bahn sofort laufen. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "52": {
+        "i": [
+          "Rad 45 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich bleiben.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "53": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "54": {
+        "i": [
+          "SkiErg 1000 m @ 1:45/500 m (Ziel 3:30)",
+          "Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:45)",
+          "Sled Pull 50 m mit 155 kg (105 kg Platten, Ziel 3:15)",
+          "Burpee Broad Jumps 80 m (Ziel 2:40)",
+          "RowErg 1000 m @ 1:50/500 m (Ziel 3:40)",
+          "Farmers Carry 200 m mit 2×32 kg (Ziel 1:22)",
+          "Sandbag Lunges 100 m mit 30 kg (Ziel 3:10)",
+          "Wall Balls 100 mit 9 kg auf 3 m (Ziel 3:20)"
+        ],
+        "k": "station",
+        "n": "",
+        "t": "Stationen-Re-Test (im Team mit Jimoh)",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "55": {
+        "i": [
+          "6 km Zone 2 @ 5:20/km (32:00), Puls 135–150 bpm"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lockerer Lauf",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "56": {
+        "i": [
+          "Back Squat 3×3, Pause 150 s, explosiv",
+          "Bulgarian Split Squat 2×6 je Seite, Pause 90 s",
+          "Romanian Deadlift 3×5, Pause 120 s",
+          "Pull-ups 3×5, Pause 120 s",
+          "Langhantel-Rudern vorgebeugt 3×8, Pause 120 s",
+          "Shoulder Press 3×5, Pause 120 s",
+          "Sled Push 12,5 m mit 225 kg (175 kg Platten, 6 Wiederholungen, Pause 30 s)",
+          "Wadenheben einbeinig 3×15 je Seite (3 s absenken, Pause 60 s) → Pallof Press 3×10 je Seite, Pause 60 s"
+        ],
+        "k": "kraft",
+        "n": "Arbeitsgewicht aus dem Profil verwenden, Startgewicht über Reserve finden, Gewicht steigt nur nach Sätzen mit Reserve und ohne Muskelversagen. Bench Press und Shoulder Press wechseln sich wöchentlich ab. Vorher Rad einfahren und Mobility. Schlitten-Wiederholungen maximal schnell, zwischen den Bahnen volle Pause. Zum Abschluss auf dem Rad ausrollen.",
+        "t": "Kraft 1 Maximalkraft Unterkörper",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "57": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "10×400 m @ 3:45/km (1:30), Trabpause 9×200 m @ 7:00/km (1:24)",
+          "Auslaufen 1 km @ 5:30/km (5:30)"
+        ],
+        "k": "lauf",
+        "n": "Allein laufen, Lap manuell drücken, Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor. Ohne Windschatten bei Pulsüberschreitung das Tempo leicht drosseln.",
+        "t": "VO2max Intervall",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "58": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Sandbag Lunges 100 m mit 30 kg (Ziel 2:50, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 30 s Pause",
+          "Runde 3: Wall Balls 50 mit 9 kg auf 3 m (Ziel 2:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 30 s Pause",
+          "Runde 4: Sandbag Lunges 100 m mit 30 kg (Ziel 2:50, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 30 s Pause",
+          "Runde 5: Wall Balls 50 mit 9 kg auf 3 m (Ziel 2:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 30 s Pause",
+          "Auslaufen 600 m @ 5:30/km (3:18)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Lunges und Wall Balls erst nach Go; bei Schmerz 3 oder mehr die Lunges auf 50 m kürzen. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Lunges und Wall Balls erst nach Go; bei Schmerz 3 oder mehr die Lunges auf 50 m kürzen. Wall Balls in 3 Sätzen zu 20, 15 und 15.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "59": {
+        "i": [
+          "5 km Zone 2 @ 5:20/km (26:40)",
+          "Farmers Hold 2×40 s mit 2×40 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich laufen und bei Ziehen in Achillessehne oder Wade sofort auf Rad Zone 2 wechseln.",
+        "t": "Lauf Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "60": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "61": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "Run 5: 1 km @ 4:05/km (4:05) (Verbot schneller als 4:05/km!) → RowErg 1000 m @ 1:52/500 m (Ziel 3:47, Wechsel bei 350 m und 700 m)",
+          "Run 6: 1 km @ 4:05/km (4:05) → Farmers Carry 200 m mit 2×32 kg (Ziel 1:18, 1 Wechsel bei 100 m)",
+          "Run 7: 1 km @ 4:05/km (4:05) → Sandbag Lunges 100 m mit 30 kg (Ziel 3:00, Wechsel alle 25 m)",
+          "Run 8: 1 km @ 4:05/km (4:05) → Wall Balls 100 mit 9 kg auf 3 m (Ziel 3:05, Aufteilung 20/20/15/15/15/15)",
+          "Ziel: Run 5–8 mit Stationen 5–8 unter 30:07 inklusive Wege",
+          "Auslaufen 400 m @ 5:30/km (2:12)"
+        ],
+        "k": "sim",
+        "n": "Tempo hart aber kontrolliert, Gesamtzeit und alle Splits notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59).",
+        "t": "Halb-Simulation B auf Zeit",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "62": {
+        "i": [
+          "6 km Zone 2 @ 5:20/km (32:00), Puls 135–150 bpm",
+          "Farmers Hold 2×40 s mit 2×40 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lockerer Lauf",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "63": {
+        "i": [
+          "Back Squat 3×3, Pause 150 s, explosiv",
+          "Bulgarian Split Squat 2×6 je Seite, Pause 90 s",
+          "Romanian Deadlift 3×5, Pause 120 s",
+          "Pull-ups 3×5, Pause 120 s",
+          "Langhantel-Rudern vorgebeugt 3×8, Pause 120 s",
+          "Bench Press 3×5, Pause 120 s",
+          "Sled Pull 12,5 m mit 175 kg (125 kg Platten, 6 Wiederholungen, Pause 30 s)",
+          "Wadenheben einbeinig 3×15 je Seite (3 s absenken, Pause 60 s) → Pallof Press 3×10 je Seite, Pause 60 s"
+        ],
+        "k": "kraft",
+        "n": "Arbeitsgewicht aus dem Profil verwenden, Startgewicht über Reserve finden, Gewicht steigt nur nach Sätzen mit Reserve und ohne Muskelversagen. Bench Press und Shoulder Press wechseln sich wöchentlich ab. Vorher Rad einfahren und Mobility. Schlitten-Wiederholungen maximal schnell, zwischen den Bahnen volle Pause. Zum Abschluss auf dem Rad ausrollen.",
+        "t": "Kraft 1 Maximalkraft Unterkörper",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "64": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "4×1,2 km @ 3:53/km (4:40), Trabpause 3×250 m @ 7:00/km (1:45)",
+          "Auslaufen 1 km @ 5:30/km (5:30)"
+        ],
+        "k": "lauf",
+        "n": "Allein laufen, Lap manuell drücken, Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor. Ohne Windschatten bei Pulsüberschreitung das Tempo leicht drosseln.",
+        "t": "Über-Rennpace Intervall",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "65": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Burpee Broad Jumps 40 m (Ziel 1:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+          "Runde 3: Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:10, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+          "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+          "Runde 5: Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:10, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+          "Auslaufen 600 m @ 5:30/km (3:18)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s).",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "66": {
+        "i": [
+          "5 km Zone 2 @ 5:20/km (26:40)",
+          "Farmers Hold 2×40 s mit 2×40 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lauf Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "67": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "68": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Runde 1: SkiErg 500 m @ 1:47/500 m (Ziel 1:47, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+          "Runde 2: Burpee Broad Jumps 40 m (Ziel 1:15, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+          "Runde 3: RowErg 500 m @ 1:52/500 m (Ziel 1:52, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+          "Runde 4: Farmers Carry 100 m mit 2×34 kg (Ziel 0:39, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+          "Auslaufen 600 m @ 5:30/km (3:18)"
+        ],
+        "k": "station",
+        "n": "Lap nach jeder Runde manuell drücken und das Delta gegen die frische Runde vom Mittwoch notieren. Puls bleibt unter der Redline. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast.",
+        "t": "Stationen-Ökonomie 2",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "69": {
+        "i": [
+          "8 km Zone 2 @ 5:20/km (42:40), Puls 135–150 bpm",
+          "Farmers Hold 2×40 s mit 2×40 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lockerer Lauf",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "70": {
+        "i": [
+          "Back Squat 2×3, Pause 150 s / Heim: Kniebeugen mit Rucksack 10 kg 3×12, Pause 90 s",
+          "Romanian Deadlift 2×5, Pause 120 s / Heim: Einbeiniges Kreuzheben 2×8 je Seite mit 2×22,5 kg, Pause 90 s",
+          "Pull-ups 2×6, Pause 120 s / Heim: Rucksack-Rudern 2×12 mit 10 kg, Pause 90 s",
+          "Shoulder Press 2×6, Pause 120 s / Heim: Kurzhantel-Schulterdrücken 2×8 mit 2×22,5 kg, Pause 90 s",
+          "Wadenheben einbeinig 2×15 je Seite (3 s absenken, Pause 60 s) → Plank 2×45 s, Pause 45 s"
+        ],
+        "k": "kraft",
+        "n": "Deload mit sauberer Ausführung. Termine innerhalb der Feiertage frei tauschbar, Reihenfolge der Woche beibehalten, Ruhetage bleiben fix.",
+        "t": "Kraft 1 Deload",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "71": {
+        "i": [
+          "Einlaufen 800 m @ 5:30/km (4:24)",
+          "3×1,5 km @ 4:10/km (6:15) (mit Jimoh oder allein), Trabpause 2×200 m @ 6:30/km (1:18)",
+          "Auslaufen 600 m @ 5:30/km (3:18)"
+        ],
+        "k": "lauf",
+        "n": "Termine innerhalb der Feiertage frei tauschbar, Reihenfolge der Woche beibehalten, Ruhetage bleiben fix. Auto-Lap bleibt Aus.",
+        "t": "Schwelle Intervall",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "72": {
+        "i": [
+          "Einlaufen 300 m @ 5:30/km (1:39)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz",
+          "Runde 2: RowErg 500 m @ 1:52/500 m (Ziel 1:52, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+          "Runde 3: RowErg 500 m @ 1:52/500 m (Ziel 1:52, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+          "Runde 4: RowErg 500 m @ 1:52/500 m (Ziel 1:52, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+          "Auslaufen 300 m @ 5:30/km (1:39)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken und das Delta notieren. Termine innerhalb der Feiertage frei tauschbar. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Mit Jimoh im Wechsel 1000 m RowErg statt 500 m allein. Ohne Rudergerät: 50 Rucksack-Lunges mit 10 kg und 20 Thruster mit 2×22,5 kg. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "73": {
+        "i": [
+          "5 km Zone 2 @ 5:20/km (26:40)"
+        ],
+        "k": "lauf",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lauf Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "74": {
+        "i": [],
+        "k": "rest",
+        "n": "Feiertag und fixer Ruhetag.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "75": {
+        "i": [
+          "Rad 60 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Danach Mobility, Feiertage geniessen.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "76": {
+        "i": [
+          "6 km Zone 2 @ 5:20/km (32:00), Puls 135–150 bpm"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lockerer Lauf",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "77": {
+        "i": [
+          "Back Squat 3×3, Pause 150 s, explosiv / Heim: Kniebeugen mit Rucksack 10 kg 3×15, Pause 90 s",
+          "Bulgarian Split Squat 2×6 je Seite, Pause 90 s",
+          "Romanian Deadlift 3×5, Pause 120 s / Heim: Einbeiniges Kreuzheben 3×8 je Seite mit 2×22,5 kg, Pause 90 s",
+          "Pull-ups 3×5, Pause 120 s / Heim: Rucksack-Rudern 3×12 mit 10 kg, Pause 90 s",
+          "Bench Press 3×5, Pause 120 s / Heim: Liegestütze mit Rucksack 10 kg 3×12, Pause 90 s",
+          "Wadenheben einbeinig 3×15 je Seite (3 s absenken, Pause 60 s) → Pallof Press 3×10 je Seite, Pause 60 s"
+        ],
+        "k": "kraft",
+        "n": "Termine innerhalb der Feiertage frei tauschbar, Reihenfolge der Woche beibehalten, Ruhetage bleiben fix.",
+        "t": "Kraft 1 Maximalkraft Unterkörper",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "78": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "4×1 km @ 3:51/km (3:51) allein auf 400-m-Bahn, manueller Lap (Ziel höchstens 3:51 pro km, entspricht etwa 3:48 pro km im Team), Trabpause 3×200 m @ 7:30/km (1:30)",
+          "Auslaufen 600 m @ 5:30/km (3:18)"
+        ],
+        "k": "lauf",
+        "n": "Jeder läuft den Test allein, Jimoh zeitversetzt an seinem Termin. Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor.",
+        "t": "Lauf-Test T allein",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "79": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz",
+          "Runde 2: Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:10, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 3: Sled Pull 50 m mit 155 kg (105 kg Platten, Ziel 3:15, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 4: Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:10, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 5: Sled Pull 50 m mit 155 kg (105 kg Platten, Ziel 3:15, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Auslaufen 600 m @ 5:30/km (3:18)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken und das Delta notieren. Termine innerhalb der Feiertage frei tauschbar. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Delta-Audit 2 mit vollen Lasten, Ziel Delta höchstens 15 s. Für ein gültiges Audit echte Schlitten nutzen. Diese Einheit besteht bewusst nur aus Sled Push und Pull, weil sie genau diese beiden Deltas misst.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "80": {
+        "i": [
+          "5 km Zone 2 @ 5:20/km (26:40)",
+          "Farmers Hold 2×40 s mit 2×40 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lauf Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "81": {
+        "i": [],
+        "k": "rest",
+        "n": "Neujahr und fixer Ruhetag.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "82": {
+        "i": [
+          "5 km Zone 2 @ 5:20/km (26:40)"
+        ],
+        "k": "lauf",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln. Dreiviertel-Simulation folgt am Samstag der nächsten Woche mit Jimoh.",
+        "t": "Lauf Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": true
+      },
+      "83": {
+        "i": [
+          "7 km Zone 2 @ 5:20/km (37:20), Puls 135–150 bpm",
+          "Farmers Hold 2×40 s mit 2×40 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lockerer Lauf",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "84": {
+        "i": [
+          "Back Squat 3×3, Pause 150 s, explosiv",
+          "Romanian Deadlift 3×3, Pause 150 s",
+          "Pull-ups 3×3, Pause 120 s",
+          "Shoulder Press 3×3, Pause 120 s",
+          "Sled Push 12,5 m mit 200 kg (150 kg Platten, 4 Wiederholungen, Pause 30 s)",
+          "Wadenheben einbeinig 2×15 je Seite (3 s absenken, Pause 60 s) → Box Jumps 3×3 auf 60 cm, Pause 60 s"
+        ],
+        "k": "kraft",
+        "n": "Alle Wiederholungen explosiv und ohne Ermüdung. Bench Press und Shoulder Press wechseln sich wöchentlich ab. Vorher Rad einfahren und Mobility. Zum Abschluss auf dem Rad ausrollen.",
+        "t": "Kraft 1 Explosiver Kraft-Erhalt",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "85": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "6×1 km @ 4:00/km (4:00), Trabpause 5×200 m @ 6:00/km (1:12), Puls-Ziel Ø unter 182 bpm",
+          "Auslaufen 1 km @ 5:30/km (5:30)"
+        ],
+        "k": "lauf",
+        "n": "Allein laufen, Lap manuell drücken, Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor. Ohne Windschatten bei Pulsüberschreitung das Tempo leicht drosseln. Harte Einheit am Abend zur Rennzeit von Basel.",
+        "t": "Metronom Intervall",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "86": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:10, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 3: Wall Balls 50 mit 9 kg auf 3 m (Ziel 2:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Auslaufen 600 m @ 5:30/km (3:18)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Harte Einheit am Abend zur Rennzeit von Basel. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Wall Balls in 3 Sätzen zu 20, 15 und 15.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "87": {
+        "i": [
+          "5 km Zone 2 @ 5:20/km (26:40)",
+          "Farmers Hold 2×40 s mit 2×40 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lauf Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "88": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "89": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "Run 1: 1 km @ 4:10/km (4:10) (Verbot schneller als 4:05/km!) → SkiErg 1000 m @ 1:46/500 m (Ziel 3:35, Wechsel bei 350 m und 700 m) → Run 2: 1 km @ 4:10/km (4:10) → Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:20, Wechsel alle 7 m in Bewegung)",
+          "Run 3: 1 km @ 4:10/km (4:10) → Sled Pull 50 m mit 155 kg (105 kg Platten, Ziel 2:55, Wechsel jede 12,5-m-Bahn) → Run 4: 1 km @ 4:10/km (4:10) → Burpee Broad Jumps 80 m (Ziel 2:08, Wechsel alle 5 Sprünge)",
+          "Run 5: 1 km @ 4:10/km (4:10) → RowErg 1000 m @ 1:51/500 m (Ziel 3:45, Wechsel bei 350 m und 700 m) → Run 6: 1 km @ 4:10/km (4:10) → Farmers Carry 200 m mit 2×32 kg (Ziel 1:12, 1 Wechsel bei 100 m)",
+          "Ziele: Gesamtzeit unter 44:58, Roxzone gesamt 2:48, Kompromiss-Delta höchstens 15 s",
+          "Auslaufen 600 m @ 5:30/km (3:18)",
+          "Nach jeder Station führt der frischere Partner und läuft die ersten 200 m kontrolliert bei 4:15/km an, bis der andere im Rhythmus ist, erst ab Meter 200–300 auf Zielpace"
+        ],
+        "k": "sim",
+        "n": "Ohne Satzpausen laufen, jede Station im Rennrhythmus und nach der Station sofort weiter. Frühstück und Schuhe wie am Renntag erproben. Alle Splits, Stationszeiten, Wege und Roxzone notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Start am Abend zur Rennzeit von Basel, Mahlzeiten und Koffein danach ausrichten. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59).",
+        "t": "Dreiviertel-Simulation 1",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "90": {
+        "i": [
+          "Rad 45 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Erholung nach der Simulation, kein Laufen.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "91": {
+        "i": [
+          "Back Squat 3×3, Pause 150 s, explosiv",
+          "Romanian Deadlift 2×3, Pause 150 s",
+          "Pull-ups 3×3, Pause 120 s",
+          "Bench Press 3×3, Pause 120 s",
+          "Sled Pull 12,5 m mit 155 kg (105 kg Platten, 4 Wiederholungen, Pause 30 s)",
+          "Wadenheben einbeinig 2×15 je Seite (3 s absenken, Pause 60 s) → Pallof Press 3×10 je Seite, Pause 60 s"
+        ],
+        "k": "kraft",
+        "n": "Nach der Simulation bewusst kurz halten.",
+        "t": "Kraft 1 kurz",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "92": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "3×1,5 km @ 4:03/km (6:05), Trabpause 2×200 m @ 6:40/km (1:20), Puls-Ziel Ø unter 178 bpm",
+          "Auslaufen 1 km @ 5:30/km (5:30)"
+        ],
+        "k": "lauf",
+        "n": "Allein laufen, Lap manuell drücken, Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor. Ohne Windschatten bei Pulsüberschreitung das Tempo leicht drosseln. Harte Einheit am Abend zur Rennzeit von Basel.",
+        "t": "Metronom Intervall kurz",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "93": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Sled Pull 50 m mit 155 kg (105 kg Platten, Ziel 3:15, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 3: Sandbag Lunges 100 m mit 30 kg (Ziel 2:50, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Auslaufen 600 m @ 5:30/km (3:18)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Harte Einheit am Abend zur Rennzeit von Basel. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen (und W14 bei Bedarf als Deload-Woche laufen). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Woche 14 ist die kurze Woche vor der Simulation: bei Ruhepuls erhöht oder Sehnenziehen die Einheit auf zwei Runden kürzen (und die Woche bei Bedarf als Deload laufen).",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "94": {
+        "i": [
+          "5 km Zone 2 @ 5:20/km (26:40)",
+          "Farmers Hold 2×40 s mit 2×40 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lauf Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "95": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "96": {
+        "i": [
+          "Rad 45 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Lockere Beine für die volle Simulation nächsten Samstag. Nicht härter fahren als Zone 2, Gespräch muss möglich bleiben.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "97": {
+        "i": [
+          "7 km Zone 2 @ 5:20/km (37:20), Puls 135–150 bpm",
+          "Farmers Hold 2×40 s mit 2×40 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lockerer Lauf",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "98": {
+        "i": [
+          "Back Squat 2×3, Pause 150 s, explosiv",
+          "Romanian Deadlift 3×3, Pause 150 s",
+          "Pull-ups 3×3, Pause 120 s",
+          "Shoulder Press 3×3, Pause 120 s",
+          "Wadenheben einbeinig 2×15 je Seite (3 s absenken, Pause 60 s) → Pallof Press 3×10 je Seite, Pause 60 s"
+        ],
+        "k": "kraft",
+        "n": "Kurz und explosiv, keine Ermüdung sammeln. Bench Press und Shoulder Press wechseln sich wöchentlich ab. Vorher Rad einfahren und Mobility.",
+        "t": "Kraft 1 Explosiver Kraft-Erhalt",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "99": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "5×1 km @ 3:58/km (3:58), Trabpause 4×150 m @ 6:40/km (1:00), Puls-Ziel Ø unter 178 bpm",
+          "Auslaufen 1 km @ 5:30/km (5:30)"
+        ],
+        "k": "lauf",
+        "n": "Allein laufen, Lap manuell drücken, Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor. Ohne Windschatten bei Pulsüberschreitung das Tempo leicht drosseln. Harte Einheit am Abend zur Rennzeit von Basel.",
+        "t": "Metronom Intervall",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "100": {
+        "i": [
+          "Einlaufen 400 m @ 5:30/km (2:12)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Sled Push 25 m mit 200 kg (150 kg Platten, Ziel 1:04, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 3: Wall Balls 50 mit 9 kg auf 3 m (Ziel 2:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Auslaufen 400 m @ 5:30/km (2:12)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Harte Einheit am Abend zur Rennzeit von Basel. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Wall Balls in 3 Sätzen zu 20, 15 und 15.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "101": {
+        "i": [
+          "5 km Zone 2 @ 5:20/km (26:40)",
+          "Farmers Hold 2×40 s mit 2×40 kg, Pause 90 s"
+        ],
+        "k": "lauf",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lauf Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "102": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "103": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30), danach 4 Steigerungen à 100 m @ 3:40/km (0:22)",
+          "Aufteilung 60 zu 40 testen: Der Stärkere übernimmt bei Farmers Carry und Sandbag Lunges den grösseren Anteil, Abstand zur Zielzeit der Station mit dem Abstand in der letzten Simulation vergleichen",
+          "Run 1: 1 km @ 4:10/km (4:10) (Verbot schneller als 4:05/km!) → SkiErg 1000 m @ 1:46/500 m (Ziel 3:35, Wechsel bei 350 m und 700 m) → Run 2: 1 km @ 4:10/km (4:10) → Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:20, Wechsel alle 7 m in Bewegung)",
+          "Run 3: 1 km @ 4:10/km (4:10) → Sled Pull 50 m mit 155 kg (105 kg Platten, Ziel 2:55, Wechsel jede 12,5-m-Bahn) → Run 4: 1 km @ 4:10/km (4:10) → Burpee Broad Jumps 80 m (Ziel 2:08, Wechsel alle 5 Sprünge)",
+          "Run 5: 1 km @ 4:08/km (4:08) → RowErg 1000 m @ 1:51/500 m (Ziel 3:45, Wechsel bei 350 m und 700 m) → Run 6: 1 km @ 4:08/km (4:08) → Farmers Carry 200 m mit 2×32 kg (Ziel 1:12, 1 Wechsel bei 100 m)",
+          "Run 7: 1 km @ 4:08/km (4:08) → Sandbag Lunges 100 m mit 30 kg (Ziel 2:50, Wechsel alle 25 m) → Run 8: 1 km @ 4:08/km (4:08) → Wall Balls 100 mit 9 kg auf 3 m (Ziel 3:05, Aufteilung 20/20/15/15/15/15)",
+          "Ziele: Gesamtzeit unter 59:05 (Läufe 33:12, Stationen 21:50, Roxzone gesamt 3:59), Kompromiss-Delta höchstens 12 s",
+          "Auslaufen 600 m @ 5:30/km (3:18)",
+          "Nach jeder Station führt der frischere Partner und läuft die ersten 200 m kontrolliert bei 4:15/km an, bis der andere im Rhythmus ist, erst ab Meter 200–300 auf Zielpace"
+        ],
+        "k": "sim",
+        "n": "Volle Simulation, 21 Tage vor dem Rennen, mindestens 90 % Intensität, Start am Abend zur Rennzeit von Basel, Frühstück, Koffein, Verpflegung und Schuhe wie am Renntag. Alle 16 Teile, Wege und Roxzone stoppen und in der App unter Rennprognose → Simulation eintragen (Intensität, Laufzeit gesamt, Roxzone gesamt): nur an einer vollen Simulation eicht sich die Prognose. Vorher Go/No-Go Fuss; bei Sehnenziehen auf Dreiviertel kürzen. Die Zielzeit 59:05 ist die Hochrechnung für Sub-60, keine Pflicht. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf.",
+        "t": "Volle Simulation 8×1 km + 8 Stationen (Generalprobe)",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "104": {
+        "i": [
+          "Rad 45 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Erholung nach der Generalprobe, kein Laufen.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "105": {
+        "i": [
+          "Back Squat 2×3, Pause 150 s",
+          "Romanian Deadlift 2×5, Pause 120 s",
+          "Pull-ups 2×6, Pause 120 s",
+          "Bench Press 2×6, Pause 120 s",
+          "Wadenheben einbeinig 2×15 je Seite (3 s absenken, Pause 60 s) → Plank 2×45 s, Pause 45 s"
+        ],
+        "k": "kraft",
+        "n": "Deload mit sauberer Ausführung. Bench Press und Shoulder Press wechseln sich wöchentlich ab.",
+        "t": "Kraft 1 Deload",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "106": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30)",
+          "2×2 km @ 4:12/km (8:24), Trabpause 300 m @ 6:30/km (1:57)",
+          "Auslaufen 600 m @ 5:30/km (3:18)"
+        ],
+        "k": "lauf",
+        "n": "Allein laufen, Lap manuell drücken, Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor. Ohne Windschatten bei Pulsüberschreitung das Tempo leicht drosseln.",
+        "t": "Metronom Intervall kurz",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "107": {
+        "i": [
+          "Einlaufen 300 m @ 5:30/km (1:39)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Sled Pull 25 m mit 155 kg (105 kg Platten, Ziel 1:20, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 3: Sandbag Lunges 50 m mit 30 kg (Ziel 1:25, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Auslaufen 300 m @ 5:30/km (1:39)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s).",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "108": {
+        "i": [
+          "Rad 45 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich bleiben.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "109": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "110": {
+        "i": [
+          "Einlaufen 600 m @ 5:30/km (3:18)",
+          "Ersatz bei anderem Rückstand zum Rennmodell: Die Station mit dem grössten Rückstand ersetzt eine der 3 Stationen der Runden, zur Wahl Sled Push 25 m mit 200 kg (150 kg Platten, Ziel 0:56) oder Burpee Broad Jumps 40 m (Ziel 1:04) oder RowErg 500 m @ 1:51/500 m (Ziel 1:51)",
+          "4 Runden mit Jimoh: 1 km @ 4:05/km (4:05) → Sled Pull 25 m mit 155 kg (105 kg Platten, Ziel 1:10) → Sandbag Lunges 50 m mit 30 kg (Ziel 1:25) → 40 Wall Balls mit 9 kg auf 3 m (Ziel 1:14), 90 s Pause"
+        ],
+        "k": "sim",
+        "n": "Falls in der Generalprobe eine andere Station den grössten Rückstand zum Rennmodell hatte, wird genau diese Station hier eingesetzt. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59).",
+        "t": "Schwachstellen-Simulation",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "111": {
+        "i": [
+          "6 km Zone 2 @ 5:20/km (32:00), Puls 135–150 bpm"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lockerer Lauf",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "112": {
+        "i": [
+          "Back Squat 2×2, Pause 150 s",
+          "Romanian Deadlift 2×3, Pause 150 s",
+          "Pull-ups 2×5, Pause 120 s",
+          "Shoulder Press 2×5, Pause 120 s"
+        ],
+        "k": "kraft",
+        "n": "Letzte Krafteinheit für Hüfte und Oberkörper vor Basel.",
+        "t": "Kraft 1 kurz",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "113": {
+        "i": [
+          "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "5×800 m @ 3:55/km (3:08), Trabpause 4×200 m @ 7:00/km (1:24)",
+          "Auslaufen 1 km @ 5:30/km (5:30)"
+        ],
+        "k": "lauf",
+        "n": "Allein laufen, Lap manuell drücken, Auto-Lap bleibt Aus und der HRM Pro Plus steht auf Nur Indoor. Ohne Windschatten bei Pulsüberschreitung das Tempo leicht drosseln.",
+        "t": "Schärfen Intervall",
+        "key": true,
+        "src": "pdf",
+        "joint": false
+      },
+      "114": {
+        "i": [
+          "Einlaufen 400 m @ 5:30/km (2:12)",
+          "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+          "Runde 2: Sled Push 25 m mit 200 kg (150 kg Platten, Ziel 1:04, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 3: Wall Balls 50 mit 9 kg auf 3 m (Ziel 2:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Runde 4: Sandbag Lunges 50 m mit 30 kg (Ziel 1:25, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+          "Auslaufen 400 m @ 5:30/km (2:12)",
+          "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+        ],
+        "k": "station",
+        "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Wall Balls in 3 Sätzen zu 20, 15 und 15. Rennwoche naht: nichts Neues, Tempo locker.",
+        "t": "Kraft 2 + Compromised Running",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "115": {
+        "i": [
+          "Rad 45 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Gelenkschonende aerobe Basis, gesprächstauglich bleiben.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "116": {
+        "i": [],
+        "k": "rest",
+        "n": "Schlafen, essen und nichts nachholen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "117": {
+        "i": [
+          "Rad 45 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Taper: Beine frisch halten, die Stationen sind mit dem Mittwoch und der Generalprobe abgedeckt.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "118": {
+        "i": [
+          "6 km Zone 2 @ 5:20/km (32:00), Puls 135–150 bpm"
+        ],
+        "k": "lauf",
+        "n": "Langer Lauf für die aerobe Basis, die Wochenkilometer wachsen hier am sichersten. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln.",
+        "t": "Lockerer Lauf",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "119": {
+        "i": [
+          "Rad 30 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Ganz gesprächstauglich, Beine nur durchbewegen.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "120": {
+        "i": [
+          "Einlaufen 1,2 km @ 5:30/km (6:36) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+          "6×400 m @ 3:50/km (1:32), Trabpause 5×200 m @ 6:30/km (1:18)",
+          "Auslaufen 800 m @ 5:30/km (4:24)"
+        ],
+        "k": "lauf",
+        "n": "Mit Jimoh nebeneinander laufen, Lap manuell drücken und nichts beweisen wollen.",
+        "t": "Lauf kurz und scharf",
+        "key": true,
+        "src": "pdf",
+        "joint": true
+      },
+      "121": {
+        "i": [
+          "Rad 20 Min Zone 2 (Puls 135–150 bpm), Trittfrequenz 85–95 U/min"
+        ],
+        "k": "bike",
+        "n": "Oder frei, Beine hochlegen.",
+        "t": "Rad Zone 2",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "122": {
+        "i": [
+          "4 km Zone 2 @ 5:20/km (21:20) → 3×200 m @ 4:00/km (0:48)"
+        ],
+        "k": "lauf",
+        "n": "Gemütlich auslaufen, Beine hochlegen und Material packen.",
+        "t": "Lockerer Lauf",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "123": {
+        "i": [],
+        "k": "rest",
+        "n": "Anreise, Material prüfen, früh schlafen und nichts Neues essen.",
+        "t": "Ruhetag",
+        "key": false,
+        "src": "pdf",
+        "joint": false
+      },
+      "124": {
+        "i": [
+          "HYROX Basel, Doubles Men PRO mit Jimoh (Ziel: Sub-60)"
+        ],
+        "k": "race",
+        "n": "",
+        "t": "HYROX Basel – Rennen",
+        "key": true,
+        "src": "pdf",
+        "race": true,
+        "joint": true
+      },
+      "125": {
+        "i": [],
+        "k": "rest",
+        "n": "",
+        "t": "Ruhetag",
+        "key": false,
+        "joint": false
+      }
+    },
+    "from": 13,
+    "name": "HYROX_Basel2027_Plan_v13c_plus_v3",
+    "weeks": [
+      {
+        "n": 1,
+        "km": 10,
+        "name": "Standortbestimmung",
+        "start": 0
+      },
+      {
+        "n": 2,
+        "km": 21,
+        "name": "Extensive Schwelle & Halb-Simulation A",
+        "start": 7
+      },
+      {
+        "n": 3,
+        "km": 23,
+        "name": "Aufbau mit Schwelle",
+        "start": 14
+      },
+      {
+        "n": 4,
+        "km": 16,
+        "name": "Deload und T-Test",
+        "start": 21
+      },
+      {
+        "n": 5,
+        "km": 25,
+        "name": "Intensive Schwelle",
+        "start": 28
+      },
+      {
+        "n": 6,
+        "km": 27,
+        "name": "Schwelle und Cruise",
+        "start": 35
+      },
+      {
+        "n": 7,
+        "km": 28,
+        "name": "Delta-Audit 1",
+        "start": 42
+      },
+      {
+        "n": 8,
+        "km": 17,
+        "name": "Deload und T-Test",
+        "start": 49
+      },
+      {
+        "n": 9,
+        "km": 31,
+        "name": "VO2max und 400 m",
+        "start": 56
+      },
+      {
+        "n": 10,
+        "km": 32,
+        "name": "Über-Rennpace",
+        "start": 63
+      },
+      {
+        "n": 11,
+        "km": 22,
+        "name": "Feiertage und Deload",
+        "start": 70
+      },
+      {
+        "n": 12,
+        "km": 30,
+        "name": "Delta-Audit 2 und T-Test",
+        "start": 77
+      },
+      {
+        "n": 13,
+        "km": 28,
+        "name": "Peak 1",
+        "start": 84
+      },
+      {
+        "n": 14,
+        "km": 25,
+        "name": "Peak 2",
+        "start": 91
+      },
+      {
+        "n": 15,
+        "km": 28,
+        "name": "Peak 3 Generalprobe",
+        "start": 98
+      },
+      {
+        "n": 16,
+        "km": 21,
+        "name": "Deload",
+        "start": 105
+      },
+      {
+        "n": 17,
+        "km": 18,
+        "name": "Schärfen",
+        "start": 112
+      },
+      {
+        "n": 18,
+        "km": 10,
+        "name": "Rennwoche",
+        "start": 119
+      }
+    ],
+    "blocks": [
+      {
+        "id": "A",
+        "end": 27,
+        "name": "Basis und Kraft",
+        "start": 0
+      },
+      {
+        "id": "B",
+        "end": 55,
+        "name": "Schwelle und spezifische Kraft",
+        "start": 28
+      },
+      {
+        "id": "C",
+        "end": 83,
+        "name": "VO2max und Kraftausdauer",
+        "start": 56
+      },
+      {
+        "id": "D",
+        "end": 111,
+        "name": "Peak und Renn-Bricks",
+        "start": 84
+      },
+      {
+        "id": "T",
+        "end": 124,
+        "name": "Taper",
+        "start": 112
+      }
+    ],
+    "source": "pdf",
+    "importedAt": 1794008745164,
+    "by": "Jaime",
+    "at": "2026-10-25T15:40:24.307115+00:00"
+  }
+}

@@ -1,6 +1,12 @@
 # Planung: Dashboard nach dem Training
 
-Stand: Entwurf, nichts in `index.html` oder `src/` geändert. Artefakt mit den vier Designs: https://claude.ai/artifact/CH6PtQxfa5wukdJyVgM8xB (privat, nur für Jaime).
+Stand: Entwurf, nichts in `index.html` oder `src/` geändert. Jedes Design ist ein eigenes Artefakt mit drei Screens (Kraft, Lauf-Intervall, Stationstag), privat, nur für Jaime:
+1. Kacheln: https://claude.ai/artifact/T3Yt4Ag4HuLx5ohrXun2ox
+2. Zeitleiste: https://claude.ai/artifact/3ZiBGxQy1EUTwQT2gDC1QQ
+3. Plan gegen Ist: https://claude.ai/artifact/Fdhj9NaKB4ekngMQipgE7H
+4. Urteil: https://claude.ai/artifact/CaAiZF4C8gK17Wh8eiv1bB
+
+Die frühere Sammelseite (alles in einer Seite, mit Schaltern) war überladen und ist ersetzt. Die Screens zeigen bewusst wenig: 4 Zahlen oder eine Tabelle, Farbe nur für das, was nicht im Ziel war.
 
 ## 1. Blindspot-Pass
 

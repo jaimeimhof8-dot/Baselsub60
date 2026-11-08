@@ -42,6 +42,8 @@ export function levelOf(base) {
  * Reihenfolge wie review.STATIONS. Ausserhalb = Eingabefehler (oder Modellwert, der nicht stimmen kann), nicht Prognose. */
 export const STATION_BOUNDS = [[200, 330], [60, 210], [90, 270], [120, 270], [200, 330], [50, 120], [120, 270], [180, 360]];
 export const STATION_NAMES = ["SkiErg", "Sled Push", "Sled Pull", "Burpee BJ", "RowErg", "Farmers", "Lunges", "Wall Balls"];
+// Teamzeiten je Station (Doubles Men Pro): P1 bis P99 von 1181 echten Teams (HyRanking). Schneller als P1 ist für ein Team nicht belegt.
+export const TEAM_BOUNDS = [[196, 243], [82, 163], [145, 287], [89, 181], [213, 266], [70, 111], [124, 230], [193, 287]];
 export const RUN_BOUNDS = [150, 420]; // 1 km Laufen: 2:30 bis 7:00
 const fmt = (s) => Math.floor(s / 60) + ":" + String(Math.round(s % 60)).padStart(2, "0");
 
@@ -225,12 +227,19 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
 
   // Teamzeit je Station bei Faktor kk. Modellwerte ausserhalb der Plausibilitätsgrenze werden auf die Grenze gesetzt (nie schneller).
   const clamped = new Set();
-  const teamAt = (kk, fbF, note) => solo.map((v, r) => {
-    if (v == null) return fb[r] * fbF;
-    const x = v * (kr ? kr[r] * (kk / k) : kk), [lo, hi] = STATION_BOUNDS[r];
-    if (x < lo || x > hi) { if (note) clamped.add(r); return Math.min(hi, Math.max(lo, x)); }
-    return x;
-  });
+  // Ohne Eichung je Station: Die Summe kommt aus den Benchmarks (Solo × kk), die Verteilung auf die Stationen aus dem echten Rennen
+  // (St. Gallen). Ein Faktor allein verteilt falsch (z. B. RowErg 3:30 statt 4:01, Lunges 2:18 statt 3:21).
+  const anchor = fallbackStations(dv).map((v) => v * share);
+  const teamAt = (kk, fbF, note) => {
+    const idx = solo.map((v, r) => (v == null ? -1 : r)).filter((r) => r >= 0);
+    const sumModel = idx.reduce((a, r) => a + solo[r] * kk, 0), sumAnchor = idx.reduce((a, r) => a + anchor[r], 0) || 1;
+    return solo.map((v, r) => {
+      if (v == null) return fb[r] * fbF;
+      const x = kr ? v * kr[r] * (kk / k) : anchor[r] * (sumModel / sumAnchor), [lo, hi] = TEAM_BOUNDS[r];
+      if (x < lo || x > hi) { if (note) clamped.add(r); return Math.min(hi, Math.max(lo, x)); }
+      return x;
+    });
+  };
   const team = teamAt(k, 1, true);
   const st = sum(team);
   const stAt = (kk, fbF) => sum(teamAt(kk, fbF));

@@ -19538,6 +19538,18 @@
         const p = dayPlan(focusI),
           id = keyI(focusI) + "|" + focusJ,
           t = p.i[focusJ];
+        const sn = s7SetN(t);
+        if (sn > 1) {
+          // je Satz: nur der aktuelle Satz ändert sich (spätere gleiche Sätze ziehen nach)
+          const base = parseKg(S.val[id] || preWeight(p, t)),
+            cur = Math.min(sn - 1, fcSetsGet(id)),
+            arr = wSetsOf(id, sn, base);
+          if (isNaN(base) && arr[cur] == null) return toast("Gib zuerst ein Gewicht ein", true);
+          const from = arr[cur] != null ? arr[cur] : cur > 0 && arr[cur - 1] != null ? arr[cur - 1] : base;
+          wSetsChange(id, sn, cur, Math.max(0, +(from + dir * 2.5).toFixed(1)), base);
+          save();
+          return focusRender();
+        }
         const nv = stepValue(S.val[id] || preWeight(p, t), dir); // alle Sätze gleich verschieben, Struktur bleibt
         if (isNaN(parseKg(S.val[id] || preWeight(p, t)))) return toast("Gib zuerst ein Gewicht ein", true);
         if (nv) S.val[id] = nv;
@@ -21796,6 +21808,28 @@
         else delete out[id];
         lsSet(FC_SETS_KEY, JSON.stringify(out));
       }
+      /* Gewichte pro Satz im Fokusmodus: gespeichert wie im Abschluss-Sheet ("80 kg" für alle, "80 kg / 82,5 kg / 85 kg" je Satz) */
+      function wSetsOf(id, sn, baseKg) {
+        const kgs = parseSets(S.val[id]).map((x) => x.kg);
+        const b = isNaN(baseKg) ? null : baseKg;
+        if (kgs.length === sn) return kgs;
+        if (kgs.length === 1) return Array(sn).fill(kgs[0]);
+        if (kgs.length > 1) return Array.from({ length: sn }, (_, k) => (k < kgs.length ? kgs[k] : kgs[kgs.length - 1]));
+        return Array(sn).fill(b);
+      }
+      function wSetsPut(id, arr) {
+        const full = arr.map((x) => (x > 0 ? x : null));
+        if (full.every((x) => x == null)) return void delete S.val[id];
+        const L = full.filter((x) => x != null);
+        S.val[id] = L.every((x) => x === L[0]) && L.length === full.length ? formatSets([{ kg: L[0] }]) : formatSets(full.map((kg) => ({ kg })));
+      }
+      /* Satz k auf Wert kg setzen; spätere Sätze, die noch gleich oder leer waren, ziehen nach */
+      function wSetsChange(id, sn, k, kg, baseKg) {
+        const arr = wSetsOf(id, sn, baseKg), old = arr[k];
+        arr[k] = kg;
+        for (let x = k + 1; x < sn; x++) if (arr[x] == null || arr[x] === old) arr[x] = kg;
+        wSetsPut(id, arr);
+      }
       const s7SetN = (t) => {
         const m = /(\d+)\s*[×x]\s*(\d+)/.exec(String(t));
         return m ? Math.max(1, +m[1]) : 1;
@@ -21849,6 +21883,13 @@
             field = `<div class="fc-field slots">${slotsField(id, lineSlots(t), S.val[id])}</div>`;
           else if (lift) {
             const num = String(val || "").replace(/\s*kg\s*$/i, "");
+            if (sn > 1) {
+              const cur = Math.min(sn - 1, sd),
+                arr = wSetsOf(id, sn, parseKg(preWeight(p, t))),
+                shown = arr[cur] != null ? String(arr[cur]).replace(".", ",") : "",
+                diff = arr.some((x) => x !== arr[0]);
+              field = `<div class="f7-w"><button type="button" data-fc="dec" aria-label="Gewicht Satz ${cur + 1} verringern">${F7_CHEV("M5 12h14")}</button><div class="f7-wv"><div class="f7-n"><input class="f7-in${pre ? " pre" : ""}" type="text" data-v2s="${id}" data-k="${cur}" value="${esc(shown)}" inputmode="decimal" placeholder="–" enterkeyhint="done" aria-label="Gewicht für Satz ${cur + 1} in Kilogramm"><span>kg</span></div><span class="s6-kick">Satz ${cur + 1} von ${sn}</span></div><button type="button" data-fc="inc" aria-label="Gewicht Satz ${cur + 1} erhöhen">${F7_CHEV("M12 5v14M5 12h14")}</button></div>${diff || arr.some((x) => x != null) ? `<p class="f7-note">${arr.map((x, k) => `<span${k === cur ? " style=\"color:var(--gold,#e0bf6a)\"" : ""}>${x != null ? String(x).replace(".", ",") : "–"}</span>`).join(" · ")} kg · jeder Satz einzeln</p>` : ""}`;
+            } else
             field = `<div class="f7-w"><button type="button" data-fc="dec" aria-label="Gewicht verringern">${F7_CHEV("M5 12h14")}</button><div class="f7-wv"><div class="f7-n"><input class="f7-in${pre ? " pre" : ""}" type="text" data-v2="${id}" value="${esc(num)}" inputmode="decimal" placeholder="–" enterkeyhint="done" aria-label="Gewicht für ${esc(r.title)} in Kilogramm"><span>kg</span></div><span class="s6-kick">Gewicht</span></div><button type="button" data-fc="inc" aria-label="Gewicht erhöhen">${F7_CHEV("M12 5v14M5 12h14")}</button></div>`;
             const sg = weightSug(focusI, t),
               sgv = sg.kg ? `${sg.kg} kg` : "";
@@ -22619,7 +22660,12 @@
       }
       /* Gespeicherter Text einer Gewichtszeile aus dem Sheet-Zustand: ein Wert für alle Sätze ("80 kg") oder je Satz ("80 kg × 5 / 85 kg × 5") */
       function fin7Out(j) {
-        if (fin7.wm[j]) return formatSets(fin7.wps[j]);
+        if (fin7.wm[j]) {
+          const L = fin7.wps[j].filter((x) => x.kg > 0);
+          // alle Sätze gleich: wie bisher als ein Wert speichern
+          if (L.length === fin7.wps[j].length && L.every((x) => x.kg === L[0].kg && x.reps === L[0].reps)) return formatSets([L[0]]);
+          return formatSets(fin7.wps[j]);
+        }
         const kg = fin7.w[j];
         return kg > 0 ? formatSets([{ kg, reps: fin7.wr[j] }]) : "";
       }
@@ -22733,6 +22779,14 @@
             if (sets.length > 1) {
               fin7.wm[j] = true;
               fin7.wps[j] = sets.map((x) => ({ ...x }));
+            }
+            if (!fin7.wm[j]) {
+              // mehrere Sätze im Plan: Eintragen pro Satz ist der Normalfall (jeder Satz darf ein anderes Gewicht haben)
+              const rp = parseRx(t);
+              if (rp && rp.sets > 1) {
+                fin7.wm[j] = true;
+                fin7.wps[j] = Array.from({ length: Math.min(10, rp.sets) }, () => ({ kg: fin7.w[j], reps: fin7.wr[j] }));
+              }
             }
             fin7.w0[j] = raw ? fin7Out(j) : ""; // geplantes Gewicht wird wie bisher gespeichert
           }
@@ -24860,6 +24914,9 @@
             .map((x) => x.value.trim())
             .join(" / ")
             .replace(/(?: \/ )+$/, "");
+        } else if (d.v2s) {
+          const kg = parseFloat(String(t.value).replace(",", ".")), id = d.v2s, pl = dayPlan(idxOfIso(id.split("|")[0]));
+          if (kg >= 0 && pl) wSetsChange(id, s7SetN(pl.i[+id.split("|")[1]]), +d.k, kg, parseKg(preWeight(pl, pl.i[+id.split("|")[1]])));
         } else if (d.v2) {
           S.val[d.v2] = t.value;
           t.classList.remove("pre");
@@ -24913,10 +24970,10 @@
         }
       });
 
-      /* Feedback-Modus (nur Jaime): Elemente antippen und kommentieren, siehe src/feedback.js */
+      /* Feedback-Modus (jedes angemeldete Mitglied, eigene Einträge): Elemente antippen und kommentieren, siehe src/feedback.js */
       fb.init({
         isOwner: () =>
-          ME === "Jaime" && authed() && !["login", "shared", "onb"].includes(view),
+          authed() && !["login", "shared", "onb"].includes(view),
         key: () => LSK,
         sb: () => sb,
         user: () => USER,

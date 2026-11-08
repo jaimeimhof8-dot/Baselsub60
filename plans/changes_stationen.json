@@ -1,0 +1,288 @@
+{
+ "days": {
+  "33": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18)",
+    "Runde 1: SkiErg 500 m @ 1:55/500 m (Ziel 1:55, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+    "Runde 2: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+    "Runde 3: RowErg 500 m @ 1:54/500 m (Ziel 1:54, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+    "Runde 4: Farmers Carry 100 m mit 2×34 kg (Ziel 0:53, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+    "Auslaufen 600 m @ 5:30/km (3:18)"
+   ],
+   "k": "station",
+   "n": "Lap nach jeder Runde manuell drücken und das Delta gegen die frische Runde vom Mittwoch notieren. Puls bleibt unter der Redline. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Stationen-Ökonomie 2",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "40": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18)",
+    "Runde 1: RowErg 500 m @ 1:54/500 m (Ziel 1:54, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause",
+    "Runde 2: Farmers Carry 100 m mit 2×34 kg (Ziel 0:53, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause",
+    "Runde 3: Sandbag Lunges 50 m mit 30 kg (Ziel 1:38, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause",
+    "Runde 4: Wall Balls 50 mit 9 kg auf 3 m (Ziel 2:27, 3 Sätze zu 20, 15 und 15, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 90 s Pause",
+    "Auslaufen 600 m @ 5:30/km (3:18)"
+   ],
+   "k": "station",
+   "n": "Lap nach jeder Runde manuell drücken und das Delta gegen die frische Runde vom Mittwoch notieren. Puls bleibt unter der Redline. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Stationen-Ökonomie 1",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "44": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18)",
+    "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+    "Runde 2: Sled Push 37,5 m mit 200 kg (150 kg Platten, Ziel 1:35, 3 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+    "Runde 3: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+    "Runde 4: Sled Push 37,5 m mit 200 kg (150 kg Platten, Ziel 1:35, 3 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+    "Runde 5: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+    "Auslaufen 600 m @ 5:30/km (3:18)",
+    "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+   ],
+   "k": "station",
+   "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Delta-Audit 1: Delta nach dem Push getrennt von dem nach den Burpees notieren, Ziel Delta höchstens 20 s. Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Kraft 2 + Compromised Running",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "47": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+    "Aufteilung 60 zu 40 testen: Der Stärkere übernimmt bei Schlitten schieben und ziehen den grösseren Anteil, Abstand zur Zielzeit der Station mit dem Abstand in der letzten Simulation vergleichen",
+    "Run 1: 1 km @ 4:05/km (4:05) (Verbot schneller als 4:05/km!) → Sled Push 50 m mit 225 kg (175 kg Platten, Ziel 3:03, Wechsel alle 7 m in Bewegung)",
+    "Run 2: 1 km @ 4:05/km (4:05) → Sled Pull 50 m mit 175 kg (125 kg Platten, Ziel 3:40, Wechsel jede 12,5-m-Bahn)",
+    "Run 3: 1 km @ 4:05/km (4:05) → Sandbag Lunges 100 m mit 30 kg (Ziel 3:15, Wechsel alle 25 m ohne Ablegen)",
+    "Run 4: 1 km @ 4:05/km (4:05) → Wall Balls 100 mit 9 kg auf 3 m (Ziel 4:40, Aufteilung 20/20/15/15/15/15)",
+    "Nach jeder Station führt der frischere Partner und läuft die ersten 200 m kontrolliert bei 4:15/km an, bis der andere im Rhythmus ist"
+   ],
+   "k": "sim",
+   "n": "Zwischen Lauf und Station zügig gehen, Wechsel exakt wie notiert ausführen, alle Splits und Stationszeiten notieren. Schlitten mit Überlast als Reserve für zähen Belag. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Brick-Simulation",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "51": {
+   "i": [
+    "Einlaufen 300 m @ 5:30/km (1:39)",
+    "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+    "Runde 2: Sled Push 12,5 m mit 200 kg (150 kg Platten, Ziel 0:42, 1 Bahn, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+    "Runde 3: Sled Pull 12,5 m mit 155 kg (105 kg Platten, Ziel 0:50, 1 Bahn, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+    "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 60 s Pause",
+    "Auslaufen 300 m @ 5:30/km (1:39)"
+   ],
+   "k": "station",
+   "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Stehzeiten nach Stoppuhr ersetzen Jimohs Anteil und werden nie verkürzt, nach der letzten Bahn sofort laufen. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Kraft 2 + Compromised Running",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "54": {
+   "i": [
+    "SkiErg 1000 m @ 1:49/500 m (Ziel 3:38)",
+    "Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:45)",
+    "Sled Pull 50 m mit 155 kg (105 kg Platten, Ziel 3:15)",
+    "Burpee Broad Jumps 80 m (Ziel 2:57)",
+    "RowErg 1000 m @ 1:50/500 m (Ziel 3:40)",
+    "Farmers Carry 200 m mit 2×32 kg (Ziel 1:40)",
+    "Sandbag Lunges 100 m mit 30 kg (Ziel 3:10)",
+    "Wall Balls 100 mit 9 kg auf 3 m (Ziel 4:40)"
+   ],
+   "k": "station",
+   "n": " Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Stationen-Re-Test (im Team mit Jimoh)",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "61": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+    "Run 5: 1 km @ 4:05/km (4:05) (Verbot schneller als 4:05/km!) → RowErg 1000 m @ 1:52/500 m (Ziel 3:47, Wechsel bei 350 m und 700 m)",
+    "Run 6: 1 km @ 4:05/km (4:05) → Farmers Carry 200 m mit 2×32 kg (Ziel 1:40, 1 Wechsel bei 100 m)",
+    "Run 7: 1 km @ 4:05/km (4:05) → Sandbag Lunges 100 m mit 30 kg (Ziel 3:00, Wechsel alle 25 m)",
+    "Run 8: 1 km @ 4:05/km (4:05) → Wall Balls 100 mit 9 kg auf 3 m (Ziel 4:40, Aufteilung 20/20/15/15/15/15)",
+    "Ziel: Run 5–8 mit Stationen 5–8 unter 32:04 inklusive Wege (Läufe 16:20, Stationen 13:07, Wege 2:37)",
+    "Auslaufen 400 m @ 5:30/km (2:12)"
+   ],
+   "k": "sim",
+   "n": "Tempo hart aber kontrolliert, Gesamtzeit und alle Splits notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Halb-Simulation B auf Zeit",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "65": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18)",
+    "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+    "Runde 2: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 3: Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:10, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 5: Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:10, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Auslaufen 600 m @ 5:30/km (3:18)",
+    "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+   ],
+   "k": "station",
+   "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Kraft 2 + Compromised Running",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "68": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18)",
+    "Runde 1: SkiErg 500 m @ 1:55/500 m (Ziel 1:55, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 2: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 3: RowErg 500 m @ 1:52/500 m (Ziel 1:52, 500 m ohne Pause am Stück durchziehen, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 4: Farmers Carry 100 m mit 2×34 kg (Ziel 0:53, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 5: Sandbag Lunges 50 m mit 30 kg (Ziel 1:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Runde 6: Wall Balls 50 mit 9 kg auf 3 m (Ziel 2:27, 3 Sätze zu 20, 15 und 15, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 15 s Pause",
+    "Auslaufen 600 m @ 5:30/km (3:18)"
+   ],
+   "k": "station",
+   "n": "Lap nach jeder Runde manuell drücken und das Delta gegen die frische Runde vom Mittwoch notieren. Puls bleibt unter der Redline. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Einmalig sechs Runden am Stück: Lauf 5 und 6 mit aufgebauter Ermüdung (Runde 5 und 6 sind neu gegenüber v3, Ziele Lunges 1:30 und Wall Balls 1:36 sind eine Annahme: je 8 s schneller als am Sa 21.11. (so viel wie bei den Burpees; SkiErg und RowErg verbesserten sich nur um 2 s, Farmers um 4 s)). Vor Runde 5 prüfen: Bei Schmerz in Fuss, Wade oder Achillessehne 3 oder mehr von 10, Hinken oder Puls über der Redline in Runde 4 nach Runde 4 aufhören (das war der Umfang in v3). Der lockere Lauf am Sonntag 20.12. ist dafür von 8 auf 6 km gekürzt, die Wochenkilometer bleiben gleich. Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Stationen-Ökonomie 2 (6 Runden)",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "86": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18)",
+    "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+    "Runde 2: Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:10, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 3: Wall Balls 50 mit 9 kg auf 3 m (Ziel 2:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Auslaufen 600 m @ 5:30/km (3:18)",
+    "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+   ],
+   "k": "station",
+   "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Harte Einheit am Abend zur Rennzeit von Basel. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Wall Balls in 3 Sätzen zu 20, 15 und 15. Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Kraft 2 + Compromised Running",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "89": {
+   "i": [
+    "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)",
+    "Run 1: 1 km @ 4:08/km (4:08) (Verbot schneller als 4:05/km!) → SkiErg 1000 m @ 1:49/500 m (Ziel 3:38, Wechsel bei 350 m und 700 m) → Run 2: 1 km @ 4:08/km (4:08) → Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:20, Wechsel alle 7 m in Bewegung)",
+    "Run 3: 1 km @ 4:05/km (4:05) → Sled Pull 50 m mit 155 kg (105 kg Platten, Ziel 2:55, Wechsel jede 12,5-m-Bahn) → Run 4: 1 km @ 4:05/km (4:05) → Burpee Broad Jumps 80 m (Ziel 2:57, Wechsel alle 5 Sprünge)",
+    "Run 5: 1 km @ 4:05/km (4:05) → RowErg 1000 m @ 1:51/500 m (Ziel 3:45, Wechsel bei 350 m und 700 m) → Run 6: 1 km @ 4:05/km (4:05) → Farmers Carry 200 m mit 2×32 kg (Ziel 1:40, 1 Wechsel bei 100 m)",
+    "Ziele: Gesamtzeit unter 45:54 (Läufe 24:36, Stationen 17:15, Roxzone gesamt 2:48, Wege 1:15), Kompromiss-Delta höchstens 15 s",
+    "Auslaufen 600 m @ 5:30/km (3:18)",
+    "Nach jeder Station führt der frischere Partner und läuft die ersten 200 m kontrolliert bei 4:15/km an, bis der andere im Rhythmus ist, erst ab Meter 200–300 auf Zielpace"
+   ],
+   "k": "sim",
+   "n": "Ohne Satzpausen laufen, jede Station im Rennrhythmus und nach der Station sofort weiter. Frühstück und Schuhe wie am Renntag erproben. Alle Splits, Stationszeiten, Wege und Roxzone notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Start am Abend zur Rennzeit von Basel, Mahlzeiten und Koffein danach ausrichten. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Dreiviertel-Simulation 1",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "93": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18)",
+    "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+    "Runde 2: Sled Pull 50 m mit 155 kg (105 kg Platten, Ziel 3:15, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 3: Sandbag Lunges 100 m mit 30 kg (Ziel 2:50, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Auslaufen 600 m @ 5:30/km (3:18)",
+    "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+   ],
+   "k": "station",
+   "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Harte Einheit am Abend zur Rennzeit von Basel. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen (und W14 bei Bedarf als Deload-Woche laufen). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Woche 14 ist die kurze Woche vor der Simulation: bei Ruhepuls erhöht oder Sehnenziehen die Einheit auf zwei Runden kürzen (und die Woche bei Bedarf als Deload laufen). Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Kraft 2 + Compromised Running",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "100": {
+   "i": [
+    "Einlaufen 400 m @ 5:30/km (2:12)",
+    "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+    "Runde 2: Sled Push 25 m mit 200 kg (150 kg Platten, Ziel 1:04, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 3: Wall Balls 50 mit 9 kg auf 3 m (Ziel 2:30, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Auslaufen 400 m @ 5:30/km (2:12)",
+    "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+   ],
+   "k": "station",
+   "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Harte Einheit am Abend zur Rennzeit von Basel. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Wall Balls in 3 Sätzen zu 20, 15 und 15. Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Kraft 2 + Compromised Running",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "103": {
+   "i": [
+    "Einlaufen 1 km @ 5:30/km (5:30), danach 4 Steigerungen à 100 m @ 3:40/km (0:22)",
+    "Aufteilung 60 zu 40 testen: Der Stärkere übernimmt bei Farmers Carry und Sandbag Lunges den grösseren Anteil, Abstand zur Zielzeit der Station mit dem Abstand in der letzten Simulation vergleichen",
+    "Run 1: 1 km @ 4:08/km (4:08) (Verbot schneller als 4:05/km!) → SkiErg 1000 m @ 1:49/500 m (Ziel 3:38, Wechsel bei 350 m und 700 m) → Run 2: 1 km @ 4:08/km (4:08) → Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:20, Wechsel alle 7 m in Bewegung)",
+    "Run 3: 1 km @ 4:05/km (4:05) → Sled Pull 50 m mit 155 kg (105 kg Platten, Ziel 2:55, Wechsel jede 12,5-m-Bahn) → Run 4: 1 km @ 4:05/km (4:05) → Burpee Broad Jumps 80 m (Ziel 2:57, Wechsel alle 5 Sprünge)",
+    "Run 5: 1 km @ 4:05/km (4:05) → RowErg 1000 m @ 1:51/500 m (Ziel 3:45, Wechsel bei 350 m und 700 m) → Run 6: 1 km @ 4:05/km (4:05) → Farmers Carry 200 m mit 2×32 kg (Ziel 1:40, 1 Wechsel bei 100 m)",
+    "Run 7: 1 km @ 4:02/km (4:02) → Sandbag Lunges 100 m mit 30 kg (Ziel 2:50, Wechsel alle 25 m) → Run 8: 1 km @ 4:02/km (4:02) → Wall Balls 100 mit 9 kg auf 3 m (Ziel 4:40, Aufteilung 20/20/15/15/15/15)",
+    "Ziele: Läufe 32:40, Stationen 24:45, Roxzone gesamt 3:59, Gesamt 61:24 (für 60:00 fehlen 1:24), Kompromiss-Delta höchstens 12 s",
+    "Auslaufen 600 m @ 5:30/km (3:18)",
+    "Nach jeder Station führt der frischere Partner und läuft die ersten 200 m kontrolliert bei 4:15/km an, bis der andere im Rhythmus ist, erst ab Meter 200–300 auf Zielpace"
+   ],
+   "k": "sim",
+   "n": "Volle Simulation, 21 Tage vor dem Rennen, mindestens 90 % Intensität, Start am Abend zur Rennzeit von Basel, Frühstück, Koffein, Verpflegung und Schuhe wie am Renntag. Alle 16 Teile, Wege und Roxzone stoppen und in der App unter Rennprognose → Simulation eintragen (Intensität, Laufzeit gesamt, Roxzone gesamt): nur an einer vollen Simulation eicht sich die Prognose. Vorher Go/No-Go Fuss; bei Sehnenziehen auf Dreiviertel kürzen. Die Zielzeit 61:24 rechnet mit deinen Werten von heute plus 3 %. Die 1:24 bis Sub-60 müssen aus Wall Balls, Burpees (Aufteilung mit Jimoh) oder der Roxzone kommen, nicht aus den Läufen. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf. Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Volle Simulation 8×1 km + 8 Stationen (Generalprobe)",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "107": {
+   "i": [
+    "Einlaufen 300 m @ 5:30/km (1:39)",
+    "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+    "Runde 2: Sled Pull 25 m mit 155 kg (105 kg Platten, Ziel 1:20, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 3: Sandbag Lunges 50 m mit 30 kg (Ziel 1:25, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Auslaufen 300 m @ 5:30/km (1:39)",
+    "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+   ],
+   "k": "station",
+   "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Kraft 2 + Compromised Running",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "110": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18)",
+    "Ersatz bei anderem Rückstand zum Rennmodell: Die Station mit dem grössten Rückstand ersetzt eine der 3 Stationen der Runden, zur Wahl Sled Push 25 m mit 200 kg (150 kg Platten, Ziel 0:56) oder Burpee Broad Jumps 40 m (Ziel 1:28) oder RowErg 500 m @ 1:51/500 m (Ziel 1:51)",
+    "4 Runden mit Jimoh: 1 km @ 4:05/km (4:05) → Sled Pull 25 m mit 155 kg (105 kg Platten, Ziel 1:10) → Sandbag Lunges 50 m mit 30 kg (Ziel 1:25) → 40 Wall Balls mit 9 kg auf 3 m (Ziel 1:52), 90 s Pause"
+   ],
+   "k": "sim",
+   "n": "Falls in der Generalprobe eine andere Station den grössten Rückstand zum Rennmodell hatte, wird genau diese Station hier eingesetzt. Roxzone (St. Gallen 4:19; dort waren 12 Teams mit 58:30-60:00 im Mittel 22 s schneller, ueber alle Events liegt die Roxzone der Sub-60-Teams bei etwa 4:16): Zwischen Station und Lauf traben statt gehen, Wechsel mit Lap stoppen, Ziel minus 20 s gegenueber St. Gallen (3:59). Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97 (Team mal 0,95), nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen.",
+   "t": "Schwachstellen-Simulation",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "69": {
+   "i": [
+    "6 km Zone 2 @ 5:20/km (32:00), Puls 135–150 bpm",
+    "Farmers Hold 2×40 s mit 2×40 kg, Pause 90 s"
+   ],
+   "k": "lauf",
+   "n": "Lockerer Lauf für die aerobe Basis. Durchschnittspuls und Zeit in der App notieren, bei Pulsüberschreitung Tempo drosseln. Auf weichem Boden laufen und bei Ziehen in Achillessehne oder Wade auf Rad Zone 2 wechseln. Von 8 auf 6 km gekürzt, weil die Stationen-Ökonomie am Samstag 19.12. zwei Läufe mehr hat (Wochenkilometer bleiben gleich).",
+   "t": "Lockerer Lauf",
+   "key": false,
+   "src": "pdf",
+   "joint": false
+  }
+ },
+ "weeks": {}
+}

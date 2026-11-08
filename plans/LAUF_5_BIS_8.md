@@ -152,6 +152,37 @@ Was das heisst: **8×4:05 allein reichen nur, wenn die Stationen + Roxzone unter
 
 **Die 8er-Kette als Option:** `changes_option_8_runden.json` ersetzt Sa 19.12. (statt der 6 Runden in `changes.json`) durch 8 Runden in Rennreihenfolge mit halber Stationslänge (Lauf 3 folgt dem Sled Push) und kürzt So 20.12. von 8 auf 4 km. **Ich empfehle sie nicht**, weil sie in Woche 10 (32 km, Dienstag 4×1,2 km @ 3:53) 8 harte Kilometer am Stück bringt, und die Daten keinen Nutzen von 8 gegenüber 6 Läufen zeigen. Wenn du es trotzdem willst, ist die Abbruchregel in der Notiz: vor Runde 5 und 7 prüfen, bei Schmerz 3 oder mehr, Hinken, Puls über Redline oder einer Runde langsamer als 4:12 aufhören. Nimm entweder `changes.json` oder die Option, nicht beide. Die beiden Dateien sind von mir geprüft, aber nicht von einem unabhängigen Prüfer.
 
+## 7. Stationsziele angepasst und warum die Prognose mit 4:12 rechnet
+
+### Stationsziele (`changes_stationen.json`)
+
+Regel: Ziel = dein Benchmark vom 18.10. (solo) mal 0,97, im Team mal 0,95, und **nie schneller als vorher geplant**. Geändert wurden nur SkiErg, Burpee Broad Jumps, Farmers Carry und Wall Balls, in 17 Tagen (33, 40, 44, 47, 51, 54, 61, 65, 68, 69, 86, 89, 93, 100, 103, 107, 110). Row und Lunges waren schon langsamer geplant, als dein Benchmark hergibt. **Schlitten sind unverändert**, weil im Benchmark die Lasten fehlen.
+
+| Station (Rennlänge, Team) | Plan vorher | Plan jetzt | Sub-60-Teams (Mittel) |
+|---|---|---|---|
+| SkiErg 1000 m | 3:35 | 3:38 | 3:39 |
+| Burpee Broad Jumps 80 m | 2:08 | 2:57 | 2:14 |
+| Farmers Carry 200 m | 1:12 | 1:40 | 1:29 |
+| Wall Balls 100 | 3:05 | 4:40 | 3:43 |
+| Sled Push, Pull, Row, Lunges | unverändert | unverändert | - |
+| **Summe Volle Simulation 23.01.** | **21:50** | **24:45** | **23:20** |
+
+In der Vollen Simulation (Tag 103) rechnet die Zeile jetzt: Läufe 32:40 (4:08, 4:08, dann viermal 4:05, zweimal 4:02) + Stationen 24:45 + Roxzone 3:59 = **61:24, für 60:00 fehlen 1:24**. Die 3/4-Simulation (Tag 89) und die Halb-Simulation B (Tag 61) tragen die neu gerechneten Summen. Der Satz "Die Zielzeit 59:05 ist die Hochrechnung für Sub-60" ist ersetzt.
+
+Das ist ehrlich, aber unangenehm: Mit deinen Werten von heute plus 3 % ist 60:00 nicht erreicht. Die 1:24 müssen aus Wall Balls, Burpees (Aufteilung mit Jimoh) oder der Roxzone kommen. **Jimohs Zeiten fehlen in der App**, im Doubles kann er bei Burpees oder Wall Balls mehr übernehmen. Sobald seine Werte in "Tests" stehen, gehört dieser Teil neu gerechnet. Die 3 % sind eine Annahme, der Re-Test am 05.12. zeigt, ob sie stimmen. Unsicher bleiben ausserdem die Lasten im Benchmark und die Garmin-Runden, die Station und Anlauf manchmal in einer Runde zusammenfassen.
+
+Anwenden: zuerst `changes.json` weglassen, dann nur `changes_stationen.json` (enthält schon die 6 Runden am 19.12. und das Kürzen am 20.12.) in den Plan übernehmen. Die Option mit 8 Runden und diese Datei ergänzen sich nicht, Tag 68 würde überschrieben.
+
+### Warum die Prognose bei 4:12 steht
+
+Das ist keine Pace, die ich oder der Plan setze, sondern die Formel in `src/forecast.js`:
+- T = Mittel deiner Lauf-Testzeiten (3:53, 3:58, 3:55, 4:00 = 3:56,5).
+- Plus **15 s Ermüdung** (`levelOf`, für alle Tempi unter 4:15) = **4:11,5, das sind die 4:12**.
+- Plus **3 s pro Lauf ab Lauf 5** (`DRIFT`): Lauf 5 4:14,5, Lauf 6 4:17,5, Lauf 7 4:20,5, Lauf 8 4:23,5.
+- Ergibt Läufe 34:02, im Schnitt 4:15.
+
+Deine Daten sprechen für weniger Ermüdung: Mittwoch +3 s gegen die Referenz (Bereich -5 bis +16 s), Sub-60-Teams frisch gegen Schnitt aller 8 Läufe +7 s, deine Halb-Simulation A +12,5 s im Schnitt der ersten vier Läufe. Mit 8 s Ermüdung (statt 15) und 3 s Drift läge die Prognose bei Läufen von 33:06 (4:08 im Schnitt), mit 3 s Ermüdung bei 32:26 (4:03). Das spart 56 bis 96 s. **Ich habe den Code nicht geändert**: Die Konstanten sind Annahmen mit Tests (`test/forecast.test.js`, `test/review.test.js`) und die Änderung betrifft jedes Teammitglied. Der vorgesehene Weg ist, die Volle Simulation am 23.01. in der App einzutragen, dann eicht die Prognose das Laufen an deiner gemessenen Zeit (ab 85 % Intensität).
+
 ## Offen
 
 - Deine 8 Lauf-Splits aus St. Gallen fehlen mir im Repo, ohne sie ist dein Wert für Läufe 5-8 nicht überprüfbar. Der Sub-60-Vergleichswert aus St. Gallen beruht nur auf 10 Teams; der Plantext nennt dort 12 Teams, die Datei enthält 10 (alter v3-Text, nicht von mir geprüft).

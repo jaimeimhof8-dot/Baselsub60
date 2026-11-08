@@ -289,6 +289,14 @@ export function phaseStats(ph, { steps = null, maxHr = null } = {}) {
   return st;
 }
 
+/** Phasen-Sicherheit in Worten (für die Anzeige der Unsicherheit). */
+export function confText(conf, mode) {
+  if (conf === "sure") return { v: "sicher", tone: "green", note: "Runden passen zum Plan." };
+  if (conf === "likely") return { v: "wahrscheinlich", tone: "yellow", note: "Zuordnung plausibel, aber nicht einzeln bestätigt." };
+  if (conf === "unsure") return { v: "unsicher", tone: "red", note: mode === "pace" ? "Arbeit nach Tempo geschätzt." : "Arbeit und Pause nicht sicher trennbar." };
+  return { v: "nicht erkennbar", tone: "", note: "Ohne Runden keine Trennung." };
+}
+
 const sg = (n, unit) => `${n > 0 ? "+" : n < 0 ? "−" : "±"}${Math.abs(n)} ${unit}`;
 
 /**
@@ -296,7 +304,7 @@ const sg = (n, unit) => `${n > 0 ? "+" : n < 0 ? "−" : "±"}${Math.abs(n)} ${u
  * -> {main: [{k, v, sub, tone}], totals: string, phaseBar: [{phase, s, pct}], details: [{k, v, why, tone, rows?: [{a, b, tone}]}], warn: string}
  */
 export function workDash(st) {
-  const out = { main: [], totals: "", phaseBar: [], details: [], warn: "" };
+  const out = { main: [], totals: "", phaseBar: [], details: [], warn: "", conf: null };
   if (st.time.all) {
     const parts = [["work", st.time.work], ["rest", st.time.rest], ["warm", st.time.warm], ["cool", st.time.cool]].filter(([, s]) => s > 0);
     out.phaseBar = parts.map(([phase, s]) => ({ phase, s, label: phaseName(phase), pct: Math.max(2, Math.round((s / st.time.all) * 100)) }));
@@ -306,20 +314,21 @@ export function workDash(st) {
   if (st.total.pace) tot.push(`Ø Pace ${mmss(st.total.pace)}/km`);
   if (st.time.all) tot.push(`${hms(st.time.all)} gesamt`);
   out.totals = tot.length ? `Ganzes Training inkl. Pausen: ${tot.join(" · ")}` : "";
+  if (st.conf !== "none") out.conf = confText(st.conf, st.mode);
   if (st.conf === "none") { out.warn = st.note || "Phasen nicht erkennbar."; return out; }
   if (st.conf === "unsure" || st.conf === "likely" || st.mode === "steady") out.warn = st.note;
   const w = st.work;
   if (!w) return out;
   const diff = st.total.hr && w.hr ? w.hr - st.total.hr : null;
-  if (w.hr) out.main.push({ k: "Ø Puls Arbeit", v: String(w.hr), sub: diff ? `${sg(diff, "bpm")} zum Gesamt-Ø` : "gleich wie Gesamt", tone: "" });
-  if (w.peak) out.main.push({ k: "Höchster Runden-Ø", v: String(w.peak), sub: "Spitze der Arbeitsrunden", tone: "" });
-  if (w.pace) out.main.push({ k: "Pace Arbeit", v: mmss(w.pace), sub: "/km nur Arbeitsläufe", tone: "" });
-  if (st.time.work) out.main.push({ k: "Arbeitszeit", v: hms(st.time.work), sub: `${st.n.work} Runden · Pause ${st.time.rest ? hms(st.time.rest) : "–"}`, tone: "" });
+  if (w.hr) out.main.push({ k: "Ø Puls Arbeit", v: String(w.hr), sub: diff ? `${sg(diff, "bpm")} zum Gesamt-Ø` : "gleich wie Gesamt", why: "Pulsschnitt nur der Arbeitsrunden, ohne Pausen und Einlaufen.", tone: "" });
+  if (w.peak) out.main.push({ k: "Höchster Runden-Ø", v: String(w.peak), sub: "Spitze der Arbeitsrunden", why: "Höchster Rundenschnitt, nicht dein echter Maximalpuls.", tone: "" });
+  if (w.pace) out.main.push({ k: "Pace Arbeit", v: mmss(w.pace), sub: "/km nur Arbeitsläufe", why: "Tempo der Arbeitsläufe, ohne Trabpausen.", tone: "" });
+  if (st.time.work) out.main.push({ k: "Arbeitszeit", v: hms(st.time.work), sub: `${st.n.work} Runden · Pause ${st.time.rest ? hms(st.time.rest) : "–"}`, why: "Zeit unter Belastung, Pausen getrennt.", tone: "" });
   if (st.drift) {
     const d = st.drift, tone = d.pct < 3 ? "green" : d.pct < 6 ? "yellow" : "red";
-    out.main.push({ k: "Puls-Drift", v: sg(d.bpm, "bpm"), sub: `${d.from} → ${d.to}`, tone });
+    out.main.push({ k: "Puls-Drift", v: sg(d.bpm, "bpm"), sub: `${d.from} → ${d.to}`, why: "Pulsanstieg vom ersten zum letzten Drittel; unter 3 % ist gut.", tone });
   }
-  if (st.compromise) out.main.push({ k: "Kompromiss-Delta", v: sg(st.compromise.avg, "s/km"), sub: `schlechtester: nach ${st.compromise.worst.after}`, tone: st.compromise.avg <= 8 ? "green" : st.compromise.avg <= 20 ? "yellow" : "red" });
+  if (st.compromise) out.main.push({ k: "Kompromiss-Delta", v: sg(st.compromise.avg, "s/km"), sub: `schlechtester: nach ${st.compromise.worst.after}`, why: "Wie viel langsamer du direkt nach einer Station läufst als frisch.", tone: st.compromise.avg <= 8 ? "green" : st.compromise.avg <= 20 ? "yellow" : "red" });
   out.main = out.main.slice(0, 6);
 
   const D = out.details;
@@ -354,7 +363,7 @@ export function dashSections({ src, wd, actId = "" }, esc) {
     const bar = wd.phaseBar.length > 1 && wd.main.length
       ? `<div class="pbar" role="img" aria-label="Zeitanteile der Phasen">${wd.phaseBar.map((p) => `<i class="ph-${p.phase}" style="flex:${p.pct}"></i>`).join("")}</div><div class="pleg">${wd.phaseBar.map((p) => `<span><i class="ph-${p.phase}"></i>${esc(p.label)} ${esc(hms(p.s))}</span>`).join("")}</div>`
       : "";
-    work = `<div class="dw"><span class="k">Nur Arbeitsphasen</span>${wd.warn ? `<p class="dwarn">${esc(wd.warn)}</p>` : ""}${wd.main.length ? `<div class="dg">${wd.main.map((t) => `<div class="dt ${t.tone}"><span class="k">${esc(t.k)}</span><b>${esc(t.v)}</b><span class="s">${esc(t.sub)}</span></div>`).join("")}</div>` : ""}${bar}${wd.totals ? `<p class="dtot">${esc(wd.totals)}</p>` : ""}</div>`;
+    work = `<div class="dw"><span class="k">Nur Arbeitsphasen</span>${wd.conf ? `<span class="dconf ${wd.conf.tone}">Phasen-Erkennung: ${esc(wd.conf.v)}</span>` : ""}${wd.warn ? `<p class="dwarn">${esc(wd.warn)}</p>` : ""}${wd.main.length ? `<div class="dg">${wd.main.map((t) => `<div class="dt ${t.tone}"><span class="k">${esc(t.k)}</span><b>${esc(t.v)}</b><span class="s">${esc(t.sub)}</span>${t.why ? `<span class="w">${esc(t.why)}</span>` : ""}</div>`).join("")}</div>` : ""}${bar}${wd.totals ? `<p class="dtot">${esc(wd.totals)}</p>` : ""}</div>`;
   }
 
   const more = wd.details.length

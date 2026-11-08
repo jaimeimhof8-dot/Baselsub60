@@ -20654,7 +20654,7 @@
             ? `<button type="button" class="s7-an-tg more" data-act="an-toggle" data-i="${i}" aria-expanded="${open}"><span>${open ? "Analyse einklappen" : "Ganze Analyse lesen"}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(${open ? 180 : 0}deg)"><path d="M6 9l6 6 6-6"/></svg></button>`
             : "";
         const redo = rec && !busy ? btn(stale ? "Neu analysieren" : "Nochmals analysieren") : "";
-        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${s7DashHtml(i, p, rec && !busy ? rec.data : null)}${body}${acts}${tg}${open ? `<div class="s7-an-txt">${text}</div>` : ""}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}${quick}</section>`;
+        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span><span class="s6-kick" title="Wenn hier nicht v113 oder höher steht, läuft noch die alte App-Version">Auswertung v2 · App ${APP_V}</span></div>${s7DashHtml(i, p, rec && !busy ? rec.data : null)}${body}${acts}${tg}${open ? `<div class="s7-an-txt">${text}</div>` : ""}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}${quick}</section>`;
       }
       /* Letzte gleiche Einheit mit Uhr-Daten: erst gleiche Art UND gleicher Plantitel, sonst gleiche Art. -> {i, act, rpe, same} oder null */
       function s7Prev(i, p, group) {
@@ -21256,6 +21256,7 @@
         return tile("Zeit gesamt", act && act.time ? fm(act.time) : "–") + tile("Distanz", act && act.dist ? (act.dist / 1000).toFixed(1).replace(".", ",") + " km" : "–") + tile("Ø Puls gesamt", act && act.hr ? act.hr + " bpm" : "–");
       }
       /* Übersicht aller bisherigen Einheiten: jede wird beim Anzeigen aus den gespeicherten Daten neu ausgewertet (src/dash-all.js) */
+      const APP_V = "v113"; /* gleich wie die Cache-Version in sw.js (hyrox-v113), Test prüft das */
       let revOpen = false;
       function s7RevAll() {
         const list = [];
@@ -21286,7 +21287,7 @@
               })
               .join("")}</div>`
           : "";
-        return `<section class="s6-card rv-all" aria-label="Alle Einheiten prüfen"><div class="r1"><span class="s6-kick">Alle Einheiten prüfen</span><button type="button" class="s7-lnk" data-act="rv-toggle" aria-expanded="${revOpen}">${revOpen ? "Zuklappen" : "Anzeigen"}</button></div><p class="rv-s">${rows.length} Einheiten, neu aus den gespeicherten Daten berechnet: <b>${count.ok}</b> komplett · <b>${count.partial}</b> teilweise · <b>${count.none}</b> ohne Uhr-Daten.</p>${body}</section>`;
+        return `<section class="s6-card rv-all" aria-label="Alle Einheiten prüfen"><div class="r1"><span class="s6-kick">Alle Einheiten prüfen · App ${APP_V}</span><button type="button" class="s7-lnk" data-act="rv-toggle" aria-expanded="${revOpen}">${revOpen ? "Zuklappen" : "Anzeigen"}</button></div><p class="rv-s">${rows.length} Einheiten, neu aus den gespeicherten Daten berechnet: <b>${count.ok}</b> komplett · <b>${count.partial}</b> teilweise · <b>${count.none}</b> ohne Uhr-Daten.</p>${body}</section>`;
       }
       function s6Dashboard() {
         const T = Math.max(-1, Math.min(TODAY, LAST)),

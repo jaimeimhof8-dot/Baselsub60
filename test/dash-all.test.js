@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { dataState, reviewOne, reviewAll, keyLine } from "../src/dash-all.js";
@@ -77,4 +78,11 @@ test("Datenlage: lapsV 3 ohne Runden bietet keinen Abruf; Puls nur gesamt oder n
   const some = dataState(g({ hr: 140, laps: [{ d: 1000, t: 300, hr: 150 }, { d: 1000, t: 300 }] }));
   assert.equal(some.state, "ok");
   assert.match(some.reason, /1 von 2/);
+});
+
+test("App-Versionsanzeige im Dashboard stimmt mit der Cache-Version in sw.js überein", () => {
+  const sw = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/hyrox-(v\d+)/)[1];
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8").match(/const APP_V = "(v\d+)"/)[1];
+  assert.equal(html, sw);
+  assert.match(readFileSync(new URL("../sw.js", import.meta.url), "utf8"), /"dash-all"/);
 });

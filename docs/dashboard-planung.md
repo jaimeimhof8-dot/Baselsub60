@@ -37,11 +37,13 @@ Stand: Entwurf, nichts in `index.html` oder `src/` geändert. Artefakt mit den v
 
 ### Annahmen (offen genannt)
 - Die App ist heute nur dunkel (`color-scheme: dark`, kein `prefers-color-scheme`). Der Hellmodus im Artefakt ist neu und kein Bestand.
-- Beispieldaten sind erfunden. Stationstag-Ziele (SkiErg 4:00, Sled 1:30, Burpees 4:15, Rudern 4:00) sind Platzhalter, nicht deine Plan-Werte.
+- Beispieldaten sind erfunden. Alle Zielzeiten (Intervall 4:00/km, Läufe nach Station 4:10, SkiErg 4:00, Sled 1:30, Burpees 4:15, Rudern 4:00), die Vorwerte der letzten Einheit und die Zonengrenzen 60/70/80/90 % von 191 bpm sind Platzhalter, nicht deine Plan-Werte. Split Squat: 20 kg je Hand, Volumen je Seite einfach gezählt.
 - Ob die Gewichts-Eingabe pro Satz nach der Einheit zuverlässig gefüllt wird, weiss ich nicht.
 
 ## 2. Die vier Designs
 Alle drei Einheitenarten (Kraft, Lauf-Intervall, Stationstag) mit Beispieldaten, Handy 390 px, Hell und Dunkel, plus Schalter «Uhr-Daten fehlen».
+
+Im Mockup gezeigte Lücken: keine Uhr-Aktivität (Schalter), Kraft ohne Puls je Satz, Rundenschnitt statt Maximalpuls, Wiederholungen/Gewicht ohne Eintrag, einzelner Referenz-km. **Nicht gezeigt** (nur hier beschrieben): Puls in nur einem Teil der Runden und Phasen-Erkennung «wahrscheinlich/unsicher».
 
 1. **Kennzahlen-Kacheln, Detail darunter.** Sechs Kacheln, Quelle-Box, Phasenbalken, Details, Vergleich.
 2. **Zeitleiste der Einheit.** Runde für Runde mit Startzeit, Tempo, Puls-Balken. Kraft nur als Reihenfolge.

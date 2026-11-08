@@ -36,6 +36,7 @@ Stand: Entwurf, nichts in `index.html` oder `src/` geändert. Artefakt mit den v
 - **Wiederholungen ohne Eintrag** zählen als Plan, nicht als Messwert.
 
 ### Annahmen (offen genannt)
+- **Optik 1:1 aus der App** (Korrektur von Jaime nach Version 1): Tokens aus `:root`, Glas-Hintergrund, `.s6-card`, `.s6-btn` und die Bausteine von `.an-dash` (Ring mit Punktzahl, Kacheln `.dt`, Quelle `.dsrc`, `.dmore`, `.chip`, `.pbar`) sind übernommen. Neu gebaut sind nur Zeitleiste und Tabelle, aus denselben Flächen und Farben.
 - Die App ist heute nur dunkel (`color-scheme: dark`, kein `prefers-color-scheme`). Der Hellmodus im Artefakt ist neu und kein Bestand.
 - Beispieldaten sind erfunden. Alle Zielzeiten (Intervall 4:00/km, Läufe nach Station 4:10, SkiErg 4:00, Sled 1:30, Burpees 4:15, Rudern 4:00), die Vorwerte der letzten Einheit und die Zonengrenzen 60/70/80/90 % von 191 bpm sind Platzhalter, nicht deine Plan-Werte. Split Squat: 20 kg je Hand, Volumen je Seite einfach gezählt.
 - Ob die Gewichts-Eingabe pro Satz nach der Einheit zuverlässig gefüllt wird, weiss ich nicht.

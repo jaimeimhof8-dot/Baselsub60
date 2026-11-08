@@ -10,12 +10,12 @@ const harm = (a, b) => (a + b) / 2; // Mittel der Partner (K ist daran angesetzt
 const SOLO = JAIME.st.map((v, r) => harm(v, JIMOH.st[r])).reduce((a, b) => a + b, 0);
 const REAL = { laufPersons: [JAIME.lauf, JIMOH.lauf], station: JAIME.st.map((v, r) => [v, JIMOH.st[r]]) };
 
-test("Eure echten Zahlen: mittleres Szenario um 62:40 (nicht mehr 58:49), Spanne unter 7 Minuten", () => {
+test("Eure echten Zahlen: mittleres Szenario um 61:44 (mit 15 s Ermüdung waren es 62:40, vorher 58:49), Spanne unter 7 Minuten", () => {
   const f = buildForecast(REAL);
-  assert.ok(f.total > t("62:00") && f.total < t("63:30"), "Mitte " + f.total);
-  assert.ok(f.lo > t("59:30") && f.lo < f.total && f.hi > f.total && f.hi < t("67:00"), `Spanne ${f.lo} bis ${f.hi}`);
+  assert.ok(f.total > t("61:00") && f.total < t("62:30"), "Mitte " + f.total);
+  assert.ok(f.lo > t("59:00") && f.lo < f.total && f.hi > f.total && f.hi < t("67:00"), `Spanne ${f.lo} bis ${f.hi}`);
   assert.ok(f.hi - f.lo < 7 * 60, "Spanne " + (f.hi - f.lo));
-  assert.equal(Math.round(f.run), 2044); // 34:04, Ø 4:16/km
+  assert.equal(Math.round(f.run), 1988); // 33:08, Ø 4:09/km (8 s Ermüdung)
   assert.equal(f.missing, 0);
   assert.equal(f.k, K.mitte);
   assert.equal(f.calibrated, false);
@@ -84,9 +84,9 @@ test("Veränderung zur Vorwoche", () => {
 test("Niveau ist stetig: 1 s Pace verschiebt die Roxzone nicht um eine Minute", () => {
   for (let b = 235; b < 330; b++) {
     const a = levelOf(b), c = levelOf(b + 1);
-    assert.ok(Math.abs(c.rox - a.rox) <= 4.1 && Math.abs(c.fatigue - a.fatigue) <= 0.41, `Sprung bei ${b}: ${a.rox} → ${c.rox}`);
+    assert.ok(Math.abs(c.rox - a.rox) <= 4.1 && Math.abs(c.fatigue - a.fatigue) <= 0.81, `Sprung bei ${b}: ${a.rox} → ${c.rox}`);
   }
-  for (const b of [200, 236, 253, 255]) assert.deepEqual([levelOf(b).fatigue, levelOf(b).rox], [15, 255], "wie vorher bis 4:15 (St. Gallen 4:13)");
+  for (const b of [200, 236, 253, 255]) assert.deepEqual([levelOf(b).fatigue, levelOf(b).rox], [8, 255], "8 s Ermüdung bis 4:15 (St. Gallen 4:13), Roxzone wie vorher");
   assert.deepEqual([levelOf(270).fatigue, levelOf(270).rox], [20, 315]);
   assert.deepEqual([levelOf(400).fatigue, levelOf(400).rox], [25, 360]); // Rand rechts
 });

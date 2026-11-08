@@ -34,9 +34,9 @@ test("Prognose: Compromised Running, Drift ab Lauf 5, Fallback statt fehlender S
   const half = forecast({ lauf: [230, 250], station: [[300, 320]] });
   assert.equal(half.T, 240);
   assert.equal(half.level, "schnell");
-  assert.deepEqual(half.paces.slice(0, 4), [255, 255, 255, 255]); // +15 s/km
-  assert.deepEqual(half.paces.slice(4), [258, 261, 264, 267]); // ab Lauf 5 progressiv langsamer
-  assert.equal(half.run, 4 * 255 + 258 + 261 + 264 + 267);
+  assert.deepEqual(half.paces.slice(0, 4), [248, 248, 248, 248]); // +8 s/km
+  assert.deepEqual(half.paces.slice(4), [251, 254, 257, 260]); // ab Lauf 5 progressiv langsamer
+  assert.equal(half.run, 4 * 248 + 251 + 254 + 257 + 260);
   assert.equal(half.missing, 7);
   assert.deepEqual(half.sources, ["bench", ...Array(7).fill("fallback")]);
   assert.ok(half.total > 0 && half.st > 0, "nie 0:00, auch ohne Benchmarks");

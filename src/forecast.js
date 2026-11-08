@@ -28,12 +28,12 @@ const lerp = (x, x0, x1, y0, y1) => y0 + (y1 - y0) * Math.min(1, Math.max(0, (x 
 /**
  * Ermüdungsaufschlag (Compromised Running) und Roxzone-Zeit nach Niveau der Basis-Pace (s/km).
  * Stetig zwischen drei Stützpunkten (4:15 schnell, 4:30 mittel, 5:00 gemütlich), ausserhalb gilt der Rand.
- * Unter 4:15/km (inkl. St. Gallen 4:13 und eure 3:56) bleibt alles wie vorher (15 s, Roxzone 4:15).
+ * Unter 4:15/km (inkl. St. Gallen 4:13 und eure 3:56) gelten 8 s Ermüdung (vorher 15 s; gesenkt am 08.11.2026, weil gemessene Läufe nach Stationen im Mittel nur etwa +3 bis +12 s über der frischen Referenz lagen) und Roxzone 4:15.
  * Vorher sprang die Roxzone bei 4:15/km von 4:15 auf 5:15 (60 s Sprung durch 1 s Pace) – das war ein Rechenartefakt.
  */
 export function levelOf(base) {
   const lo = base <= 270;
-  const fatigue = lo ? lerp(base, 255, 270, 15, 20) : lerp(base, 270, 300, 20, 25);
+  const fatigue = lo ? lerp(base, 255, 270, 8, 20) : lerp(base, 270, 300, 20, 25);
   const rox = lo ? lerp(base, 255, 270, 255, 315) : lerp(base, 270, 300, 315, 360);
   return { name: base < 255 ? "schnell" : base < 285 ? "mittel" : "gemütlich", fatigue: Math.round(fatigue * 10) / 10, rox: Math.round(rox) };
 }

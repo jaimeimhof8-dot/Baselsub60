@@ -1,0 +1,92 @@
+{
+ "days": {
+  "30": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18)",
+    "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+    "Runde 2: Sled Push 25 m mit 200 kg (150 kg Platten, Ziel 1:04, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+    "Runde 3: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+    "Runde 4: Sled Push 25 m mit 200 kg (150 kg Platten, Ziel 1:04, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+    "Runde 5: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 120 s Pause",
+    "Auslaufen 600 m @ 5:30/km (3:18)",
+    "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+   ],
+   "k": "station",
+   "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Go/No-Go Fuss, Waden, Achillessehne: Morgens Schmerz 0-2 von 10 und nicht schlechter als gestern = Go. 3-4 = Lauf durch Rad Zone 2 gleicher Dauer ersetzen (Stationen ohne Burpee Broad Jumps). 5 oder mehr, Druckschmerz am Knochen oder Hinken = Stopp, Physio oder Arzt. Vor dem ersten Lauf nach einer Pause: 20 einbeinige Wadenheben und 10 Huepfer je Seite, bei Schmerz 3 oder mehr kein Lauf. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Sled Push in Stufen: 25 m, später 37,5 m, 50 m, jede Stufe nur bei Go. Stand 08.11.: Wall Balls sind aus den Runden genommen. Im Rennen folgt auf die Wall Balls kein Lauf (Lauf 8 kommt vor ihnen), die Runden nutzen deshalb Stationen, nach denen im Rennen gelaufen wird: Sled Push (Lauf 3), Sled Pull (Lauf 4), Burpees (Lauf 5), Lunges (Lauf 8). Wall Balls bleiben in den Samstagen, den Simulationen und dem Block am Donnerstag. Pace-Regel: Jeder Lauf nach Station bei 4:05, nie schneller als 4:03; erste 200 m bei 4:15. Ist ein Lauf langsamer als 4:12, die nächste Station nicht schneller machen, sondern gleichmässig bleiben. Burpees gleichmässig, die erste Hälfte nicht schneller als die zweite. Die Pace-Regeln sind eine Annahme aus deinen Werten (Lauf nach Lunges am 31.10. +14 s gegen die Referenz, nach Burpees +9 s, nach Sleds +4 bis +6 s).",
+   "t": "Kraft 2 + Compromised Running",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "58": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18)",
+    "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+    "Runde 2: Sandbag Lunges 100 m mit 30 kg (Ziel 2:50, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 30 s Pause",
+    "Runde 3: Sled Pull 25 m mit 155 kg (105 kg Platten, Ziel 1:20, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 30 s Pause",
+    "Runde 4: Sandbag Lunges 100 m mit 30 kg (Ziel 2:50, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 30 s Pause",
+    "Runde 5: Sled Pull 25 m mit 155 kg (105 kg Platten, Ziel 1:20, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 30 s Pause",
+    "Auslaufen 600 m @ 5:30/km (3:18)",
+    "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+   ],
+   "k": "station",
+   "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Lunges erst nach Go; bei Schmerz 3 oder mehr die Lunges auf 50 m kürzen. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Lunges erst nach Go; bei Schmerz 3 oder mehr die Lunges auf 50 m kürzen. Stand 08.11.: Wall Balls sind aus den Runden genommen. Im Rennen folgt auf die Wall Balls kein Lauf (Lauf 8 kommt vor ihnen), die Runden nutzen deshalb Stationen, nach denen im Rennen gelaufen wird: Sled Push (Lauf 3), Sled Pull (Lauf 4), Burpees (Lauf 5), Lunges (Lauf 8). Wall Balls bleiben in den Samstagen, den Simulationen und dem Block am Donnerstag. Pace-Regel: Jeder Lauf nach Station bei 4:05, nie schneller als 4:03; erste 200 m bei 4:15. Ist ein Lauf langsamer als 4:12, die nächste Station nicht schneller machen, sondern gleichmässig bleiben. Burpees gleichmässig, die erste Hälfte nicht schneller als die zweite. Die Pace-Regeln sind eine Annahme aus deinen Werten (Lauf nach Lunges am 31.10. +14 s gegen die Referenz, nach Burpees +9 s, nach Sleds +4 bis +6 s).",
+   "t": "Kraft 2 + Compromised Running",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "86": {
+   "i": [
+    "Einlaufen 600 m @ 5:30/km (3:18)",
+    "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+    "Runde 2: Sled Push 50 m mit 200 kg (150 kg Platten, Ziel 2:10, 4 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 3: Sandbag Lunges 50 m mit 30 kg (Ziel 1:25, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Auslaufen 600 m @ 5:30/km (3:18)",
+    "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+   ],
+   "k": "station",
+   "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Harte Einheit am Abend zur Rennzeit von Basel. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97, im Team zusätzlich mal 0,95, nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen. Stand 08.11.: Wall Balls sind aus den Runden genommen. Im Rennen folgt auf die Wall Balls kein Lauf (Lauf 8 kommt vor ihnen), die Runden nutzen deshalb Stationen, nach denen im Rennen gelaufen wird: Sled Push (Lauf 3), Sled Pull (Lauf 4), Burpees (Lauf 5), Lunges (Lauf 8). Wall Balls bleiben in den Samstagen, den Simulationen und dem Block am Donnerstag. Pace-Regel: Jeder Lauf nach Station bei 4:05, nie schneller als 4:03; erste 200 m bei 4:15. Ist ein Lauf langsamer als 4:12, die nächste Station nicht schneller machen, sondern gleichmässig bleiben. Burpees gleichmässig, die erste Hälfte nicht schneller als die zweite. Die Pace-Regeln sind eine Annahme aus deinen Werten (Lauf nach Lunges am 31.10. +14 s gegen die Referenz, nach Burpees +9 s, nach Sleds +4 bis +6 s).",
+   "t": "Kraft 2 + Compromised Running",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "100": {
+   "i": [
+    "Einlaufen 400 m @ 5:30/km (2:12)",
+    "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+    "Runde 2: Sled Push 25 m mit 200 kg (150 kg Platten, Ziel 1:04, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 3: Sandbag Lunges 50 m mit 30 kg (Ziel 1:25, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 4: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Auslaufen 400 m @ 5:30/km (2:12)",
+    "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+   ],
+   "k": "station",
+   "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Harte Einheit am Abend zur Rennzeit von Basel. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Stationsziele am 08.11. angepasst: dein Benchmark vom 18.10. mal 0,97, im Team zusätzlich mal 0,95, nie schneller als vorher geplant. Schlitten unverändert, weil im Benchmark die Lasten fehlen. Stand 08.11.: Wall Balls sind aus den Runden genommen. Im Rennen folgt auf die Wall Balls kein Lauf (Lauf 8 kommt vor ihnen), die Runden nutzen deshalb Stationen, nach denen im Rennen gelaufen wird: Sled Push (Lauf 3), Sled Pull (Lauf 4), Burpees (Lauf 5), Lunges (Lauf 8). Wall Balls bleiben in den Samstagen, den Simulationen und dem Block am Donnerstag. Pace-Regel: Jeder Lauf nach Station bei 4:05, nie schneller als 4:03; erste 200 m bei 4:15. Ist ein Lauf langsamer als 4:12, die nächste Station nicht schneller machen, sondern gleichmässig bleiben. Burpees gleichmässig, die erste Hälfte nicht schneller als die zweite. Die Pace-Regeln sind eine Annahme aus deinen Werten (Lauf nach Lunges am 31.10. +14 s gegen die Referenz, nach Burpees +9 s, nach Sleds +4 bis +6 s).",
+   "t": "Kraft 2 + Compromised Running",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  },
+  "114": {
+   "i": [
+    "Einlaufen 400 m @ 5:30/km (2:12)",
+    "Runde 1 frisch ohne Station: 1 km @ 4:05/km (4:05) als Referenz, Puls 175–182 bpm, Redline ab 187 bpm",
+    "Runde 2: Sled Push 25 m mit 200 kg (150 kg Platten, Ziel 1:04, 2 Bahnen je 12,5 m, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 3: Burpee Broad Jumps 40 m (Ziel 1:33, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Runde 4: Sandbag Lunges 50 m mit 30 kg (Ziel 1:25, 0 s Übergang in den Lauf) → 1 km @ 4:05/km (4:05), 0 s Pause",
+    "Auslaufen 400 m @ 5:30/km (2:12)",
+    "Erste 200 m nach jeder Station kontrolliert bei 4:15/km anlaufen, dann auf 4:05/km"
+   ],
+   "k": "station",
+   "n": "Startrunde immer frisch ohne Station vorweg laufen, sie liefert die Referenz für das Kompromiss-Delta. Lap nach jeder Runde manuell drücken, auf der Bahn oder vermessener Pendelstrecke, und das Delta notieren. Bahnzeit jeder Schlitten-Bahn notieren. Morgens vorher Ruhepuls, Waden und Achillessehnen prüfen, bei erhöhtem Ruhepuls oder Sehnenziehen das Volumen sofort anpassen. Alle Stationen allein über die ganze Renndistanz (im Rennen teilt ihr sie): Überlast. Bahnzeit jeder Schlitten-Bahn notieren. Delta nach Push und nach Pull getrennt notieren: Ziel nach dem Push höchstens 15 s gegenüber der Referenz (Teams mit 58:30-60:00 verlieren dort im Mittel 13 s, du in St. Gallen 29 s). Rennwoche naht: nichts Neues, Tempo locker. Stand 08.11.: Wall Balls sind aus den Runden genommen. Im Rennen folgt auf die Wall Balls kein Lauf (Lauf 8 kommt vor ihnen), die Runden nutzen deshalb Stationen, nach denen im Rennen gelaufen wird: Sled Push (Lauf 3), Sled Pull (Lauf 4), Burpees (Lauf 5), Lunges (Lauf 8). Wall Balls bleiben in den Samstagen, den Simulationen und dem Block am Donnerstag. Pace-Regel: Jeder Lauf nach Station bei 4:05, nie schneller als 4:03; erste 200 m bei 4:15. Ist ein Lauf langsamer als 4:12, die nächste Station nicht schneller machen, sondern gleichmässig bleiben. Burpees gleichmässig, die erste Hälfte nicht schneller als die zweite. Die Pace-Regeln sind eine Annahme aus deinen Werten (Lauf nach Lunges am 31.10. +14 s gegen die Referenz, nach Burpees +9 s, nach Sleds +4 bis +6 s).",
+   "t": "Kraft 2 + Compromised Running",
+   "key": true,
+   "src": "pdf",
+   "joint": true
+  }
+ },
+ "weeks": {}
+}

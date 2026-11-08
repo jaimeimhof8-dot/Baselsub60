@@ -183,6 +183,28 @@ Das ist keine Pace, die ich oder der Plan setze, sondern die Formel in `src/fore
 
 Deine Daten sprechen für weniger Ermüdung: Mittwoch +3 s gegen die Referenz (Bereich -5 bis +16 s), Sub-60-Teams frisch gegen Schnitt aller 8 Läufe +7 s, deine Halb-Simulation A +12,5 s im Schnitt der ersten vier Läufe. Mit 8 s Ermüdung (statt 15) und 3 s Drift läge die Prognose bei Läufen von 33:06 (4:08 im Schnitt), mit 3 s Ermüdung bei 32:26 (4:03). Das spart 56 bis 96 s. **Ich habe den Code nicht geändert**: Die Konstanten sind Annahmen mit Tests (`test/forecast.test.js`, `test/review.test.js`) und die Änderung betrifft jedes Teammitglied. Der vorgesehene Weg ist, die Volle Simulation am 23.01. in der App einzutragen, dann eicht die Prognose das Laufen an deiner gemessenen Zeit (ab 85 % Intensität).
 
+## 8. 4:05 halten nach Sleds, Burpees und Lunges (Mittwoch in Rennreihenfolge)
+
+**Korrektur an der Fragestellung:** Im Rennen folgt auf die Wall Balls kein Lauf. Die Reihenfolge ist Lauf 1, SkiErg, Lauf 2, Sled Push, Lauf 3, Sled Pull, Lauf 4, Burpees, Lauf 5, Row, Lauf 6, Farmers, Lauf 7, Lunges, Lauf 8, Wall Balls, Ziel (so steht es auch in der Vollen Simulation, Tag 103). "Gut laufen nach den Wall Balls" gibt es im Rennen nicht. Gefragt sind **Lauf 3 und 4 (nach Sled Push und Pull), Lauf 5 (nach den Burpees) und Lauf 8 (nach den Lunges, direkt vor den Wall Balls).**
+
+Deine Daten dazu: Lauf nach Sleds +4 bis +6 s gegen die Referenz (28.10.), nach Burpees +9 s (28.10.), nach Lunges +14 s (31.10.). Der Lauf nach den Lunges ist bei dir der teuerste, weil die Beine am meisten kosten (App-Analyse vom 31.10.).
+
+**Änderung (`changes_mittwoch_rennreihenfolge.json`, Tage 30, 58, 86, 100, 114):** Wall Balls sind aus den Mittwochs-Runden genommen und durch Stationen ersetzt, nach denen im Rennen gelaufen wird. Pro Einheit bleibt höchstens eine Sled-Station, die Pausen bleiben.
+
+| Datum | Vorher | Jetzt |
+|---|---|---|
+| Mi 11.11. | Sled Push 25 m / Wall Balls 50 | Sled Push 25 m / Burpees 40 m |
+| Mi 09.12. | Lunges 100 m / Wall Balls 50 | Lunges 100 m / Sled Pull 25 m |
+| Mi 06.01. | Push 50 m / Wall Balls / Burpees | Push 50 m / Lunges 50 m / Burpees |
+| Mi 20.01. | Push 25 m / Wall Balls / Burpees | Push 25 m / Lunges 50 m / Burpees |
+| Mi 03.02. | Push 25 m / Wall Balls / Lunges | Push 25 m / Burpees / Lunges |
+
+Wall Balls bleiben in den Samstagen, den Simulationen und im Block am Donnerstag (Rad Zone 2, "Lunges-Wall-Ball-Block"). Tage 31 und danach sind nicht angefasst. Die Pace-Regel steht in der Notiz: Lauf nach Station bei 4:05, nie schneller als 4:03, erste 200 m bei 4:15; Burpees gleichmässig. Zur Frage "nicht bei den Burpees explodieren": In deinen Daten explodierst du bei den Burpees nicht, die Verluste liegen in der Station selbst (+28 s am 28.10., Laufverlust danach nur +9 s). Die Regel schützt davor, die Station zu schnell anzugehen.
+
+**Risiko:** Mehr Lunges und Burpees heisst mehr Belastung für Waden und Fuss als Wall Balls. Das ist eine Einschätzung. Die Go/No-Go-Regel in jeder Einheit gilt weiter. Bei Schmerz 3 oder mehr die Runde auf Rad ersetzen.
+
+**Anwenden:** Nach `changes_stationen.json` übernehmen (sonst fehlen dort die neuen Stationsziele; die Tage 30 bis 114 hier bauen schon darauf auf). Geprüft habe ich das nur selbst: Die zusammengeführte Plan-Datei liest die App-Funktion ohne Warnung, und jede Runde hat das Zeilenformat mit Kachel.
+
 ## Offen
 
 - Deine 8 Lauf-Splits aus St. Gallen fehlen mir im Repo, ohne sie ist dein Wert für Läufe 5-8 nicht überprüfbar. Der Sub-60-Vergleichswert aus St. Gallen beruht nur auf 10 Teams; der Plantext nennt dort 12 Teams, die Datei enthält 10 (alter v3-Text, nicht von mir geprüft).

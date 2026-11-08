@@ -66,3 +66,15 @@ test("reviewAll: alle Einheiten, neueste zuerst, Datenlage gezählt; Rechnung is
   assert.deepEqual(JSON.stringify(a), JSON.stringify(b));
   assert.match(keyLine(a.rows[3]), /Puls Arbeit 175/);
 });
+
+test("Datenlage: lapsV 3 ohne Runden bietet keinen Abruf; Puls nur gesamt oder nur in einem Teil der Runden", () => {
+  const g = (o) => ({ src: "garmin", lapsV: 3, ...o });
+  assert.equal(dataState(g({ laps: [] }), { garminOn: true }).refetch, false);
+  assert.equal(dataState({ src: "garmin", laps: [] }, { garminOn: true }).refetch, true);
+  const noHr = dataState(g({ hr: 140, laps: [{ d: 1000, t: 300 }] }), { garminOn: true });
+  assert.equal(noHr.state, "partial");
+  assert.match(noHr.reason, /Gesamt-Puls/);
+  const some = dataState(g({ hr: 140, laps: [{ d: 1000, t: 300, hr: 150 }, { d: 1000, t: 300 }] }));
+  assert.equal(some.state, "ok");
+  assert.match(some.reason, /1 von 2/);
+});

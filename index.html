@@ -21280,7 +21280,7 @@
         const body = revOpen
           ? `<div class="rv-list">${rows
               .map((r) => {
-                const btn = r.data.refetch ? `<button type="button" class="s6-btn" data-act="${r.actId ? "gm-refetch" : "gm-sync"}" data-id="${esc(r.actId)}">${r.actId ? "Erneut abrufen" : "Jetzt abrufen"}</button>` : "";
+                const btn = r.data.refetch ? `<button type="button" class="s6-btn" data-act="${r.actId ? "gm-refetch" : "gm-full"}" data-id="${esc(r.actId)}">${r.actId ? "Erneut abrufen" : "Alle Einheiten nachladen"}</button>` : "";
                 const k = keyLine(r);
                 return `<div class="rv-row ${r.data.state}"><button type="button" class="rv-go" data-goday="${r.i}"><span class="rv-h"><b>${esc(r.label)}</b><span>${esc(r.title)}</span></span><span class="rv-m">${esc(r.src || "ohne Uhr")} · ${esc(ST[r.data.state])}${r.conf !== "none" ? " · Phasen " + esc(r.confInfo.v) : ""}</span><span class="rv-k">${k ? esc(k) : "Keine Kennzahlen aus der Uhr"}</span></button>${r.data.reason ? `<p class="rv-w">${esc(r.data.reason)}</p>` : ""}${r.conf === "unsure" || r.conf === "likely" ? `<p class="rv-w">${esc(r.st.note)}</p>` : ""}${btn}</div>`;
               })

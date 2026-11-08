@@ -19,10 +19,11 @@ export function dataState(act, { garminOn = false } = {}) {
   const canRe = act.src === "garmin" && garminOn;
   if (!laps.length) {
     const waiting = act.src === "garmin" && act.lapsV !== 3;
-    return { state: "partial", reason: waiting ? "Runden fehlen noch: sie wurden bei der Übernahme nicht mitgeladen. Erneut abrufen holt sie." : "Die Uhr hat keine Runden aufgezeichnet – nur Gesamtwerte, keine Trennung von Arbeit und Pause.", refetch: canRe };
+    // Abruf nur sinnvoll, solange die Runden noch nie geholt wurden (lapsV 3 = geholt, die Uhr hatte keine)
+    return { state: "partial", reason: waiting ? "Runden fehlen noch: sie wurden bei der Übernahme nicht mitgeladen. Erneut abrufen holt sie." : "Die Uhr hat keine Runden aufgezeichnet – nur Gesamtwerte, keine Trennung von Arbeit und Pause.", refetch: canRe && waiting };
   }
-  if (!(act.hr || lapHr)) return { state: "partial", reason: "Kein Puls aufgezeichnet (Brustgurt/Uhr am Handgelenk prüfen) – Pulswerte fehlen.", refetch: canRe };
-  if (lapHr < laps.length) return { state: "ok", reason: `Puls nur in ${lapHr} von ${laps.length} Runden – Pulswerte sind unvollständig.`, refetch: canRe };
+  if (!lapHr) return { state: "partial", reason: act.hr ? "Nur ein Gesamt-Puls, in den Runden fehlt der Puls – keine Pulswerte für die Arbeitsphasen." : "Kein Puls aufgezeichnet (Brustgurt/Uhr am Handgelenk prüfen) – Pulswerte fehlen.", refetch: false };
+  if (lapHr < laps.length) return { state: "ok", reason: `Puls nur in ${lapHr} von ${laps.length} Runden – Pulswerte sind unvollständig.`, refetch: false };
   return { state: "ok", reason: "", refetch: false };
 }
 

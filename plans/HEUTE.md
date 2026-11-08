@@ -11,7 +11,7 @@
 
 **Warum `lauf`:** Mit `lauf` greifen der Garmin/Strava-Abgleich des Laufs und «Auf Uhr senden». Die Rad-Zeile wird dort ignoriert. Eine Rad-Aktivität von Garmin/Strava wird dem Tag NICHT automatisch zugeordnet (Rad passt nur zu Art `bike`). Das Rad hakst du von Hand ab.
 
-**Tag 26 in der App:** Die Einheit steht als offen/verpasst da. Wenn die App «Später»/Nachholen anbietet, NICHT nachholen, sonst erscheint sie doppelt. Einzelne Zeile streichen oder Tag als Pause markieren, falls vorhanden. Sonst einfach unabgehakt lassen. Die Wochenkilometer ändert das nicht, es ist ein Radtag.
+**Tag 26 in der App (Sa 07.11.):** Tag 26 öffnen und unten auf «Nicht gemacht – Einheit streichen» tippen. Er zählt dann nicht mehr als geplant (Badge «Gestrichen»), wird nicht nachgeholt und nicht umgeplant. Nicht über «Später»/Verschieben nachholen, sonst steht die Rad-Einheit doppelt da. Die Lauf-km von Woche 4 ändert das nicht, weil Tag 26 ein Radtag ist.
 
 ## Importieren
 1. Backup: Einstellungen → «Datei sichern».

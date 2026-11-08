@@ -114,6 +114,44 @@ Folgen für den Vorschlag in Abschnitt 4: Er bleibt, weil die Läufe 5 und 6 mit
 
 Offen: Die vier Test-Werte (3:53 bis 4:00) haben in der App kein Datum und ich finde keine passende Garmin-Aktivität. Der 03.11. war laut App ein Rad-Intervall (Nase). Von welchem Tag stammen sie?
 
+## 6. Warum die Teams schneller laufen, wie du 4:05 über 8 Läufe hältst, und was das bringt
+
+**Laufen die meisten Teams schneller als du?** Nicht die Sub-60-Teams. Die 235 Teams mit 58:30 bis 60:00 laufen im Mittel 3:57 pro km, Median 3:58, unteres Viertel 3:50, oberes Viertel 4:04. 144 von 235 sind unter 4:00. Dein frisches Niveau (3:55 bis 4:01) liegt mitten in dieser Gruppe. Schneller laufen die Teams unter 58:30 (3:44 und weniger), die sind aber nicht dein Vergleich.
+
+**Dein Einwand zu den Stationen stimmt.** Die Zeiten im Plan passen nicht zu deinen Werten:
+
+| Gruppe | Läufe | Stationen | Roxzone | Summe |
+|---|---|---|---|---|
+| Plan-Ziel Volle Simulation 23.01. | 33:12 (4:09) | **21:50** | 3:59 | 59:01 |
+| Sub-60-Teams (Mittel, n = 235) | 31:35 (3:57) | **23:20** | 4:26 | 59:13 |
+| Teams 55:00-58:30 (n = 471) | 29:54 (3:44) | 22:57 | 4:35 | 57:19 |
+| Dein Benchmark vom 18.10. (solo 25:44, mal 0,95 für Doubles) | - | **ca. 24:27** | - | - |
+
+Der Plan hatte die Läufe langsam (4:09, weil ich von 4:24 ausging) und die Stationen schnell (21:50, schneller als der Durchschnitt der Sub-60-Teams) angesetzt. Mit deinen heutigen Laufwerten kehrt sich das um: Läufe sind nicht dein Engpass, die Stationen sind es. Der Faktor 0,95 stammt aus `src/divisions.js` (Annahme), Jimohs Zeiten kenne ich nicht, dein Benchmark ist drei Wochen alt (Re-Test am 05.12.).
+
+**Rechnung, ohne Wahrscheinlichkeit:** Zielzeit = Läufe + Stationen + Roxzone. Wie schnell müssen die Läufe im Schnitt sein, damit es 60:00 ergibt?
+
+| Annahme für Stationen + Roxzone | Summe | Lauf-Ø höchstens | Gesamtzeit bei 8×4:05 |
+|---|---|---|---|
+| Plan-Ziel | 25:49 | 4:16 | 58:29 |
+| Sub-60-Teams im Mittel | 27:46 | 4:02 | 60:26 |
+| Deine Schätzung (24:27 + Roxzone 4:26) | 28:53 | 3:53 | 61:33 |
+
+Was das heisst: **8×4:05 allein reichen nur, wenn die Stationen + Roxzone unter 27:20 bleiben** (60:00 minus 32:40). Jede Sekunde pro km über 8 Läufe sind 8 s. Wenn du dagegen auf 4:15 abfällst, kostet das 80 s (34:00 gegen 32:40), so viel wie 1:20 auf einer Station. Das ist die ganze Wirkung des Tempohaltens. Eine Erfolgschance berechne ich daraus nicht.
+
+**Warum die Trainings nicht bis 8 Läufe gehen (Einschätzung):**
+1. Eine 8er-Kette mit Rennlasten ist ein halbes Rennen und braucht danach mehrere Tage, bevor Qualität wieder geht. Wie viele, weiss ich für dich nicht.
+2. Die Stationen zeigen den Abfall (Halb-Simulation A: +24 s von Lauf 1 auf 4), nicht die Länge der Laufkette. Die Kette ändert das Muster von Lauf 5 bis 8 laut Teamdaten kaum (Lauf 5 gegen Lauf 4 nur +2,8 s).
+3. Fuss, Waden und Achillessehne sind dein bekanntes Risiko, und bei jedem Lauf nach Station kommt eine Station dazu.
+
+**Wie du 4:05 hältst (aus deinen Daten):**
+- **Start bremsen.** In der Halb-Simulation A bist du mit 3:56 gestartet und hast bis Lauf 4 4:20 erreicht. Am 04.11. bist du mit 4:01 gestartet und mit 3:56 geendet. Lauf 1 und 2 nicht schneller als 4:05, besser 4:07.
+- **Lauf 3 und 4 sind die Prüfsteine:** nach Sled Push und Sled Pull. Dort gleich anlaufen wie im Plan (erste 200 m bei 4:15, dann 4:05).
+- **Lauf 7 und 8 dürfen schneller werden** (bis 4:00), wenn Puls und Bein es erlauben: 4:08, 4:08, 4:05, 4:05, 4:05, 4:05, 4:02, 4:02 ergeben 32:40.
+- **Stationen schneller machen, damit 4:05 reicht.** Schwächen laut App-Analyse: Burpee Broad Jumps, Wall Balls, Farmers, Lunges. Das ist der grössere Hebel.
+
+**Die 8er-Kette als Option:** `changes_option_8_runden.json` ersetzt Sa 19.12. (statt der 6 Runden in `changes.json`) durch 8 Runden in Rennreihenfolge mit halber Stationslänge (Lauf 3 folgt dem Sled Push) und kürzt So 20.12. von 8 auf 4 km. **Ich empfehle sie nicht**, weil sie in Woche 10 (32 km, Dienstag 4×1,2 km @ 3:53) 8 harte Kilometer am Stück bringt, und die Daten keinen Nutzen von 8 gegenüber 6 Läufen zeigen. Wenn du es trotzdem willst, ist die Abbruchregel in der Notiz: vor Runde 5 und 7 prüfen, bei Schmerz 3 oder mehr, Hinken, Puls über Redline oder einer Runde langsamer als 4:12 aufhören. Nimm entweder `changes.json` oder die Option, nicht beide. Die beiden Dateien sind von mir geprüft, aber nicht von einem unabhängigen Prüfer.
+
 ## Offen
 
 - Deine 8 Lauf-Splits aus St. Gallen fehlen mir im Repo, ohne sie ist dein Wert für Läufe 5-8 nicht überprüfbar. Der Sub-60-Vergleichswert aus St. Gallen beruht nur auf 10 Teams; der Plantext nennt dort 12 Teams, die Datei enthält 10 (alter v3-Text, nicht von mir geprüft).

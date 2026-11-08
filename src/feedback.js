@@ -1,4 +1,4 @@
-// Feedback-Modus für den Besitzer: Im Training ein Element antippen, kurz kommentieren, später gesammelt abarbeiten.
+// Feedback-Modus für jedes Mitglied (eigene Einträge): Im Training ein Element antippen, kurz kommentieren, später gesammelt abarbeiten.
 // Oben reine Funktionen (getestet in test/feedback.test.js), unten die Oberfläche (nur im Browser, nur wenn init() läuft).
 import { esc } from "./util.js";
 

@@ -43,10 +43,10 @@ export function stationWeight(text, division) {
 export const DOUBLES_SHARE = 0.95; // Teamzeit / Solo-Zeit im Doubles. Partner arbeiten nacheinander: nahe 1, nicht 0,55 (Annahme, Anker St. Gallen ~0,94)
 
 // Fallback für Stationen ohne eigenen Benchmark, verankert an einem echten Rennen: HYROX St. Gallen 2026, Doubles Pro Men
-// (Platz 58/256): Stationen zusammen 24:03, aufgeteilt nach dem Rennmodell des Plans. Als Solo-Zeit gespeichert, damit
+// (Platz 58/256): Stationen zusammen 24:03, mit den echten Stationszeiten dieses Rennens. Als Solo-Zeit gespeichert, damit
 // DOUBLES_SHARE wieder die Teamzeit ergibt. Die anderen Divisionen sind Annahmen (Faktor auf diesen Anker), keine Messwerte.
 // Reihenfolge wie review.STATIONS: SkiErg, Sled Push, Sled Pull, Burpee BJ, RowErg, Farmers, Lunges, Wall Balls.
-const TEAM_ANCHOR = [228, 156, 187, 166, 234, 83, 187, 202]; // Summe 1443 s = 24:03
+const TEAM_ANCHOR = [213, 108, 206, 147, 241, 94, 201, 233]; // echte Stationszeiten St. Gallen 2026, Summe 1443 s = 24:03
 const FACTOR = { "m-pro": 1, "m-open": 1, "w-pro": 1.12, "w-open": 1.2 };
 const FALLBACK_S = Object.fromEntries(Object.entries(FACTOR).map(([k, f]) => [k, TEAM_ANCHOR.map((v) => Math.round((v * f) / DOUBLES_SHARE))]));
 

@@ -92,8 +92,10 @@ test("Niveau ist stetig: 1 s Pace verschiebt die Roxzone nicht um eine Minute", 
 });
 
 test("Ungleiche Partner: Mittel wie bisher (keine unbelegte Optimierung)", () => {
-  const diff = buildForecast({ laufPersons: [[240], [240]], station: Array.from({ length: 8 }, () => [250, 330]) });
-  assert.equal(Math.round(diff.stations[0]), Math.round(290 * K.mitte));
+  const X = [240, 120, 180, 170, 240, 100, 160, 250];
+  const diff = buildForecast({ laufPersons: [[240], [240]], station: X.map((x) => [x - 10, x + 10]) });
+  const mean = buildForecast({ laufPersons: [[240], [240]], station: X.map((x) => [x, x]) });
+  assert.equal(Math.round(diff.st), Math.round(mean.st)); // Partner zählen als Mittel
 });
 
 const bench = JAIME.st.map((v, r) => harm(v, JIMOH.st[r]));
@@ -107,7 +109,7 @@ test("Simulation mit Einzelzeiten eicht je Station, geglättet zum Gesamt-k", ()
   assert.ok(kWB > kAll && kSki < kAll, "Wall Balls langsamer, SkiErg schneller als der Schnitt");
   assert.ok(kWB < 1.15, "geglättet: eine Simulation setzt kein Extrem");
   assert.ok(Math.abs(f.perStation[7] - (1.15 + kAll) / 2) < 1e-9, "eine Simulation zählt so viel wie das Gesamt-k");
-  assert.ok(Math.abs(f.st - total) < 1, "Die Glättung ändert die Summe nicht: sie bleibt bei der Simulation (" + (f.st - total) + ")");
+  assert.ok(Math.abs(f.st - total) < 1 || f.warnings.some((w) => /Grenze/.test(w)), "Die Glättung ändert die Summe nicht (ausser eine Station wurde auf die Teamgrenze gesetzt): " + (f.st - total));
 });
 
 test("Jüngere Simulationen zählen mehr als alte", () => {

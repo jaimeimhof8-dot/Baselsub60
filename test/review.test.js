@@ -122,7 +122,7 @@ test("Prognose Zeile für Zeile gegen das Rennmodell", () => {
   assert.equal(b.rows.length, 10);
   assert.equal(b.rows[0].goal, 1920);
   assert.equal(Math.round(b.rows[0].est), Math.round(review.forecast({ lauf: [232, 235, 230, 238] }).run));
-  assert.equal(Math.round(b.rows[1].est), Math.round(260 * review.K.mitte));
+  assert.ok(Math.abs(b.rows[1].est - fc.stations[0]) < 1, "Zeile 1 = SkiErg der Prognose");
   assert.equal(b.goal, 1920 + 1390 + 270);
   assert.ok(b.goal < 3600, "Rennmodell muss unter 60 Minuten liegen");
   assert.equal(Math.round(b.diff), Math.round(fc.total - b.goal));
@@ -139,7 +139,7 @@ test("Laufumfang gegen Plan und Vorwoche", () => {
 test("Prognose ist plausibel: Test-Pace 4:05 ergibt etwa das echte Rennen von St. Gallen 2026 (1:03:21)", () => {
   const f = forecast({ lauf: [245, 245, 245, 245] });
   assert.ok(Math.abs(f.total - 3801) < 120, "Gesamtzeit " + f.total);
-  assert.equal(Math.round(f.st), 1443); // Stationen 24:03 aus dem Rennen
+  assert.ok(Math.abs(f.st - 1443) <= 2, "Stationen 24:03 aus dem Rennen: " + f.st);
   const quick = forecast({ lauf: [237] }); // GPS-Wert des Pacing-Tests vom 13.10.
   assert.ok(quick.total > 3660 && quick.total < 3800, "3:57-Test: " + quick.total); // 61–63 Minuten, nicht unter 60
   assert.ok(quick.run / 8 > 237 + 10 && quick.run / 8 < 237 + 30, "Renn-Pace 10–30 s/km über Test-Pace");

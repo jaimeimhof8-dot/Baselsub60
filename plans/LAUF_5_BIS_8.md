@@ -74,7 +74,7 @@ Struktur Mo Kraft / Di Lauf / Mi Kompromiss / Do Rad oder Lauf / Fr Ruhe / Sa St
 
 | Tag | Änderung | Begründung |
 |---|---|---|
-| Sa 19.12. (Tag 68) | Stationen-Ökonomie 2 von 4 auf **6 Runden**: neu Runde 5 Sandbag Lunges 50 m (Ziel 1:30) und Runde 6 Wall Balls 50 (Ziel 1:36), je 1 km @ 4:05/km, 15 s Pause | Läufe 5 und 6 mit Vorermüdung ein erstes Mal, drei Wochen vor der 3/4-Simulation. Lunges und Wall Balls statt Sleds und Burpees, weil ich sie für schonender für Fuss und Wade halte (Einschätzung, nicht belegt). |
+| Sa 19.12. (Tag 68) | Stationen-Ökonomie 2 von 4 auf **6 Runden**: neu Runde 5 Sandbag Lunges 50 m (Ziel 1:30) und Runde 6 Wall Balls 50 (Ziel 1:36 in diesem Vorschlag; **gilt nicht mehr, ersetzt durch 2:27 in Abschnitt 7**), je 1 km @ 4:05/km, 15 s Pause | Läufe 5 und 6 mit Vorermüdung ein erstes Mal, drei Wochen vor der 3/4-Simulation. Lunges und Wall Balls statt Sleds und Burpees, weil ich sie für schonender für Fuss und Wade halte (Einschätzung, nicht belegt). |
 | So 20.12. (Tag 69) | Lockerer Lauf von 8 auf **6 km** | Wochenkilometer bleiben gleich (+2 km Samstag, -2 km Sonntag). |
 | Mittwoche | **unverändert** (Referenz + 3 oder 4 Runden) | Daten stützen längere Mittwochs-Ketten nicht. |
 | 09.01. und 23.01. | **unverändert** | Sie sind die Läufe-5-bis-8-Einheiten. |
@@ -125,7 +125,9 @@ Offen: Die vier Test-Werte (3:53 bis 4:00) haben in der App kein Datum und ich f
 | Plan-Ziel Volle Simulation 23.01. | 33:12 (4:09) | **21:50** | 3:59 | 59:01 |
 | Sub-60-Teams (Mittel, n = 235) | 31:35 (3:57) | **23:20** | 4:26 | 59:13 |
 | Teams 55:00-58:30 (n = 471) | 29:54 (3:44) | 22:57 | 4:35 | 57:19 |
-| Dein Benchmark vom 18.10. (solo 25:44, mal 0,95 für Doubles) | - | **ca. 24:27** | - | - |
+| Dein Benchmark vom 18.10. (solo 25:44, mal 0,95 für Doubles; ohne die 3 % Verbesserung) | - | **ca. 24:27** | - | - |
+
+Hinweise: Die Spalte Summe ist der Mittelwert der Gesamtzeiten; Läufe, Stationen und Roxzone addieren sich um etwa 8 s höher (die Roxzone überlappt teils mit den Läufen), die Rechnungen darunter sind deshalb etwa 8 s zu hoch. Die 59:01 des Plan-Ziels sind die Summe der Teile, die Plannotiz sagte 59:05. Die 24:27 gelten ohne, die 24:45 aus Abschnitt 7 mit der 3-%-Verbesserung, aber mit unverändert langsam geplanten Sleds, Row und Lunges; deshalb passen sie nicht zusammen. Das Argument 'Laufen allein 3:54,5' gilt für 24:45 + 3:59, mit 24:27 wären es 3:53.
 
 Der Plan hatte die Läufe langsam (4:09, weil ich von 4:24 ausging) und die Stationen schnell (21:50, schneller als der Durchschnitt der Sub-60-Teams) angesetzt. Mit deinen heutigen Laufwerten kehrt sich das um: Läufe sind nicht dein Engpass, die Stationen sind es. Der Faktor 0,95 stammt aus `src/divisions.js` (Annahme), Jimohs Zeiten kenne ich nicht, dein Benchmark ist drei Wochen alt (Re-Test am 05.12.).
 
@@ -145,7 +147,7 @@ Was das heisst: **8×4:05 allein reichen nur, wenn die Stationen + Roxzone unter
 3. Fuss, Waden und Achillessehne sind dein bekanntes Risiko, und bei jedem Lauf nach Station kommt eine Station dazu.
 
 **Wie du 4:05 hältst (aus deinen Daten):**
-- **Start bremsen.** In der Halb-Simulation A bist du mit 3:56 gestartet und hast bis Lauf 4 4:20 erreicht. Am 04.11. bist du mit 4:01 gestartet und mit 3:56 geendet. Lauf 1 und 2 nicht schneller als 4:05, besser 4:07.
+- **Start bremsen.** In der Halb-Simulation A bist du mit 3:56 gestartet und hast bis Lauf 4 4:20 erreicht. Am 04.11. bist du mit 4:01 gestartet und mit 3:56 geendet. Lauf 1 und 2 nicht schneller als 4:05, besser 4:08 wie in den Simulationen.
 - **Lauf 3 und 4 sind die Prüfsteine:** nach Sled Push und Sled Pull. Dort gleich anlaufen wie im Plan (erste 200 m bei 4:15, dann 4:05).
 - **Lauf 7 und 8 dürfen schneller werden** (bis 4:00), wenn Puls und Bein es erlauben: 4:08, 4:08, 4:05, 4:05, 4:05, 4:05, 4:02, 4:02 ergeben 32:40.
 - **Stationen schneller machen, damit 4:05 reicht.** Schwächen laut App-Analyse: Burpee Broad Jumps, Wall Balls, Farmers, Lunges. Das ist der grössere Hebel.
@@ -156,7 +158,7 @@ Was das heisst: **8×4:05 allein reichen nur, wenn die Stationen + Roxzone unter
 
 ### Stationsziele (`changes_stationen.json`)
 
-Regel: Ziel = dein Benchmark vom 18.10. (solo) mal 0,97, im Team mal 0,95, und **nie schneller als vorher geplant**. Geändert wurden nur SkiErg, Burpee Broad Jumps, Farmers Carry und Wall Balls, in 17 Tagen (33, 40, 44, 47, 51, 54, 61, 65, 68, 69, 86, 89, 93, 100, 103, 107, 110). Row und Lunges waren schon langsamer geplant, als dein Benchmark hergibt. **Schlitten sind unverändert**, weil im Benchmark die Lasten fehlen.
+Regel: Ziel = dein Benchmark vom 18.10. mal 0,97 (solo), im Team zusätzlich mal 0,95 (also mal 0,92), und **nie schneller als vorher geplant**. Geändert wurden nur SkiErg, Burpee Broad Jumps, Farmers Carry und Wall Balls, in 17 Tagen (33, 40, 44, 47, 51, 54, 61, 65, 68, 69, 86, 89, 93, 100, 103, 107, 110). Row und Lunges waren schon langsamer geplant, als dein Benchmark hergibt. **Schlitten sind unverändert**, weil im Benchmark die Lasten fehlen.
 
 | Station (Rennlänge, Team) | Plan vorher | Plan jetzt | Sub-60-Teams (Mittel) |
 |---|---|---|---|
@@ -173,7 +175,7 @@ Das ist ehrlich, aber unangenehm: Mit deinen Werten von heute plus 3 % ist 60:00
 
 Anwenden: zuerst `changes.json` weglassen, dann nur `changes_stationen.json` (enthält schon die 6 Runden am 19.12. und das Kürzen am 20.12.) in den Plan übernehmen. Die Option mit 8 Runden und diese Datei ergänzen sich nicht, Tag 68 würde überschrieben.
 
-### Warum die Prognose bei 4:12 steht
+### Warum die Prognose bei 4:12 stand (Stand vor Abschnitt 9)
 
 Das ist keine Pace, die ich oder der Plan setze, sondern die Formel in `src/forecast.js`:
 - T = Mittel deiner Lauf-Testzeiten (3:53, 3:58, 3:55, 4:00 = 3:56,5).
@@ -181,15 +183,15 @@ Das ist keine Pace, die ich oder der Plan setze, sondern die Formel in `src/fore
 - Plus **3 s pro Lauf ab Lauf 5** (`DRIFT`): Lauf 5 4:14,5, Lauf 6 4:17,5, Lauf 7 4:20,5, Lauf 8 4:23,5.
 - Ergibt Läufe 34:02, im Schnitt 4:15.
 
-Deine Daten sprechen für weniger Ermüdung: Mittwoch +3 s gegen die Referenz (Bereich -5 bis +16 s), Sub-60-Teams frisch gegen Schnitt aller 8 Läufe +7 s, deine Halb-Simulation A +12,5 s im Schnitt der ersten vier Läufe. Mit 8 s Ermüdung (statt 15) und 3 s Drift läge die Prognose bei Läufen von 33:06 (4:08 im Schnitt), mit 3 s Ermüdung bei 32:26 (4:03). Das spart 56 bis 96 s. **Ich habe den Code nicht geändert**: Die Konstanten sind Annahmen mit Tests (`test/forecast.test.js`, `test/review.test.js`) und die Änderung betrifft jedes Teammitglied. Der vorgesehene Weg ist, die Volle Simulation am 23.01. in der App einzutragen, dann eicht die Prognose das Laufen an deiner gemessenen Zeit (ab 85 % Intensität).
+Deine Daten sprechen für weniger Ermüdung: Mittwoch +3 s gegen die Referenz (Bereich -5 bis +16 s), Sub-60-Teams frisch gegen Schnitt aller 8 Läufe +7 s, deine Halb-Simulation A +12,5 s im Schnitt der ersten vier Läufe. Mit 8 s Ermüdung (statt 15) und 3 s Drift läge die Prognose bei Läufen von 33:06 (4:08 im Schnitt), mit 3 s Ermüdung bei 32:26 (4:03). Das spart 56 bis 96 s. (Basis hier: nur dein Testschnitt 3:56,5; Abschnitt 9 rechnet mit dem Mittel beider Partner 3:56,75, daher 33:08.) **Dieser Absatz beschreibt den Code vor der Änderung. Auf deinen Wunsch ist die Ermüdung jetzt 8 s, siehe Abschnitt 9.** Die Konstanten sind Annahmen und die Änderung betrifft jedes Teammitglied. Die Volle Simulation am 23.01. in der App einzutragen eicht die Prognose zusätzlich an deiner gemessenen Zeit (ab 85 % Intensität).
 
 ## 8. 4:05 halten nach Sleds, Burpees und Lunges (Mittwoch in Rennreihenfolge)
 
 **Korrektur an der Fragestellung:** Im Rennen folgt auf die Wall Balls kein Lauf. Die Reihenfolge ist Lauf 1, SkiErg, Lauf 2, Sled Push, Lauf 3, Sled Pull, Lauf 4, Burpees, Lauf 5, Row, Lauf 6, Farmers, Lauf 7, Lunges, Lauf 8, Wall Balls, Ziel (so steht es auch in der Vollen Simulation, Tag 103). "Gut laufen nach den Wall Balls" gibt es im Rennen nicht. Gefragt sind **Lauf 3 und 4 (nach Sled Push und Pull), Lauf 5 (nach den Burpees) und Lauf 8 (nach den Lunges, direkt vor den Wall Balls).**
 
-Deine Daten dazu: Lauf nach Sleds +4 bis +6 s gegen die Referenz (28.10.), nach Burpees +9 s (28.10.), nach Lunges +14 s (31.10.). Der Lauf nach den Lunges ist bei dir der teuerste, weil die Beine am meisten kosten (App-Analyse vom 31.10.).
+Deine Daten dazu (App-Analyse, ca.-Werte): Lauf nach Sleds etwa +4 s (28.10., Runden 2 und 3), nach Burpees +9 s (28.10.), nach Lunges etwa +14 s (31.10., Zuordnung der Garmin-Runden unsicher). Der Lauf nach den Lunges ist bei dir der teuerste, weil die Beine am meisten kosten (App-Analyse vom 31.10.).
 
-**Änderung (`changes_mittwoch_rennreihenfolge.json`, Tage 30, 58, 86, 100, 114):** Wall Balls sind aus den Mittwochs-Runden genommen und durch Stationen ersetzt, nach denen im Rennen gelaufen wird. Pro Einheit bleibt höchstens eine Sled-Station, die Pausen bleiben.
+**Änderung (`changes_mittwoch_rennreihenfolge.json`, Tage 30, 58, 86, 100, 114):** Wall Balls sind aus den Mittwochs-Runden genommen und durch Stationen ersetzt, nach denen im Rennen gelaufen wird. In diesen fünf Einheiten bleibt höchstens eine Sled-Art (Tag 51, 02.12., und der Delta-Audit am 30.12. mit Push und Pull sind nicht angefasst), die Pausen bleiben.
 
 | Datum | Vorher | Jetzt |
 |---|---|---|
@@ -208,6 +210,8 @@ Wall Balls bleiben in den Samstagen, den Simulationen und im Block am Donnerstag
 ## 9. Prognose-Code: Ermüdung von 15 auf 8 s
 
 Geändert (auf Wunsch von Jaime): `src/forecast.js`, `levelOf`: für Basis-Paces unter 4:15 sind es **8 s Ermüdung** statt 15 s, dazwischen steigt der Wert bis 4:30 (270 s) wie vorher auf 20 s. Die 3 s Drift je Lauf ab Lauf 5 und die Roxzone (4:15) sind unverändert. `sw.js` auf v113. Tests angepasst (`test/forecast.test.js`, `test/review.test.js`), 339 von 339 laufen.
+
+Hinweis: `levelOf` ist zwischen 4:15 und 4:30 jetzt steiler (0,8 s je s Pace statt 0,33): Wer 4:16 als Basis hat, bekommt 8,8 s, wer 4:30 hat, 20 s. Stetig und getestet.
 
 Folge mit euren Testwerten (Jaime und Jimoh): Läufe **33:08 statt 34:04** (Ø 4:09 statt 4:16), mittleres Szenario **61:44 statt 62:40**, Spanne 59:28 bis 64:35. Das Sub-60-Szenario bleibt "nur im besten Szenario". Die 8 s sind eine Annahme aus deinen gemessenen Mittwochs-Läufen (+3 s) und den Sub-60-Teams (+7 s frisch gegen Schnitt), nicht aus einer Messung der Vollen Simulation. Die Eichung an der Simulation vom 23.01. überschreibt den Wert, sobald sie eingetragen ist.
 

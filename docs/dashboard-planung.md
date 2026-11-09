@@ -36,7 +36,7 @@ Heute: Überschrift, dann Fließtext mit Stärken, Schwächen, Anpassungen (`coa
 - **Keine Farbe ausser bei «Nicht gut»** (Orange-Punkt). Kein Grün, keine Ampel.
 - **Kraft:** nur Haken-Aussagen («1 von 5 offen: Wadenheben»), nie Aussagen zu Gewicht, Puls oder Anstrengung, weil es dazu keine Daten gibt.
 - **Ganzer Text bleibt eingeklappt** hinter «Ganze Analyse lesen» (existiert schon, `an-toggle`).
-- Quelle: `strengths`, `weaknesses`, `adjustments`, `nextFocus` der Coach-Analyse. Das ist hauptsächlich Darstellung, die Daten gibt es schon.
+- Quelle (umgesetzt): «Gut» und «Nicht gut» werden aus den gemessenen Zahlen berechnet (`src/dash-v3.js`), nicht aus dem Coach-Text. So gibt es sie auch ohne Coach-Analyse und immer mit Zahl vorn. «Nächstes Mal» ist `nextFocus` der Coach-Analyse, sonst eine feste Regel.
 
 ## Regeln für fehlende Daten
 - Nie eine Zahl erfinden. Stattdessen **«keine Daten, Grund: …»** mit konkretem Grund.
@@ -60,3 +60,9 @@ Wie die App: dunkel, Glas-Hintergrund, Kacheln und Karten der bestehenden Auswer
 
 ## Nächster Schritt
 Du bestätigst oder korrigierst diesen Plan. Danach genau ein Mockup mit genau diesen Daten, inklusive der Analyse-Karte.
+
+## Stand der Umsetzung in der App
+- Neu: `src/dash-v3.js` (Kennzahlen, Plan gegen Ist, Vergleich, Analyse-Zeilen) mit Tests in `test/dash-v3.test.js` und `test/session-dash.test.js`. `phaseStats().compromise` liefert zusätzlich `list` (Delta je Station).
+- Geändert: `index.html` (`s7DashParts` ersetzt `s7DashHtml`; Analyse-Karte; CSS), `sw.js` (Modul in der Cache-Liste, Version v116).
+- Weg aus der Anzeige: Ring/Punktzahl, Kurzurteil, Chips, Anstrengung, Rundenbalken, Phasenbalken, Zonen, Erholung, Streuung, «Schnell-Check». Die alten Funktionen in `session-dash.js` bleiben im Code (andere Ansicht und Tests nutzen sie).
+- Nicht angefasst: die Rückblick-Liste aller Einheiten (`dash-all.js`) zeigt weiter Anstrengung. Die Eingabe der RPE ist unverändert (Frage 1 offen).

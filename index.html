@@ -12962,7 +12962,7 @@
       .an-dash .chip.yellow { color: var(--warn); }
       .an-dash .chip.red { color: var(--danger); }
       .an-dash .df { margin: 0; padding: var(--s3) var(--s4); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); font-size: 14px; line-height: 21px; }
-      .an-dash .dsrc { display: grid; gap: var(--s2); padding: var(--s3); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); border-left: 3px solid var(--ok); }
+      .an-dash .dsrc { display: grid; gap: var(--s2); padding: var(--s3); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); border-left: 3px solid transparent; }
       .an-dash .dt .w { font-size: 12px; line-height: 17px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); opacity: 0.85; }
       .an-dash .dconf { display: inline-block; justify-self: start; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--well); box-shadow: var(--edge); color: var(--muted); }
       .an-dash .dconf.green { color: var(--ok); } .an-dash .dconf.yellow { color: var(--warn); } .an-dash .dconf.red { color: var(--danger); }
@@ -12983,7 +12983,7 @@
       .an-dash .dsrc ul { display: flex; flex-wrap: wrap; gap: 4px var(--s3); margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--muted); }
       .an-dash li { list-style: none; padding: 0; }
       .an-dash li::before { content: none; }
-      .an-dash .dsrc li.ok span { color: var(--ok); }
+      .an-dash .dsrc li.ok span { color: var(--muted); }
       .an-dash .dsrc li.bad span { color: var(--danger); font-weight: 700; }
       .an-dash .dw { display: grid; gap: var(--s2); }
       .an-dash .dwarn { margin: 0; padding: var(--s2) var(--s3); border-radius: var(--r-s); background: var(--well); box-shadow: var(--edge); font-size: 13px; line-height: 19px; color: var(--warn); }
@@ -13006,6 +13006,28 @@
       .an-dash .ddr { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 2px; font-size: 13px; }
       .an-dash .ddr li { display: flex; justify-content: space-between; gap: var(--s2); color: var(--text); }
       .an-dash .df small { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
+      /* Dashboard Fassung 3: Tabellen, Delta je Station, Analyse-Karte (Datenplan docs/dashboard-planung.md) */
+      .an-dash .v3-note { color: var(--muted); }
+      .an-dash .v3-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s2); padding: 6px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 14px; color: var(--text); }
+      .an-dash .v3-row:first-of-type { border-top: 0; }
+      .an-dash .v3-row b { font-family: var(--f-head); font-size: 17px; font-weight: 700; }
+      .an-dash .v3-row.warn b { color: var(--warn); }
+      .an-dash .v3-t { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+      .an-dash .v3-t th { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 2px 4px 8px; }
+      .an-dash .v3-t td { padding: 8px 4px; border-top: 1px solid rgba(255, 255, 255, 0.08); color: var(--text); }
+      .an-dash .v3-t .n { text-align: right; white-space: nowrap; }
+      .an-dash .v3-t td.o, .an-dash .v3-t td.m { font-family: var(--f-head); font-weight: 700; font-size: 16px; }
+      .an-dash .v3-t td.m { color: var(--warn); }
+      .v3-an { display: grid; gap: var(--s3); margin-top: var(--s3); padding: var(--s3); border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); }
+      .v3-an .k { font-size: 11px; line-height: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .v3-blk { display: grid; gap: 6px; }
+      .v3-blk ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+      .s7-an .v3-blk li { display: grid; grid-template-columns: 76px 1fr; gap: 10px; align-items: baseline; padding: 0; font-size: 14px; line-height: 20px; }
+      .s7-an .v3-blk li::before { content: none; }
+      .v3-blk li b { font-family: var(--f-head); font-weight: 700; font-size: 19px; font-variant-numeric: tabular-nums; color: var(--text); }
+      .v3-blk li.bad b { color: var(--warn); }
+      .v3-blk p { margin: 0; font-size: 14px; line-height: 21px; color: var(--text); }
+      .v3-empty { margin: 0; font-size: 14px; color: var(--muted); }
       .s7-an-tg.more { margin-top: 10px; font-size: 14px; }
       .s7-an-txt { display: grid; gap: 4px; margin-top: 6px; }
       .s7-an {
@@ -14361,6 +14383,7 @@
       import { analyseSession } from "./src/analyse.js";
       import { sessionDash, compareToPrev, splitPhases, phaseStats, workDash, sourceInfo, dashSections } from "./src/session-dash.js";
       import { reviewAll, keyLine } from "./src/dash-all.js";
+      import { dashV3, dashV3Html, anCardHtml } from "./src/dash-v3.js";
       import { alignSplits } from "./src/laps.js";
       import {
         extractTests,
@@ -20629,17 +20652,6 @@
           a
             .map((x) => `<li><b>${esc(x.title)}</b> ${esc(x.detail)}</li>`)
             .join("");
-        let quick = "";
-        try {
-          const r = s7Analysis(i, p);
-          quick = `<details class="s7-an-q"><summary>Schnell-Check (automatisch, ohne Coach) · ${esc(r.verdict)}</summary>
-          <p class="s7-an-e">${esc(r.exec)}</p>
-          ${r.good.length ? `<h4>Gut</h4><ul class="g">${li(r.good)}</ul>` : ""}
-          ${r.bad.length ? `<h4>Schlecht</h4><ul class="b">${li(r.bad)}</ul>` : ""}
-          ${r.adjust.length ? `<h4>Anpassen</h4><ul class="a">${li(r.adjust)}</ul>` : ""}</details>`;
-        } catch (e) {}
-        const btn = (label) =>
-          `<button type="button" class="s6-btn gold" data-act="an-run" data-i="${i}"${busy ? " disabled" : ""}>${label}</button>`;
         const open = !!rec && rec.open === true; /* Fliesstext der Analyse: standardmässig zugeklappt, das Dashboard oben zeigt die Fakten */
         let body = "",
           acts = "",
@@ -20676,7 +20688,7 @@
           const formHtml = r.form
             ? `<p class="s7-an-form"><b>${esc(r.form.rating)}</b> ${esc(r.form.text)}</p>`
             : "";
-          body = `${stale ? `<p class="s7-an-st">Seit der Analyse haben sich Werte oder Uhr-Daten geändert. Die Kennzahlen oben sind aktuell, der Coach-Text darunter noch nicht.</p>` : ""}<p class="s7-an-h">${esc(r.headline)}</p>`;
+          body = "";
           text = `<p class="s7-an-e">${esc(r.summary)}</p>
           ${formHtml}
           ${r.insights && r.insights.length ? `<h4>Erkenntnisse</h4><ul class="n">${pair(r.insights)}</ul>` : ""}
@@ -20692,7 +20704,14 @@
             ? `<button type="button" class="s7-an-tg more" data-act="an-toggle" data-i="${i}" aria-expanded="${open}"><span>${open ? "Analyse einklappen" : "Ganze Analyse lesen"}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(${open ? 180 : 0}deg)"><path d="M6 9l6 6 6-6"/></svg></button>`
             : "";
         const redo = rec && !busy ? btn(stale ? "Neu analysieren" : "Nochmals analysieren") : "";
-        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${s7DashHtml(i, p, rec && !busy ? rec.data : null)}${body}${acts}${tg}${open ? `<div class="s7-an-txt">${text}</div>` : ""}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}${quick}</section>`;
+        let parts = { dash: "", an: { good: [], bad: [], next: "" } };
+        try {
+          parts = s7DashParts(i, p, rec && !busy ? rec.data : null);
+        } catch (e) {}
+        const lines = anCardHtml(parts.an, esc),
+          staleHtml = stale ? `<p class="s7-an-st">Seit der Analyse haben sich Werte oder Uhr-Daten geändert. Die Kennzahlen oben sind aktuell, der Coach-Text darunter noch nicht.</p>` : "",
+          card = `<div class="v3-an"><span class="k">Analyse</span>${lines || `<p class="v3-empty">Aus den Zahlen ergibt sich nichts Auffälliges.</p>`}${rec && !busy ? staleHtml + tg + (open ? `<div class="s7-an-txt">${text}</div>` : "") : ""}</div>`;
+        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${parts.dash}${card}${!rec || busy ? body : ""}${acts}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}</section>`;
       }
       /* Letzte gleiche Einheit mit Uhr-Daten: erst gleiche Art UND gleicher Plantitel, sonst gleiche Art. -> {i, act, rpe, same} oder null */
       function s7Prev(i, p, group) {
@@ -20716,58 +20735,50 @@
           maxHr = Math.max(0, ...Object.values(S.strava.acts).map((a) => a.maxHr || 0)) || null;
         return { ph, st: phaseStats(ph, { steps, maxHr }) };
       }
-      /* Dashboard: Punktzahl-Ring, Quelle der Uhr-Daten, Kennzahlen nur über Arbeitsphasen, Vergleich, Rundenbalken, Coach-Kennzahlen */
-      function s7DashHtml(i, p, coachData) {
-        let q;
-        try {
-          q = s7Analysis(i, p);
-        } catch (e) {
-          return "";
-        }
+      /* Dashboard nach dem Training (Datenplan docs/dashboard-planung.md): Quelle der Uhr-Daten, wenige Kennzahlen, aufklappbar Plan gegen Ist und Vergleich.
+         Kein Urteil, keine Anstrengung (RPE). Kraft wird nicht mit der Uhr getrackt: dort nur Haken. -> {dash, an} (an = Zeilen für die Analyse-Karte) */
+      function s7DashParts(i, p, coachData) {
         const acts = actsOf(i),
           act = acts.find((a) => a.laps && a.laps.length) || acts[0] || null,
-          W = act ? s7Work(p, act) : null,
-          d = sessionDash(q, act, coachData, W && W.ph),
-          C = 2 * Math.PI * 26,
-          off = (C * (100 - d.score)) / 100;
-        const sec = dashSections(
-          {
-            src: sourceInfo(act, {
-              garmin: { on: gmOn(), err: S.garmin.conn && S.garmin.conn.err, at: S.garmin.at },
-              strava: { on: !!stTok(), at: S.strava.at },
-              dayLabel: shortDay(i),
-            }),
-            wd: W ? workDash(W.st) : { main: [], totals: "", phaseBar: [], details: [], warn: "" },
-            actId: act ? act.id : "",
-          },
-          esc,
-        );
-        const tiles = d.tiles
-          .map((t) => `<div class="dt ${t.tone}"><span class="k">${esc(t.k)}</span><b>${esc(t.v)}</b>${t.sub ? `<span class="s">${esc(t.sub)}</span>` : ""}</div>`)
-          .join("");
-        const pv = act ? s7Prev(i, p, act.group) : null,
+          isK = p.k === "kraft",
+          dk = keyI(i),
+          W = act && !isK ? s7Work(p, act) : null,
+          wd = W ? workDash(W.st) : null,
+          planText = (p.i || []).find((t) => dash.parseReps(t)) || "",
+          items = (p.i || [])
+            .map((t, j) => ({ t, done: !!S.done[dk + "|" + j], skip: !!S.xs[dk + "|" + j], fill: isFiller(t) || /^Erste \d+ m nach jeder Station/.test(t) }))
+            .filter((x) => !x.fill),
+          live = items.filter((x) => !x.skip),
+          open = live.filter((x) => !x.done).map((x) => x.t.split(/\s\d|\s@/)[0]),
+          facts = { done: live.length - open.length, n: live.length, open, skipped: items.length - live.length },
+          pv = act && !isK ? s7Prev(i, p, act.group) : null,
           pw = pv ? s7Work(dayPlan(pv.i), pv.act) : null,
-          cmp = pv
-            ? compareToPrev(
-                { act, rpe: S.rpe[keyI(i)] != null ? +S.rpe[keyI(i)] : null, work: W && ["sure", "likely"].includes(W.ph.conf) ? W.st.work : null },
-                { ...pv, work: pw && ["sure", "likely"].includes(pw.ph.conf) ? pw.st.work : null },
-                { easy: isEasyRun(p) },
-              )
-            : [],
-          cmpHtml = cmp.length
-            ? `<div class="dp"><span class="k">Vergleich mit ${pv.same ? "der letzten gleichen Einheit" : "der letzten ähnlichen Einheit"}</span><span class="dpl">${esc(shortDay(pv.i))} · ${esc(s7Title(dayPlan(pv.i).t))}</span><div class="dg">${cmp.map((t) => `<div class="dt ${t.tone}"><span class="k">${esc(t.k)}</span><b>${esc(t.v)}</b><span class="s">${esc(t.sub)}</span></div>`).join("")}</div></div>`
-            : act
-              ? `<div class="dp"><span class="k">Vergleich</span><span class="dpl">Noch keine frühere ${esc(s7Title(p.t))}-Einheit mit Uhr-Daten zum Vergleichen.</span></div>`
-              : "";
-        const bars = d.laps
-          ? `<div class="dl" role="img" aria-label="Rundenzeiten der Uhr"><span class="k">Runden der Uhr (${d.laps.length})</span><div class="bars">${d.laps
-              .map((l, k) => `<div class="bar${l.phase ? " ph-" + l.phase : ""}" title="Runde ${k + 1}${l.phase ? " · " + {warm:"Einlaufen",work:"Arbeit",rest:"Pause",cool:"Auslaufen",other:"Sonstiges"}[l.phase] : ""}: ${l.label}${l.pace ? " · " + l.pace + "/km" : ""}${l.hr ? " · " + l.hr + " bpm" : ""}"><i style="height:${l.h}%"></i><small>${l.label}</small></div>`)
-              .join("")}</div></div>`
-          : "";
-        const chips = d.chips.length
-          ? `<div class="dc">${d.chips.map((c) => `<span class="chip ${c.tone}"><small>${esc(c.k)}</small> ${esc(c.v)}</span>`).join("")}</div>`
-          : "";
-        return `<div class="an-dash"><div class="dh"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle cx="32" cy="32" r="26" fill="none" class="ring ${d.tone}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 32 32)"/></svg><div><b class="sc">${d.score}<small>/100</small></b><span class="vd">${esc(d.verdict)}</span></div></div>${sec.src}${tiles ? `<div class="dg">${tiles}</div>` : ""}${sec.work}${sec.more}${cmpHtml}${bars}${chips}${d.focus ? `<p class="df"><small>Nächstes Mal</small> ${esc(d.focus)}</p>` : ""}</div>`;
+          prev = pv
+            ? {
+                label: shortDay(pv.i),
+                same: pv.same,
+                work: pw && ["sure", "likely"].includes(pw.ph.conf) ? pw.st.work : null,
+                comp: pw && pw.st.compromise ? pw.st.compromise.avg : null,
+              }
+            : null,
+          d = dashV3({ kind: p.k, act, ph: W && W.ph, st: W && W.st, planText, facts, prev, coachNext: (coachData && coachData.nextFocus) || "" });
+        let srcHtml;
+        if (isK && !act) srcHtml = `<div class="dsrc"><div class="dsh"><b>Kraft wird nicht mit der Uhr getrackt</b></div><ul><li class="ok"><span>Es gibt keine Uhr-Daten, das ist so gewollt.</span></li></ul></div>`;
+        else
+          srcHtml = dashSections(
+            {
+              src: sourceInfo(act, {
+                garmin: { on: gmOn(), err: S.garmin.conn && S.garmin.conn.err, at: S.garmin.at },
+                strava: { on: !!stTok(), at: S.strava.at },
+                dayLabel: shortDay(i),
+              }),
+              wd: { main: [], totals: "", phaseBar: [], details: [], warn: "" },
+              actId: act ? act.id : "",
+            },
+            esc,
+          ).src;
+        const warn = wd && wd.warn ? `<p class="dwarn">${esc(wd.warn)}</p>` : "";
+        return { dash: `<div class="an-dash">${srcHtml}${warn}${dashV3Html(d, esc)}</div>`, an: d.an };
       }
       function s7FinCard(i, p) {
         const dk = keyI(i),

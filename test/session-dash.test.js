@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { sessionDash, compareToPrev } from "../src/session-dash.js";
 import { analyseSession } from "../src/analyse.js";
+import { dashV3 } from "../src/dash-v3.js";
 
 const q = analyseSession({ kind: "lauf", easy: true, rpe: 4, items: [{ t: "Lockerer Lauf 40′", done: true, val: "" }] });
 test("sessionDash: Kacheln, Rundenbalken, Coach-Chips", () => {
@@ -95,6 +96,7 @@ test("phaseStats: Drift, Streuung, Erholung, Kompromiss-Delta, Plan gegen Ist", 
   assert.equal(st.compromise.avg, Math.round((17 + 21 + 25 + 33) / 4));
   assert.equal(st.compromise.worst.after, "Rudern");
   assert.equal(st.compromise.worst.delta, 33);
+  assert.deepEqual(st.compromise.list.map((x) => x.delta), [17, 21, 25, 33], "Delta je Station für das Dashboard");
   // Plan gegen Ist: Referenz 245 ≤ 245 im Ziel, Stationen 84/78/90/82 gegen 80
   assert.equal(st.plan.n, 9);
   assert.equal(st.plan.rows.find((r) => r.name === "Sled Push").diff, -2);
@@ -233,4 +235,15 @@ test("workDash: gleichmässiger Lauf warnt, dass Ein-/Auslaufen nicht abgetrennt
   const iv = [mk(1000, 240, 150), mk(200, 90, 160), mk(1000, 240, 160), mk(200, 90, 165), mk(1000, 240, 170)];
   const dd = workDash(phaseStats(splitPhases(iv, { planText: "3×1 km" }), {}));
   assert.ok(dd.details.some((x) => x.k.startsWith("Erholung") && x.v.startsWith("+")), JSON.stringify(dd.details.map((x) => x.v)));
+});
+
+test("dashV3 Stationstag: Kompromiss-Delta, Delta je Station, Hinweis auf 1 Referenz-km", () => {
+  const ph = splitPhases(LAPS, { steps: SP }), st = phaseStats(ph, { steps: SP, maxHr: 190 });
+  const d = dashV3({ kind: "station", act: { laps: LAPS }, ph, st, facts: {}, prev: null });
+  assert.equal(d.tiles[0].k, "Kompromiss-Delta");
+  assert.equal(d.tiles[0].v, "+24 s/km");
+  assert.deepEqual(d.stations.map((x) => x.delta), [17, 21, 25, 33]);
+  assert.match(d.hint, /1 km/);
+  assert.match(d.an.bad[0].t, /Rudern/);
+  assert.ok(!JSON.stringify(d).match(/Anstrengung|RPE/));
 });

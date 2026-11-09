@@ -279,7 +279,7 @@ export function phaseStats(ph, { steps = null, maxHr = null } = {}) {
         const p = paceOf(lapOf(k));
         if (p) ds.push({ after: steps[k - 1].name, delta: Math.round(p - ref) });
       });
-      if (ds.length) st.compromise = { ref: Math.round(ref), avg: Math.round(mean(ds.map((d) => d.delta))), worst: ds.reduce((a, b) => (b.delta > a.delta ? b : a)), n: ds.length };
+      if (ds.length) st.compromise = { ref: Math.round(ref), avg: Math.round(mean(ds.map((d) => d.delta))), worst: ds.reduce((a, b) => (b.delta > a.delta ? b : a)), n: ds.length, list: ds };
     }
     // Plan gegen Ist je Schritt (nur Schritte mit Zielzeit und Runde)
     const rows = [];

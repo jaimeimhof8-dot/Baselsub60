@@ -20652,6 +20652,8 @@
           a
             .map((x) => `<li><b>${esc(x.title)}</b> ${esc(x.detail)}</li>`)
             .join("");
+        const btn = (label) =>
+          `<button type="button" class="s6-btn gold" data-act="an-run" data-i="${i}"${busy ? " disabled" : ""}>${label}</button>`;
         const open = !!rec && rec.open === true; /* Fliesstext der Analyse: standardmässig zugeklappt, das Dashboard oben zeigt die Fakten */
         let body = "",
           acts = "",

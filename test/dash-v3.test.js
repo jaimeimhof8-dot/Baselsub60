@@ -83,3 +83,35 @@ test("anCardHtml: leere Blöcke entfallen, Nicht gut ist markiert", () => {
   assert.match(h, /class="bad"/);
   assert.ok(!/Nächstes Mal/.test(h));
 });
+
+test("dashV3 Rad Zone 2: Ø Puls, Dauer, Drift; Zone-2-Bereich; kein Pace", () => {
+  const laps = [lap(600, 5000, 124), lap(600, 5000, 126), lap(600, 5000, 128), lap(600, 5000, 129), lap(600, 5000, 130), lap(600, 5000, 131)];
+  const ph = splitPhases(laps, { planText: "" }), st = phaseStats(ph, {});
+  const act = { hr: 128, time: 3600, dist: 30000, laps };
+  const d = dashV3({ kind: "steady", group: "bike", act, ph, st, facts: {}, prev: null, maxHr: 187, zone2: true });
+  assert.equal(d.kind, "steady");
+  assert.deepEqual(d.tiles.map((t) => t.k), ["Ø Puls", "Dauer", "Puls-Drift"]);
+  assert.equal(d.tiles[1].v, "1:00 h");
+  assert.equal(d.tiles[1].sub, "30,0 km");
+  assert.match(d.an.good[0].t, /Zone-2-Bereich \(112–131 bpm\)/);
+  assert.ok(!JSON.stringify(d).match(/Pace|Anstrengung|RPE/));
+  assert.match(dashV3Html(d, esc), /Zone 2 = 60 bis 70 %/);
+});
+
+test("dashV3 Rad Zone 2: Puls über Zone 2 ist «Nicht gut»; ohne Runden gilt der Gesamt-Puls", () => {
+  const ph = splitPhases([], {}), st = phaseStats(ph, {});
+  const d = dashV3({ kind: "steady", group: "bike", act: { hr: 142, time: 3000 }, ph, st, facts: {}, prev: null, maxHr: 187, zone2: true });
+  assert.equal(d.tiles[0].v, "142");
+  assert.equal(d.an.bad[0].n, "142 bpm");
+  assert.match(d.an.bad[0].t, /über Zone 2/);
+  assert.equal(d.an.good.length, 0);
+});
+
+test("actHeaderHtml: sagt, welche Aktivität gemeint ist und ob sie geplant oder zusätzlich war", async () => {
+  const { actHeaderHtml } = await import("../src/dash-v3.js");
+  const h = actHeaderHtml({ i: 2, n: 2, label: "Rad", start: "18:30", time: 2700, dist: 18000, planned: false }, esc);
+  assert.match(h, /Aktivität 2 von 2/);
+  assert.match(h, /Rad/);
+  assert.match(h, /18:30 · 45:00 min · 18,0 km/);
+  assert.match(h, /Zusätzlich/);
+});

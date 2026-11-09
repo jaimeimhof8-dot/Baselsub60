@@ -4,6 +4,7 @@ import { mmss } from "./util.js";
 
 const sg = (n) => (n > 0 ? "+" : n < 0 ? "−" : "±") + Math.abs(n);
 const de = (n, d = 1) => n.toFixed(d).replace(".", ",");
+const hms = (t) => (t >= 3600 ? Math.floor(t / 3600) + ":" + String(Math.floor((t % 3600) / 60)).padStart(2, "0") + " h" : mmss(t) + " min");
 /** Ab dieser Verlangsamung nach einer Station (s/km) gilt ein Übergang als «nicht im Ziel» (orange). */
 export const COMP_WARN = 15;
 /** Ab diesem Puls-Anstieg (%) ist die Drift «nicht im Ziel» (orange); darunter neutral. */
@@ -33,14 +34,14 @@ export function compareRows(cur, prev, kind) {
   const rows = [];
   if (!cur || !prev) return rows;
   const cw = cur.work, pw = prev.work;
-  const label = kind === "station" ? "Pace Läufe" : "Pace Arbeit";
+  const label = kind === "station" ? "Pace Läufe" : kind === "steady" ? "Pace" : "Pace Arbeit";
   if (cw && pw && cw.pace && pw.pace) {
     const d = Math.round(cw.pace - pw.pace);
     rows.push({ k: label, now: mmss(cw.pace) + "/km", was: mmss(pw.pace) + "/km", d: sg(d) + " s/km", tone: d >= 5 ? "yellow" : "" });
   }
   if (cw && pw && cw.hr && pw.hr) {
     const d = Math.round(cw.hr - pw.hr);
-    rows.push({ k: "Ø Puls Arbeit", now: String(Math.round(cw.hr)), was: String(Math.round(pw.hr)), d: sg(d) + " bpm", tone: "" });
+    rows.push({ k: kind === "steady" ? "Ø Puls" : "Ø Puls Arbeit", now: String(Math.round(cw.hr)), was: String(Math.round(pw.hr)), d: sg(d) + " bpm", tone: "" });
   }
   if (kind === "station" && cur.comp != null && prev.comp != null) {
     const d = cur.comp - prev.comp;
@@ -51,12 +52,12 @@ export function compareRows(cur, prev, kind) {
 
 /**
  * Daten für Dashboard und Analyse-Karte.
- *  kind: Art der Einheit (kraft|station|lauf|…) · act: Uhr-Aktivität oder null · ph: splitPhases() · st: phaseStats()
+ *  kind: Art der Einheit (kraft|station|lauf|steady = gleichmässig: Rad, lockerer Lauf, Zusatz-Einheit); group: Sportart der Uhr (run|bike|…); maxHr: höchster gemessener Puls; zone2: Plan nennt Zone 2 · act: Uhr-Aktivität oder null · ph: splitPhases() · st: phaseStats()
  *  planText: Intervall-Zeile des Plans · facts: {done, n, open: [Namen], skipped: Zahl}
  *  prev: null | {label, same, work, comp} (letzte gleiche Einheit mit Uhr-Daten) · coachNext: nextFocus der Coach-Analyse oder ""
  * -> {kind, tiles: [{k, v, sub, tone, na?, why?}], stations: [{after, delta, warn}] | null, hint, openNote, plan, cmp: {title, rows, note} | null, an: {good, bad, next}}
  */
-export function dashV3({ kind, act, ph, st, planText = "", facts = {}, prev = null, coachNext = "" }) {
+export function dashV3({ kind, act, ph, st, planText = "", facts = {}, prev = null, coachNext = "", group = "", maxHr = null, zone2 = false }) {
   const isK = kind === "kraft", isS = kind === "station";
   const out = { kind: isK ? "kraft" : isS ? "station" : "lauf", tiles: [], stations: null, hint: "", openNote: "", plan: null, cmp: null, an: { good: [], bad: [], next: "" } };
   const work = st && st.work, comp = st && st.compromise;
@@ -71,6 +72,39 @@ export function dashV3({ kind, act, ph, st, planText = "", facts = {}, prev = nu
     if (facts.n) out.an.good.push({ n: `${facts.done} von ${facts.n}`, t: "Übungen abgehakt." });
     if (facts.open && facts.open.length) out.an.bad.push({ n: `${facts.open.length} offen`, t: `${facts.open.join(", ")} fehlt.` });
     out.an.next = coachNext || (facts.open && facts.open.length ? `${facts.open[0]} früher machen, wenn die Zeit knapp wird.` : "");
+    return out;
+  }
+
+  if (kind === "steady") {
+    // Gleichmässige Einheit (Rad, lockerer Lauf, Zusatz-Einheit): die ganze Einheit zählt, Tempo nur beim Laufen
+    out.kind = "steady";
+    const hr = work && work.hr ? work.hr : act && act.hr ? act.hr : null;
+    const noWhySt = !act ? "keine Uhr-Aktivität gefunden" : "kein Puls aufgezeichnet";
+    out.tiles.push(hr ? { k: "Ø Puls", v: String(Math.round(hr)), sub: "ganze Einheit", tone: "" } : { k: "Ø Puls", v: "–", sub: "", na: true, why: noWhySt });
+    const time = act && act.time ? act.time : st && st.time && st.time.all ? st.time.all : 0;
+    out.tiles.push(time ? { k: "Dauer", v: hms(time), sub: act && act.dist ? de(act.dist / 1000) + " km" : "", tone: "" } : { k: "Dauer", v: "–", sub: "", na: true, why: noWhySt });
+    if (group === "run" && work && work.pace) out.tiles.push({ k: "Pace", v: mmss(work.pace), sub: "/km", tone: "" });
+    if (st && st.drift) out.tiles.push({ k: "Puls-Drift", v: sg(st.drift.bpm) + " bpm", sub: "erstes zu letztem Drittel", tone: st.drift.pct >= DRIFT_WARN ? "yellow" : "" });
+    if (prev) {
+      const confOk = st && (st.conf === "sure" || st.conf === "likely");
+      const cur = { work: hr ? { hr, pace: group === "run" && confOk && work ? work.pace : null } : null };
+      const rows = compareRows(cur, { work: prev.work }, "steady");
+      out.cmp = { title: `Vergleich mit ${prev.same ? "der letzten gleichen Einheit" : "der letzten ähnlichen Einheit"} (${prev.label})`, rows, note: rows.length ? "" : "keine Daten, Grund: in der früheren Einheit fehlt der Puls" };
+    } else if (act) out.cmp = { title: "Vergleich mit der letzten Einheit", rows: [], note: "keine Daten, Grund: noch keine frühere gleiche Einheit mit Uhr-Daten" };
+    const G = out.an.good, B = out.an.bad;
+    if (hr && zone2 && maxHr) {
+      const lo = Math.round(maxHr * 0.6), hi = Math.round(maxHr * 0.7);
+      if (hr > hi) B.push({ n: `${Math.round(hr)} bpm`, t: `über Zone 2 (bis ${hi} bpm).` });
+      else G.push({ n: `${Math.round(hr)} bpm`, t: `im Zone-2-Bereich (${lo}–${hi} bpm).` });
+    }
+    if (st && st.drift) {
+      if (st.drift.pct >= 3) B.push({ n: sg(st.drift.bpm) + " bpm", t: "Puls stieg im Verlauf." });
+      else if (G.length < 2) G.push({ n: sg(st.drift.bpm) + " bpm", t: "Puls blieb stabil." });
+    }
+    out.an.good = G.slice(0, 2);
+    out.an.bad = B.slice(0, 2);
+    out.an.next = coachNext || "";
+    if (hr && zone2 && maxHr) out.hint = `Zone 2 = 60 bis 70 % vom höchsten gemessenen Puls (${maxHr} bpm).`;
     return out;
   }
 
@@ -143,17 +177,18 @@ export function dashV3Html(d, esc) {
   let h = `<div class="dg">${d.tiles.map((t) => tileHtml(t, esc)).join("")}</div>`;
   if (d.openNote) h += `<p class="dwarn v3-note">${esc(d.openNote)}</p>`;
   if (d.stations && d.stations.length) h += `<div class="dl"><span class="k">Delta je Station</span>${d.stations.map((s) => `<div class="v3-row${s.warn ? " warn" : ""}"><span>nach ${esc(s.after)}</span><b>${esc(sgs(s.delta))} s/km</b></div>`).join("")}${d.hint ? `<p class="dtot">${esc(d.hint)}</p>` : ""}</div>`;
-  if (d.kind !== "kraft") {
+  if (d.kind === "steady" && d.hint) h += `<p class="dtot v3-note">${esc(d.hint)}</p>`;
+  if (d.kind === "lauf" || d.kind === "station") {
     const planBody = d.plan
       ? `<table class="v3-t"><thead><tr><th>Schritt</th><th class="n">Ziel</th><th class="n">Ist</th><th class="n">Δ s</th></tr></thead><tbody>${d.plan.rows.map((r) => `<tr><td>${esc(r.name)}</td><td class="n">${mmss(r.goal)}</td><td class="n o">${mmss(r.t)}</td><td class="n ${r.diff > 0 ? "m" : "o"}">${sgs(r.diff)}</td></tr>`).join("")}</tbody></table><p class="dtot">${d.plan.hit} von ${d.plan.n} im Ziel. Rundenzeit gegen Zielzeit.</p>`
       : `<p class="dtot">keine Daten, Grund: ${esc(d.kind === "lauf" ? "im Plan steht kein Zieltempo («@ 4:00») oder es gibt keine Arbeitsrunden" : "Runden passen nicht zu den Plan-Schritten")}</p>`;
     h += `<details class="dmore"><summary>Plan gegen Ist</summary><div class="dd">${planBody}</div></details>`;
-    if (d.cmp) {
+  }
+  if (d.cmp && (d.kind === "lauf" || d.kind === "station" || d.kind === "steady")) {
       const body = d.cmp.rows.length
         ? `<table class="v3-t"><thead><tr><th>Wert</th><th class="n">Jetzt</th><th class="n">Vorher</th><th class="n">Δ</th></tr></thead><tbody>${d.cmp.rows.map((r) => `<tr><td>${esc(r.k)}</td><td class="n o">${esc(r.now)}</td><td class="n">${esc(r.was)}</td><td class="n ${r.tone === "yellow" ? "m" : "o"}">${esc(r.d)}</td></tr>`).join("")}</tbody></table>`
         : `<p class="dtot">${esc(d.cmp.note)}</p>`;
       h += `<details class="dmore"><summary>${esc(d.cmp.title)}</summary><div class="dd">${body}</div></details>`;
-    }
   }
   return h;
 }
@@ -164,4 +199,10 @@ export function anCardHtml(an, esc) {
   const next = an.next ? `<div class="v3-blk"><span class="k">Nächstes Mal</span><p>${esc(an.next)}</p></div>` : "";
   const inner = blk("Gut", an.good, false) + blk("Nicht gut", an.bad, true) + next;
   return inner;
+}
+
+/** Kopfzeile je Aktivität, wenn ein Tag mehrere hat: Sportart, Start, Dauer, Distanz, und ob sie zur geplanten Einheit gehört. */
+export function actHeaderHtml({ i, n, label, start, time, dist, planned }, esc) {
+  const meta = [start, time ? hms(time) : "", dist ? de(dist / 1000) + " km" : ""].filter(Boolean).join(" · ");
+  return `<div class="v3-ah"><div><span class="k">Aktivität ${i} von ${n}</span><b>${esc(label)}</b>${meta ? `<span class="s">${esc(meta)}</span>` : ""}</div><span class="v3-tag${planned ? "" : " x"}">${planned ? "Geplant" : "Zusätzlich"}</span></div>`;
 }

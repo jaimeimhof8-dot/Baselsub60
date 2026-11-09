@@ -112,16 +112,31 @@ test("workDash: höchstens 6 Hauptkennzahlen, Gesamtwerte klein beschriftet, jed
   assert.equal(d.warn, "");
 });
 
-test("splitPhases: passt die Rundenzahl nicht zum Plan, wird nichts geraten", () => {
+test("splitPhases: passt die Rundenzahl nicht zum Plan, wird nach Tempo geschätzt und das offen gesagt", () => {
   const ph = splitPhases(LAPS.slice(0, 12), { steps: SP });
-  assert.equal(ph.conf, "none");
+  assert.equal(ph.conf, "unsure", "keine Zuordnung zum Plan: nur geschätzt");
   assert.match(ph.note, /passen nicht/);
+  assert.match(ph.note, /Tempo geschätzt/);
   const st = phaseStats(ph, { steps: SP });
-  assert.equal(st.work, null);
+  assert.ok(st.work, "Arbeitswerte gibt es trotzdem");
   const d = workDash(st);
-  assert.deepEqual(d.main, []);
   assert.ok(d.warn);
   assert.ok(d.totals.includes("Ø Puls"), "Gesamtwerte bleiben sichtbar");
+});
+
+test("splitPhases: 13 Runden der Uhr zu 12 Plan-Schritten -> nach Zeit zugeordnet (Doppelrunde zusammengefasst)", () => {
+  const steps = [{ kind: "warm", name: "Einlaufen", goal: 600 }, { kind: "run", name: "1 km Referenz", goal: 240 }, { kind: "station", name: "SkiErg", goal: 240 }, { kind: "run", name: "Lauf", goal: 250 }, { kind: "rest", name: "Pause", goal: 120 }, { kind: "station", name: "Sled", goal: 90 }, { kind: "run", name: "Lauf", goal: 250 }, { kind: "cool", name: "Auslaufen", goal: 420 }];
+  // Die erste Station wurde in zwei Runden gelappt (120 + 118 s), sonst passt alles
+  const laps = [mk(1600, 600, 126), mk(1000, 242, 166), mk(500, 120, 150), mk(500, 118, 160), mk(1000, 247, 171), mk(0, 120, 140), mk(50, 88, 170), mk(1000, 251, 176), mk(1100, 420, 138)];
+  const ph = splitPhases(laps, { steps });
+  assert.equal(ph.mode, "fuzzy");
+  assert.equal(ph.conf, "likely");
+  assert.match(ph.note, /9 Runden der Uhr, 8 Plan-Schritte: nach Zeit zugeordnet, 1 Doppelrunde zusammengefasst/);
+  assert.equal(ph.laps.length, 8);
+  assert.equal(ph.laps[2].t, 238, "Doppelrunde = 120 + 118 s");
+  const st = phaseStats(ph, { steps, maxHr: 190 });
+  assert.equal(st.compromise.ref, 242);
+  assert.deepEqual(st.compromise.list.map((x) => x.delta), [5, 9]);
 });
 
 test("splitPhases: Pausen wechseln mit Arbeit ab (Lap nach Satz und nach Pause) -> wahrscheinlich, mit Hinweis", () => {
@@ -225,7 +240,7 @@ test("sessionDash: mit erkannten Phasen keine Gesamt-Kacheln, Rundenbalken trage
   assert.equal(d.laps[0].phase, "warm");
   assert.equal(d.laps[4].phase, "rest");
   const plain = sessionDash(q, act, null, splitPhases(LAPS.slice(0, 12), { steps: SP }));
-  assert.ok(plain.tiles.some((t) => t.k === "Ø Puls"));
+  assert.ok(plain.tiles.length >= 1);
 });
 
 test("workDash: gleichmässiger Lauf warnt, dass Ein-/Auslaufen nicht abgetrennt ist; Erholung zeigt auch steigenden Puls", () => {

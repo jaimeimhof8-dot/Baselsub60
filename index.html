@@ -13027,6 +13027,15 @@
       .v3-blk li b { font-family: var(--f-head); font-weight: 700; font-size: 19px; font-variant-numeric: tabular-nums; color: var(--text); }
       .v3-blk li.bad b { color: var(--warn); }
       .v3-blk p { margin: 0; font-size: 14px; line-height: 21px; color: var(--text); }
+      .v3-blk-act { display: grid; gap: var(--s3); }
+      .v3-blk-act + .v3-blk-act { margin-top: var(--s5); padding-top: var(--s4); border-top: 1px solid rgba(255, 255, 255, 0.12); }
+      .v3-ah { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s3); }
+      .v3-ah > div { display: grid; gap: 2px; min-width: 0; }
+      .v3-ah .k { font-size: 11px; line-height: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .v3-ah b { font-family: var(--f-head); font-weight: 700; font-size: 22px; line-height: 1.1; color: var(--text); }
+      .v3-ah .s { font-size: 13px; color: var(--muted); }
+      .v3-tag { flex: none; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--well); box-shadow: var(--edge); color: var(--muted); }
+      .v3-tag.x { color: var(--accent); }
       .v3-empty { margin: 0; font-size: 14px; color: var(--muted); }
       .s7-an-tg.more { margin-top: 10px; font-size: 14px; }
       .s7-an-txt { display: grid; gap: 4px; margin-top: 6px; }
@@ -14383,7 +14392,7 @@
       import { analyseSession } from "./src/analyse.js";
       import { sessionDash, compareToPrev, splitPhases, phaseStats, workDash, sourceInfo, dashSections } from "./src/session-dash.js";
       import { reviewAll, keyLine } from "./src/dash-all.js";
-      import { dashV3, dashV3Html, anCardHtml } from "./src/dash-v3.js";
+      import { dashV3, dashV3Html, anCardHtml, actHeaderHtml } from "./src/dash-v3.js";
       import { alignSplits } from "./src/laps.js";
       import {
         extractTests,
@@ -20706,14 +20715,21 @@
             ? `<button type="button" class="s7-an-tg more" data-act="an-toggle" data-i="${i}" aria-expanded="${open}"><span>${open ? "Analyse einklappen" : "Ganze Analyse lesen"}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(${open ? 180 : 0}deg)"><path d="M6 9l6 6 6-6"/></svg></button>`
             : "";
         const redo = rec && !busy ? btn(stale ? "Neu analysieren" : "Nochmals analysieren") : "";
-        let parts = { dash: "", an: { good: [], bad: [], next: "" } };
+        let blocks = [];
         try {
-          parts = s7DashParts(i, p, rec && !busy ? rec.data : null);
+          blocks = s7DashParts(i, p, rec && !busy ? rec.data : null);
         } catch (e) {}
-        const lines = anCardHtml(parts.an, esc),
-          staleHtml = stale ? `<p class="s7-an-st">Seit der Analyse haben sich Werte oder Uhr-Daten geändert. Die Kennzahlen oben sind aktuell, der Coach-Text darunter noch nicht.</p>` : "",
-          card = `<div class="v3-an"><span class="k">Analyse</span>${lines || `<p class="v3-empty">Aus den Zahlen ergibt sich nichts Auffälliges.</p>`}${rec && !busy ? staleHtml + tg + (open ? `<div class="s7-an-txt">${text}</div>` : "") : ""}</div>`;
-        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${parts.dash}${card}${!rec || busy ? body : ""}${acts}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}</section>`;
+        const staleHtml = stale ? `<p class="s7-an-st">Seit der Analyse haben sich Werte oder Uhr-Daten geändert. Die Kennzahlen oben sind aktuell, der Coach-Text darunter noch nicht.</p>` : "",
+          // Coach-Text (Ganze Analyse lesen) gehört zur geplanten Einheit: er hängt am letzten Block, nicht an einer Zusatz-Aktivität
+          coachAt = blocks.length - 1 - [...blocks].reverse().findIndex((b) => b.planned);
+        const parts = blocks
+          .map((b, k) => {
+            const lines = anCardHtml(b.an, esc),
+              coach = k === coachAt && rec && !busy ? staleHtml + tg + (open ? `<div class="s7-an-txt">${text}</div>` : "") : "";
+            return `<div class="v3-blk-act">${b.head}${b.dash}<div class="v3-an"><span class="k">Analyse${blocks.length > 1 ? " dieser Aktivität" : ""}</span>${lines || `<p class="v3-empty">Aus den Zahlen ergibt sich nichts Auffälliges.</p>`}${coach}</div></div>`;
+          })
+          .join("");
+        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${parts}${!rec || busy ? body : ""}${acts}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}</section>`;
       }
       /* Letzte gleiche Einheit mit Uhr-Daten: erst gleiche Art UND gleicher Plantitel, sonst gleiche Art. -> {i, act, rpe, same} oder null */
       function s7Prev(i, p, group) {
@@ -20738,49 +20754,92 @@
         return { ph, st: phaseStats(ph, { steps, maxHr }) };
       }
       /* Dashboard nach dem Training (Datenplan docs/dashboard-planung.md): Quelle der Uhr-Daten, wenige Kennzahlen, aufklappbar Plan gegen Ist und Vergleich.
-         Kein Urteil, keine Anstrengung (RPE). Kraft wird nicht mit der Uhr getrackt: dort nur Haken. -> {dash, an} (an = Zeilen für die Analyse-Karte) */
+         Kein Urteil, keine Anstrengung (RPE). Kraft wird nicht mit der Uhr getrackt: dort nur Haken.
+         Hat der Tag mehrere Aktivitäten, bekommt jede ihren eigenen Block mit Kopfzeile (Sportart, Start, Dauer, «Geplant»/«Zusätzlich») und eigener Analyse.
+         -> [{head, dash, an}] */
       function s7DashParts(i, p, coachData) {
         const acts = actsOf(i),
-          act = acts.find((a) => a.laps && a.laps.length) || acts[0] || null,
-          isK = p.k === "kraft",
           dk = keyI(i),
-          W = act && !isK ? s7Work(p, act) : null,
-          wd = W ? workDash(W.st) : null,
+          isK = p.k === "kraft",
+          maxHr = Math.max(0, ...Object.values(S.strava.acts).map((a) => a.maxHr || 0)) || null,
           planText = (p.i || []).find((t) => dash.parseReps(t)) || "",
+          pick = (list) => list.find((a) => a.laps && a.laps.length) || list[0] || null,
+          fit = acts.filter((a) => strava.fits(p.k, a.group)),
+          // Einzelne Aktivität: wie bisher die einzige. Mehrere: die zum Plan passende ist «Geplant», alle anderen «Zusätzlich».
+          main = isK ? null : acts.length === 1 ? acts[0] : pick(fit),
+          extras = acts.filter((a) => a !== main && !(isK && fit.includes(a))),
           items = (p.i || [])
             .map((t, j) => ({ t, done: !!S.done[dk + "|" + j], skip: !!S.xs[dk + "|" + j], fill: isFiller(t) || /^Erste \d+ m nach jeder Station/.test(t) }))
             .filter((x) => !x.fill),
           live = items.filter((x) => !x.skip),
           open = live.filter((x) => !x.done).map((x) => x.t.split(/\s\d|\s@/)[0]),
           facts = { done: live.length - open.length, n: live.length, open, skipped: items.length - live.length },
-          pv = act && !isK ? s7Prev(i, p, act.group) : null,
-          pw = pv ? s7Work(dayPlan(pv.i), pv.act) : null,
-          prev = pv
-            ? {
-                label: shortDay(pv.i),
-                same: pv.same,
-                work: pw && ["sure", "likely"].includes(pw.ph.conf) ? pw.st.work : null,
-                comp: pw && pw.st.compromise ? pw.st.compromise.avg : null,
-              }
-            : null,
-          d = dashV3({ kind: p.k, act, ph: W && W.ph, st: W && W.st, planText, facts, prev, coachNext: (coachData && coachData.nextFocus) || "" });
-        let srcHtml;
-        if (isK && !act) srcHtml = `<div class="dsrc"><div class="dsh"><b>Kraft wird nicht mit der Uhr getrackt</b></div><ul><li class="ok"><span>Es gibt keine Uhr-Daten, das ist so gewollt.</span></li></ul></div>`;
-        else
-          srcHtml = dashSections(
-            {
-              src: sourceInfo(act, {
-                garmin: { on: gmOn(), err: S.garmin.conn && S.garmin.conn.err, at: S.garmin.at },
-                strava: { on: !!stTok(), at: S.strava.at },
-                dayLabel: shortDay(i),
-              }),
-              wd: { main: [], totals: "", phaseBar: [], details: [], warn: "" },
-              actId: act ? act.id : "",
-            },
-            esc,
-          ).src;
-        const warn = wd && wd.warn ? `<p class="dwarn">${esc(wd.warn)}</p>` : "";
-        return { dash: `<div class="an-dash">${srcHtml}${warn}${dashV3Html(d, esc)}</div>`, an: d.an };
+          srcOf = (act) =>
+            dashSections(
+              {
+                src: sourceInfo(act, {
+                  garmin: { on: gmOn(), err: S.garmin.conn && S.garmin.conn.err, at: S.garmin.at },
+                  strava: { on: !!stTok(), at: S.strava.at },
+                  dayLabel: shortDay(i),
+                }),
+                wd: { main: [], totals: "", phaseBar: [], details: [], warn: "" },
+                actId: act ? act.id : "",
+              },
+              esc,
+            ).src;
+        const block = (act, plan, planned) => {
+          // plan: Plan-Einheit zu dieser Aktivität (nur «Geplant») oder null (Zusatz-Einheit: gleichmässig, ohne Plan)
+          const pp = plan || { k: "x", i: [], t: (act && act.name) || "" },
+            group = act ? act.group : "",
+            kind = plan ? (plan.k === "kraft" ? "kraft" : plan.k === "station" ? "station" : planText ? "lauf" : "steady") : "steady",
+            W = act && kind !== "kraft" ? s7Work(pp, act) : null,
+            wd = W ? workDash(W.st) : null,
+            pv = act && plan && kind !== "kraft" ? s7Prev(i, plan, act.group) : null,
+            pw = pv ? s7Work(dayPlan(pv.i), pv.act) : null,
+            okConf = pw && ["sure", "likely"].includes(pw.ph.conf),
+            prev = pv
+              ? {
+                  label: shortDay(pv.i),
+                  same: pv.same,
+                  work: kind === "steady" ? (okConf && pw.st.work ? { hr: pw.st.work.hr, pace: group === "run" ? pw.st.work.pace : null } : pv.act.hr ? { hr: pv.act.hr, pace: null } : null) : okConf ? pw.st.work : null,
+                  comp: pw && pw.st.compromise ? pw.st.compromise.avg : null,
+                }
+              : null,
+            d = dashV3({
+              kind, act, group, maxHr,
+              zone2: !!plan && /Zone\s*2/i.test(plan.t || ""),
+              ph: W && W.ph, st: W && W.st,
+              planText: plan ? planText : "", facts: plan ? facts : {}, prev,
+              coachNext: planned && coachData ? coachData.nextFocus || "" : "",
+            });
+          let srcHtml;
+          if (kind === "kraft" && !act) srcHtml = `<div class="dsrc"><div class="dsh"><b>Kraft wird nicht mit der Uhr getrackt</b></div><ul><li class="ok"><span>Es gibt keine Uhr-Daten, das ist so gewollt.</span></li></ul></div>`;
+          else srcHtml = srcOf(act);
+          const warn = wd && wd.warn ? `<p class="dwarn">${esc(wd.warn)}</p>` : "";
+          return { dash: `<div class="an-dash">${srcHtml}${warn}${dashV3Html(d, esc)}</div>`, an: d.an, act };
+        };
+        const blocks = [];
+        blocks.push({ ...block(main, p, true), planned: true });
+        extras.forEach((a) => blocks.push({ ...block(a, null, false), planned: false }));
+        const n = blocks.length;
+        blocks.forEach((b, k) => {
+          b.head =
+            n > 1
+              ? actHeaderHtml(
+                  {
+                    i: k + 1,
+                    n,
+                    label: b.act ? strava.SPORT_LABEL[b.act.group] || b.act.name || "Aktivität" : S6_KIND[p.k] || "Einheit",
+                    start: b.act && b.act.start ? String(b.act.start).slice(11, 16) : "",
+                    time: b.act ? b.act.time : 0,
+                    dist: b.act ? b.act.dist : 0,
+                    planned: b.planned,
+                  },
+                  esc,
+                )
+              : "";
+        });
+        return blocks;
       }
       function s7FinCard(i, p) {
         const dk = keyI(i),

@@ -66,3 +66,8 @@ Du bestätigst oder korrigierst diesen Plan. Danach genau ein Mockup mit genau d
 - Geändert: `index.html` (`s7DashParts` ersetzt `s7DashHtml`; Analyse-Karte; CSS), `sw.js` (Modul in der Cache-Liste, Version v116).
 - Weg aus der Anzeige: Ring/Punktzahl, Kurzurteil, Chips, Anstrengung, Rundenbalken, Phasenbalken, Zonen, Erholung, Streuung, «Schnell-Check». Die alten Funktionen in `session-dash.js` bleiben im Code (andere Ansicht und Tests nutzen sie).
 - Nicht angefasst: die Rückblick-Liste aller Einheiten (`dash-all.js`) zeigt weiter Anstrengung. Die Eingabe der RPE ist unverändert (Frage 1 offen).
+
+## Nachbesserung 09.11.2026 (Rückmeldung von Jaime)
+1. **Runden passen nicht zum Plan** (z. B. 13 Runden, 12 Planschritte): `alignFuzzy` (laps.js) ordnet nach Zeit zu und fasst eine Doppelrunde zusammen, überzählige Mini-Runden werden ausgelassen. Der Hinweis nennt das («nach Zeit zugeordnet … nicht einzeln bestätigt»), Zuordnung «wahrscheinlich». Klappt auch das nicht, wird nach Tempo geschätzt («unsicher») statt keine Analyse zu zeigen. Zum Eintragen von Zeiten bleibt die strenge Zuordnung.
+2. **Rad Zone 2 und andere gleichmässige Einheiten** (Art «steady»): Ø Puls, Dauer (mit km), Puls-Drift; bei Zone 2 die Bewertung gegen 60 bis 70 % vom höchsten gemessenen Puls. Kein Pace beim Rad. Annahme: Zone 2 = 60 bis 70 % (so rechnet die App heute die Zonen), das kann für dich zu eng sein.
+3. **Mehrere Aktivitäten an einem Tag:** Jede Aktivität hat einen eigenen Block mit Kopfzeile («Aktivität 2 von 2 · Rad · 18:40 · 40:00 min · 14 km · Zusätzlich») und eigener Analyse. «Geplant» ist die Aktivität, die zum Plan passt. Der Coach-Text hängt an der geplanten.

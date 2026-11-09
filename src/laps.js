@@ -84,6 +84,54 @@ export function alignSplits(laps, steps) {
 }
 
 /**
+ * Tolerante Zuordnung für die Anzeige (nicht für das Eintragen von Zeiten): Stimmt die Rundenzahl nicht genau, werden die Runden
+ * nach Zeit dem Plan zugeordnet. Erlaubt sind eine zusammengefasste Doppelrunde (ein Schritt in zwei Runden gelappt), überzählige Runden
+ * (Auto-Lap, Stopp) und nicht gelappte Pausen. Fehlt eine Arbeitsrunde oder passen die Zeiten schlecht, gibt es null (nichts geraten).
+ * -> {times, hr, laps: Index je Schritt in merged | null, mode: "fuzzy", count, merged: [{d, t, hr}], merges, skipped} oder null
+ */
+export function alignFuzzy(laps, steps) {
+  const n = (steps || []).length;
+  let T = (laps || []).filter((l) => l && l.t > 0);
+  while (T.length > 1 && T[T.length - 1].t < 15) T = T.slice(0, -1);
+  const m = T.length;
+  if (!n || !m || Math.abs(m - n) > 3) return null;
+  const cost = (s, t) => (s.goal > 0 ? Math.abs(Math.log(t / s.goal)) : 0.35);
+  const INF = 1e9;
+  const f = Array.from({ length: n + 1 }, () => Array(m + 1).fill(INF));
+  const bk = Array.from({ length: n + 1 }, () => Array(m + 1).fill(null));
+  f[0][0] = 0;
+  const relax = (i, j, c, how, pi, pj) => { if (c < f[i][j]) { f[i][j] = c; bk[i][j] = [how, pi, pj]; } };
+  for (let i = 0; i <= n; i++) for (let j = 0; j <= m; j++) {
+    const c = f[i][j];
+    if (c >= INF) continue;
+    if (i < n && j < m) relax(i + 1, j + 1, c + cost(steps[i], T[j].t), "m", i, j);
+    if (i < n && j + 1 < m) relax(i + 1, j + 2, c + cost(steps[i], T[j].t + T[j + 1].t) + 0.3, "g", i, j);
+    if (j < m) relax(i, j + 1, c + (T[j].t < 45 ? 0.15 : 1.0), "l", i, j);
+    if (i < n) relax(i + 1, j, c + (steps[i].kind === "rest" ? 0.1 : 1.5), "s", i, j);
+  }
+  if (f[n][m] >= INF || f[n][m] > 0.4 * n) return null;
+  const asg = Array(n).fill(null);
+  let i = n, j = m, skipped = 0, merges = 0;
+  while (i > 0 || j > 0) {
+    const [how, pi, pj] = bk[i][j];
+    if (how === "m") asg[pi] = [pj];
+    else if (how === "g") { asg[pi] = [pj, pj + 1]; merges++; }
+    else if (how === "l") skipped++;
+    i = pi; j = pj;
+  }
+  if (steps.some((st, k) => st.kind !== "rest" && !asg[k])) return null;
+  const merged = [], idx = [];
+  asg.forEach((a) => {
+    if (!a) { idx.push(null); return; }
+    const ls = a.map((x) => T[x]), t = ls.reduce((q, l) => q + l.t, 0), d = ls.reduce((q, l) => q + (l.d || 0), 0);
+    const hl = ls.filter((l) => l.hr), ht = hl.reduce((q, l) => q + l.t, 0);
+    merged.push({ ...ls[0], t, d, hr: ht ? Math.round(hl.reduce((q, l) => q + l.hr * l.t, 0) / ht) : null });
+    idx.push(merged.length - 1);
+  });
+  return { times: idx.map((k) => (k == null ? null : Math.round(merged[k].t))), hr: idx.map((k) => (k == null ? null : merged[k].hr || null)), laps: idx, mode: "fuzzy", count: m, merged, merges, skipped };
+}
+
+/**
  * Prüfbericht für eine Einheit von der Uhr: Was kam wirklich an? Reine Funktion, Grundlage der Anzeige „Garmin-Übernahme“.
  *  laps:      {n, state: "ok" | "wait" | "none"} – Runden da / werden beim nächsten Sync geholt (Garmin ohne lapsV 3) / keine
  *  splits:    nur mit steps (Stationstag): {state: "ok" | "bad" | "none", got, total, mode, count}

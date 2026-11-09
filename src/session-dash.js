@@ -1,7 +1,7 @@
 // Dashboard zur Einheit: die wichtigsten Fakten als Kacheln, Rundenbalken und Coach-Kennzahlen.
 // Reine Funktionen ohne DOM; die Anzeige steht in index.html (s7DashHtml). Der Fliesstext der Analyse bleibt darunter.
 import { paceOf, intervals, parseReps } from "./dashboard.js";
-import { alignSplits } from "./laps.js";
+import { alignSplits, alignFuzzy } from "./laps.js";
 import { mmss } from "./util.js";
 
 const hms = (s) => (s >= 3600 ? Math.floor(s / 3600) + ":" + String(Math.floor((s % 3600) / 60)).padStart(2, "0") + " h" : mmss(s) + " min");
@@ -140,61 +140,79 @@ export function splitPhases(laps, { steps = null, planText = "" } = {}) {
   const out = { laps: L, phase: L.map(() => "other"), step: L.map(() => null), sub: L.map(() => null), conf: "none", mode: null, note: "" };
   if (!L.length) { out.note = "Keine Runden – Phasen lassen sich nicht trennen."; return out; }
 
+  let stepNote = "";
   if (steps && steps.length) {
-    const r = alignSplits(L, steps);
-    if (!r.times) { out.note = `Die ${r.count} Runden der Uhr passen nicht zu den ${steps.length} Plan-Schritten – keine Trennung geraten.`; return out; }
-    steps.forEach((st, k) => {
-      const li = r.laps[k];
-      if (li == null || !L[li]) return;
-      out.step[li] = k;
-      out.phase[li] = st.kind === "warm" ? "warm" : st.kind === "cool" ? "cool" : st.kind === "rest" ? "rest" : st.kind === "run" || st.kind === "station" ? "work" : "other";
-      out.sub[li] = st.kind === "run" || st.kind === "station" ? st.kind : null;
-    });
-    if (r.mode === "alt") for (let i = 1; i < r.count; i += 2) if (out.phase[i] === "other" && out.step[i] == null) out.phase[i] = "rest";
-    out.mode = r.mode;
-    out.conf = r.mode === "alt" ? "likely" : "sure";
-    out.note = r.mode === "alt" ? "Arbeit und Pause wechseln sich in den Runden ab – so zugeordnet, nicht einzeln bestätigt." : r.mode === "work" ? "Pausen wurden an der Uhr nicht gelappt; Arbeitsrunden direkt zugeordnet." : "";
-    return out;
-  }
-
-  const reps = parseReps(planText);
-  const fillAround = (work) => {
-    const first = Math.min(...work), last = Math.max(...work);
-    L.forEach((_, i) => { out.phase[i] = work.includes(i) ? "work" : i < first ? "warm" : i > last ? "cool" : "rest"; out.sub[i] = work.includes(i) ? "run" : null; });
-  };
-  if (reps) {
-    const iv = intervals(L, planText);
-    if (iv.kind === "intervals") {
-      fillAround(iv.work);
-      out.mode = "plan-intervals";
-      out.conf = iv.work.length === reps.n ? "sure" : "likely";
-      out.note = iv.work.length === reps.n ? "" : `${iv.work.length} von ${reps.n} geplanten Wiederholungen in den Runden gefunden.`;
-      // Laufen die übrigen Runden im selben Tempo, ist «Pause/Einlaufen» nicht belegt (z. B. Auto-Lap bei gleichmässigem Lauf)
-      const wp = mean(iv.work.map((i) => paceOf(L[i])).filter(Boolean));
-      if (wp && L.some((l, i) => !iv.work.includes(i) && l.t >= 60 && paceOf(l) && paceOf(l) <= wp * 1.06)) {
-        out.conf = "unsure";
-        out.note = "Runden ausserhalb der Wiederholungen laufen im gleichen Tempo – Arbeit und Pause sind nicht sicher trennbar.";
-      }
+    let r = alignSplits(L, steps);
+    if (!r.times) { const fz = alignFuzzy(L, steps); if (fz) r = fz; }
+    if (!r.times) {
+      // Keine Zuordnung zum Plan: nicht aufgeben, sondern nach Tempo schätzen und das offen sagen
+      stepNote = `Die ${r.count} Runden der Uhr passen nicht zu den ${steps.length} Plan-Schritten.`;
+    } else {
+      const LL = r.merged || L;
+      if (r.merged) { out.laps = LL; out.phase = LL.map(() => "other"); out.step = LL.map(() => null); out.sub = LL.map(() => null); }
+      steps.forEach((st, k) => {
+        const li = r.laps[k];
+        if (li == null || !LL[li]) return;
+        out.step[li] = k;
+        out.phase[li] = st.kind === "warm" ? "warm" : st.kind === "cool" ? "cool" : st.kind === "rest" ? "rest" : st.kind === "run" || st.kind === "station" ? "work" : "other";
+        out.sub[li] = st.kind === "run" || st.kind === "station" ? st.kind : null;
+      });
+      if (r.mode === "alt") for (let i = 1; i < r.count; i += 2) if (out.phase[i] === "other" && out.step[i] == null) out.phase[i] = "rest";
+      out.mode = r.mode;
+      out.conf = r.mode === "alt" || r.mode === "fuzzy" ? "likely" : "sure";
+      out.note = r.mode === "fuzzy"
+        ? `${r.count} Runden der Uhr, ${steps.length} Plan-Schritte: nach Zeit zugeordnet${r.merges ? `, ${r.merges} Doppelrunde${r.merges > 1 ? "n" : ""} zusammengefasst` : ""}${r.skipped ? `, ${r.skipped} überzählige Runde${r.skipped > 1 ? "n" : ""} ausgelassen` : ""} – nicht einzeln bestätigt.`
+        : r.mode === "alt" ? "Arbeit und Pause wechseln sich in den Runden ab – so zugeordnet, nicht einzeln bestätigt." : r.mode === "work" ? "Pausen wurden an der Uhr nicht gelappt; Arbeitsrunden direkt zugeordnet." : "";
       return out;
     }
   }
-  const iv = intervals(L, "");
-  if (iv.kind === "steady" || L.length === 1) {
-    L.forEach((_, i) => { out.phase[i] = "work"; out.sub[i] = "run"; });
-    out.mode = "steady";
-    out.conf = reps ? "unsure" : "sure";
-    out.note = reps ? "Plan nennt Wiederholungen, die Runden zeigen aber gleichmässiges Tempo: ganze Einheit als Arbeit gezählt." : "Gleichmässige Einheit: alles gilt als Arbeit, Ein-/Auslaufen ist nicht abgetrennt.";
+
+  const generic = () => {
+    const reps = parseReps(planText);
+    const fillAround = (work) => {
+      const first = Math.min(...work), last = Math.max(...work);
+      L.forEach((_, i) => { out.phase[i] = work.includes(i) ? "work" : i < first ? "warm" : i > last ? "cool" : "rest"; out.sub[i] = work.includes(i) ? "run" : null; });
+    };
+    if (reps) {
+      const iv = intervals(L, planText);
+      if (iv.kind === "intervals") {
+        fillAround(iv.work);
+        out.mode = "plan-intervals";
+        out.conf = iv.work.length === reps.n ? "sure" : "likely";
+        out.note = iv.work.length === reps.n ? "" : `${iv.work.length} von ${reps.n} geplanten Wiederholungen in den Runden gefunden.`;
+        // Laufen die übrigen Runden im selben Tempo, ist «Pause/Einlaufen» nicht belegt (z. B. Auto-Lap bei gleichmässigem Lauf)
+        const wp = mean(iv.work.map((i) => paceOf(L[i])).filter(Boolean));
+        if (wp && L.some((l, i) => !iv.work.includes(i) && l.t >= 60 && paceOf(l) && paceOf(l) <= wp * 1.06)) {
+          out.conf = "unsure";
+          out.note = "Runden ausserhalb der Wiederholungen laufen im gleichen Tempo – Arbeit und Pause sind nicht sicher trennbar.";
+        }
+        return out;
+      }
+    }
+    const iv = intervals(L, "");
+    if (iv.kind === "steady" || L.length === 1) {
+      L.forEach((_, i) => { out.phase[i] = "work"; out.sub[i] = "run"; });
+      out.mode = "steady";
+      out.conf = reps ? "unsure" : "sure";
+      out.note = reps ? "Plan nennt Wiederholungen, die Runden zeigen aber gleichmässiges Tempo: ganze Einheit als Arbeit gezählt." : "Gleichmässige Einheit: alles gilt als Arbeit, Ein-/Auslaufen ist nicht abgetrennt.";
+      return out;
+    }
+    if (iv.kind === "intervals") {
+      fillAround(iv.work);
+      out.mode = "pace";
+      out.conf = "unsure";
+      out.note = reps ? "Runden passen nicht zur Plan-Vorgabe (z. B. Auto-Lap): Arbeitsrunden nach Tempo geschätzt – Werte mit Vorsicht lesen." : "Arbeitsrunden nach Tempo geschätzt (keine Plan-Vorgabe) – Werte mit Vorsicht lesen.";
+      return out;
+    }
+    out.note = "Zu wenige Runden mit Distanz – Phasen nicht erkennbar.";
     return out;
+  };
+  const g = generic();
+  if (stepNote) {
+    if (g.conf !== "none") { g.conf = "unsure"; g.note = stepNote + " Arbeit nach Tempo geschätzt – Werte mit Vorsicht lesen."; }
+    else g.note = stepNote + " " + g.note;
   }
-  if (iv.kind === "intervals") {
-    fillAround(iv.work);
-    out.mode = "pace";
-    out.conf = "unsure";
-    out.note = reps ? "Runden passen nicht zur Plan-Vorgabe (z. B. Auto-Lap): Arbeitsrunden nach Tempo geschätzt – Werte mit Vorsicht lesen." : "Arbeitsrunden nach Tempo geschätzt (keine Plan-Vorgabe) – Werte mit Vorsicht lesen.";
-    return out;
-  }
-  out.note = "Zu wenige Runden mit Distanz – Phasen nicht erkennbar.";
-  return out;
+  return g;
 }
 
 const wavg = (items, key) => {

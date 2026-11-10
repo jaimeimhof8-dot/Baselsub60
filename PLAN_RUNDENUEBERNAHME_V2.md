@@ -115,7 +115,13 @@ Regel: **Aufpasser (Opus)** schreibt nie Produktivcode, **Macher (Sonnet)** schr
 3. Die Plan-Struktur (Schritte mit Ziel) ist verlässlich, das Problem liegt bei den Uhr-Runden.
 4. Sonnet-Sessions dürfen auf den Branch `claude/garmin-rundenuebernahme-fix-1sj1qc` pushen, PR erst nach S5.
 
-## 6. Offene Fragen (Stand nach Antworten)
+## 6. Stand 10.11. (abends)
+
+- **Variante A gewählt, umgesetzt:** Knopf «Diagnose kopieren» in der Prüfliste jeder Garmin-Einheit mit Runden (`index.html`, `diagText`). Kopiert Runden, Plan-Schritte und das Ergebnis der heutigen Zuordnung als JSON. sw v119, 389 Tests grün.
+- **Fall heute:** Lauf mit 4×100 m Strides und 1 km, danach Absturz. Das ist ein **Lauf-Profil** (Auto-Lap an), kein Hyrox-Stationstag. Damit geht der Pfad über `segmentRuns`/`splitPhases` «plan-intervals», nicht über Stationsschritte. Kurze 100-m-Runden plus Auto-Lap plus unvollständiges Ende sind eine eigene Fehlerquelle, die S0 mitspezifizieren muss.
+- **Vorschau bestätigt:** Bei Unsicherheit Vorschau zum Bestätigen. Ziel bleibt, dass sie fast nie nötig ist.
+
+## 7. Offene Fragen (alt)
 
 Beantwortet: Fehlerbild (keine Zuordnung bei vielen Runden), Runde bei jedem Wechsel, Auto-Lap an (Laufen), Profil «Hyrox» (Cardio).
 

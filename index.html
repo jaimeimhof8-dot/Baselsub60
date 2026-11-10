@@ -14499,7 +14499,7 @@
       import { lockReason, canDrop, shelfStart } from "./src/shelf.js";
       import { fmtLine, lineSlots } from "./src/workout-fmt.js";
       import { normTime } from "./src/timeinput.js";
-      import { repSummary, watchCheck } from "./src/laps.js";
+      import { repSummary, watchCheck, alignFuzzy } from "./src/laps.js";
       import { planSteps } from "./src/garmin-workout.js";
       import {
         flatten,
@@ -15105,7 +15105,25 @@
         }
         if (taken) row(done >= n ? "ok" : "wait", `Plan: ${done} von ${n} Zeilen abgehakt`);
         else row("wait", "Plan: noch nicht übernommen");
-        return `<ul class="gchk" aria-label="Prüfung der Übernahme">${rows.join("")}</ul>`;
+        const diagBtn = a.laps && a.laps.length ? `<button class="btn ghost sm mt-1" data-act="diag-copy" data-i="${i}" data-a="${esc(a.id)}">Diagnose kopieren</button>` : "";
+        return `<ul class="gchk" aria-label="Prüfung der Übernahme">${rows.join("")}</ul>${diagBtn}`;
+      }
+      /* Diagnose einer Einheit als JSON (Runden, Plan, Zuordnungsergebnis) zum Weitergeben bei Problemen mit der Rundenübernahme */
+      function diagText(i, aid) {
+        const a = S.strava.acts[aid], p = dayPlan(i);
+        if (!a) return "";
+        const steps = p && planAct(i) === a ? s7Steps(p) : null,
+          cut = (r) => r && { mode: r.mode || null, count: r.count, times: r.times || null, laps: r.laps || null, merges: r.merges, skipped: r.skipped };
+        let split = null, fuzzy = null, check = null;
+        try { if (steps && steps.length) { split = cut(alignSplits(a.laps || [], steps)); fuzzy = cut(alignFuzzy(a.laps || [], steps)); } } catch (e) { split = { error: String(e) }; }
+        try { check = watchCheck(a, { steps, intervalText: p && p.i ? p.i.find((t) => dash.parseReps(t)) || "" : "" }); } catch (e) { check = { error: String(e) }; }
+        return JSON.stringify({
+          v: 1,
+          act: { id: a.id, src: a.src, type: a.type, group: a.group, date: a.date, start: a.start, time: a.time, dist: a.dist, lapsV: a.lapsV },
+          laps: a.laps || [],
+          plan: { kind: p ? p.k : null, lines: p ? p.i : null, steps },
+          result: { alignSplits: split, alignFuzzy: fuzzy, watchCheck: check },
+        });
       }
       /* Übernehmen-Auswahl: welche Übungen wurden gemacht? (Tag-Index oder null) */
       let takeOpen = null;
@@ -24615,6 +24633,17 @@
         }
         if (d.act === "gm-off") return garminOff();
         if (d.act === "gm-mfa-x") return garminMfaCancel();
+        if (d.act === "diag-copy") {
+          const txt = diagText(+d.i, d.a);
+          if (!txt) return toast("Keine Daten für die Diagnose", true);
+          if (navigator.clipboard)
+            navigator.clipboard.writeText(txt).then(
+              () => toast("Diagnose kopiert"),
+              () => prompt("Diagnose:", txt),
+            );
+          else prompt("Diagnose:", txt);
+          return;
+        }
         if (d.act === "gm-copy") {
           const txt = gmCmd();
           if (navigator.clipboard)

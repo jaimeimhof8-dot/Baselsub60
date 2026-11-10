@@ -15118,7 +15118,7 @@
             prev = `<div class="take" data-prev="${i}"><div class="sub">Zuordnung prüfen: Haken setzen bei Zeiten, die stimmen.</div><ul class="gchk">${li}</ul><button class="btn sm mt-1" data-act="prev-ok" data-i="${i}" data-a="${esc(a.id)}">Bestätigte übernehmen</button></div>`;
           }
         }
-        const diagBtn = a.laps && a.laps.length ? `<button class="btn ghost sm mt-1" data-act="diag-copy" data-i="${i}" data-a="${esc(a.id)}">Diagnose kopieren</button>` : "";
+        const diagBtn = `<button class="btn ghost sm mt-1" data-act="diag-copy" data-i="${i}" data-a="${esc(a.id)}">Diagnose kopieren</button>`;
         return `<ul class="gchk" aria-label="Prüfung der Übernahme">${rows.join("")}</ul>${prev}${diagBtn}`;
       }
       /* Diagnose einer Einheit als JSON (Runden, Plan, Zuordnungsergebnis) zum Weitergeben bei Problemen mit der Rundenübernahme */

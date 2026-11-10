@@ -382,13 +382,15 @@ const ICON = { ok: "✓", bad: "!", none: "–" };
  *  src: sourceInfo() · wd: workDash() · actId: Aktivitäts-ID für «Erneut abrufen»
  * -> {src, work, more}
  */
-export function dashSections({ src, wd, actId = "" }, esc) {
+export function dashSections({ src, wd, actId = "", day = null }, esc) {
   const btn = src.refetch
     ? src.state === "none"
       ? `<button type="button" class="s6-btn" data-act="gm-sync">Jetzt abrufen</button>`
       : `<button type="button" class="s6-btn" data-act="gm-refetch" data-id="${esc(actId)}">Erneut abrufen</button>`
     : "";
-  const srcHtml = `<div class="dsrc ${src.state}"><div class="dsh"><b>${esc(src.head)}</b>${btn}</div><ul>${src.lines.map((l) => `<li class="${l.st}"><span aria-hidden="true">${ICON[l.st] || "–"}</span> ${esc(l.txt)}</li>`).join("")}</ul></div>`;
+  // Diagnose: Runden, Plan und Zuordnungsergebnis als JSON kopieren (bei Problemen mit der Rundenübernahme)
+  const diag = actId && day != null ? `<div class="dsd"><button type="button" class="s6-btn" data-act="diag-copy" data-i="${day}" data-a="${esc(actId)}">Diagnose kopieren</button></div>` : "";
+  const srcHtml = `<div class="dsrc ${src.state}"><div class="dsh"><b>${esc(src.head)}</b>${btn}</div><ul>${src.lines.map((l) => `<li class="${l.st}"><span aria-hidden="true">${ICON[l.st] || "–"}</span> ${esc(l.txt)}</li>`).join("")}</ul>${diag}</div>`;
 
   let work = "";
   if (wd.main.length || wd.warn || wd.totals) {

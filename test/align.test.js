@@ -168,3 +168,18 @@ test("Ungültige Eingaben: kein Absturz", () => {
   assert.equal(alignLaps([{ t: 240 }], [null]), null);
   assert.doesNotThrow(() => alignLaps([{ t: "240", d: NaN }, { t: NaN }], STEPS));
 });
+
+import { repSummary as repSummaryLaps, segmentRuns as segLaps } from "../src/laps.js";
+test("Strides: «100 m» von der Uhr als 90–99 m gemessen wird nicht verworfen (4×100 m, nicht nur 2)", () => {
+  const plan = "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)";
+  const laps = [{ d: 1002, t: 331 }, { d: 97, t: 23 }, { d: 92, t: 48 }, { d: 103, t: 22 }, { d: 95, t: 50 }, { d: 99, t: 23 }, { d: 94, t: 47 }, { d: 101, t: 21 }, { d: 90, t: 52 }, { d: 1000, t: 290 }];
+  assert.equal(intervals(laps, plan).work.length, 4);
+  assert.equal(segLaps(laps, plan).length, 4);
+  assert.match(repSummaryLaps({ laps }, plan), /^4×100 m: 0:23 · 0:22 · 0:23 · 0:21/);
+});
+test("Strides: Abbruch nach dem Einlaufen (nur 2 von 4 Steigerungen) gibt keine erfundenen Wiederholungen", () => {
+  const plan = "Einlaufen 1 km @ 5:30/km (5:30) → Steigerungen 4×100 m @ 3:40/km (0:22)";
+  const laps = [{ d: 1002, t: 331 }, { d: 97, t: 23 }, { d: 92, t: 48 }, { d: 103, t: 22 }];
+  const iv = intervals(laps, plan);
+  assert.ok(iv.kind !== "intervals" || iv.work.length <= 2);
+});

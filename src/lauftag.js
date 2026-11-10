@@ -88,7 +88,8 @@ export function alignLauf(laps, steps) {
     if (c >= INF) continue;
     if (i < n) {
       const s = steps[i];
-      for (let g = 1; g <= 3 && j + g <= m; g++) relax(i + 1, j + g, c + cost(s.dist, s.goal, s.soft, pre[j + g] - pre[j], dpre[j + g] - dpre[j]) + (g - 1) * 0.3, "m", i, j, g);
+      const gmax = s.dist >= 3000 ? 12 : 3; // lange Dauerläufe: Auto-Lap (jeder km eine Runde) darf zusammengefasst werden
+      for (let g = 1; g <= gmax && j + g <= m; g++) relax(i + 1, j + g, c + cost(s.dist, s.goal, s.soft, pre[j + g] - pre[j], dpre[j + g] - dpre[j]) + (g - 1) * (s.dist >= 3000 ? 0.05 : 0.3), "m", i, j, g);
       if (i + 1 < n && j < m) { // eine Runde deckt zwei Schritte (vergessener Druck)
         const s2 = steps[i + 1];
         relax(i + 2, j + 1, c + cost(s.dist + s2.dist, s.goal > 0 && s2.goal > 0 ? s.goal + s2.goal : 0, s.soft && s2.soft, T[j].t, T[j].d) + 0.5, "p", i, j, 1);
@@ -134,7 +135,7 @@ export function alignLauf(laps, steps) {
   for (let k = 0; k < n; k++) {
     const x = match[k], s = steps[k];
     if (softLine !== null && s.line !== softLine) softLine = null;
-    if (!x.lap) { if (k < last && !isRest(k)) doubt(s); else if (k < last && !s.soft && k > got[0]) hard = false; continue; } // feste Trabpause fehlt zwischen zwei Schritten: Strecke steckt in einer anderen Runde
+    if (!x.lap) { if (k < last && !isRest(k)) doubt(s); else if (k < last && k > got[0]) { if (s.soft) softLine = s.line; else hard = false; } continue; } // feste Trabpause fehlt zwischen zwei Schritten: Strecke steckt in einer anderen Runde
     const t = pre[x.lap[1] + 1] - pre[x.lap[0]], d = dpre[x.lap[1] + 1] - dpre[x.lap[0]];
     x.t = Math.round(t); x.d = Math.round(d);
     for (let q = 0; q < x.lap[0]; q++) if (!used.has(q) && (T[q].d >= 60 || T[q].t >= 60)) hard = false;
@@ -148,7 +149,9 @@ export function alignLauf(laps, steps) {
     const timeOk = s.goal <= 0 ? true : s.kind === "run" ? (s.dist <= 200 ? pace <= 1.25 * (s.goal / (s.dist / 1000)) && (jogMed == null || pace <= 0.8 * jogMed) : tt <= 0.15) : tt <= 0.5;
     // Zu kurze Runde (Strecke deutlich unter Plan) ist vermutlich nur ein Teil des Schritts (Doppeldruck): dort enger als bei zu langer Strecke (GPS)
     const under = s.dist > 0 && d > 0 && Math.log(d / s.dist) < -0.12;
-    x.sure = rigidNow() && !x.pair && x.lap[0] === x.lap[1] && !s.soft && !isRest(k) && dd <= tol(k) && !under && timeOk;
+    // Dauerlauf-Gruppe: mehrere Auto-Lap-Runden (je ≥ 300 m) zu einem langen Schritt (≥ 3 km) sind zulässig
+    const autoLap = s.dist >= 3000 && x.lap[1] > x.lap[0] && T.slice(x.lap[0], x.lap[1] + 1).every((l) => l.d >= 300);
+    x.sure = rigidNow() && !x.pair && (x.lap[0] === x.lap[1] || autoLap) && !s.soft && !isRest(k) && dd <= tol(k) && !under && timeOk;
     // Ein zweifelhaft zugeordneter Schritt (Strecke oder Zeit passt nicht) kann die Reihenfolge verschoben haben: alles danach ist nicht mehr sicher.
     // Sammelrunden (pair) sind davon ausgenommen: Ihre Gesamtstrecke bestätigt die Reihenfolge.
     if (!x.pair && !isRest(k) && !x.sure) doubt(s);

@@ -15204,7 +15204,7 @@
         if (!st) return null; // Plan nicht sicher lesbar: bisheriges Verhalten
         // Plan lesbar, aber keine (brauchbare) Zuordnung: none = true. Dann wird NICHTS vorausgewählt oder automatisch abgehakt.
         // Keine Runden (noch nicht geholt, Abruf fehlgeschlagen, Import ohne Runden): nichts abhaken, bei neuem Abruf wird neu bewertet
-        if (!a.laps || !a.laps.length) return { none: true, wait: true, lines: [] };
+        if (!a.laps || !a.laps.length) return { none: true, wait: a.src === "garmin" && a.lapsV !== 3, lines: [] };
         const r = alignLauf(a.laps, st);
         return r || { none: true, lines: [] };
       }
@@ -24663,7 +24663,7 @@
           const i = +d.i,
             p = dayPlan(i);
           // Mehrere Übungen: erst auswählen, was wirklich gemacht wurde
-          if (p && p.i.length > 1) {
+          if (p && (p.i.length > 1 || lauftagFor(i, planAct(i)))) {
             takeOpen = i;
             return render();
           }

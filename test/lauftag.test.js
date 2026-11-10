@@ -147,3 +147,23 @@ test("Review2 M3: fehlende feste Trabpause zwischen zwei Wiederholungen macht de
   const r = alignLauf([{ d: 1000, t: 330 }, { d: 2000, t: 508 }, { d: 2000, t: 562 }], P);
   assert.ok(!r || !r.lines[1].done);
 });
+
+// ---- Dritter Review ----
+test("Review3 H1: fehlender (angenommener) Rückweg zwischen zwei Läufen setzt Zweifel – Abbruch nach 2 von 3 mit Trab 5:00/km", () => {
+  const P = lauftagSteps(["4 km Zone 2 @ 5:20/km (21:20) → 3×200 m @ 4:00/km (0:48)"]);
+  for (const laps of [
+    [{ d: 4000, t: 1280 }, { d: 200, t: 48 }, { d: 200, t: 60 }, { d: 200, t: 48 }],
+    [{ d: 4000, t: 1280 }, { d: 200, t: 48 }, { d: 205, t: 61 }, { d: 200, t: 48 }],
+  ]) {
+    const r = alignLauf(laps, P);
+    assert.ok(!r || !r.lines[0].done);
+  }
+  const r2 = alignLauf([{ d: 4000, t: 1280 }, { d: 200, t: 48 }, { d: 200, t: 60 }], P);
+  assert.ok(!r2 || !/1:00/.test(r2.lines[0].text));
+});
+test("Review3: Dauerlauf mit Auto-Lap (5×1 km) wird weiter zugeordnet", () => {
+  const P = lauftagSteps(["5 km Zone 2 @ 5:20/km (26:40)"]);
+  const r = alignLauf([1, 2, 3, 4, 5].map(() => ({ d: 1000, t: 320 })), P);
+  assert.ok(r);
+  assert.equal(r.lines[0].done, true);
+});

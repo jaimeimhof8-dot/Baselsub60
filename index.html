@@ -13119,20 +13119,155 @@
       .cmp-zr > span b { font-family: var(--f-head); font-size: 15px; color: var(--text); font-variant-numeric: tabular-nums; }
       @media (prefers-reduced-motion: no-preference) { .cmp-tip { animation: cmpfade 0.12s ease-out; } @keyframes cmpfade { from { opacity: 0; } } }
       .s7-an-tg.more { margin-top: 10px; font-size: 14px; }
-      /* Analyse-Bereich */
-      .an-solo { margin-top: 24px; }
-      .an-solo h4 { margin: 0 0 12px; font-size: 18px; }
-      .an-solo .cmp-sheet, .an-solo .cmp-leg { display: none; }
-      .an-empty { padding: 18px 0; color: var(--muted); }
-      .an-wk { margin: 28px 0 8px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
-      .an-row { all: unset; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: 52px 1fr 18px; gap: 16px; align-items: center; min-height: 76px; border-top: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; color: var(--text); }
-      .an-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-      .an-row .d { text-align: center; }
-      .an-row .d small { display: block; font-size: 13px; color: var(--muted); }
-      .an-row .d b { font-family: var(--f-head); font-size: 28px; line-height: 1.1; }
-      .an-row .t { font-size: 17px; font-weight: 600; line-height: 24px; }
-      .an-row .t i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
-      .an-row .t small { display: block; font-size: 14px; font-weight: 400; color: var(--muted); }
+      /* Analyse-Bereich nach dem Entwurf */
+      .an2 { padding: 24px 20px 56px; max-width: 760px; margin: 0 auto; color: #f5f5f7; font-family: var(--f-body); }
+      .an2-kick { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #9a9ba3; }
+      .an2-head { display: flex; justify-content: space-between; align-items: center; }
+      .an2-head h1 { margin: 6px 0 0; font-family: var(--f-head); font-weight: 700; font-size: 44px; line-height: 1; letter-spacing: 0.01em; }
+      .an2-burger { all: unset; box-sizing: border-box; width: 48px; height: 48px; border-radius: 50%; background: #161922; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #f5f5f7; }
+      .an2-burger:focus-visible, .an2-btn:focus-visible, .an2-link:focus-visible, .an2-dd > button:focus-visible, .an2-row:focus-visible, .an2-plot:focus-visible { outline: 2px solid #e0bf6a; outline-offset: 2px; }
+      .an2-empty { padding: 28px 0; color: #9a9ba3; font-size: 16px; line-height: 24px; }
+      .an2-res { padding: 28px 0; display: flex; flex-direction: column; gap: 20px; }
+      .an2-meta { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #9a9ba3; }
+      .an2-meta i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+      .an2-res h2 { margin: 0; font-family: var(--f-head); font-weight: 700; font-size: 34px; line-height: 1.05; }
+      .an2-big { display: flex; align-items: baseline; gap: 14px; }
+      .an2-big b { font-family: var(--f-head); font-size: 52px; line-height: 1; }
+      .an2-big span { font-size: 16px; color: #c9cad1; }
+      .an2-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .an2-col { padding: 0 12px; border-left: 1px solid rgba(255, 255, 255, 0.1); min-width: 0; }
+      .an2-col:first-child { padding-left: 0; border-left: none; }
+      .an2-col .k { font-size: 13px; color: #9a9ba3; }
+      .an2-col .v { font-family: var(--f-head); font-weight: 700; font-size: 32px; line-height: 1.15; white-space: nowrap; }
+      .an2-col .v small { font-family: var(--f-body); font-weight: 400; font-size: 14px; color: #9a9ba3; margin-left: 4px; }
+      .an2-col.warn .v, .an2-col.warn .v small { color: #ffb340; }
+      .an2-note { margin: 0; font-size: 14px; line-height: 21px; color: #9a9ba3; }
+      .an2-sec { padding: 28px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; gap: 24px; }
+      .an2-sec > h3 { margin: 0; font-size: 18px; font-weight: 600; }
+      .an2-blk { display: flex; flex-direction: column; gap: 10px; }
+      .an2-blk .h { display: flex; align-items: center; gap: 10px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #9a9ba3; }
+      .an2-blk .h i { width: 10px; height: 10px; border-radius: 50%; background: #64a8ff; display: block; }
+      .an2-blk.bad .h { color: #ffb340; } .an2-blk.bad .h i { background: #ffb340; } .an2-blk.bad b { color: #ffb340; }
+      .an2-blk.next .h { color: #e0bf6a; } .an2-blk.next .h i { background: #e0bf6a; }
+      .an2-blk p { margin: 0; font-size: 16px; line-height: 24px; }
+      .an2-blk b { font-family: var(--f-head); font-size: 20px; margin-right: 4px; }
+      .an2-prop .t { margin: 0; font-size: 18px; line-height: 26px; font-weight: 500; }
+      .an2-prop .t small { display: block; font-size: 14px; color: #9a9ba3; font-weight: 400; }
+      .an2 .btns { display: flex; gap: 12px; }
+      .an2-btn { all: unset; box-sizing: border-box; flex: 1; min-height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: #1f2330; font-size: 16px; font-weight: 600; cursor: pointer; color: #f5f5f7; text-align: center; }
+      .an2-btn.gold { background: #e0bf6a; color: #16181a; }
+      .an2-btn:disabled { opacity: 0.5; cursor: default; }
+      .an2-link { all: unset; align-self: center; min-height: 44px; padding: 0 16px; display: flex; align-items: center; justify-content: center; color: #9a9ba3; font-size: 16px; cursor: pointer; width: 100%; box-sizing: border-box; }
+      .an2-details { padding: 12px 0; gap: 0; }
+      .an2-dt { border-top: 1px solid rgba(255, 255, 255, 0.07); }
+      .an2-dt:first-child { border-top: none; }
+      .an2-dt summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 68px; padding: 10px 0; color: #9a9ba3; }
+      .an2-dt summary::-webkit-details-marker { display: none; }
+      .an2-dt summary b { display: block; font-size: 17px; font-weight: 600; color: #f5f5f7; }
+      .an2-dt summary small { display: block; font-size: 14px; margin-top: 2px; }
+      .an2-dt[open] summary svg { transform: rotate(180deg); }
+      .an2-dt .body { padding: 0 0 12px; }
+      .an2-lr { display: grid; grid-template-columns: 32px 1fr 64px 52px; gap: 0 12px; align-items: center; min-height: 52px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+      .an2-lr.hd { border-top: none; min-height: 32px; font-size: 13px; color: #9a9ba3; }
+      .an2-lr b { font-family: var(--f-head); font-size: 22px; }
+      .an2-lr .n { text-align: right; font-family: var(--f-head); font-weight: 700; font-size: 22px; }
+      .an2-lr.hd .n { font-family: var(--f-body); font-size: 13px; font-weight: 400; }
+      .an2-lr .h { text-align: right; font-size: 16px; color: #c9cad1; }
+      .an2-lr.hd .h { font-size: 13px; color: #9a9ba3; }
+      .an2-lr .ok { color: #9cc7ff; font-size: 15px; }
+      .an2-lr .bad, .an2-lr .n.bad { color: #ffb340; }
+      .an2-lr span.bad { font-size: 15px; }
+      .an2-z { display: grid; grid-template-columns: 32px 1fr 52px; gap: 12px; align-items: center; min-height: 36px; font-size: 14px; color: #9a9ba3; }
+      .an2-z div { height: 12px; border-radius: 6px; background: #161922; }
+      .an2-z i { display: block; height: 100%; border-radius: 6px; }
+      .an2-z .n { text-align: right; font-size: 15px; color: #c9cad1; }
+      .an2-dr { display: grid; grid-template-columns: 1fr auto auto; gap: 0 20px; align-items: center; min-height: 52px; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 16px; }
+      .an2-dr .m { color: #9a9ba3; } .an2-dr b { font-weight: 600; } .an2-dr b.bad { color: #ffb340; }
+      .an2-wk { margin: 28px 0 12px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #9a9ba3; font-weight: 500; }
+      .an2-row { all: unset; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: 52px 1fr 18px; gap: 16px; align-items: center; min-height: 80px; padding: 14px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; color: #f5f5f7; }
+      .an2-row .d { text-align: center; }
+      .an2-row .d small { display: block; font-size: 13px; color: #9a9ba3; }
+      .an2-row .d b { font-family: var(--f-head); font-size: 28px; line-height: 1.1; }
+      .an2-row .t > span { display: block; font-size: 17px; font-weight: 600; line-height: 24px; }
+      .an2-row .t i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+      .an2-row .t small { display: block; font-size: 14px; color: #9a9ba3; margin-top: 2px; }
+      .an2-row svg { color: #9a9ba3; }
+      .an2-trend { padding: 28px 0 8px; display: flex; flex-direction: column; gap: 10px; }
+      .an2-trend .big { display: flex; align-items: baseline; gap: 10px; }
+      .an2-trend .big b { font-family: var(--f-head); font-size: 52px; line-height: 1; }
+      .an2-trend .big small { font-size: 16px; color: #9a9ba3; }
+      .an2-trend p { margin: 0; font-size: 16px; line-height: 24px; color: #c9cad1; }
+      .an2-ct { display: flex; flex-direction: column; }
+      .an2-cr { display: grid; grid-template-columns: 1fr 76px 76px; gap: 0 12px; align-items: center; min-height: 56px; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 16px; }
+      .an2-cr.hd { border-top: none; min-height: 36px; font-size: 14px; }
+      .an2-cr > span { color: #c9cad1; }
+      .an2-cr b { text-align: right; font-family: var(--f-head); font-size: 24px; }
+      .an2-cr.hd b { font-family: var(--f-body); font-size: 14px; }
+      .an2-cr .p { color: #c9cad1; }
+      .an2-ir { display: grid; grid-template-columns: 32px 1fr 1fr 64px; gap: 0 12px; align-items: center; min-height: 52px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+      .an2-ir.hd { border-top: none; min-height: 32px; font-size: 13px; color: #9a9ba3; }
+      .an2-ir b { font-family: var(--f-head); font-size: 22px; }
+      .an2-ir span { text-align: right; font-family: var(--f-head); font-weight: 700; font-size: 22px; }
+      .an2-ir.hd span { font-family: var(--f-body); font-size: 13px; font-weight: 400; }
+      .an2-ir .p { color: #c9cad1; }
+      .an2-ir em { font-style: normal; text-align: right; font-size: 15px; color: #c9cad1; }
+      /* Diagramm */
+      .an2-chart { display: flex; flex-direction: column; gap: 16px; --ph: 240px; }
+      .an2-ctl { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; position: relative; z-index: 10; }
+      .an2-dd { position: relative; flex: 1 1 0; min-width: 0; }
+      .an2-dd > button { all: unset; box-sizing: border-box; width: 100%; min-height: 56px; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-radius: 14px; background: #161922; cursor: pointer; color: #9a9ba3; }
+      .an2-dd > button span { min-width: 0; }
+      .an2-dd > button small { display: block; font-size: 12px; }
+      .an2-dd > button b { display: block; font-size: 16px; font-weight: 600; color: #f5f5f7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .an2-list { position: absolute; top: 62px; left: 0; width: 240px; max-width: 90vw; padding: 6px; border-radius: 16px; background: #232736; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6); z-index: 20; }
+      .an2-list.lap { left: auto; right: 0; }
+      .an2-list[hidden] { display: none; }
+      .an2-list button { all: unset; box-sizing: border-box; width: 100%; min-height: 48px; padding: 0 12px; display: flex; align-items: center; gap: 10px; border-radius: 10px; font-size: 16px; cursor: pointer; color: #f5f5f7; }
+      .an2-list button[aria-selected="true"] { background: rgba(255, 255, 255, 0.08); }
+      .an2-list button i { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+      .an2-list button span { flex: 1; }
+      .an2-list button em { font-style: normal; font-size: 13px; color: #e0bf6a; }
+      .an2-list button small { font-size: 14px; color: #9a9ba3; }
+      .an2-zoom { display: none; gap: 4px; }
+      .an2-zoom button { all: unset; box-sizing: border-box; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #161922; font-size: 22px; cursor: pointer; color: #f5f5f7; }
+      .an2-zoom .w { width: auto; min-width: 56px; padding: 0 12px; font-size: 14px; font-weight: 600; }
+      .an2-zoom button:disabled { opacity: 0.4; cursor: default; }
+      @media (min-width: 900px), (orientation: landscape) and (max-height: 520px) { .an2-zoom { display: flex; } }
+      @media (min-width: 900px) { .an2-chart { --ph: 320px; } }
+      @media (orientation: landscape) and (max-height: 520px) { .an2-chart { --ph: min(200px, 42vh); } .an2 { max-width: none; } }
+      .an2-read { min-height: 20px; font-size: 14px; color: #c9cad1; }
+      .an2-plotbox { position: relative; height: calc(var(--ph) + 26px); }
+      .an2-yl { position: absolute; top: 0; width: 38px; height: var(--ph); font-size: 11px; line-height: 12px; }
+      .an2-yl.l { left: 0; } .an2-yl.r { right: 0; color: #ff8a84; }
+      .an2-yl span { position: absolute; transform: translateY(-50%); }
+      .an2-yl.l span { right: 6px; } .an2-yl.r span { left: 6px; }
+      .an2-plot { position: absolute; left: 38px; right: 38px; top: 0; height: var(--ph); overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: crosshair; }
+      .an2-plot > .g { position: absolute; left: 0; right: 0; height: 1px; background: rgba(255, 255, 255, 0.08); pointer-events: none; }
+      .an2-plot .band { position: absolute; top: 0; bottom: 0; background: rgba(255, 255, 255, 0.05); pointer-events: none; }
+      .an2-plot .band.on { background: rgba(255, 255, 255, 0.14); box-shadow: inset 0 0 0 1.5px #e0bf6a; }
+      .an2-plot .band span { position: absolute; top: 4px; left: 0; right: 0; text-align: center; font-size: 11px; font-weight: 600; color: #c9cad1; }
+      .an2-plot .bar { position: absolute; padding: 0 8%; box-sizing: border-box; pointer-events: none; }
+      .an2-plot .bar i { display: block; width: 100%; height: 100%; border-radius: 4px; }
+      .an2-plot .bar i.ok { background: #64a8ff; } .an2-plot .bar i.bad { background: #ffb340; }
+      .an2-plot .bar span { position: absolute; left: 0; right: 0; text-align: center; font-size: 12px; font-weight: 600; }
+      .an2-plot .bar span.ok { color: #9cc7ff; } .an2-plot .bar span.bad { color: #ffb340; }
+      .an2-plot svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+      .an2-plot .sel { position: absolute; top: 0; bottom: 0; background: rgba(224, 191, 106, 0.16); border-left: 2px solid #e0bf6a; border-right: 2px solid #e0bf6a; box-sizing: border-box; pointer-events: none; }
+      .an2-plot .cross { position: absolute; top: 0; bottom: 0; width: 1px; background: #f5f5f7; opacity: 0.8; pointer-events: none; }
+      .an2-plot [hidden] { display: none; }
+      .an2-xl { position: absolute; left: 38px; right: 38px; top: calc(var(--ph) + 6px); height: 14px; }
+      .an2-xl span { position: absolute; transform: translateX(-50%); font-size: 11px; line-height: 14px; color: #9a9ba3; white-space: nowrap; }
+      .an2-leg { display: flex; gap: 18px; font-size: 13px; color: #c9cad1; }
+      .an2-leg span { display: inline-flex; align-items: center; gap: 8px; }
+      .an2-leg i { width: 18px; height: 3px; border-radius: 2px; display: block; }
+      .an2-leg i.d { height: 0; border-top: 3px dashed #f5f5f7; background: none; }
+      .an2-rng { display: flex; flex-direction: column; gap: 12px; }
+      .an2-cells { display: grid; gap: 14px 12px; }
+      .an2-cells.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .an2-cells.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .an2-cells > div { border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 10px; min-width: 0; }
+      .an2-cells small { display: block; font-size: 13px; color: #9a9ba3; white-space: nowrap; min-height: 16px; }
+      .an2-cells b { display: block; font-family: var(--f-head); font-size: 28px; line-height: 1.1; margin-top: 2px; white-space: nowrap; }
       #msub .mi.sub { padding-left: 44px; }
       .s7-an-txt { display: grid; gap: 4px; margin-top: 6px; }
       .s7-an {
@@ -14505,7 +14640,9 @@
       import { analyseSession } from "./src/analyse.js";
       import { sessionDash, compareToPrev, splitPhases, phaseStats, workDash, sourceInfo, dashSections } from "./src/session-dash.js";
       import { reviewAll, keyLine } from "./src/dash-all.js";
-      import { dashV3, dashV3Html, anCardHtml, actHeaderHtml } from "./src/dash-v3.js";
+      import { dashV3, dashV3Html, anCardHtml, actHeaderHtml, intervalPlan } from "./src/dash-v3.js";
+      import { anHead, anResultHtml, anCoachHtml, anProposalHtml, anDetailsHtml, anListHtml, anTrendHtml, anCmpBody, anChartData, anChartHtml, attachAnChart } from "./src/an-ui.js";
+      import { seriesOf as anSeriesOf, zoneTimes as anZoneTimes } from "./src/series.js";
       import { compareSessions, pickAct } from "./src/compare.js";
       import { comparePanelHtml, attachCharts } from "./src/charts.js";
       import { alignSplits } from "./src/laps.js";
@@ -20825,6 +20962,7 @@
       const PSES = {},
         cmpTab = {};
       attachCharts();
+      attachAnChart();
       async function loadPartnerSession(iso) {
         /* Nur Testkopie (dev/seeds.js setzt TL_PARTNER_DEMO): Demo-Partnerdaten statt Supabase */
         const demo = window.TL_PARTNER_DEMO && window.TL_PARTNER_DEMO[iso];
@@ -20957,7 +21095,7 @@
           .join("");
         const cmp = { tabs: "", panel: "", hint: "", on: false };
         if (cmp.on) return `<section class="s7-an" aria-label="Vergleich"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${cmp.tabs}${cmp.panel}</section>`;
-        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${parts}${anChart(i, p)}${!rec || busy ? body : ""}${acts}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}${cmp.hint}</section>`;
+        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${parts}${!rec || busy ? body : ""}${acts}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}${cmp.hint}</section>`;
       }
       /* Letzte gleiche Einheit mit Uhr-Daten: erst gleiche Art UND gleicher Plantitel, sonst gleiche Art. -> {i, act, rpe, same} oder null */
       function s7Prev(i, p, group) {
@@ -21045,7 +21183,7 @@
           if (kind === "kraft" && !act) srcHtml = `<div class="dsrc"><div class="dsh"><b>Kraft wird nicht mit der Uhr getrackt</b></div><ul><li class="ok"><span>Es gibt keine Uhr-Daten, das ist so gewollt.</span></li></ul></div>`;
           else srcHtml = srcOf(act);
           const warn = wd && wd.warn ? `<p class="dwarn">${esc(wd.warn)}</p>` : "";
-          return { dash: `<div class="an-dash">${srcHtml}${warn}${dashV3Html(d, esc)}</div>`, an: d.an, act };
+          return { dash: `<div class="an-dash">${srcHtml}${warn}${dashV3Html(d, esc)}</div>`, an: d.an, act, d, ph: W && W.ph, maxHr };
         };
         const blocks = [];
         blocks.push({ ...block(main, p, true), planned: true });
@@ -21227,7 +21365,7 @@
         const goal = `<section class="s6-card s6-goal"><span class="s6-kick">Ziel</span><b class="s7-gb">&lt; 60:00</b><span class="s7-gd">Sa 13.02.2027</span><span class="s7-gs">HYROX Basel · Doubles Men PRO mit ${esc(PARTNER)}</span></section>`;
         return `${intro}<div class="s6 s6-today">${head}${rail}<div class="s6-main">${hero}${more}${hintsHtml}</div><div class="s6-side">${goal}${s7Ready(i)}${ciHtml}</div></div>`;
       }
-      /* ---- Analyse-Bereich (Menü): Heute, Verlauf, Vergleich ---- */
+      /* ---- Analyse-Bereich (Menü): Heute, Verlauf, Vergleich. Aufbau nach dem Entwurf, Bausteine in src/an-ui.js ---- */
       let anSel = null, anKeep = false; // anSel: null = heute
       function anFinished(i) {
         const p = dayPlan(i), dk = keyI(i);
@@ -21236,24 +21374,67 @@
         return !!st.n && (st.done >= st.n || (rpe != null && st.done > 0));
       }
       const anToday = () => Math.max(0, Math.min(LAST, TODAY));
-      const anHead = (i, title) => s6Head(`${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))}${i === anToday() ? " · Heute" : ""}`, title, "");
-      /* Diagramm der eigenen Einheit (Garmin-Stil: Puls, Pace, Höhe, Kadenz, Zoom, Ausschnitt, Runden, Zonen), gleiche Technik wie im Vergleich */
-      function anChart(i, p) {
-        const mine = actsOf(i), fit = mine.filter((a) => strava.fits(p.k, a.group)), me = pickAct(fit.length ? fit : mine, "");
-        if (!me) return "";
-        const maxHr = Math.max(0, ...Object.values(S.strava.acts).map((a) => a.maxHr || 0)) || null,
-          model = { ok: true, same: false, names: { me: ME, partner: PARTNER }, tiles: [], note: "" };
-        return `<div class="an-solo"><h4>Verlauf</h4>${comparePanelHtml("an-" + keyI(i), model, esc, { me, pa: null, steps: s7Steps(p), maxHr })}</div>`;
+      const anPlain = (msg) => `<p class="an2-empty">${msg}</p>`;
+      const anKick = (i) => `${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))}${i === anToday() ? " · Heute" : ""}`;
+      /* Intervalle (1-km-Runden der Arbeitsphasen) mit Zeitbereich, Pace, Puls und Abweichung vom Ziel */
+      function anIntervals(ph, plan) {
+        const out = [];
+        if (!ph || !ph.laps) return out;
+        let t = 0;
+        ph.laps.forEach((l, k) => {
+          const t0 = t;
+          t += l.t;
+          if (ph.phase[k] === "work" && (ph.sub[k] || "run") === "run" && l.d >= 100) {
+            const n = out.length, row = plan && plan.rows[n];
+            out.push({ k: n + 1, t0, t1: t, pace: l.t / (l.d / 1000), hr: l.hr || null, diff: row ? row.diff : null });
+          }
+        });
+        return out;
       }
-      const anPlain = (msg) => `<p class="an-empty">${msg}</p>`;
+      const anMeta = (act) => (act ? [act.time ? Math.round(act.time / 60) + " min" : "", act.dist ? (act.dist / 1000).toFixed(1).replace(".", ",") + " km" : ""].filter(Boolean).join(" · ") : "");
+      function anBody(i, p) {
+        const dk = keyI(i), rec = S.analysis[dk], busy = !!anBusy[dk], stale = !!rec && rec.sig !== s7AnSig(i, p);
+        let blocks = [];
+        try { blocks = s7DashParts(i, p, rec && !busy ? rec.data : null); } catch (e) {}
+        const b = blocks.find((x) => x.planned) || blocks[0];
+        if (!b || !b.d) return anPlain("Für diese Einheit gibt es noch keine Auswertung.");
+        const { d, act, ph, maxHr } = b, ivs = anIntervals(ph, d.plan), cd = act ? anChartData(act, ivs) : null;
+        const R = rec && !busy ? rec.data : null;
+        let prop = "";
+        if (R && R.actions && R.actions.length) {
+          const { valid } = coachCheck(R.actions);
+          if (valid.length && rec.state === "open") prop = anProposalHtml(valid.map((a) => ({ text: propText(a), why: a.reason || "" })), i, valid.some((a) => a.type === "edit"), esc);
+          else if (rec.state === "applied") prop = `<p class="an2-note">Planänderung übernommen.</p>`;
+        }
+        const zones = act && act.series ? anZoneTimes(anSeriesOf(act), maxHr) : null;
+        return anResultHtml({ kind: S6_KIND[p.k] || p.k, color: `var(--${p.k})`, meta: anMeta(act), title: s7Title(p.t), d }, esc)
+          + (cd ? `<section class="an2-sec" aria-label="Verlauf"><h3>Verlauf</h3>${anChartHtml("an-" + dk, cd, { me: ME, pa: PARTNER })}</section>` : "")
+          + anCoachHtml(d.an, esc)
+          + (R && R.summary ? `<p class="an2-note" style="padding:0 0 24px">${esc(R.summary)}</p>` : "")
+          + prop
+          + anDetailsHtml({ d, ivs, zones, maxHr }, esc)
+          + `<div class="an2-sec"><button type="button" class="an2-btn" data-act="an-run" data-i="${i}"${busy ? " disabled" : ""}>${busy ? "Coach liest die Einheit …" : !rec ? "Coach-Analyse starten" : stale ? "Neu analysieren" : "Nochmals analysieren"}</button>${anErr[dk] ? `<p class="an2-note">${esc(anErr[dk])}</p>` : ""}${stale ? `<p class="an2-note">Seit der Analyse haben sich Werte oder Uhr-Daten geändert.</p>` : ""}</div>`;
+      }
       function anTabView() {
         const today = anToday(), i = anSel != null ? anSel : today, p = dayPlan(i), dk = keyI(i);
         let body;
         if (!p || p.k === "rest") body = anPlain(i === today ? "Heute ist Ruhetag, es gibt nichts auszuwerten." : "An diesem Tag war Ruhetag.");
-        else if (anFinished(i) || S.analysis[dk] || actsOf(i).length) body = `<article class="s6-hero s7-fin" data-day="${i}" style="--kc:var(--${p.k})"><div class="s6-hero-top"><span class="s6-chip"><i style="background:var(--${p.k})"></i>${S6_KIND[p.k] || p.k}</span></div><h2 class="s6-title">${esc(s7Title(p.t))}</h2><div class="s6-title-d"><h1>${esc(s7Title(p.t))}</h1></div>${s7AnHtml(i, p)}</article>`;
+        else if (anFinished(i) || S.analysis[dk] || actsOf(i).length) body = anBody(i, p);
         else body = anPlain(i === today ? "Die heutige Einheit ist noch nicht erledigt. Sobald du sie abschliesst, findest du hier die Analyse." : "Zu diesem Tag gibt es keine Analyse.");
-        const back = i !== today ? `<button type="button" class="s6-btn" data-act="an-pick" data-i="${today}">Zurück zu heute</button>` : "";
-        return `<div class="s6">${anHead(i, "Analyse")}<div class="s6-main">${body}${back}</div></div>`;
+        const back = i !== today ? `<button type="button" class="an2-link" data-act="an-pick" data-i="${today}">Zurück zu heute</button>` : "";
+        return `<div class="an2">${anHead(anKick(i), "Analyse")}${body}${back}</div>`;
+      }
+      function anTrend(today) {
+        const pts = [];
+        for (let x = today; x >= 0 && pts.length < 5; x--) {
+          const q = dayPlan(x);
+          if (!q || q.k !== "lauf" || !anFinished(x)) continue;
+          const a = actsOf(x).find((y) => strava.fits(q.k, y.group) && y.laps && y.laps.length);
+          if (!a) continue;
+          const w = s7Work(q, a), pc = w && w.st.work && w.st.work.pace;
+          if (pc && ["sure", "likely"].includes(w.ph.conf)) pts.push({ pc });
+        }
+        return pts.reverse();
       }
       function anVerlaufView() {
         const today = anToday(), rows = [];
@@ -21262,24 +21443,37 @@
           if (!q || q.k === "rest" || !(x === today || anFinished(x) || S.analysis[keyI(x)])) continue;
           const w = Math.floor(x / 7) + 1, last = rows[rows.length - 1];
           if (!last || last.w !== w) rows.push({ w });
-          rows.push({ x, q, w });
+          rows.push({ x, dow: DAYS[dow(x)], day: dateFromIdx(x).getDate(), color: `var(--${q.k})`, title: s7Title(q.t), sub: S.analysis[keyI(x)] ? "Coach-Analyse vorhanden" : S6_KIND[q.k] || q.k, today: x === today });
           n++;
         }
-        const arrow = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
-        const list = rows.map((r) => r.q
-          ? `<button type="button" class="an-row" data-act="an-pick" data-i="${r.x}" data-go="analysis"><span class="d"><small>${DAYS[dow(r.x)]}</small><b>${dateFromIdx(r.x).getDate()}</b></span><span class="t"><i style="background:var(--${r.q.k})"></i>${esc(s7Title(r.q.t))}<small>${r.x === today ? "Heute · " : ""}${S.analysis[keyI(r.x)] ? "Coach-Analyse vorhanden" : S6_KIND[r.q.k] || r.q.k}</small></span>${arrow}</button>`
-          : `<h3 class="an-wk">Woche ${r.w}</h3>`).join("");
-        return `<div class="s6">${s6Head("Alle Einheiten", "Verlauf", "")}<div class="s6-main">${list || anPlain("Noch keine abgeschlossene Einheit.")}</div></div>`;
+        let trend = "";
+        try { trend = anTrendHtml(anTrend(today)); } catch (e) {}
+        return `<div class="an2">${anHead("Verlauf · Woche " + (Math.floor(today / 7) + 1), "Analyse")}${trend}<div class="an2-list-wrap">${rows.length ? anListHtml(rows, esc) : anPlain("Noch keine abgeschlossene Einheit.")}</div></div>`;
       }
       function anCmpView() {
-        const today = anToday(), i = anSel != null ? anSel : today, p = dayPlan(i);
+        const today = anToday(), i = anSel != null ? anSel : today, p = dayPlan(i), kick = "Vergleich mit " + esc(PARTNER);
         let body = anPlain("An diesem Tag gibt es keine Einheit zum Vergleichen.");
         if (p && p.k !== "rest") {
           cmpTab[keyI(i)] = "cmp";
-          const c = s7CmpParts(i, p);
-          body = c.panel || c.hint || anPlain("Der Vergleich mit " + esc(PARTNER) + " lädt.");
+          const c = s7CmpParts(i, p), e = PSES[isoI(i)], mine = actsOf(i), fit = mine.filter((a) => strava.fits(p.k, a.group)), me = pickAct(fit.length ? fit : mine, ""),
+            pa = e && e.state === "ok" && e.acts.length && me ? pickAct(e.acts, me.group) : null;
+          if (!me || !pa) body = c.hint || anPlain("Der Vergleich mit " + esc(PARTNER) + " lädt.");
+          else {
+            const planText = (p.i || []).find((t) => dash.parseReps(t)) || "", Wm = s7Work(p, me), Wp = s7Work(p, pa);
+            const pm = intervalPlan(Wm.ph, planText), pp = intervalPlan(Wp.ph, planText), im = anIntervals(Wm.ph, pm), ip = anIntervals(Wp.ph, pp);
+            const wk = (W) => (W.st && W.st.work) || {}, dr = (W) => (W.st && W.st.drift ? sg(W.st.drift.bpm) : "–");
+            const rows = [
+              { k: "Im Ziel", me: pm ? pm.hit + " von " + pm.n : "–", pa: pp ? pp.hit + " von " + pp.n : "–" },
+              { k: "Pace Arbeit", me: wk(Wm).pace ? mmss(wk(Wm).pace) : "–", pa: wk(Wp).pace ? mmss(wk(Wp).pace) : "–" },
+              { k: "Puls Ø Arbeit", me: wk(Wm).hr || "–", pa: wk(Wp).hr || "–" },
+              { k: "Puls-Drift", me: dr(Wm), pa: dr(Wp) },
+            ];
+            const pairs = im.map((v, k) => ({ k: v.k, me: mmss(v.pace), pa: ip[k] ? mmss(ip[k].pace) : "–", d: ip[k] ? sg(Math.round(v.pace - ip[k].pace)) + " s" : "–" }));
+            const cd = anChartData(me, im, pa);
+            body = anCmpBody({ names: { me: ME, pa: PARTNER }, kind: S6_KIND[p.k] || p.k, color: `var(--${p.k})`, day: shortDay(i), title: s7Title(p.t), rows, pairs, chart: cd ? anChartHtml("anc-" + keyI(i), cd, { me: ME, pa: PARTNER }) : "" }, esc);
+          }
         }
-        return `<div class="s6">${anHead(i, "Vergleich mit " + esc(PARTNER))}<div class="s6-main"><section class="s7-an">${body}</section><button type="button" class="s6-btn" data-v="analysisv">Andere Einheit wählen</button></div></div>`;
+        return `<div class="an2">${anHead(kick, "Analyse")}${body}<div class="an2-sec" style="border:none"><button type="button" class="an2-btn" data-v="analysisv">Andere Einheit wählen</button></div></div>`;
       }
       /* ---- Woche ---- */
       function s6RunKm(w) {

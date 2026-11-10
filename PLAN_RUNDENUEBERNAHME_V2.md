@@ -12,8 +12,13 @@ Stand 10.11.2026. Nur Plan, kein Code. Ergänzt `PLAN_GARMIN_RUNDEN.md` (18.10.,
 | `alignFuzzy` | Zeit-DP, aber nur wenn `|Runden − Schritte| ≤ 3` und Kosten ≤ 0,4·n | Grenzen hart, gilt laut Kommentar „nicht für das Eintragen“ |
 | `segmentRuns` | Pace-Schwelle ref·1,12 für Intervalle | eine schwache Runde reisst die Kette ab |
 
-Folge (aus dem Code abgeleitet, noch nicht an echten Daten belegt): Es gibt ein Alles-oder-nichts-Verhalten. Passt die Rundenzahl knapp nicht, kommt „von Hand eintragen“ (index.html:22719). `strava-take` (index.html:24507) hakt zudem alle Zeilen ab, nicht nur die gelaufenen.
-`PLAN_GARMIN_RUNDEN.md` nennt ausserdem: Runden werden nur für `run, row, ride, ski` geholt, HIIT/Indoor-Cardio (Gruppe `strength`) bekommt keine.
+Folge: Alles-oder-nichts. Passt die Rundenzahl nicht, kommt „von Hand eintragen“ (index.html:22719), und die Analyse hat keine Daten. `strava-take` (index.html:24507) hakt zudem alle Zeilen ab, nicht nur die gelaufenen.
+
+**Befund nach Jaimes Antworten (10.11.)**: «Keine Zuordnung, vor allem bei vielen Runden; bei jedem Wechsel Runde gedrückt; Auto-Lap an; Profil: unbenanntes Cardio-Profil „Hyrox“.»
+- **Wahrscheinliche Hauptursache:** `alignFuzzy` bricht bei `|Runden − Schritte| > 3` mit `null` ab. Auto-Lap plus Doppeldrücker plus Pausenrunden überschreiten das bei langen Einheiten fast immer. Je mehr Runden, desto sicherer null. Passt zu deiner Beobachtung, ist aber noch nicht an einer echten Aktivität bestätigt.
+- **Zweite Ursache:** `normalizeLaps` (supabase/functions/garmin/reduce.js:39) schneidet bei 80 Runden ab. Lange Hyrox-Einheiten mit Auto-Lap können darüber liegen, dann fehlt das Ende.
+- **Widerlegt:** Die Annahme aus dem Altplan, HIIT/Cardio bekomme keine Runden. Der Abruf in `index.ts:169` filtert nicht nach Gruppe, Cardio-Profile (`hyrox`, `indoor_cardio`) werden erkannt. Dieser Punkt entfällt aus dem Plan.
+- **Ungeklärt:** Cardio-Profile liefern oft keine Distanz (`d = 0`). Dann fällt die Typ-Erkennung per Pace aus, und es bleibt nur die Dauer als Signal.
 
 ## 2. Ansatz: ein Verfahren statt drei
 
@@ -21,13 +26,14 @@ Kein GitHub-Projekt kopieren. Ehrlich: Ich kenne keine Bibliothek, die genau „
 
 Neuer Kern `alignLaps(laps, steps) → {pairs, quality, notes}`:
 
-1. **Vorbereiten**: Fehldrücker < 15 s mit Nachbarn verschmelzen, Auto-Lap-Muster (viele ~1000 m) erkennen.
+1. **Vorbereiten**: Fehldrücker < 15 s mit Nachbarn verschmelzen. **Auto-Lap-Runden erkennen und rausrechnen**: Eine Runde ~1000 m (±15 m) die *direkt auf eine Runde im selben Segment folgt* ohne Pause dazwischen, wird mit dem Rest des Segments zusammengefasst. Dadurch entspricht ein 3-km-Lauf wieder einem Schritt.
 2. **Kosten** je Paar Schritt/Runde aus drei Signalen: Typ (Lauf/Station/Pause über Distanz+Pace), Dauer gegen Planziel (log-Abstand), Distanz gegen Plan (bei Läufen).
-3. **DP mit Operationen**: 1:1, Runde auslassen (Zusatzdruck), Schritt auslassen (nicht gelappt), 2 Runden zu 1 Schritt, 1 Runde zu 2 Schritten (Lauf+Station zusammen, dann kein Einzelwert). **Keine harte Obergrenze** der Rundenzahldifferenz mehr; stattdessen Kosten.
+3. **DP mit Operationen**: 1:1, Runde auslassen (Zusatzdruck), Schritt auslassen (nicht gelappt), **beliebig viele Runden zu 1 Schritt** (nicht nur 2), 1 Runde zu 2 Schritten (Lauf+Station zusammen, dann kein Einzelwert). **Keine harte Obergrenze** der Rundenzahldifferenz mehr (bisher 3); stattdessen Kosten. Rechenaufwand bei 80 Runden × 40 Schritten unproblematisch.
+3a. **Anker-Strategie bei vielen Runden**: Erst die auffälligsten Runden fest zuordnen (längste Lauf-Runden, Stationen mit klarer Dauer), dann den Rest dazwischen. Das hält die Zuordnung auch bei 60+ Runden stabil.
 4. **Güte 0–1** = Anteil sauber zugeordneter Arbeitsschritte. Ab 0,6 automatisch übernehmen, darunter Vorschau mit Hinweis. Nie raten: nicht zugeordnete Schritte bleiben leer und offen.
 5. `alignSplits`/`alignFuzzy` bleiben als Wrapper (alle bestehenden Aufrufer und Tests laufen weiter), die Logik liegt nur noch im neuen Kern.
 
-Zusätzlich (aus dem Altplan, getrennt umsetzbar): Garmin-Edge-Function holt Runden auch für HIIT/Indoor-Cardio; Teil-Abhaken nur für tatsächlich gelaufene Zeilen; Vorschau-Karte vor dem Übernehmen.
+Zusätzlich (aus dem Altplan, getrennt umsetzbar): Teil-Abhaken nur für tatsächlich gelaufene Zeilen; Vorschau-Karte vor dem Übernehmen; Rundenlimit in `normalizeLaps` von 80 auf 200 anheben.
 
 ## 3. Sessions
 
@@ -56,7 +62,7 @@ Regel: **Aufpasser (Opus)** schreibt nie Produktivcode, **Macher (Sonnet)** schr
 ### S4 – Macher (Sonnet): Anbindung
 - `strava-take`: nur zugeordnete Zeilen abhaken, Wert „3 von 4 Runden“ bei Teilerfolg.
 - Vorschau-Karte vor dem Übernehmen (Häkchen änderbar, „Nur Gesamtzeit“).
-- Edge Function `garmin`: `withLaps` auch für HIIT/Indoor-Cardio (Limit 15 bleibt).
+- `normalizeLaps`: Limit 80 → 200 (Edge Function neu deployen, Jaime muss das auslösen).
 - Service-Worker-Version erhöhen (wie bei den letzten Commits).
 
 ### S5 – Aufpasser (Opus), blind: Endabnahme
@@ -85,9 +91,10 @@ Regel: **Aufpasser (Opus)** schreibt nie Produktivcode, **Macher (Sonnet)** schr
 3. Die Plan-Struktur (Schritte mit Ziel) ist verlässlich, das Problem liegt bei den Uhr-Runden.
 4. Sonnet-Sessions dürfen auf den Branch `claude/garmin-rundenuebernahme-fix-1sj1qc` pushen, PR erst nach S5.
 
-## 6. Offene Fragen (Antworten ändern den Plan)
+## 6. Offene Fragen (Stand nach Antworten)
 
-1. **Kannst du 2–3 echte Aktivitäten liefern**, bei denen es falsch lief (Export oder Datum, dann hole ich sie)? Das ist der wichtigste Punkt: Ohne echte Daten optimiere ich Annahmen.
-2. Was ist das **falsche Ergebnis konkret**: keine Zuordnung, falsche Zeile, falsche Zeiten, oder alles abgehakt?
-3. Drückst du **Runde bei jedem Wechsel** oder hast du Auto-Lap an? Das bestimmt, wie viel Toleranz der Algorithmus braucht.
-4. Welches **Uhrenprofil** nutzt du für Zirkel (Laufen, HIIT, Indoor Cardio)?
+Beantwortet: Fehlerbild (keine Zuordnung bei vielen Runden), Runde bei jedem Wechsel, Auto-Lap an (Laufen), Profil «Hyrox» (Cardio).
+
+1. **Ist Auto-Lap auch im Profil „Hyrox“ an**, oder nur im Lauf-Profil? Wenn ja, mit welcher Distanz/Zeit?
+2. **Eine echte Aktivität, bei der es nicht klappte** (Datum reicht, ich hole die Runden). Damit wird die Ursache bestätigt statt vermutet. Ohne sie baut S1 synthetische Testfälle.
+3. Schalten wir Auto-Lap im Hyrox-Profil trotzdem aus (einfachste Abhilfe), oder soll die App damit klarkommen? Plan geht von «App kommt klar» aus.

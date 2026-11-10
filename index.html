@@ -14500,6 +14500,7 @@
       import { fmtLine, lineSlots } from "./src/workout-fmt.js";
       import { normTime } from "./src/timeinput.js";
       import { repSummary, watchCheck, alignFuzzy } from "./src/laps.js";
+      import { alignLaps } from "./src/align.js";
       import { planSteps } from "./src/garmin-workout.js";
       import {
         flatten,
@@ -15094,7 +15095,7 @@
           const sp = w.splits;
           if (sp.state === "ok") {
             const wr = S.wsplit[dk] === a.id;
-            row(wr ? "ok" : "wait", `Splits: ${sp.got} von ${sp.total} Schritten mit Uhrzeit${wr ? " – im Plan eingetragen" : " – werden beim Übernehmen eingetragen"}`);
+            row(wr ? "ok" : "wait", `Splits: ${sp.got} von ${sp.total} Schritten mit Uhrzeit${sp.tail ? `, Aufzeichnung ${sp.tail} Schritte vor Plan-Ende beendet` : ""}${sp.unsure ? `, ${sp.unsure} nicht sicher zuordenbar (bleiben leer, bitte von Hand prüfen)` : ""}${wr ? " – im Plan eingetragen" : " – werden beim Übernehmen eingetragen"}`);
           } else if (sp.state === "bad")
             row("bad", `Splits nicht zuordenbar: Uhr ${sp.count} Runden, Plan ${sp.total} Arbeitsschritte. Zeiten von Hand eintragen.`);
           else row("none", "Splits: keine Runden, nichts zuzuordnen");
@@ -22688,6 +22689,9 @@
           if (!a.laps || !a.laps.length) continue;
           const r = alignSplits(a.laps, steps);
           if (r.times) return { ...r, act: a };
+          // Rückfall bei fehlenden/doppelten Runden oder Absturz: nur eindeutig zugeordnete Schritte übernehmen, der Rest bleibt leer
+          const dp = alignLaps(a.laps, steps);
+          if (dp && dp.sure.some((x) => x)) return { ...dp, times: dp.times.map((t, k) => (dp.sure[k] ? t : null)), act: a };
         }
         return null;
       }

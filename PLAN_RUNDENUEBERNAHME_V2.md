@@ -121,6 +121,14 @@ Regel: **Aufpasser (Opus)** schreibt nie Produktivcode, **Macher (Sonnet)** schr
 - **Fall heute:** Lauf mit 4×100 m Strides und 1 km, danach Absturz. Das ist ein **Lauf-Profil** (Auto-Lap an), kein Hyrox-Stationstag. Damit geht der Pfad über `segmentRuns`/`splitPhases` «plan-intervals», nicht über Stationsschritte. Kurze 100-m-Runden plus Auto-Lap plus unvollständiges Ende sind eine eigene Fehlerquelle, die S0 mitspezifizieren muss.
 - **Vorschau bestätigt:** Bei Unsicherheit Vorschau zum Bestätigen. Ziel bleibt, dass sie fast nie nötig ist.
 
+## 6b. Gebaut (Macher, 10.11.) – noch ohne Aufpasser-Review
+
+- `src/align.js` (`alignLaps`): DP-Zuordnung mit fehlenden/doppelten/zusätzlichen Runden, Absturz-Ende («nicht aufgezeichnet», unvollständige letzte Runde), Distanz als Typ-Beleg, Eindeutigkeitsprüfung je Schritt. Rückfall nach `alignSplits`/`alignFuzzy`, bestehendes Verhalten unverändert.
+- «Sicher» nur bei lückenlosem Anfang, klarer Passung und Abstand zur besten Alternative; ein zweifelhafter Schritt macht alles danach unsicher. Zusammengefasste Runden sind nie sicher.
+- `splitPhases`: **keine Tempo-Schätzung mehr bei Stationstagen**. `watchCheck`/Zeitübernahme: nur sichere Schritte werden eingetragen, der Rest bleibt leer.
+- Zufallstest (500 Läufe im Test, 20 000 einmalig): keine als «sicher» gemeldete Zuordnung auf der Runde eines anderen Schritts. Einschränkung: Die Testdaten sind synthetisch.
+- **Noch offen:** Vorschau-Karte zum Bestätigen, Lauf-Profil mit Strides (parseReps/segmentRuns), echte Daten, Aufpasser-Review (S3).
+
 ## 7. Offene Fragen (alt)
 
 Beantwortet: Fehlerbild (keine Zuordnung bei vielen Runden), Runde bei jedem Wechsel, Auto-Lap an (Laufen), Profil «Hyrox» (Cardio).

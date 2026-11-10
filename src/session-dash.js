@@ -2,6 +2,7 @@
 // Reine Funktionen ohne DOM; die Anzeige steht in index.html (s7DashHtml). Der Fliesstext der Analyse bleibt darunter.
 import { paceOf, intervals, parseReps } from "./dashboard.js";
 import { alignSplits, alignFuzzy } from "./laps.js";
+import { alignLaps } from "./align.js";
 import { mmss } from "./util.js";
 
 const hms = (s) => (s >= 3600 ? Math.floor(s / 3600) + ":" + String(Math.floor((s % 3600) / 60)).padStart(2, "0") + " h" : mmss(s) + " min");
@@ -144,9 +145,12 @@ export function splitPhases(laps, { steps = null, planText = "" } = {}) {
   if (steps && steps.length) {
     let r = alignSplits(L, steps);
     if (!r.times) { const fz = alignFuzzy(L, steps); if (fz) r = fz; }
+    if (!r.times) { const dp = alignLaps(L, steps); if (dp) r = dp; }
     if (!r.times) {
-      // Keine Zuordnung zum Plan: nicht aufgeben, sondern nach Tempo schätzen und das offen sagen
+      // Keine Zuordnung zum Plan. Bei Stationstagen wird NICHT nach Tempo geschätzt (Stationen haben kein Tempo): nur belegte Gesamtwerte.
       stepNote = `Die ${r.count} Runden der Uhr passen nicht zu den ${steps.length} Plan-Schritten.`;
+      out.note = stepNote + " Keine Schätzung: Splits und Vergleiche werden nur bei sicherer Zuordnung gezeigt.";
+      return out;
     } else {
       const LL = r.merged || L;
       if (r.merged) { out.laps = LL; out.phase = LL.map(() => "other"); out.step = LL.map(() => null); out.sub = LL.map(() => null); }
@@ -159,8 +163,10 @@ export function splitPhases(laps, { steps = null, planText = "" } = {}) {
       });
       if (r.mode === "alt") for (let i = 1; i < r.count; i += 2) if (out.phase[i] === "other" && out.step[i] == null) out.phase[i] = "rest";
       out.mode = r.mode;
-      out.conf = r.mode === "alt" || r.mode === "fuzzy" ? "likely" : "sure";
-      out.note = r.mode === "fuzzy"
+      out.conf = r.mode === "dp" ? (r.quality === 1 && !r.incomplete ? "sure" : "likely") : r.mode === "alt" || r.mode === "fuzzy" ? "likely" : "sure";
+      out.note = r.mode === "dp"
+        ? `${r.count} Runden der Uhr, ${steps.length} Plan-Schritte: ${r.tail ? `Aufzeichnung endet ${r.tail} Schritt${r.tail > 1 ? "e" : ""} vor dem Plan-Ende${r.incomplete != null ? " (letzter Schritt unvollständig, nicht gewertet)" : ""}; ` : ""}nach Abfolge und Zeit zugeordnet${r.quality === 1 ? "" : ", einzelne Schritte nicht sicher"}.`
+        : r.mode === "fuzzy"
         ? `${r.count} Runden der Uhr, ${steps.length} Plan-Schritte: nach Zeit zugeordnet${r.merges ? `, ${r.merges} Doppelrunde${r.merges > 1 ? "n" : ""} zusammengefasst` : ""}${r.skipped ? `, ${r.skipped} überzählige Runde${r.skipped > 1 ? "n" : ""} ausgelassen` : ""} – nicht einzeln bestätigt.`
         : r.mode === "alt" ? "Arbeit und Pause wechseln sich in den Runden ab – so zugeordnet, nicht einzeln bestätigt." : r.mode === "work" ? "Pausen wurden an der Uhr nicht gelappt; Arbeitsrunden direkt zugeordnet." : "";
       return out;

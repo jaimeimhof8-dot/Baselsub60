@@ -112,16 +112,21 @@ test("workDash: höchstens 6 Hauptkennzahlen, Gesamtwerte klein beschriftet, jed
   assert.equal(d.warn, "");
 });
 
-test("splitPhases: passt die Rundenzahl nicht zum Plan, wird nach Tempo geschätzt und das offen gesagt", () => {
+test("splitPhases: Aufzeichnung endet früher (Absturz): vorhandene Schritte zugeordnet, Rest als nicht aufgezeichnet", () => {
   const ph = splitPhases(LAPS.slice(0, 12), { steps: SP });
-  assert.equal(ph.conf, "unsure", "keine Zuordnung zum Plan: nur geschätzt");
-  assert.match(ph.note, /passen nicht/);
-  assert.match(ph.note, /Tempo geschätzt/);
+  assert.equal(ph.mode, "dp");
+  assert.equal(ph.conf, "sure");
+  assert.match(ph.note, /endet 3 Schritte vor dem Plan-Ende/);
   const st = phaseStats(ph, { steps: SP });
-  assert.ok(st.work, "Arbeitswerte gibt es trotzdem");
-  const d = workDash(st);
-  assert.ok(d.warn);
-  assert.ok(d.totals.includes("Ø Puls"), "Gesamtwerte bleiben sichtbar");
+  assert.ok(st.work, "Arbeitswerte der vorhandenen Schritte");
+});
+
+test("splitPhases: passt nichts zum Plan, wird NICHT nach Tempo geschätzt (keine Arbeitswerte aus Vermutungen)", () => {
+  const ph = splitPhases([{ d: 8000, t: 2400, hr: 150 }, { d: 1000, t: 300, hr: 150 }], { steps: SP });
+  assert.equal(ph.conf, "none");
+  assert.match(ph.note, /passen nicht/);
+  assert.match(ph.note, /Keine Schätzung/);
+  assert.ok(ph.phase.every((p) => p === "other"), "keine Phase geraten");
 });
 
 test("splitPhases: 13 Runden der Uhr zu 12 Plan-Schritten -> nach Zeit zugeordnet (Doppelrunde zusammengefasst)", () => {

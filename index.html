@@ -15118,7 +15118,8 @@
           else row("none", "Splits: keine Runden, nichts zuzuordnen");
         }
         const lt = isPlan ? lauftagFor(i, a) : null;
-        if (lt) {
+        if (lt && lt.none) row("bad", lt.wait ? "Runden werden noch geholt – bitte nach dem nächsten Garmin-Abruf übernehmen" : "Zuordnung: Die Uhr-Runden passen nicht sicher zum Plan. Zeilen bitte von Hand wählen.");
+        else if (lt) {
           const names = (dayPlan(i).i || []).map((t) => String(t).split(/\s[@(]/)[0].split(" → ").pop().replace(/\s\d.*$/, "").trim() || "Zeile");
           row(lt.lines.every((L) => L.done) ? "ok" : "wait", "Zuordnung: " + lt.lines.map((L) => `${names[L.j] || "Zeile " + (L.j + 1)} ${L.done ? "✓" : L.got ? L.got + "/" + L.of : "✗"}`).join(" · ") + (lt.tail ? " – Aufzeichnung endet früher als der Plan" : ""));
         }
@@ -15174,11 +15175,11 @@
           any = had.some(Boolean),
           carried = new Set((S.later[dk] || {}).j || []), // Übungen, die auf morgen verschoben sind, nicht vorauswählen
           lt = lauftagFor(i, planAct(i)),
-          ltLine = (j) => (lt ? lt.lines.find((L) => L.j === j) : null);
+          ltLine = (j) => (lt && lt.lines ? lt.lines.find((L) => L.j === j) : null);
         return `<div class="take" data-take="${i}"><div class="sub">Was hast du gemacht?</div>${p.i
           .map(
             (t, j) =>
-              `<label class="tk"><input type="checkbox" data-tk="${j}" ${had[j] || (lt && !any ? !!(ltLine(j) && ltLine(j).done) : !any && !carried.has(j)) ? "checked" : ""}><span>${esc(t)}${ltLine(j) && !ltLine(j).done ? (ltLine(j).got ? ` <i>(laut Uhr ${ltLine(j).got} von ${ltLine(j).of} gelaufen)</i>` : " <i>(laut Uhr nicht gelaufen)</i>") : ""}</span></label>`,
+              `<label class="tk"><input type="checkbox" data-tk="${j}" ${had[j] || (lt && !any ? !!(ltLine(j) && ltLine(j).done) && !carried.has(j) : !any && !carried.has(j)) ? "checked" : ""}><span>${esc(t)}${lt && lt.none ? " <i>(Uhr nicht zuordenbar)</i>" : ltLine(j) && !ltLine(j).done ? (ltLine(j).got ? ` <i>(laut Uhr sicher erkannt: ${ltLine(j).got} von ${ltLine(j).of})</i>` : " <i>(laut Uhr nicht sicher erkennbar)</i>") : ""}</span></label>`,
           )
           .join(
             "",
@@ -15198,11 +15199,13 @@
       /* Lauftag (Einlaufen, Steigerungen, Leiter …): Runden der Uhr den Plan-Zeilen über die Strecke zuordnen. null, wenn der Plan nicht sicher lesbar ist. */
       function lauftagFor(i, a) {
         const p = dayPlan(i);
-        if (!p || p.k !== "lauf" || !a || !a.laps || !a.laps.length) return null;
+        if (!p || p.k !== "lauf" || !a) return null;
         const st = lauftagSteps(p.i);
-        if (!st) return null;
+        if (!st) return null; // Plan nicht sicher lesbar: bisheriges Verhalten
+        // Plan lesbar, aber keine (brauchbare) Zuordnung: none = true. Dann wird NICHTS vorausgewählt oder automatisch abgehakt.
+        if (!a.laps || !a.laps.length) return a.src === "garmin" && a.lapsV !== 3 ? { none: true, wait: true, lines: [] } : null;
         const r = alignLauf(a.laps, st);
-        return r && r.lines.some((l) => l.got > 0) ? r : null;
+        return r || { none: true, lines: [] };
       }
       function takeDay(i, js, silent) {
         const p = dayPlan(i),
@@ -15212,10 +15215,12 @@
         const spl = a && importWatchSplits(i); // Stationstag: Rundenzeiten der Uhr in die Planzeilen
         const lt = lauftagFor(i, a); // Lauftag: nur wirklich gelaufene Zeilen, Zeiten aus den Runden
         let msg = `${js.length === p.i.length ? "Workout erledigt" : `${js.length} von ${p.i.length} Übungen erledigt`}${a ? " – von " + srcName(a) + " übernommen" : ""}`;
-        if (a && lt) {
-          // Zeiten je Zeile, vorhandene Handeinträge bleiben unberührt (auch bei nicht abgehakten, teilweisen Zeilen wie «2 von 5»)
+        if (a && lt && lt.none) {
+          msg = `${js.length} von ${p.i.length} Zeilen abgehakt – die Uhr-Runden passen nicht sicher zum Plan, keine Zeiten übernommen`;
+        } else if (a && lt) {
+          // Zeiten je Zeile (abgehakte und teilweise gelaufene Zeilen wie «2 von 5»), vorhandene Handeinträge bleiben unberührt
           lt.lines.forEach((L) => {
-            if (L.text && !String(S.val[dk + "|" + L.j] || "").trim()) S.val[dk + "|" + L.j] = L.text;
+            if (L.text && (js.includes(L.j) || (L.got > 0 && !L.done)) && !String(S.val[dk + "|" + L.j] || "").trim()) S.val[dk + "|" + L.j] = L.text;
           });
           const part = lt.lines.filter((L) => L.got > 0 && !L.done).length;
           msg = `${js.length} von ${p.i.length} Zeilen abgehakt, Zeiten aus den Runden${part ? ` (${part} teilweise gelaufen)` : ""}`;
@@ -15281,8 +15286,8 @@
           if (!a || !ingest.matchKind(a, p)) continue;
           const lt = lauftagFor(i, a);
           // Lauftag mit erkannten Runden: nur vollständig gelaufene Zeilen abhaken (sonst bleibt der Tag zur Auswahl offen)
-          const js = lt ? lt.lines.filter((L) => L.done).map((L) => L.j) : p.i.map((_, j) => j);
-          if (lt && !js.length) continue;
+          const js = lt ? (lt.lines || []).filter((L) => L.done).map((L) => L.j) : p.i.map((_, j) => j);
+          if (lt && !js.length) continue; // Lauftag ohne sichere Zuordnung: nichts automatisch abhaken, der Nutzer wählt
           takeDay(i, js, true);
           n++;
         }

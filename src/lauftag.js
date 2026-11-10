@@ -22,9 +22,11 @@ export function lauftagSteps(lines) {
       tok = tok.trim().replace(/\.$/, "");
       let m;
       if ((m = tok.match(EZ))) {
+        if (tok.slice(m[0].length).trim()) return null; // Rest der Zeile nicht erkannt: nichts raten
         const dist = meters(m[2], m[3]);
         steps.push({ kind: m[1] === "Einlaufen" ? "warm" : "cool", dist, goal: goalOf(dist, m[4], m[5], m[6], m[7]), line: j, label: `${m[1]} ${label(dist)}` });
       } else if ((m = tok.match(STRIDE))) {
+        if (tok.slice(m[0].length).trim()) return null;
         const dist = meters(m[2], "m"), goal = goalOf(dist, m[3], m[4], m[5], m[6]);
         for (let k = 1; k <= +m[1]; k++) {
           steps.push({ kind: "run", dist, goal, line: j, label: `Steigerung ${k}` });
@@ -41,12 +43,17 @@ export function lauftagSteps(lines) {
         // Es darf nichts Unerkanntes übrig bleiben (sonst wäre die Zuordnung geraten)
         const rest = head.replace(RUN, "").replace(/^\d{1,2}×/, "").replace(/[\s,;]+/g, "");
         if (rest) return null;
-        const list = reps && runs.length === 1 ? Array.from({ length: +reps[1] }, () => runs[0]) : runs;
-        const gaps = trab ? (trab[1] ? +trab[1] : 1) : 0;
+        if (reps && runs.length > 1) return null; // «N×» zusammen mit mehreren Strecken: Aufbau unklar
+        const list = reps ? Array.from({ length: +reps[1] }, () => runs[0]) : runs;
+        // Pausen zwischen den Wiederholungen: ohne Anzahl gilt «überall», eine abweichende Anzahl ist unklar
+        if (trab && trab[1] && +trab[1] !== list.length - 1) return null;
         list.forEach((r, k) => {
           const dist = meters(r[1], r[2]);
           steps.push({ kind: "run", dist, goal: goalOf(dist, r[3], r[4], r[5], r[6]), line: j, label: label(dist) });
-          if (trab && k < list.length - 1 && k < gaps) steps.push({ kind: "rest", dist: meters(trab[2], "m"), goal: goalOf(meters(trab[2], "m"), trab[3], trab[4]), line: j, label: "Trabpause" });
+          if (k < list.length - 1) {
+            if (trab) steps.push({ kind: "rest", dist: meters(trab[2], "m"), goal: goalOf(meters(trab[2], "m"), trab[3], trab[4]), line: j, label: "Trabpause" });
+            else if (reps) steps.push({ kind: "rest", dist, goal: 0, line: j, label: "Rückweg", soft: true }); // Wiederholungen ohne Pausenangabe: Rückweg angenommen
+          }
         });
       }
     }
@@ -102,11 +109,16 @@ export function alignLauf(laps, steps) {
   }
   const got = match.map((x, k) => (x.lap ? k : -1)).filter((k) => k >= 0);
   if (!got.some((k) => !isRest(k))) return null;
-  if (f[n][m] / got.length > 0.6) return null; // schlechte Gesamtpassung: nichts raten
   const last = got[got.length - 1], tail = n - 1 - last;
+  if ((f[n][m] - 0.15 * tail) / got.length > 0.6) return null; // schlechte Gesamtpassung: nichts raten (nicht aufgezeichnete Schlussschritte zählen nicht)
   const lastLap = match[last].lap[1];
   // Sicherheit: nur bei Strecke (GPS), Einzelrunde, Strecke ≤ 15 % daneben und lückenlosem Anfang (sonst könnte die Reihenfolge verschoben sein)
-  let rigid = hasDist;
+  // hard: grosse Unstimmigkeit (Reihenfolge der langen Schritte unsicher), gilt für den Rest der Einheit.
+  // softLine: Zweifel an einem kurzen Schritt (Steigerung, Rückweg), gilt nur bis zum Ende dieser Plan-Zeile: Die Strecken der langen Schritte
+  // (600/1000/1400 m) unterscheiden sich klar von 100 m, ein zweifelhafter Lauf von 100 m kann sie nicht verschieben.
+  let hard = hasDist, softLine = null;
+  const rigidNow = () => hard && softLine === null;
+  const doubt = (st) => { if (st.dist <= 200) softLine = st.line; else hard = false; };
   const used = new Set();
   match.forEach((x) => x.lap && x.lap[0] <= x.lap[1] && [...Array(x.lap[1] - x.lap[0] + 1).keys()].forEach((q) => used.add(x.lap[0] + q)));
   // Toleranz der Strecke: höchstens 30 % des kleinsten Nachbarschritts (sonst wäre «Schritt + Nachbar in einer Runde» nicht auszuschliessen)
@@ -117,19 +129,25 @@ export function alignLauf(laps, steps) {
   };
   for (let k = 0; k < n; k++) {
     const x = match[k], s = steps[k];
-    if (!x.lap) { if (k < last && !isRest(k)) rigid = false; continue; }
+    if (softLine !== null && s.line !== softLine) softLine = null;
+    if (!x.lap) { if (k < last && !isRest(k)) doubt(s); continue; }
     const t = pre[x.lap[1] + 1] - pre[x.lap[0]], d = dpre[x.lap[1] + 1] - dpre[x.lap[0]];
     x.t = Math.round(t); x.d = Math.round(d);
-    for (let q = 0; q < x.lap[0]; q++) if (!used.has(q) && (T[q].d >= 60 || T[q].t >= 60)) rigid = false;
+    for (let q = 0; q < x.lap[0]; q++) if (!used.has(q) && (T[q].d >= 60 || T[q].t >= 60)) hard = false;
     const dd = s.dist > 0 && d >= 20 ? Math.abs(Math.log(d / s.dist)) : 9;
     // Kurze Strecken: GPS-Fehler ist absolut (±10–25 m), darum grosszügiger. Die Zeit muss ausserdem zum Planziel passen (sonst ist es eine andere Runde, z. B. der Trab zurück).
     const tt = s.goal > 0 ? Math.abs(Math.log(t / s.goal)) : 0;
-    x.sure = rigid && !x.pair && x.lap[0] === x.lap[1] && !s.soft && !isRest(k) && dd <= tol(k) && tt <= 0.5;
+    // Zeit muss zum Ziel passen. Kurze Läufe (Steigerungen): Tempo höchstens 35 % langsamer als geplant, sonst ist es der Trab zurück.
+    // Lange Läufe: ±22 %. Ein- und Auslaufen (locker, unterschiedlich schnell): ±65 %.
+    const timeOk = s.goal <= 0 ? true : s.kind === "run" ? (s.dist <= 200 ? t / (d / 1000) <= 1.35 * (s.goal / (s.dist / 1000)) : tt <= 0.2) : tt <= 0.5;
+    // Zu kurze Runde (Strecke deutlich unter Plan) ist vermutlich nur ein Teil des Schritts (Doppeldruck): dort enger als bei zu langer Strecke (GPS)
+    const under = s.dist > 0 && d > 0 && Math.log(d / s.dist) < -0.12;
+    x.sure = rigidNow() && !x.pair && x.lap[0] === x.lap[1] && !s.soft && !isRest(k) && dd <= tol(k) && !under && timeOk;
     // Ein zweifelhaft zugeordneter Schritt (Strecke oder Zeit passt nicht) kann die Reihenfolge verschoben haben: alles danach ist nicht mehr sicher.
     // Sammelrunden (pair) sind davon ausgenommen: Ihre Gesamtstrecke bestätigt die Reihenfolge.
-    if (!x.pair && !isRest(k) && !x.sure) rigid = false;
+    if (!x.pair && !isRest(k) && !x.sure) doubt(s);
     // Pause mit stark abweichender Strecke: vermutlich mehrere Schritte in einer Runde (mehrere Drücker vergessen)
-    if (isRest(k) && !x.pair && dd > 0.5) rigid = false;
+    if (isRest(k) && !x.pair && dd > 0.5) { if (s.soft) softLine = s.line; else hard = false; }
   }
   // Sammelrunde «Steigerung + Rückweg»: nur als gelaufen gewertet, wenn sie deutlich schneller ist als die Rückwege dieser Einheit
   // (sonst könnte es auch «Rückweg + Rückweg» sein, wenn eine Steigerung fehlt)

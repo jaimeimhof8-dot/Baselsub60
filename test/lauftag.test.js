@@ -87,3 +87,40 @@ test("Zufallstest Lauftag: nie «sicher» auf fremder Runde (600 Läufe)", () =>
   }
   assert.ok(sureCount > 1000, "zu wenig Abdeckung: " + sureCount);
 });
+
+// ---- Review-Befunde (Opus, blind) ----
+test("Review H1: Rückweg (34 s) wird nicht als vierte Steigerung gezählt, Zeile nicht erledigt", () => {
+  const st = lauftagSteps(LINES);
+  const laps = [{ d: 1000, t: 330 }, { d: 100, t: 21 }, { d: 100, t: 34 }, { d: 100, t: 21 }, { d: 100, t: 34 }, { d: 100, t: 21 }, { d: 100, t: 34 },
+    { d: 600, t: 147 }, { d: 200, t: 78 }, { d: 1000, t: 245 }, { d: 200, t: 78 }, { d: 1400, t: 343 }, { d: 200, t: 78 }, { d: 1000, t: 245 }, { d: 200, t: 78 }, { d: 600, t: 147 }, { d: 800, t: 264 }];
+  const r = alignLauf(laps, st);
+  assert.ok(r);
+  assert.equal(r.lines[1].done, false, "nur 3 Steigerungen gelaufen");
+  assert.ok(!/0:34/.test(r.lines[1].text), "der Rückweg steht nicht als Steigerungszeit da");
+  assert.equal(r.lines[2].done, true, "die Leiter wurde komplett gelaufen");
+});
+test("Review H2: «3×200 m» ohne Pausenangabe bekommt Rückwege; 2 von 3 gelaufen = nicht erledigt", () => {
+  const P = lauftagSteps(["4 km Zone 2 @ 5:20/km (21:20) → 3×200 m @ 4:00/km (0:48)"]);
+  assert.ok(P);
+  assert.equal(P.filter((s) => s.kind === "run").length, 4);
+  assert.equal(P.filter((s) => s.kind === "rest").length, 2);
+  const r = alignLauf([{ d: 4000, t: 1280 }, { d: 200, t: 48 }, { d: 200, t: 75 }, { d: 200, t: 48 }], P);
+  assert.ok(r);
+  assert.equal(r.lines[0].done, false);
+});
+test("Review H4: Abbruch nach dem Einlaufen liefert eine Zuordnung (Einlaufen erledigt, Rest nicht)", () => {
+  const r = alignLauf([{ d: 1000, t: 330 }], lauftagSteps(LINES));
+  assert.ok(r);
+  assert.equal(r.lines[0].done, true);
+  assert.equal(r.lines[1].done, false);
+  assert.equal(r.lines[2].got, 0);
+});
+test("Review M1–M3: Parser liest nichts, was er nicht versteht", () => {
+  assert.equal(lauftagSteps(["Einlaufen 15 min locker"]), null);
+  assert.equal(lauftagSteps(["Einlaufen 2 km locker + 4 Steigerungen"]), null);
+  assert.equal(lauftagSteps(["Auslaufen 1 km @ 5:30/km (5:30), danach 3×100 m Steigerungen"]), null);
+  assert.equal(lauftagSteps(["2×2 km @ 4:00/km (8:00), 1 km @ 3:50/km (3:50)"]), null);
+  assert.equal(lauftagSteps(["4×1 km @ 4:00/km (4:00), Trabpause 2×200 m @ 6:30/km (1:18)"]), null);
+  const ok = lauftagSteps(["3×1 km @ 4:00/km (4:00), Trabpause 200 m @ 6:30/km (1:18)"]);
+  assert.equal(ok.filter((s) => s.kind === "rest").length, 2, "ohne Anzahl: Pause zwischen allen Wiederholungen");
+});

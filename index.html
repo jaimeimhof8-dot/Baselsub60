@@ -33,6 +33,9 @@
     />
     <!-- defer: Splash-Screen erscheint sofort, Skripte laufen danach in dieser Reihenfolge -->
     <script src="config.js" defer></script>
+    <!-- uPlot 1.6.31 (MIT), lokal unter vendor/uplot, damit die PWA offline läuft: Diagramme im Tab «Vergleich» -->
+    <link rel="stylesheet" href="vendor/uplot/uPlot.min.css" />
+    <script src="vendor/uplot/uPlot.iife.min.js" defer></script>
     <script
       src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"
       integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o"
@@ -13037,6 +13040,89 @@
       .v3-tag { flex: none; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--well); box-shadow: var(--edge); color: var(--muted); }
       .v3-tag.x { color: var(--accent); }
       .v3-empty { margin: 0; font-size: 14px; color: var(--muted); }
+      /* Tab «Vergleich»: Tab-Leiste, Kacheln, Diagramm (src/charts.js). Keine Ampelfarben: Ich = Gold, Partner = Blau, dazu Linienart und Markierung. */
+      .cmp-tabs { display: flex; gap: 4px; margin: var(--s3) 0; padding: 4px; border-radius: 999px; background: var(--well); box-shadow: var(--edge); }
+      .cmp-tabs button { all: unset; box-sizing: border-box; flex: 1; text-align: center; min-height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; }
+      .cmp-tabs button.on { background: rgba(255, 255, 255, 0.12); color: var(--text); }
+      .cmp-tabs button:focus-visible, .cmp-m:focus-visible, .cmp-lg:focus-visible, .cmp-plot:focus-visible { outline: 2px solid #e6b94d; outline-offset: 2px; }
+      .cmp-hint, .cmp-sub, .cmp-note { margin: var(--s3) 0 0; font-size: 13px; line-height: 19px; color: var(--muted); }
+      .cmp { display: grid; gap: var(--s3); margin-top: var(--s3); }
+      .cmp-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+      .cmp-tile { display: grid; gap: 4px; padding: 12px; border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); min-width: 0; }
+      .cmp-tile .k, .cmp-tip b { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .cmp-v { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+      .cmp-v small { font-size: 12px; color: var(--muted); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .cmp-v b { font-family: var(--f-head); font-size: 18px; font-variant-numeric: tabular-nums; color: var(--text); }
+      .cmp-v em { font-style: normal; font-size: 12px; color: var(--muted); }
+      .cmp-d { font-size: 12px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 4px; }
+      .cmp-sw { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; align-self: center; }
+      .cmp-sw.me { background: #e6b94d; }
+      .cmp-sw.partner { background: #6aa9ff; border-radius: 2px; }
+      .cmp-bar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; }
+      .cmp-seg, .cmp-leg { display: flex; gap: 4px; flex-wrap: wrap; }
+      .cmp-m, .cmp-lg { all: unset; box-sizing: border-box; cursor: pointer; min-height: 40px; padding: 0 14px; display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); background: var(--well); box-shadow: var(--edge); }
+      .cmp-m.on { color: var(--text); background: rgba(255, 255, 255, 0.14); }
+      .cmp-lg { color: var(--text); }
+      .cmp-lg.off { color: var(--muted); text-decoration: line-through; }
+      .cmp-lg.off .cmp-sw { opacity: 0.35; }
+      .cmp-plot { position: relative; border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); padding: 6px; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+      .cmp-svg { display: block; width: 100%; height: auto; }
+      .cmp-grid { stroke: rgba(255, 255, 255, 0.09); stroke-width: 1; }
+      .cmp-ax { font-size: 12px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+      .cmp-empty { font-size: 14px; fill: var(--muted); }
+      .cmp-xh { stroke: rgba(255, 255, 255, 0.55); stroke-width: 1; stroke-dasharray: 3 3; }
+      .cmp-tip { position: absolute; top: 10px; z-index: 2; display: grid; gap: 3px; min-width: 128px; width: max-content; max-width: 75%; padding: 8px 10px; border-radius: 10px; background: rgba(20, 22, 30, 0.94); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), var(--edge); font-size: 13px; color: var(--text); pointer-events: none; }
+      .cmp-tip.r { transform: translateX(12px); }
+      .cmp-tip.l { transform: translateX(calc(-100% - 12px)); }
+      .cmp-tr, .cmp-td { display: flex; align-items: center; gap: 6px; }
+      .cmp-tr em, .cmp-td em { white-space: nowrap; margin-left: auto; padding-left: 10px; font-style: normal; font-weight: 700; font-variant-numeric: tabular-nums; }
+      .cmp-td { color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 3px; }
+      .cmp-tn { color: var(--muted); }
+      .cmp-none { margin: 0; padding: var(--s4) var(--s3); font-size: 14px; color: var(--muted); }
+      .cmp-live { margin: 0; height: 0; overflow: hidden; }
+
+      /* Vergleich: gestapelte uPlot-Diagramme */
+      .cmp-host { display: grid; gap: 2px; border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); padding: 6px 6px 2px; outline-offset: 2px; min-width: 0; }
+      .cmp-host:focus-visible, .cmp-m:focus-visible, .cmp-lg:focus-visible, .cmp-chip:focus-visible { outline: 2px solid #e6b94d; }
+      .cmp-pl { min-width: 0; }
+      .cmp-pl .u-over, .cmp-pl .u-wrap { touch-action: pan-y; }
+      .cmp-pl .u-select { background: rgba(230, 185, 77, 0.16); }
+      .cmp-pl .u-cursor-x, .cmp-pl .u-cursor-y { border-color: rgba(255, 255, 255, 0.55) !important; }
+      .cmp-ph { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 4px 0 54px; min-height: 26px; flex-wrap: wrap; }
+      .cmp-ph > b { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .cmp-pv { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--text); font-variant-numeric: tabular-nums; }
+      .cmp-pv b { font-family: var(--f-head); font-size: 16px; margin-right: 6px; }
+      .cmp-pv small { color: var(--muted); font-size: 11px; }
+      .cmp-read { display: grid; gap: 6px; padding: 10px 12px; border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); }
+      .cmp-rh { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+      .cmp-rh b { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
+      .cmp-rr { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; }
+      .cmp-rr > span { display: inline-flex; flex-direction: column; min-width: 54px; }
+      .cmp-rr small, .cmp-who { font-size: 11px; color: var(--muted); }
+      .cmp-rr > span b { font-family: var(--f-head); font-size: 17px; font-variant-numeric: tabular-nums; }
+      .cmp-who { flex-direction: row !important; align-items: center; gap: 6px; min-width: 70px !important; font-size: 13px; color: var(--text); }
+      .cmp-zoom { display: flex; gap: 4px; }
+      .cmp-m.sm { min-height: 34px; padding: 0 12px; font-size: 13px; }
+      .cmp-dmbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+      .cmp-dmbar .k, .cmp-laps .k { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .cmp-hintx { margin: 0; font-size: 12px; color: var(--muted); }
+      .cmp-laps { display: grid; gap: 6px; }
+      .cmp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+      .cmp-chip { all: unset; box-sizing: border-box; cursor: pointer; min-width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--well); box-shadow: var(--edge); font-family: var(--f-head); font-size: 16px; color: var(--text); }
+      .cmp-chip.on { background: rgba(230, 185, 77, 0.2); color: #e6b94d; }
+      .cmp-lt caption { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding-bottom: 4px; }
+      .cmp-lt td .cmp-sw { margin-right: 6px; }
+      .cmp-lt .na { color: var(--muted); }
+      .cmp-zinfo:empty { display: none; }
+      .cmp-zinfo { display: grid; gap: 8px; padding: 10px 12px; border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); font-size: 12px; color: var(--muted); }
+      .cmp-zl { display: grid; gap: 2px; }
+      .cmp-zl b { font-size: 13px; color: var(--text); }
+      .cmp-zt { display: grid; gap: 6px; }
+      .cmp-zr { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+      .cmp-zr > span { display: inline-flex; flex-direction: column; min-width: 40px; }
+      .cmp-zr small { font-size: 11px; color: var(--muted); }
+      .cmp-zr > span b { font-family: var(--f-head); font-size: 15px; color: var(--text); font-variant-numeric: tabular-nums; }
+      @media (prefers-reduced-motion: no-preference) { .cmp-tip { animation: cmpfade 0.12s ease-out; } @keyframes cmpfade { from { opacity: 0; } } }
       .s7-an-tg.more { margin-top: 10px; font-size: 14px; }
       .s7-an-txt { display: grid; gap: 4px; margin-top: 6px; }
       .s7-an {
@@ -14393,6 +14479,8 @@
       import { sessionDash, compareToPrev, splitPhases, phaseStats, workDash, sourceInfo, dashSections } from "./src/session-dash.js";
       import { reviewAll, keyLine } from "./src/dash-all.js";
       import { dashV3, dashV3Html, anCardHtml, actHeaderHtml } from "./src/dash-v3.js";
+      import { compareSessions, pickAct } from "./src/compare.js";
+      import { comparePanelHtml, attachCharts } from "./src/charts.js";
       import { alignSplits } from "./src/laps.js";
       import {
         extractTests,
@@ -20651,6 +20739,63 @@
         plan: "Plan",
         recovery: "Erholung",
       };
+      /* Tab «Vergleich» (Plan docs/plan-vergleich-tab.md): Einheit des Partners für genau diesen Tag über partner_session(date).
+         PSES[iso] = {state: "busy"|"ok"|"err", acts: [...], at}. Ohne Cloud-Login oder ohne Daten gibt es nur einen ruhigen Hinweis, nie erfundene Zahlen. */
+      const PSES = {},
+        cmpTab = {};
+      attachCharts();
+      async function loadPartnerSession(iso) {
+        /* Nur Testkopie (dev/seeds.js setzt TL_PARTNER_DEMO): Demo-Partnerdaten statt Supabase */
+        const demo = window.TL_PARTNER_DEMO && window.TL_PARTNER_DEMO[iso];
+        if (demo) {
+          PSES[iso] = { state: "ok", acts: demo, at: Date.now(), demo: true };
+          return;
+        }
+        if (!sb || !USER) return;
+        const e = PSES[iso];
+        if (e && (e.state === "busy" || Date.now() - e.at < 3e5)) return;
+        PSES[iso] = { state: "busy", acts: e ? e.acts : [], at: Date.now() };
+        const uid = USER.id;
+        let r;
+        try {
+          r = await sb.rpc("partner_session", { p_date: iso });
+        } catch (x) {
+          r = { error: x };
+        }
+        if (!USER || USER.id !== uid) return;
+        const row = ((r && r.data) || [])[0];
+        PSES[iso] = r && r.error ? { state: "err", acts: [], at: Date.now() } : { state: "ok", acts: row && Array.isArray(row.acts) ? row.acts : [], at: Date.now() };
+        if (view === "today") render();
+      }
+      /* -> {tabs, panel, hint, on}: Tabs nur mit Partner-Daten und eigener Uhr-Aktivität; sonst ein ruhiger Hinweis mit konkretem Grund */
+      function s7CmpParts(i, p) {
+        const dk = keyI(i),
+          iso = isoI(i),
+          mine = actsOf(i),
+          fit = mine.filter((a) => strava.fits(p.k, a.group)),
+          me = pickAct(fit.length ? fit : mine, ""),
+          out = { tabs: "", panel: "", hint: "", on: false };
+        if (!me) return out; /* ohne eigene Uhr-Aktivität gibt es nichts zu vergleichen (z. B. Kraft) */
+        loadPartnerSession(iso);
+        const e = PSES[iso];
+        const why = !sb || !USER ? "Der Vergleich braucht die Cloud-Anmeldung." : !e || e.state === "busy" ? "" : e.state === "err" ? "Der Abruf hat nicht geklappt." : `${PARTNER} hat an diesem Tag keine Uhr-Aktivität geteilt.`;
+        if (!e || (e.state !== "ok" && e.state !== "busy") || !e.acts.length) {
+          out.hint = why ? `<p class="cmp-hint">Vergleich mit ${esc(PARTNER)}: keine Daten, Grund: ${esc(why)}</p>` : "";
+          return out;
+        }
+        const paAct = pickAct(e.acts, me.group),
+          maxHr = Math.max(0, ...Object.values(S.strava.acts).map((a) => a.maxHr || 0)) || null,
+          model = compareSessions(me, paAct, { me: ME, partner: PARTNER });
+        if (!model.ok) {
+          out.hint = `<p class="cmp-hint">Vergleich mit ${esc(PARTNER)}: keine Daten, Grund: ${esc(model.why)}</p>`;
+          return out;
+        }
+        const on = cmpTab[dk] === "cmp";
+        out.on = on;
+        out.tabs = `<div class="cmp-tabs" role="tablist" aria-label="Ansicht">${[["an", "Auswertung"], ["cmp", "Vergleich"]].map(([t, l]) => `<button type="button" role="tab" id="cmptab-${t}-${i}" aria-selected="${(t === "cmp") === on}" class="${(t === "cmp") === on ? "on" : ""}" data-act="cmp-tab" data-i="${i}" data-t="${t}">${l}</button>`).join("")}</div>`;
+        if (on) out.panel = `<div role="tabpanel" aria-labelledby="cmptab-cmp-${i}"><p class="cmp-sub">${e.demo ? "<b>DEMO-DATEN (Testkopie)</b> · " : ""}${esc(shortDay(i))} · ${esc(ME)} und ${esc(PARTNER)}, Zeitverlauf und Runden. Nur Zahlen, keine Wertung.</p>${comparePanelHtml(dk, model, esc, { me, pa: paAct, steps: s7Steps(p), maxHr })}</div>`;
+        return out;
+      }
       function s7AnHtml(i, p) {
         const dk = keyI(i),
           rec = S.analysis[dk],
@@ -20729,7 +20874,9 @@
             return `<div class="v3-blk-act">${b.head}${b.dash}<div class="v3-an"><span class="k">Analyse${blocks.length > 1 ? " dieser Aktivität" : ""}</span>${lines || `<p class="v3-empty">Aus den Zahlen ergibt sich nichts Auffälliges.</p>`}${coach}</div></div>`;
           })
           .join("");
-        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${parts}${!rec || busy ? body : ""}${acts}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}</section>`;
+        const cmp = s7CmpParts(i, p);
+        if (cmp.on) return `<section class="s7-an" aria-label="Vergleich"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${cmp.tabs}${cmp.panel}</section>`;
+        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${cmp.tabs}${parts}${!rec || busy ? body : ""}${acts}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}${cmp.hint}</section>`;
       }
       /* Letzte gleiche Einheit mit Uhr-Daten: erst gleiche Art UND gleicher Plantitel, sonst gleiche Art. -> {i, act, rpe, same} oder null */
       function s7Prev(i, p, group) {
@@ -23932,6 +24079,10 @@
           return leaveCheckin(t);
         }
         if (d.act === "an-run") return runAnalysis(+d.i);
+        if (d.act === "cmp-tab") {
+          cmpTab[keyI(+d.i)] = d.t === "cmp" ? "cmp" : "an";
+          return render();
+        }
         if (d.act === "an-toggle") {
           const rec = S.analysis[keyI(+d.i)];
           if (!rec) return;

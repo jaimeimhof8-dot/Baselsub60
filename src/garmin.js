@@ -83,14 +83,23 @@ export function mergeActs(store, list, minDate = "") {
     if (!a || !a.date || a.date < minDate || !relevant(a)) continue;
     // Bereits geladene Runden behalten, wenn die neue Version keine mitbringt
     // got = Zeitpunkt der ersten Übernahme (bleibt bei späteren Abrufen erhalten, für die Anzeige «Übernommen am»)
-    if (store[a.id]) { const got = store[a.id].got || a.got; store[a.id] = { ...(!a.laps && store[a.id].laps ? { ...a, laps: store[a.id].laps, lapsV: store[a.id].lapsV } : a), ...(got ? { got } : {}) }; continue; }
+    if (store[a.id]) { const got = store[a.id].got || a.got; store[a.id] = { ...(!a.laps && store[a.id].laps ? { ...a, laps: store[a.id].laps, lapsV: store[a.id].lapsV } : a), ...(!a.series && store[a.id].series ? { series: store[a.id].series } : {}), ...(got ? { got } : {}) }; continue; }
     const dups = Object.values(store).filter((x) => sameAct(x, a));
     if (dups.length && a.src !== "garmin") continue;
     for (const d of dups) delete store[d.id];
     store[a.id] = a.got ? a : { ...a, got: Date.now() };
     if (!dups.length) n++;
   }
+  trimSeries(store);
   return n;
+}
+
+/** Zeitreihen (ca. 16 KB je Aktivität) nur für die neuesten `keep` Aktivitäten behalten, ältere verlieren nur die Reihe (Runden und Kennzahlen bleiben). -> Anzahl entfernter Reihen */
+export function trimSeries(store, keep = 30) {
+  const withS = Object.values(store).filter((a) => a && a.series).sort((x, y) => String(y.start || y.date || "").localeCompare(String(x.start || x.date || "")));
+  const drop = withS.slice(keep);
+  for (const a of drop) delete a.series;
+  return drop.length;
 }
 
 /* ---------- Erholung ---------- */

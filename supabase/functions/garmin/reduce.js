@@ -97,3 +97,40 @@ export function reduceWell(raw = {}) {
   }
   return out;
 }
+
+/**
+ * Sekunden-Zeitreihe aus /activity-service/activity/{id}/details (maxChartSize ≈ 1000) auf höchstens maxN Punkte reduzieren.
+ * Kompaktes Format (Arrays statt Objekten, nur ganze Zahlen, damit plan_state klein bleibt):
+ *   {n, t: Sekunden ab Start, d: Meter, hr: bpm, v: Tempo in cm/s, el: Höhe in dm, cad: Schritte bzw. Umdrehungen/min}
+ * Alle Arrays haben n Einträge, null = Garmin hat dort nichts. Ohne verwertbare Zeitachse oder ohne jede Messreihe: null (nichts erfinden).
+ */
+export function reduceSeries(raw, maxN = 600) {
+  const desc = (raw && raw.metricDescriptors) || [], rows = (raw && raw.activityDetailMetrics) || [];
+  if (!desc.length || rows.length < 2) return null;
+  const idx = {};
+  for (const m of desc) if (m && m.key != null && Number.isInteger(m.metricsIndex)) idx[m.key] = m.metricsIndex;
+  const col = (...keys) => { for (const k of keys) if (idx[k] != null) return idx[k]; return null; };
+  const cT = col("sumDuration"), cTs = col("directTimestamp"), cD = col("sumDistance"), cHr = col("directHeartRate"), cV = col("directSpeed"), cEl = col("directElevation"), cCad = col("directDoubleCadence", "directRunCadence", "directBikeCadence");
+  const get = (r, c) => { const v = c == null || !r || !r.metrics ? null : r.metrics[c]; return typeof v === "number" && isFinite(v) ? v : null; };
+  const t0 = cT == null && cTs != null ? get(rows[0], cTs) : 0;
+  const pts = rows.map((r) => ({
+    t: cT != null ? get(r, cT) : (get(r, cTs) != null && t0 != null ? (get(r, cTs) - t0) / 1000 : null),
+    d: get(r, cD), hr: get(r, cHr), v: get(r, cV), el: get(r, cEl), cad: get(r, cCad),
+  })).filter((p) => p.t != null && p.t >= 0);
+  if (pts.length < 2) return null;
+  for (let i = 1; i < pts.length; i++) if (pts[i].t < pts[i - 1].t) return null; // Zeit muss aufsteigen
+  const step = Math.max(1, Math.ceil(pts.length / maxN)), out = { n: 0, t: [], d: [], hr: [], v: [], el: [], cad: [] };
+  const avg = (b, k) => { const x = b.map((p) => p[k]).filter((q) => q != null); return x.length ? x.reduce((s, q) => s + q, 0) / x.length : null; };
+  for (let i = 0; i < pts.length; i += step) {
+    const b = pts.slice(i, i + step), last = b[b.length - 1];
+    out.t.push(Math.round(last.t));
+    out.d.push(last.d == null ? null : Math.round(last.d));
+    out.hr.push(round(avg(b, "hr")));
+    const v = avg(b, "v"); out.v.push(v == null ? null : Math.round(v * 100));
+    const e = avg(b, "el"); out.el.push(e == null ? null : Math.round(e * 10));
+    out.cad.push(round(avg(b, "cad")));
+  }
+  out.n = out.t.length;
+  const any = ["hr", "v", "el", "cad"].some((k) => out[k].some((x) => x != null));
+  return any && out.n >= 2 ? out : null;
+}

@@ -15,7 +15,7 @@
 //       {action: "disconnect"}                   → {ok}
 //       {action: "refresh-all"} + x-cron-secret  → {refreshed, failed}
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { normalizeAct, normalizeLaps, reduceWell, relevant } from "./reduce.js";
+import { normalizeAct, normalizeLaps, reduceSeries, reduceWell, relevant } from "./reduce.js";
 import { buildWorkout } from "./workout.js";
 
 const KEY = Deno.env.get("GARMIN_TOKEN_KEY") ?? "";
@@ -171,6 +171,9 @@ async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string,
   for (let i = 0; i < withLaps.length; i += 5) {
     await Promise.all(withLaps.slice(i, i + 5).map(async (a) => {
       try { const r = await api(ctx, `/activity-service/activity/${String(a.id).slice(1)}/splits`); a.laps = normalizeLaps(r); a.lapsV = 3; }
+      catch (e) { if ((e as { code?: string }).code === "relogin") throw e; }
+      // Zeitreihe (Puls, Tempo, Höhe, Kadenz) für die Diagramme; fehlt sie, nutzt die App die Rundenwerte
+      try { const r = await api(ctx, `/activity-service/activity/${String(a.id).slice(1)}/details?maxChartSize=1000&maxPolylineSize=0`); const s = reduceSeries(r); if (s) a.series = s; }
       catch (e) { if ((e as { code?: string }).code === "relogin") throw e; }
     }));
   }

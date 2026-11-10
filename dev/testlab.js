@@ -35,6 +35,14 @@
     return st && st.merge ? Object.assign(base, st.merge) : base; // merge: Felder des Beispielstands ersetzen, z. B. {solo: {"2026-10-27": 1}}
   };
   const urlFor = (st) => "/" + (st && st.date ? "?heute=" + st.date : "");
+  // Direktlink: /?seed=vergleich&heute=2026-10-13 lädt den Beispielstand einmal und entfernt den Parameter wieder (Neuladen behält den Stand)
+  try {
+    const q = new URLSearchParams(location.search), sd = q.get("seed");
+    if (sd && window.TL_SEEDS && window.TL_SEEDS[sd]) {
+      clearHx(); localStorage.setItem(LSK, JSON.stringify(window.TL_SEEDS[sd]()));
+      q.delete("seed"); history.replaceState(null, "", location.pathname + (q.toString() ? "?" + q : "") + location.hash);
+    }
+  } catch (_) {}
   const J0 = job();
   if (J0 && J0.apply) { clearHx(); localStorage.setItem(LSK, JSON.stringify(J0.apply)); J0.apply = null; setJob(J0); }
 

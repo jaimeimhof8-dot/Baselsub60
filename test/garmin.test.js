@@ -185,3 +185,39 @@ test("mergeActs: Übernahme-Zeitpunkt (got) wird gesetzt und bei späteren Abruf
   assert.equal(store.g1.got, first);
   assert.equal(store.g1.laps.length, 1);
 });
+
+import { reduceSeries } from "../supabase/functions/garmin/reduce.js";
+test("Zeitreihe: reduziert auf höchstens maxN Punkte, ganze Zahlen, Arrays gleich lang", () => {
+  const keys = ["sumDuration", "sumDistance", "directHeartRate", "directSpeed", "directElevation", "directRunCadence"];
+  const raw = { metricDescriptors: keys.map((key, metricsIndex) => ({ key, metricsIndex })),
+    activityDetailMetrics: Array.from({ length: 1000 }, (_, i) => ({ metrics: [i, i * 3.2, 120 + (i % 50) + 0.4, 3.3, 500.26, 170.2] })) };
+  const s = reduceSeries(raw, 600);
+  assert.ok(s.n <= 600 && s.n >= 300);
+  for (const k of ["t", "d", "hr", "v", "el", "cad"]) { assert.equal(s[k].length, s.n); assert.ok(s[k].every((x) => x == null || Number.isInteger(x))); }
+  assert.equal(s.v[0], 330);
+  assert.equal(s.el[0], 5003);
+  assert.ok(s.t.every((x, i) => i === 0 || x >= s.t[i - 1]));
+});
+
+test("Zeitreihe: fehlende Messreihe bleibt null, ohne Daten oder Zeit gibt es null", () => {
+  const raw = { metricDescriptors: [{ key: "sumDuration", metricsIndex: 0 }, { key: "directHeartRate", metricsIndex: 1 }],
+    activityDetailMetrics: [{ metrics: [0, 100] }, { metrics: [1, null] }, { metrics: [2, 102] }] };
+  const s = reduceSeries(raw);
+  assert.deepEqual(s.hr, [100, null, 102]);
+  assert.deepEqual(s.v, [null, null, null]);
+  assert.equal(reduceSeries({ metricDescriptors: [{ key: "directHeartRate", metricsIndex: 0 }], activityDetailMetrics: [{ metrics: [1] }, { metrics: [2] }] }), null);
+  assert.equal(reduceSeries(null), null);
+  assert.equal(reduceSeries({ metricDescriptors: [{ key: "sumDuration", metricsIndex: 0 }], activityDetailMetrics: [{ metrics: [0] }, { metrics: [1] }] }), null);
+});
+
+import { trimSeries } from "../src/garmin.js";
+test("Zeitreihen nur für die letzten 30 Aktivitäten, Runden bleiben", () => {
+  const store = {};
+  for (let i = 0; i < 40; i++) store["g" + i] = { id: "g" + i, date: "2026-10-" + String(1 + (i % 28)).padStart(2, "0"), start: "2026-" + String(1 + Math.floor(i / 28)).padStart(2, "0") + "-" + String(1 + (i % 28)).padStart(2, "0") + "T08:00", laps: [{ d: 1000, t: 250 }], series: { n: 2, t: [0, 1] } };
+  const gone = trimSeries(store);
+  assert.equal(gone, 10);
+  assert.equal(Object.values(store).filter((a) => a.series).length, 30);
+  assert.ok(Object.values(store).every((a) => a.laps.length === 1));
+  assert.ok(store.g39.series && !store.g0.series, "neueste behalten, älteste verlieren die Reihe");
+  assert.equal(trimSeries(store), 0);
+});

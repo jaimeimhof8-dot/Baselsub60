@@ -13040,81 +13040,76 @@
       .v3-tag { flex: none; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--well); box-shadow: var(--edge); color: var(--muted); }
       .v3-tag.x { color: var(--accent); }
       .v3-empty { margin: 0; font-size: 14px; color: var(--muted); }
-      /* Tab «Vergleich»: Tab-Leiste, Kacheln, Diagramm (src/charts.js). Keine Ampelfarben: Ich = Gold, Partner = Blau, dazu Linienart und Markierung. */
-      .cmp-tabs { display: flex; gap: 4px; margin: var(--s3) 0; padding: 4px; border-radius: 999px; background: var(--well); box-shadow: var(--edge); }
-      .cmp-tabs button { all: unset; box-sizing: border-box; flex: 1; text-align: center; min-height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; }
-      .cmp-tabs button.on { background: rgba(255, 255, 255, 0.12); color: var(--text); }
-      .cmp-tabs button:focus-visible, .cmp-m:focus-visible, .cmp-lg:focus-visible, .cmp-plot:focus-visible { outline: 2px solid #e6b94d; outline-offset: 2px; }
-      .cmp-hint, .cmp-sub, .cmp-note { margin: var(--s3) 0 0; font-size: 13px; line-height: 19px; color: var(--muted); }
-      .cmp { display: grid; gap: var(--s3); margin-top: var(--s3); }
-      .cmp-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
-      .cmp-tile { display: grid; gap: 4px; padding: 12px; border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); min-width: 0; }
-      .cmp-tile .k, .cmp-tip b { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-      .cmp-v { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
-      .cmp-v small { font-size: 12px; color: var(--muted); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .cmp-v b { font-family: var(--f-head); font-size: 18px; font-variant-numeric: tabular-nums; color: var(--text); }
-      .cmp-v em { font-style: normal; font-size: 12px; color: var(--muted); }
-      .cmp-d { font-size: 12px; color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 4px; }
-      .cmp-sw { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; align-self: center; }
+      /* Tab «Vergleich»: ruhig und editorial, keine Karten. Diagramme randlos auf dem Seitenhintergrund, Haarlinien, Zahlen als Typografie, Schalter als Textumschalter. */
+      .cmp-tabs { display: flex; gap: 22px; margin: var(--s3) 0 var(--s2); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+      .cmp-tabs button { all: unset; box-sizing: border-box; min-height: 44px; display: flex; align-items: center; font-size: 15px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+      .cmp-tabs button.on { color: var(--text); border-bottom-color: #e6b94d; }
+      .cmp-tabs button:focus-visible, .cmp-m:focus-visible, .cmp-lg:focus-visible, .cmp-chip:focus-visible, .cmp-host:focus-visible { outline: 2px solid #e6b94d; outline-offset: 2px; }
+      .cmp-hint, .cmp-sub, .cmp-note, .cmp-hintx { margin: var(--s2) 0 0; font-size: 13px; line-height: 19px; color: var(--muted); }
+      .cmp-sub b { color: #e6b94d; letter-spacing: 0.06em; }
+      .cmp { display: grid; gap: var(--s4); margin-top: var(--s2); }
+      /* Kennzahlen: eine Tabelle, große Zahlen, nur Haarlinien */
+      .cmp-sheet { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+      .cmp-sheet th { font-size: 12px; font-weight: 500; color: var(--muted); text-align: left; padding: 0 0 8px; white-space: nowrap; }
+      .cmp-sheet thead th:not(:first-child) { text-align: right; padding-left: 8px; }
+      .cmp-sheet td b { white-space: nowrap; }
+      .cmp-sheet tbody th { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 12px 8px 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+      .cmp-sheet td { text-align: right; padding: 10px 0 10px 8px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+      .cmp-sheet td b { font-family: var(--f-head); font-size: 21px; font-weight: 700; color: var(--text); }
+      .cmp-sheet td.d, .cmp-sheet th.d { font-size: 12px; color: var(--muted); }
+      .cmp-sheet .na { font-size: 12px; color: var(--muted); }
+      .cmp-sw { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; flex: none; }
       .cmp-sw.me { background: #e6b94d; }
       .cmp-sw.partner { background: #6aa9ff; border-radius: 2px; }
-      .cmp-bar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; }
-      .cmp-seg, .cmp-leg { display: flex; gap: 4px; flex-wrap: wrap; }
-      .cmp-m, .cmp-lg { all: unset; box-sizing: border-box; cursor: pointer; min-height: 40px; padding: 0 14px; display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); background: var(--well); box-shadow: var(--edge); }
-      .cmp-m.on { color: var(--text); background: rgba(255, 255, 255, 0.14); }
+      /* Schalter: Text, aktiv unterstrichen, kein Pillen-Kasten */
+      .cmp-bar { display: flex; flex-wrap: wrap; gap: 2px 18px; align-items: center; }
+      .cmp-seg, .cmp-leg, .cmp-zoom { display: flex; gap: 14px; flex-wrap: wrap; }
+      .cmp-m, .cmp-lg { all: unset; box-sizing: border-box; cursor: pointer; min-height: 40px; display: inline-flex; align-items: center; gap: 2px; font-size: 14px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; }
+      .cmp-m.on { color: var(--text); border-bottom-color: #e6b94d; }
+      .cmp-m.sm { min-height: 34px; font-size: 13px; }
       .cmp-lg { color: var(--text); }
       .cmp-lg.off { color: var(--muted); text-decoration: line-through; }
       .cmp-lg.off .cmp-sw { opacity: 0.35; }
-      .cmp-plot { position: relative; border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); padding: 6px; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
-      .cmp-svg { display: block; width: 100%; height: auto; }
-      .cmp-grid { stroke: rgba(255, 255, 255, 0.09); stroke-width: 1; }
-      .cmp-ax { font-size: 12px; fill: var(--muted); font-variant-numeric: tabular-nums; }
-      .cmp-empty { font-size: 14px; fill: var(--muted); }
-      .cmp-xh { stroke: rgba(255, 255, 255, 0.55); stroke-width: 1; stroke-dasharray: 3 3; }
-      .cmp-tip { position: absolute; top: 10px; z-index: 2; display: grid; gap: 3px; min-width: 128px; width: max-content; max-width: 75%; padding: 8px 10px; border-radius: 10px; background: rgba(20, 22, 30, 0.94); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), var(--edge); font-size: 13px; color: var(--text); pointer-events: none; }
-      .cmp-tip.r { transform: translateX(12px); }
-      .cmp-tip.l { transform: translateX(calc(-100% - 12px)); }
-      .cmp-tr, .cmp-td { display: flex; align-items: center; gap: 6px; }
-      .cmp-tr em, .cmp-td em { white-space: nowrap; margin-left: auto; padding-left: 10px; font-style: normal; font-weight: 700; font-variant-numeric: tabular-nums; }
-      .cmp-td { color: var(--muted); border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 3px; }
-      .cmp-tn { color: var(--muted); }
-      .cmp-none { margin: 0; padding: var(--s4) var(--s3); font-size: 14px; color: var(--muted); }
-      .cmp-live { margin: 0; height: 0; overflow: hidden; }
-
-      /* Vergleich: gestapelte uPlot-Diagramme */
-      .cmp-host { display: grid; gap: 2px; border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); padding: 6px 6px 2px; outline-offset: 2px; min-width: 0; }
-      .cmp-host:focus-visible, .cmp-m:focus-visible, .cmp-lg:focus-visible, .cmp-chip:focus-visible { outline: 2px solid #e6b94d; }
+      .cmp-zbtn { font-weight: 500; font-size: 13px; }
+      .cmp-zbtn:not(.off) { color: var(--text); border-bottom-color: rgba(255, 255, 255, 0.5); }
+      .cmp-zbtn.off { text-decoration: none; }
+      .cmp-zoom .cmp-m { font-weight: 500; font-size: 13px; }
+      /* Diagramme: randlos, Haarlinien */
+      .cmp-host { display: grid; gap: 0; min-width: 0; margin: 0 -4px; }
       .cmp-pl { min-width: 0; }
       .cmp-pl .u-over, .cmp-pl .u-wrap { touch-action: pan-y; }
-      .cmp-pl .u-select { background: rgba(230, 185, 77, 0.16); }
-      .cmp-pl .u-cursor-x, .cmp-pl .u-cursor-y { border-color: rgba(255, 255, 255, 0.55) !important; }
-      .cmp-ph { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 4px 0 54px; min-height: 26px; flex-wrap: wrap; }
+      .cmp-pl .u-select { background: rgba(230, 185, 77, 0.14); }
+      .cmp-pl .u-cursor-x, .cmp-pl .u-cursor-y { border-color: rgba(255, 255, 255, 0.45) !important; }
+      .cmp-pl + .cmp-pl { margin-top: 6px; }
+      .cmp-ph { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 4px 0 50px; min-height: 26px; flex-wrap: wrap; }
       .cmp-ph > b { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-      .cmp-pv { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--text); font-variant-numeric: tabular-nums; }
+      .cmp-pv { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--text); font-variant-numeric: tabular-nums; }
+      .cmp-pv .cmp-sw { margin-right: 0; }
       .cmp-pv b { font-family: var(--f-head); font-size: 16px; margin-right: 6px; }
       .cmp-pv small { color: var(--muted); font-size: 11px; }
-      .cmp-read { display: grid; gap: 6px; padding: 10px 12px; border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); }
-      .cmp-rh { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+      .cmp-read { display: grid; gap: 4px; padding: 0; }
+      .cmp-rh { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); padding-bottom: 6px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
       .cmp-rh b { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
-      .cmp-rr { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; }
+      .cmp-rr { display: flex; flex-wrap: wrap; gap: 2px 16px; align-items: baseline; padding: 6px 0; }
       .cmp-rr > span { display: inline-flex; flex-direction: column; min-width: 54px; }
       .cmp-rr small, .cmp-who { font-size: 11px; color: var(--muted); }
       .cmp-rr > span b { font-family: var(--f-head); font-size: 17px; font-variant-numeric: tabular-nums; }
-      .cmp-who { flex-direction: row !important; align-items: center; gap: 6px; min-width: 70px !important; font-size: 13px; color: var(--text); }
-      .cmp-zoom { display: flex; gap: 4px; }
-      .cmp-m.sm { min-height: 34px; padding: 0 12px; font-size: 13px; }
-      .cmp-dmbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+      .cmp-who { flex-direction: row !important; align-items: center; gap: 0; min-width: 70px !important; font-size: 13px; color: var(--text); }
+      .cmp-dmbar { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 14px; }
       .cmp-dmbar .k, .cmp-laps .k { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-      .cmp-hintx { margin: 0; font-size: 12px; color: var(--muted); }
-      .cmp-laps { display: grid; gap: 6px; }
-      .cmp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-      .cmp-chip { all: unset; box-sizing: border-box; cursor: pointer; min-width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--well); box-shadow: var(--edge); font-family: var(--f-head); font-size: 16px; color: var(--text); }
-      .cmp-chip.on { background: rgba(230, 185, 77, 0.2); color: #e6b94d; }
+      .cmp-dmbar .cmp-hintx { margin: 0; flex-basis: 100%; }
+      .cmp-laps { display: grid; gap: 2px; }
+      .cmp-chips { display: flex; flex-wrap: wrap; gap: 0 4px; }
+      .cmp-chip { all: unset; box-sizing: border-box; cursor: pointer; min-width: 36px; height: 40px; display: inline-flex; align-items: center; justify-content: center; font-family: var(--f-head); font-size: 17px; color: var(--muted); border-bottom: 2px solid transparent; }
+      .cmp-chip.on { color: #e6b94d; border-bottom-color: #e6b94d; }
+      .cmp-lt { width: 100%; }
       .cmp-lt caption { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding-bottom: 4px; }
       .cmp-lt td .cmp-sw { margin-right: 6px; }
       .cmp-lt .na { color: var(--muted); }
+      .cmp-none { margin: 0; padding: var(--s4) 0; font-size: 14px; color: var(--muted); }
+      .cmp-live { margin: 0; height: 0; overflow: hidden; }
       .cmp-zinfo:empty { display: none; }
-      .cmp-zinfo { display: grid; gap: 8px; padding: 10px 12px; border-radius: var(--r-m); background: var(--well); box-shadow: var(--edge); font-size: 12px; color: var(--muted); }
+      .cmp-zinfo { display: grid; gap: 8px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 12px; color: var(--muted); }
       .cmp-zl { display: grid; gap: 2px; }
       .cmp-zl b { font-size: 13px; color: var(--text); }
       .cmp-zt { display: grid; gap: 6px; }
@@ -16775,20 +16770,38 @@
           const noLaps = Object.values(S.strava.acts).some(
             (a) => a.src === "garmin" && a.lapsV !== 3,
           );
+          // Zeitreihe (Diagramme im Tab «Vergleich») fehlt bei Einheiten, die vor dem Update geladen wurden: bei den 30 neuesten nachholen
+          const seriesIds = () => Object.values(S.strava.acts).filter((a) => a.src === "garmin").sort((x, y) => String(y.start || y.date).localeCompare(String(x.start || x.date))).slice(0, 30).filter((a) => !a.series && !a.seriesTried).map((a) => a.id);
+          const noSeries = seriesIds().length > 0;
           const to = isoD(NOW),
             from = isoD(
               new Date(
                 Math.min(
                   +NOW,
-                  Math.max(+START - 7 * dayMs, noLaps ? 0 : syncFrom("garmin")),
+                  Math.max(+START - 7 * dayMs, noLaps || noSeries ? 0 : syncFrom("garmin")),
                 ),
               ),
             );
           const have = Object.values(S.strava.acts)
             .filter((a) => a.src === "garmin" && a.lapsV === 3)
             .map((a) => a.id);
-          const r = await gmInvoke({ action: "sync", from, to, have });
-          const n = mergeActs(r.acts || []);
+          const haveSeries = () => Object.values(S.strava.acts).filter((a) => a.src === "garmin" && (a.series || a.seriesTried)).map((a) => a.id);
+          let r = await gmInvoke({ action: "sync", from, to, have, haveSeries: haveSeries() });
+          let n = mergeActs(r.acts || []);
+          // Backfill der Zeitreihen in Schritten (der Server lädt je Abruf höchstens 15 Einheiten); höchstens zwei weitere Runden, ein Fehler bricht nichts ab
+          const sd = { ok: (r.series || {}).ok || 0, empty: (r.series || {}).empty || 0, err: (r.series || {}).err || 0, last: (r.series || {}).last || "" };
+          for (let k = 0, left = (r.series || {}).left || 0; k < 2 && left > 0; k++) {
+            try {
+              const r2 = await gmInvoke({ action: "sync", from, to, have: Object.values(S.strava.acts).filter((a) => a.src === "garmin" && a.lapsV === 3).map((a) => a.id), haveSeries: haveSeries() });
+              n += mergeActs(r2.acts || []);
+              const q = r2.series || {};
+              sd.ok += q.ok || 0; sd.empty += q.empty || 0; sd.err += q.err || 0; sd.last = q.last || sd.last;
+              if (!(q.ok || q.empty)) break;
+              left = q.left || 0;
+            } catch (e2) { sd.err++; sd.last = String((e2 && (e2.code || e2.message)) || "fehler"); console.warn("Garmin-Zeitreihen: Nachladen abgebrochen", e2); break; }
+          }
+          S.garmin.series = { ...sd, at: Date.now() };
+          if (sd.err || sd.empty) console.warn("Garmin-Zeitreihen", sd);
           if (autoSplits()) toast("Splits aus der Uhr übernommen");
           S.garmin.well = garmin.mergeWell(S.garmin.well, r.well || {});
           S.garmin.at = Date.now();

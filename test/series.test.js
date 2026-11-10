@@ -119,7 +119,7 @@ test("Panel-Gerüst: Achse, Legende, Zoom, Runden; ohne Daten ein Hinweis", () =
   const none = comparePanelHtml("x2", compareSessions({ group: "ride", time: 1 }, { group: "ride", time: 1 }, {}), undefined, { me: { group: "ride", time: 1 }, pa: { group: "ride", time: 1 } });
   assert.match(none, /keine Daten, Grund/);
   const lapOnly = { group: "run", time: 500, dist: 1000, laps: [lap(1000, 250, 150)] };
-  assert.match(comparePanelHtml("x3", compareSessions(lapOnly, lapOnly, {}), undefined, { me: lapOnly, pa: lapOnly }), /nur der Rundendurchschnitt/);
+  assert.match(comparePanelHtml("x3", compareSessions(lapOnly, lapOnly, {}), undefined, { me: lapOnly, pa: lapOnly }), /Rundenwerte als Blöcke/);
 });
 
 import { timeGap } from "../src/series.js";
@@ -163,4 +163,20 @@ test("Zonen: Zeit je Zone aus dem Puls, nur mit Pulswert; Schalter standardmäß
   assert.match(h, /data-cmp-zones/);
   assert.match(h, /aria-pressed="false"/);
   assert.ok(h.includes('cmp-zbtn off'));
+});
+
+import { lapBlocks } from "../src/series.js";
+test("Rundenrückfall: Blöcke mit Breite = Dauer, nie Linie; Hinweis mit Handlungsaufforderung", () => {
+  const b = lapBlocks({ laps: [lap(1000, 250, 150), lap(50, 20, 160), lap(1000, 300, null)] });
+  assert.deepEqual(b.map((x) => [x.t0, x.t1]), [[0, 250], [250, 270], [270, 570]]);
+  assert.equal(Math.round(b[0].pace), 250);
+  assert.equal(b[1].pace, null, "unter 100 m keine Pace");
+  assert.equal(b[2].hr, null);
+  const me = { group: "run", time: 570, dist: 2050, laps: [lap(1000, 250, 150)] };
+  const h = comparePanelHtml("miss", compareSessions(me, me, { me: "A", partner: "B" }), undefined, { me, pa: me });
+  assert.match(h, /Zeitreihe fehlt: bitte Garmin neu abrufen/);
+  assert.match(h, /B: Zeitreihe fehlt noch/);
+  const tried = { ...me, seriesTried: 1 };
+  assert.match(comparePanelHtml("miss2", compareSessions(tried, me, {}), undefined, { me: tried, pa: me }), /Garmin liefert für diese Einheit keine Zeitreihe/);
+  assert.doesNotMatch(comparePanelHtml("ok", compareSessions(act(100, 0), act(100, 0), {}), undefined, { me: act(100, 0), pa: act(100, 0) }), /Zeitreihe fehlt/);
 });

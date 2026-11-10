@@ -174,3 +174,11 @@ export function zoneTimes(S, maxHr) {
   }
   return any ? out.map((v) => Math.round(v)) : null;
 }
+
+/**
+ * Rundenblöcke einer Aktivität für die Darstellung ohne Zeitreihe: je Runde ein Block mit Breite = Dauer. [{t0, t1, d0, d1, d, t, hr, pace}]
+ * (pace = s/km, nur ab 100 m; sonst null). Leer ohne Runden.
+ */
+export function lapBlocks(act) {
+  return withRange(cleanLaps(act && act.laps)).map((l) => ({ ...l, pace: l.d >= 100 ? l.t / (l.d / 1000) : null }));
+}

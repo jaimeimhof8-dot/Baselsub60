@@ -2,7 +2,7 @@
 // ein Differenz-Diagramm, übereinander mit gemeinsamer Zeit- oder Distanzachse und EINEM synchronen Fadenkreuz.
 // Zoom: Ziehen, Mausrad, Pinch, Knöpfe, Tastatur. Der sichtbare Ausschnitt zeigt Durchschnitte für genau diesen Bereich. Runden als Bänder.
 // Reine Teile (Formate, HTML-Gerüst) laufen ohne DOM in Node-Tests; die Einbindung (mount) braucht window.uPlot.
-import { buildPlot, rangeStats, seriesOf, pairLaps, hrZones, timeGap, zoneTimes } from "./series.js";
+import { buildPlot, rangeStats, seriesOf, pairLaps, hrZones, timeGap, zoneTimes, lapBlocks } from "./series.js";
 import { mmss } from "./util.js";
 
 export const COLORS = { me: "#e6b94d", pa: "#6aa9ff" };
@@ -54,9 +54,10 @@ const stateOf = (id, model, ctx) => {
   return s;
 };
 
-const tileHtml = (t, nm, esc) => {
-  const side = (who, v) => `<span class="cmp-v"><i class="cmp-sw ${who}"></i><small>${esc(nm[who])}</small>${v == null ? `<em class="na">keine Daten</em>` : `<b>${esc(t.fmt(v))}</b>`}</span>`;
-  return `<div class="cmp-tile"><span class="k">${esc(t.k)}</span>${side("me", t.me)}${side("partner", t.partner)}<span class="cmp-d">${t.diff == null ? "kein Unterschied berechnet" : "Unterschied " + esc(t.dfmt(t.diff))}</span></div>`;
+const sheetHtml = (tiles, nm, esc) => {
+  const cell = (t, v) => (v == null ? `<span class="na">keine Daten</span>` : `<b>${esc(t.fmt(v).replace(" min", ""))}</b>`);
+  const rows = tiles.map((t) => `<tr><th scope="row">${esc(t.k)}</th><td>${cell(t, t.me)}</td><td>${cell(t, t.partner)}</td><td class="d">${t.diff == null ? "–" : esc(t.dfmt(t.diff))}</td></tr>`).join("");
+  return `<table class="cmp-sheet"><thead><tr><th></th><th scope="col"><i class="cmp-sw me"></i>${esc(nm.me)}</th><th scope="col"><i class="cmp-sw partner"></i>${esc(nm.partner)}</th><th scope="col" class="d">Unterschied</th></tr></thead><tbody>${rows}</tbody></table>`;
 };
 
 /** Gerüst des Panels. Die Diagramme selbst setzt mount() ein, sobald das Gerüst im Dokument steht. ctx: {me, pa, steps, maxHr}. */
@@ -64,9 +65,10 @@ export function comparePanelHtml(id, model, esc = esc0, ctx = {}) {
   const s = stateOf(id, model, ctx), nm = model.names;
   const P = buildPlot(ctx.me, ctx.pa, { xk: s.xk });
   const meS = seriesOf(ctx.me), paS = seriesOf(ctx.pa);
-  const lapOnly = [meS && meS.src === "laps" ? nm.me : "", paS && paS.src === "laps" ? nm.partner : ""].filter(Boolean);
+  const miss = (S, A, who, partner) => (S && S.src === "laps" ? (A && A.seriesTried ? `${who}: Garmin liefert für diese Einheit keine Zeitreihe.` : partner ? `${who}: Zeitreihe fehlt noch (${who} muss Garmin neu abrufen).` : `Zeitreihe fehlt: bitte Garmin neu abrufen.`) : "");
+  const lapOnly = [miss(meS, ctx.me, nm.me, false), miss(paS, ctx.pa, nm.partner, true)].filter(Boolean);
   const gaps = [[ctx.me, nm.me], [ctx.pa, nm.partner]].map(([a, n]) => { const g = timeGap(a); return g != null && Math.abs(g) > 10 ? `${n}: Zeitreihe und Rundenzeiten weichen um ${Math.abs(g)} s ab (Pausen). Die Rundenbänder können gegen den Verlauf verschoben sein.` : ""; }).filter(Boolean);
-  const notes = [model.note, ...(P ? gaps : []), P && lapOnly.length ? `Für ${lapOnly.join(" und ")} liegt nur der Rundendurchschnitt vor (keine Sekundenreihe): die Linie zeigt Stufen je Runde.` : ""].filter(Boolean);
+  const notes = [model.note, ...(P ? gaps : []), ...(P ? lapOnly : []), P && lapOnly.length ? "Ohne Zeitreihe zeigen die Diagramme nur Rundenwerte als Blöcke (Breite = Dauer der Runde), keinen Verlauf." : ""].filter(Boolean);
   const seg = [["t", "Zeit"], ["d", "Distanz"]].map(([k, l]) => `<button type="button" role="radio" aria-checked="${k === s.xk}" class="cmp-m${k === s.xk ? " on" : ""}" data-cmp-x="${k}">${l}</button>`).join("");
   const leg = ["me", "pa"].map((w) => `<button type="button" class="cmp-lg${s.hidden.has(w) ? " off" : ""}" aria-pressed="${!s.hidden.has(w)}" data-cmp-hide="${w}"><i class="cmp-sw ${w === "pa" ? "partner" : "me"}"></i>${esc(nm[w === "pa" ? "partner" : "me"])}</button>`).join("");
   const zoom = `<div class="cmp-zoom" role="group" aria-label="Zoom"><button type="button" class="cmp-m" data-cmp-zoom="in" aria-label="Vergrößern">+</button><button type="button" class="cmp-m" data-cmp-zoom="out" aria-label="Verkleinern">−</button><button type="button" class="cmp-m" data-cmp-zoom="reset">Zurücksetzen</button></div>`;
@@ -75,7 +77,7 @@ export function comparePanelHtml(id, model, esc = esc0, ctx = {}) {
     ? `<p class="cmp-none">keine Daten, Grund: weder Zeitreihe noch Runden vorhanden</p>`
     : `<div class="cmp-read" aria-live="off"></div><div class="cmp-host" tabindex="0" role="group" aria-label="Diagramme. Pfeiltasten bewegen das Fadenkreuz, Plus und Minus zoomen, 0 setzt zurück"></div>${model.same ? `<div class="cmp-dmbar"><span class="k">Unterschied zeigt</span><div class="cmp-seg" role="radiogroup" aria-label="Messwert des Unterschieds">${dm}</div><span class="cmp-hintx">Jeweils ab Start der Aufzeichnung, nicht an derselben Stelle der Einheit.</span></div>` : ""}<p class="cmp-hintx">Ziehen wählt einen Ausschnitt, Strg oder Cmd mit Mausrad und zwei Finger zoomen, Doppelklick setzt zurück.</p><div class="cmp-zinfo"></div><div class="cmp-laps"></div><div class="cmp-lapinfo"></div>`;
   return `<div class="cmp" data-cmp="${esc(id)}">
-    <div class="cmp-tiles">${model.tiles.map((t) => tileHtml(t, nm, esc)).join("")}</div>
+    ${sheetHtml(model.tiles, nm, esc)}
     <div class="cmp-bar"><div class="cmp-seg" role="radiogroup" aria-label="Achse">${seg}</div><div class="cmp-leg" role="group" aria-label="Reihen ein- oder ausblenden">${leg}</div>${P && P.has.hr ? `<button type="button" class="cmp-lg cmp-zbtn${s.zones ? "" : " off"}" aria-pressed="${s.zones}" data-cmp-zones>Zonen</button>` : ""}${P ? zoom : ""}</div>
     ${notes.map((n) => `<p class="cmp-note">${esc(n)}</p>`).join("")}
     ${body}
@@ -99,6 +101,24 @@ function destroyMount(id) {
   m.ro && m.ro.disconnect();
   m.plots.forEach((p) => { try { p.u.destroy(); } catch (_) {} });
   MOUNTS.delete(id);
+}
+
+/** Rundenwerte als Blöcke (Breite = Dauer bzw. Distanz der Runde), nie als verbundene Linie. */
+function lapPaths(blocks, kind, xk) {
+  return (u) => {
+    const fill = new Path2D(), stroke = new Path2D(), { left, top, width, height } = u.bbox, bottom = top + height;
+    for (const b of blocks) {
+      const v = kind === "hr" ? b.hr : b.pace;
+      if (v == null || (kind === "pace" && v > 720)) continue;
+      const [a, c] = xk === "d" ? [b.d0, b.d1] : [b.t0, b.t1];
+      const x0 = Math.max(left, Math.round(u.valToPos(a, "x", true)) + 1), x1 = Math.min(left + width, Math.round(u.valToPos(c, "x", true)) - 1);
+      if (x1 <= x0) continue;
+      const y = Math.max(top, Math.min(bottom, Math.round(u.valToPos(v, "y", true))));
+      fill.rect(x0, y, x1 - x0, bottom - y);
+      stroke.moveTo(x0, y); stroke.lineTo(x1, y);
+    }
+    return { stroke, fill, clip: null, band: null, gaps: null, flags: 3 };
+  };
 }
 
 function mount(root) {
@@ -183,9 +203,13 @@ function mount(root) {
     const mountEl = document.createElement("div");
     wrap.appendChild(mountEl);
     host.appendChild(wrap);
+    const grad = (w) => (u) => { const g = u.ctx.createLinearGradient(0, u.bbox.top, 0, u.bbox.top + u.bbox.height), c = w === "me" ? "230,185,77" : "106,169,255"; g.addColorStop(0, `rgba(${c},${K.fill ? 0.34 : 0.2})`); g.addColorStop(1, `rgba(${c},0)`); return g; };
+    const base = (u) => (u.scales.y.dir === -1 ? u.scales.y.max : u.scales.y.min);
+    const sp = U.paths && U.paths.spline ? U.paths.spline() : undefined;
+    const blocksOf = (w) => { const S = seriesOf(s.ctx[w]); return S && S.src === "laps" ? lapBlocks(s.ctx[w]) : null; };
     const ser = isDiff
       ? [{}, { label: "Unterschied", stroke: "#cfd2dc", width: 1.6, points: { show: false }, fill: "rgba(207,210,220,.10)", fillTo: () => 0 }]
-      : [{}, ...["me", "pa"].map((w) => ({ label: names[w], show: !s.hidden.has(w), stroke: COLORS[w], width: 2, dash: w === "pa" ? [7, 4] : undefined, points: { show: false }, fill: K.fill ? (w === "me" ? "rgba(230,185,77,.18)" : "rgba(106,169,255,.14)") : undefined, spanGaps: false }))];
+      : [{}, ...["me", "pa"].map((w) => { const bl = blocksOf(w); return { label: names[w], show: !s.hidden.has(w), stroke: COLORS[w], width: 2, dash: w === "pa" ? [7, 4] : undefined, points: { show: false }, fill: bl ? (w === "me" ? "rgba(230,185,77,.17)" : "rgba(106,169,255,.12)") : grad(w), fillTo: base, spanGaps: false, paths: bl && (spec.kind === "hr" || spec.kind === "pace") ? lapPaths(bl, spec.kind, s.xk) : sp }; })];
     const rangeY = (u, mn, mx) => {
       if (isDiff) { const m = Math.max(1, Math.abs(mn), Math.abs(mx)); return [-m * 1.1, m * 1.1]; }
       if (spec.kind === "hr" && maxHr && s.zones) return [Math.max(0, Math.min(mn, maxHr * 0.5) - 3), Math.max(mx, maxHr * 0.9) + 3];

@@ -147,7 +147,7 @@ async function store(db: Admin, uid: string, tok: Tok, lastError: string | null 
 const isDate = (v: unknown) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v);
 const iso = (t: number) => new Date(t).toISOString().slice(0, 10);
 
-async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string, have: Set<string> = new Set()) {
+async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string, have: Set<string> = new Set(), haveSeries: Set<string> = new Set()) {
   if (ctx.tok.exp - Date.now() < 3600000) { ctx.tok = await refresh(ctx.tok); ctx.dirty = true; }
   if (!ctx.tok.name) {
     const p = await api(ctx, "/userprofile-service/socialProfile") as Record<string, string> | null;
@@ -164,17 +164,36 @@ async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string,
     if (page.length < 100) break;
   }
 
-  // Runden (Laps) für Ausdauer-Einheiten: daraus erkennt die App Intervalle und deren Zeiten. Max. 15 neueste pro Abruf.
-  // have = Einheiten, deren Runden die App schon kennt (werden nicht nochmals geholt)
-  const withLaps = acts.filter((a) => !have.has(a.id as string))
-    .sort((x, y) => String(y.start).localeCompare(String(x.start))).slice(0, 15);
-  for (let i = 0; i < withLaps.length; i += 5) {
-    await Promise.all(withLaps.slice(i, i + 5).map(async (a) => {
-      try { const r = await api(ctx, `/activity-service/activity/${String(a.id).slice(1)}/splits`); a.laps = normalizeLaps(r); a.lapsV = 3; }
-      catch (e) { if ((e as { code?: string }).code === "relogin") throw e; }
-      // Zeitreihe (Puls, Tempo, Höhe, Kadenz) für die Diagramme; fehlt sie, nutzt die App die Rundenwerte
-      try { const r = await api(ctx, `/activity-service/activity/${String(a.id).slice(1)}/details?maxChartSize=1000&maxPolylineSize=0`); const s = reduceSeries(r); if (s) a.series = s; }
-      catch (e) { if ((e as { code?: string }).code === "relogin") throw e; }
+  // Runden (Laps) und Zeitreihe für Ausdauer-Einheiten. Max. 15 neueste Einheiten pro Abruf (Ratenbegrenzung, je 5 parallel).
+  // have = Einheiten, deren Runden die App schon kennt; haveSeries = Einheiten, für die die App die Zeitreihe hat oder Garmin schon «leer» geantwortet hat.
+  // Zeitreihen gibt es nur für die 30 neuesten Einheiten (Speicher in plan_state). Fehlt sie bei gespeicherten Einheiten, wird sie hier nachgeholt (Backfill).
+  const byNew = [...acts].sort((x, y) => String(y.start).localeCompare(String(x.start)));
+  const top30 = new Set(byNew.slice(0, 30).map((a) => a.id as string));
+  const needS = (a: Record<string, unknown>) => top30.has(a.id as string) && !haveSeries.has(a.id as string);
+  const todo = byNew.filter((a) => !have.has(a.id as string) || needS(a)).slice(0, 15);
+  const series = { ok: 0, empty: 0, err: 0, left: byNew.filter(needS).length - todo.filter(needS).length, last: "" };
+  let rate = false;
+  for (let i = 0; i < todo.length; i += 5) {
+    await Promise.all(todo.slice(i, i + 5).map(async (a) => {
+      const id = String(a.id).slice(1);
+      if (!have.has(a.id as string)) {
+        try { const r = await api(ctx, `/activity-service/activity/${id}/splits`); a.laps = normalizeLaps(r); a.lapsV = 3; }
+        catch (e) { if ((e as { code?: string }).code === "relogin") throw e; }
+      }
+      if (!needS(a)) return;
+      if (rate) { series.left++; return; }
+      try {
+        const r = await api(ctx, `/activity-service/activity/${id}/details?maxChartSize=1000&maxPolylineSize=0`);
+        const s = r ? reduceSeries(r) : null;
+        if (s) { a.series = s; series.ok++; }
+        else { a.seriesTried = 1; series.empty++; series.last = r ? "keine verwertbare Reihe (Felder: " + keysOf(r) + ")" : "leere Antwort"; console.error("garmin details leer", a.id, series.last); }
+      } catch (e) {
+        const c = e as { code?: string; status?: number };
+        if (c.code === "relogin") throw e;
+        if (c.code === "rate") { rate = true; series.left++; }
+        series.err++; series.last = String(c.status || c.code || "fehler");
+        console.error("garmin details Fehler", a.id, series.last);
+      }
     }));
   }
 
@@ -201,7 +220,7 @@ async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string,
   }
   const well = reduceWell({ hrv, rhr, bb: Array.isArray(bb) ? bb : [], sleep, tr, steps });
   const shape = { hrv: keysOf(hrv), rhr: keysOf(rhr), bb: keysOf(bb), sleep: keysOf(sleep.find(Boolean)), tr: keysOf(tr.find(Boolean)) };
-  return { acts, well, diag, shape, days: Object.keys(well).length, name: ctx.tok.full || ctx.tok.name || null };
+  return { acts, series, well, diag, shape, days: Object.keys(well).length, name: ctx.tok.full || ctx.tok.name || null };
 }
 
 /* ---------- Cron: alle Tokens rechtzeitig erneuern ---------- */
@@ -275,7 +294,8 @@ Deno.serve(async (req) => {
       const ctx = { tok: row.tok, dirty: false };
       try {
         const have = new Set(Array.isArray(body.have) ? (body.have as unknown[]).filter((x) => typeof x === "string").slice(0, 2000) as string[] : []);
-        const res = await sync(ctx, from, to, have);
+        const haveSeries = new Set(Array.isArray(body.haveSeries) ? (body.haveSeries as unknown[]).filter((x) => typeof x === "string").slice(0, 2000) as string[] : []);
+        const res = await sync(ctx, from, to, have, haveSeries);
         if (ctx.dirty || row.lastError) await store(db, uid, ctx.tok);
         return json(res);
       } catch (e) {

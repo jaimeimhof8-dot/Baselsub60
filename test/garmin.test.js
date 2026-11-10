@@ -221,3 +221,39 @@ test("Zeitreihen nur für die letzten 30 Aktivitäten, Runden bleiben", () => {
   assert.ok(store.g39.series && !store.g0.series, "neueste behalten, älteste verlieren die Reihe");
   assert.equal(trimSeries(store), 0);
 });
+
+test("Zeitreihe aus realistischer Garmin-Antwort: Lücken, Pause, Zeitstempel statt Dauer", () => {
+  const keys = ["directTimestamp", "sumDistance", "directHeartRate", "directSpeed", "directElevation", "directDoubleCadence"];
+  const t0 = 1760000000000;
+  const rows = [];
+  for (let i = 0; i < 1200; i++) {
+    const pause = i >= 600 && i < 660; // Auto-Pause: Tempo 0, Distanz steht
+    rows.push({ metrics: [t0 + i * 1000, pause ? 2000 : i * 3.3, i % 97 === 0 ? null : 150 + (i % 30), pause ? 0 : 3.3, 410.5 + Math.sin(i / 50), i % 211 === 0 ? null : 172] });
+  }
+  const s = reduceSeries({ metricDescriptors: keys.map((key, metricsIndex) => ({ key, metricsIndex })), activityDetailMetrics: rows }, 600);
+  assert.ok(s.n <= 600);
+  assert.ok(s.t[0] <= 2);
+  assert.ok(s.t[s.n - 1] >= 1190);
+  assert.ok(s.v.some((v) => v === 0), "Pause bleibt als Tempo 0 sichtbar");
+  assert.ok(s.d.every((x, i) => i === 0 || x >= s.d[i - 1]));
+  assert.ok(s.hr.every((x) => x === null || (x >= 100 && x <= 200)), "Lücken werden nicht zu 0");
+  assert.equal(s.el[0], 4105);
+});
+
+test("Zeitreihe: Antwort ohne Felder oder mit falschem Format ergibt null statt Müll", () => {
+  assert.equal(reduceSeries({}), null);
+  assert.equal(reduceSeries({ metricDescriptors: [], activityDetailMetrics: [] }), null);
+  assert.equal(reduceSeries({ metricDescriptors: [{ key: "directHeartRate", metricsIndex: "x" }], activityDetailMetrics: [{ metrics: [1] }, { metrics: [2] }] }), null);
+  assert.equal(reduceSeries({ metricDescriptors: [{ key: "sumDuration", metricsIndex: 0 }, { key: "directHeartRate", metricsIndex: 1 }], activityDetailMetrics: [{ metrics: [5, 100] }, { metrics: [3, 101] }] }), null, "Zeit läuft rückwärts");
+  assert.equal(reduceSeries({ metricDescriptors: [{ key: "sumDuration", metricsIndex: 0 }, { key: "directHeartRate", metricsIndex: 1 }], activityDetailMetrics: [{ metrics: ["a", "b"] }, { metrics: [null, null] }] }), null);
+});
+
+import { mergeActs as mergeActs2 } from "../src/garmin.js";
+test("Backfill: nachgeladene Reihe kommt in die vorhandene Aktivität, seriesTried bleibt erhalten", () => {
+  const store = { g1: { id: "g1", date: "2026-10-13", group: "run", time: 3000, src: "garmin", laps: [{ d: 1000, t: 250 }], lapsV: 3 } };
+  mergeActs2(store, [{ id: "g1", date: "2026-10-13", group: "run", time: 3000, src: "garmin", series: { n: 2, t: [0, 1] } }]);
+  assert.ok(store.g1.series && store.g1.laps.length === 1);
+  const s2 = { g2: { id: "g2", date: "2026-10-13", group: "run", time: 3000, src: "garmin", seriesTried: 1 } };
+  mergeActs2(s2, [{ id: "g2", date: "2026-10-13", group: "run", time: 3000, src: "garmin" }]);
+  assert.equal(s2.g2.seriesTried, 1);
+});

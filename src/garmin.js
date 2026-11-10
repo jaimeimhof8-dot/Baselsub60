@@ -83,7 +83,7 @@ export function mergeActs(store, list, minDate = "") {
     if (!a || !a.date || a.date < minDate || !relevant(a)) continue;
     // Bereits geladene Runden behalten, wenn die neue Version keine mitbringt
     // got = Zeitpunkt der ersten Übernahme (bleibt bei späteren Abrufen erhalten, für die Anzeige «Übernommen am»)
-    if (store[a.id]) { const got = store[a.id].got || a.got; store[a.id] = { ...(!a.laps && store[a.id].laps ? { ...a, laps: store[a.id].laps, lapsV: store[a.id].lapsV } : a), ...(!a.series && store[a.id].series ? { series: store[a.id].series } : {}), ...(got ? { got } : {}) }; continue; }
+    if (store[a.id]) { const got = store[a.id].got || a.got; store[a.id] = { ...(!a.laps && store[a.id].laps ? { ...a, laps: store[a.id].laps, lapsV: store[a.id].lapsV } : a), ...(!a.series && store[a.id].series ? { series: store[a.id].series } : {}), ...(!a.seriesTried && !a.series && store[a.id].seriesTried ? { seriesTried: 1 } : {}), ...(got ? { got } : {}) }; continue; }
     const dups = Object.values(store).filter((x) => sameAct(x, a));
     if (dups.length && a.src !== "garmin") continue;
     for (const d of dups) delete store[d.id];

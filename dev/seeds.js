@@ -42,16 +42,21 @@ window.TL_SEEDS = (() => {
     o.n = o.t.length;
     return o;
   };
+  // Zweiter Demo-Tag OHNE Zeitreihe (Do 15.10.2026): nur Runden, wie bei Einheiten, die vor dem Update geladen wurden. Dort zeigt der Vergleich Rundenblöcke und den Hinweis.
+  const lapsMe2 = [L(1500, 500, 130), L(1000, 262, 160), L(1000, 266, 168), L(1000, 270, 172), L(1000, 281, 176), L(1000, 289, 178), L(1000, 295, 180), L(500, 160, 150), L(1000, 335, 141)];
+  const lapsPa2 = [L(1500, 485, 134), L(1000, 255, 166), L(1000, 259, 172), L(1000, 262, 176), L(1000, 270, 180), L(1000, 278, 182), L(1000, 283, 184), L(500, 152, 156), L(1000, 322, 146)];
   const sum = (a, k) => a.reduce((x, l) => x + l[k], 0);
   const avgHr = (a) => Math.round(a.reduce((x, l) => x + l.hr * l.t, 0) / sum(a, "t"));
   const vergleich = () => {
     const S = voll();
     for (let j = 0; j < 4; j++) S.done[day(1) + "|" + j] = true;
     S.rpe[day(1)] = 8;
-    S.strava = { acts: { demo1: { id: "demo1", src: "garmin", date: iso(1), got: Date.now(), type: "running", group: "run", name: "Intervalle (Demo)", time: sum(lapsMe, "t"), dist: sum(lapsMe, "d"), hr: avgHr(lapsMe), maxHr: 182, lapsV: 3, laps: lapsMe, series: mkSeries(lapsMe, 11, 0) } }, at: Date.now() };
+    for (let j = 0; j < 8; j++) S.done[day(3) + "|" + j] = true;
+    S.rpe[day(3)] = 8;
+    S.strava = { acts: { demo2: { id: "demo2", src: "garmin", date: iso(3), got: Date.now(), type: "running", group: "run", name: "Tempoläufe (Demo)", time: sum(lapsMe2, "t"), dist: sum(lapsMe2, "d"), hr: avgHr(lapsMe2), maxHr: 182, lapsV: 3, laps: lapsMe2 }, demo1: { id: "demo1", src: "garmin", date: iso(1), got: Date.now(), type: "running", group: "run", name: "Intervalle (Demo)", time: sum(lapsMe, "t"), dist: sum(lapsMe, "d"), hr: avgHr(lapsMe), maxHr: 182, lapsV: 3, laps: lapsMe, series: mkSeries(lapsMe, 11, 0) } }, at: Date.now() };
     return S;
   };
-  window.TL_PARTNER_DEMO = { [iso(1)]: [{ group: "run", time: sum(lapsPa, "t"), dist: sum(lapsPa, "d"), hr: avgHr(lapsPa), laps: lapsPa, series: mkSeries(lapsPa, 29, 0.4) }] };
+  window.TL_PARTNER_DEMO = { [iso(3)]: [{ group: "run", time: sum(lapsPa2, "t"), dist: sum(lapsPa2, "d"), hr: avgHr(lapsPa2), laps: lapsPa2 }], [iso(1)]: [{ group: "run", time: sum(lapsPa, "t"), dist: sum(lapsPa, "d"), hr: avgHr(lapsPa), laps: lapsPa, series: mkSeries(lapsPa, 29, 0.4) }] };
   return {
     vergleich,
     leer: () => ({ onb: { strava: true } }),

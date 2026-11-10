@@ -22715,13 +22715,17 @@
       }
       /* Lap-Runden der Uhr (Garmin/Strava) den Plan-Schritten zuordnen: Treffer {times, hr, mode, act} oder null */
       function watchSplitsFor(i, steps) {
-        for (const a of actsOf(i)) {
-          if (!a.laps || !a.laps.length) continue;
+        const acts = actsOf(i).filter((a) => a.laps && a.laps.length);
+        for (const a of acts) {
           const r = alignSplits(a.laps, steps);
           if (r.times) return { ...r, act: a };
-          // Rückfall bei fehlenden/doppelten Runden oder Absturz: nur eindeutig zugeordnete Schritte übernehmen, der Rest bleibt leer
+        }
+        // Rückfall bei fehlenden/doppelten Runden oder Absturz, erst nachdem keine Aktivität exakt passt:
+        // nur eindeutig zugeordnete Arbeitsschritte übernehmen, der Rest (auch Puls) bleibt leer
+        for (const a of acts) {
           const dp = alignLaps(a.laps, steps);
-          if (dp && dp.sure.some((x) => x)) return { ...dp, times: dp.times.map((t, k) => (dp.sure[k] ? t : null)), act: a };
+          if (dp && dp.sure.some((x, k) => x && steps[k].kind !== "rest"))
+            return { times: dp.times.map((t, k) => (dp.sure[k] ? t : null)), hr: dp.hr.map((h, k) => (dp.sure[k] ? h : null)), mode: "dp", count: dp.count, act: a };
         }
         return null;
       }

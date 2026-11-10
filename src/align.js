@@ -15,10 +15,12 @@ const MARGIN = 0.4; // Eindeutigkeit: die beste Alternative muss um so viel schl
  */
 export function alignLaps(laps, steps) {
   const n = (steps || []).length;
-  let T = (laps || []).filter((l) => l && l.t > 0);
+  if (steps && steps.some((x) => !x)) return null;
+  let T = (laps || []).filter((l) => l && Number.isFinite(+l.t) && +l.t > 0).map((l) => ({ ...l, t: +l.t, d: Number.isFinite(+l.d) ? +l.d : 0 }));
   while (T.length > 1 && T[T.length - 1].t < 15) T = T.slice(0, -1); // Stopp-Druck am Ende
   const m = T.length;
   if (!n || !m) return null;
+  if (n * m > 10000) return null; // Rechenaufwand der Eindeutigkeitsprüfung: lieber keine Zuordnung als ein blockiertes Gerät
   const isWork = (k) => steps[k].kind !== "rest";
   // Distanz als Typ-Beleg: Liefert die Uhr bei Laufrunden eine Strecke (≥ 300 m), müssen Laufschritte auch Laufrunden bekommen und Stationen/Pausen nicht.
   // Ohne Strecken (Cardio-Profil ohne GPS) bleibt nur die Zeit; dann sind Verschiebungen um eine ganze Planperiode (Lauf·Station·Pause) nicht erkennbar.
@@ -107,7 +109,12 @@ export function alignLaps(laps, steps) {
     const single = a[0] === a[1];
     if (!single) rigid = false;
     const alt = rigid && single && k !== incomplete ? solve(new Set([`${k}:${a[0]}-${a[1]}`])) : null;
-    sure[k] = !!alt && alt.total - best.total >= MARGIN && (!(anomaly || (tail > 0 && k === lastMatched)) || distinct(k, a));
+    // Nachbarschritt unbelegt: die Runde könnte beide Schritte enthalten (vergessener Druck) oder dem Nachbarn gehören
+    const gapNb = [k - 1, k + 1].some((j) => j >= 0 && j <= lastMatched && !asg[j] && (isWork(j) || !systematicRest));
+    const own = steps[k].goal > 0 ? cost(k, pre[a[1] + 1] - pre[a[0]]) : 0;
+    // Aufzeichnung endet früher und der Schritt gleicht einem Nachbarschritt: eine Lücke wäre nicht von einem Abbruch zu unterscheiden
+    const tailId = tail > 0 && [k - 1, k + 1].some((j) => j >= 0 && j < n && steps[j].kind === steps[k].kind && steps[j].goal === steps[k].goal);
+    sure[k] = !gapNb && own <= 0.2 && !tailId && !!alt && alt.total - best.total >= MARGIN && (!(anomaly || (tail > 0 && k === lastMatched)) || distinct(k, a));
     if (!sure[k] && k !== incomplete) rigid = false; // ein zweifelhafter Schritt kann die Verschiebung ausgelöst haben: alles danach ist ebenfalls nicht sicher
   }
 

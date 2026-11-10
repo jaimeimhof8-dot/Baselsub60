@@ -13119,14 +13119,21 @@
       .cmp-zr > span b { font-family: var(--f-head); font-size: 15px; color: var(--text); font-variant-numeric: tabular-nums; }
       @media (prefers-reduced-motion: no-preference) { .cmp-tip { animation: cmpfade 0.12s ease-out; } @keyframes cmpfade { from { opacity: 0; } } }
       .s7-an-tg.more { margin-top: 10px; font-size: 14px; }
-      /* Analyse-Tab: Auswahl früherer Einheiten */
-      .an-pick { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 10px; margin: 0 0 8px; scrollbar-width: thin; }
-      .an-pick button { all: unset; box-sizing: border-box; flex: 0 0 auto; min-height: 44px; display: grid; align-content: center; gap: 1px; padding: 6px 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; color: var(--muted); font-size: 12px; }
-      .an-pick button b { color: var(--text); font-size: 14px; font-weight: 600; }
-      .an-pick button.on { border-color: #e6b94d; background: rgba(230, 185, 77, 0.12); }
-      .an-pick button.on b { color: #e6b94d; }
-      .an-pick button:focus-visible { outline: 2px solid #e6b94d; outline-offset: 2px; }
+      /* Analyse-Bereich */
+      .an-solo { margin-top: 24px; }
+      .an-solo h4 { margin: 0 0 12px; font-size: 18px; }
+      .an-solo .cmp-sheet, .an-solo .cmp-leg { display: none; }
       .an-empty { padding: 18px 0; color: var(--muted); }
+      .an-wk { margin: 28px 0 8px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+      .an-row { all: unset; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: 52px 1fr 18px; gap: 16px; align-items: center; min-height: 76px; border-top: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; color: var(--text); }
+      .an-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+      .an-row .d { text-align: center; }
+      .an-row .d small { display: block; font-size: 13px; color: var(--muted); }
+      .an-row .d b { font-family: var(--f-head); font-size: 28px; line-height: 1.1; }
+      .an-row .t { font-size: 17px; font-weight: 600; line-height: 24px; }
+      .an-row .t i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+      .an-row .t small { display: block; font-size: 14px; font-weight: 400; color: var(--muted); }
+      #msub .mi.sub { padding-left: 44px; }
       .s7-an-txt { display: grid; gap: 4px; margin-top: 6px; }
       .s7-an {
         border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -14325,6 +14332,10 @@
             <path d="M4 17l5-5 4 3 7-8M15 7h5v5" /></svg
           ><span class="l">Analyse</span>
         </button>
+        <div id="msub" hidden>
+          <button class="mi sub" data-v="analysisv"><span class="l">Verlauf</span></button>
+          <button class="mi sub" data-v="analysisc"><span class="l">Vergleich mit <span data-partner>Partner</span></span></button>
+        </div>
         <button class="mi" data-v="review">
           <svg
             viewBox="0 0 24 24"
@@ -20944,9 +20955,9 @@
             return `<div class="v3-blk-act">${b.head}${b.dash}<div class="v3-an"><span class="k">Analyse${blocks.length > 1 ? " dieser Aktivität" : ""}</span>${lines || `<p class="v3-empty">Aus den Zahlen ergibt sich nichts Auffälliges.</p>`}${coach}</div></div>`;
           })
           .join("");
-        const cmp = s7CmpParts(i, p);
+        const cmp = { tabs: "", panel: "", hint: "", on: false };
         if (cmp.on) return `<section class="s7-an" aria-label="Vergleich"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${cmp.tabs}${cmp.panel}</section>`;
-        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${cmp.tabs}${parts}${!rec || busy ? body : ""}${acts}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}${cmp.hint}</section>`;
+        return `<section class="s7-an" aria-label="Coach-Analyse"><div class="s7-an-top"><span class="s6-kick">Einheit auf einen Blick</span></div>${parts}${anChart(i, p)}${!rec || busy ? body : ""}${acts}${redo}${anErr[dk] ? `<p class="s7-an-err">${esc(anErr[dk])}</p>` : ""}${cmp.hint}</section>`;
       }
       /* Letzte gleiche Einheit mit Uhr-Daten: erst gleiche Art UND gleicher Plantitel, sonst gleiche Art. -> {i, act, rpe, same} oder null */
       function s7Prev(i, p, group) {
@@ -21216,44 +21227,59 @@
         const goal = `<section class="s6-card s6-goal"><span class="s6-kick">Ziel</span><b class="s7-gb">&lt; 60:00</b><span class="s7-gd">Sa 13.02.2027</span><span class="s7-gs">HYROX Basel · Doubles Men PRO mit ${esc(PARTNER)}</span></section>`;
         return `${intro}<div class="s6 s6-today">${head}${rail}<div class="s6-main">${hero}${more}${hintsHtml}</div><div class="s6-side">${goal}${s7Ready(i)}${ciHtml}</div></div>`;
       }
-      /* ---- Analyse-Tab: heutige Einheit, dazu frühere Analysen zum Zurückschauen ---- */
-      let anSel = null; // null = heute
+      /* ---- Analyse-Bereich (Menü): Heute, Verlauf, Vergleich ---- */
+      let anSel = null, anKeep = false; // anSel: null = heute
       function anFinished(i) {
-        const p = dayPlan(i),
-          dk = keyI(i);
+        const p = dayPlan(i), dk = keyI(i);
         if (!p || p.k === "rest" || S.off[dk] || S.later[dk]) return false;
-        const st = dayStatus(i),
-          rpe = S.rpe[dk];
+        const st = dayStatus(i), rpe = S.rpe[dk];
         return !!st.n && (st.done >= st.n || (rpe != null && st.done > 0));
       }
+      const anToday = () => Math.max(0, Math.min(LAST, TODAY));
+      const anHead = (i, title) => s6Head(`${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))}${i === anToday() ? " · Heute" : ""}`, title, "");
+      /* Diagramm der eigenen Einheit (Garmin-Stil: Puls, Pace, Höhe, Kadenz, Zoom, Ausschnitt, Runden, Zonen), gleiche Technik wie im Vergleich */
+      function anChart(i, p) {
+        const mine = actsOf(i), fit = mine.filter((a) => strava.fits(p.k, a.group)), me = pickAct(fit.length ? fit : mine, "");
+        if (!me) return "";
+        const maxHr = Math.max(0, ...Object.values(S.strava.acts).map((a) => a.maxHr || 0)) || null,
+          model = { ok: true, same: false, names: { me: ME, partner: PARTNER }, tiles: [], note: "" };
+        return `<div class="an-solo"><h4>Verlauf</h4>${comparePanelHtml("an-" + keyI(i), model, esc, { me, pa: null, steps: s7Steps(p), maxHr })}</div>`;
+      }
+      const anPlain = (msg) => `<p class="an-empty">${msg}</p>`;
       function anTabView() {
-        const today = Math.max(0, Math.min(LAST, TODAY)),
-          i = anSel != null ? anSel : today,
-          p = dayPlan(i),
-          dk = keyI(i),
-          isT = i === today;
-        const days = [];
-        for (let x = today; x >= 0 && days.length < 60; x--) {
-          if (x === today || anFinished(x) || S.analysis[keyI(x)]) days.push(x);
-        }
-        const chips = days
-          .map((x) => {
-            const q = dayPlan(x);
-            if (!q) return "";
-            return `<button type="button" class="${x === i ? "on" : ""}" data-act="an-pick" data-i="${x}" aria-pressed="${x === i}"><b>${x === today ? "Heute" : esc(DAYS[dow(x)] + " " + fmt(dateFromIdx(x)))}</b><span>${esc(s7Title(q.t))}</span></button>`;
-          })
-          .join("");
-        const d = dateFromIdx(i),
-          head = s6Head(
-            `${DAYSF[dow(i)]}, ${fmt(d)}${isT ? " · Heute" : ""}`,
-            "Analyse",
-            p && p.k !== "rest" ? esc(s7Title(p.t)) : "",
-          );
+        const today = anToday(), i = anSel != null ? anSel : today, p = dayPlan(i), dk = keyI(i);
         let body;
-        if (!p || p.k === "rest") body = `<p class="an-empty">${isT ? "Heute ist Ruhetag, es gibt nichts auszuwerten." : "An diesem Tag war Ruhetag."}</p>`;
+        if (!p || p.k === "rest") body = anPlain(i === today ? "Heute ist Ruhetag, es gibt nichts auszuwerten." : "An diesem Tag war Ruhetag.");
         else if (anFinished(i) || S.analysis[dk] || actsOf(i).length) body = `<article class="s6-hero s7-fin" data-day="${i}" style="--kc:var(--${p.k})"><div class="s6-hero-top"><span class="s6-chip"><i style="background:var(--${p.k})"></i>${S6_KIND[p.k] || p.k}</span></div><h2 class="s6-title">${esc(s7Title(p.t))}</h2><div class="s6-title-d"><h1>${esc(s7Title(p.t))}</h1></div>${s7AnHtml(i, p)}</article>`;
-        else body = `<p class="an-empty">${isT ? "Die heutige Einheit ist noch nicht erledigt. Sobald du sie abschliesst, findest du hier die Analyse." : "Zu diesem Tag gibt es keine Analyse."}</p>`;
-        return `<div class="s6">${head}<div class="s6-main"><nav class="an-pick" aria-label="Einheit wählen">${chips}</nav>${body}</div></div>`;
+        else body = anPlain(i === today ? "Die heutige Einheit ist noch nicht erledigt. Sobald du sie abschliesst, findest du hier die Analyse." : "Zu diesem Tag gibt es keine Analyse.");
+        const back = i !== today ? `<button type="button" class="s6-btn" data-act="an-pick" data-i="${today}">Zurück zu heute</button>` : "";
+        return `<div class="s6">${anHead(i, "Analyse")}<div class="s6-main">${body}${back}</div></div>`;
+      }
+      function anVerlaufView() {
+        const today = anToday(), rows = [];
+        for (let x = today, n = 0; x >= 0 && n < 80; x--) {
+          const q = dayPlan(x);
+          if (!q || q.k === "rest" || !(x === today || anFinished(x) || S.analysis[keyI(x)])) continue;
+          const w = Math.floor(x / 7) + 1, last = rows[rows.length - 1];
+          if (!last || last.w !== w) rows.push({ w });
+          rows.push({ x, q, w });
+          n++;
+        }
+        const arrow = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`;
+        const list = rows.map((r) => r.q
+          ? `<button type="button" class="an-row" data-act="an-pick" data-i="${r.x}" data-go="analysis"><span class="d"><small>${DAYS[dow(r.x)]}</small><b>${dateFromIdx(r.x).getDate()}</b></span><span class="t"><i style="background:var(--${r.q.k})"></i>${esc(s7Title(r.q.t))}<small>${r.x === today ? "Heute · " : ""}${S.analysis[keyI(r.x)] ? "Coach-Analyse vorhanden" : S6_KIND[r.q.k] || r.q.k}</small></span>${arrow}</button>`
+          : `<h3 class="an-wk">Woche ${r.w}</h3>`).join("");
+        return `<div class="s6">${s6Head("Alle Einheiten", "Verlauf", "")}<div class="s6-main">${list || anPlain("Noch keine abgeschlossene Einheit.")}</div></div>`;
+      }
+      function anCmpView() {
+        const today = anToday(), i = anSel != null ? anSel : today, p = dayPlan(i);
+        let body = anPlain("An diesem Tag gibt es keine Einheit zum Vergleichen.");
+        if (p && p.k !== "rest") {
+          cmpTab[keyI(i)] = "cmp";
+          const c = s7CmpParts(i, p);
+          body = c.panel || c.hint || anPlain("Der Vergleich mit " + esc(PARTNER) + " lädt.");
+        }
+        return `<div class="s6">${anHead(i, "Vergleich mit " + esc(PARTNER))}<div class="s6-main"><section class="s7-an">${body}</section><button type="button" class="s6-btn" data-v="analysisv">Andere Einheit wählen</button></div></div>`;
       }
       /* ---- Woche ---- */
       function s6RunKm(w) {
@@ -23405,6 +23431,8 @@
         dashboard: s6Dashboard,
         review: s6Review,
         analysis: anTabView,
+        analysisv: anVerlaufView,
+        analysisc: anCmpView,
       };
       function render() {
         if (drag && drag.on) return void (renderHeld = true); // während des Ziehens nicht neu aufbauen
@@ -23431,6 +23459,8 @@
             "dashboard",
             "review",
             "analysis",
+            "analysisv",
+            "analysisc",
             "plan",
             "profile",
             "backup",
@@ -23481,6 +23511,7 @@
         // Aktive Seite im Burger-Menü markieren (Trainingsplan = Heute/Woche, Plan = Gesamtplan und Import)
         const mv =
           view === "week" ? "today" : view === "import" ? "plan" : view;
+        $("#msub").hidden = !view.startsWith("analysis");
         document.querySelectorAll("#sheet .mi[data-v]").forEach((b) => {
           const on = b.dataset.v === mv;
           b.classList.toggle("on", on);
@@ -23678,7 +23709,8 @@
         }
         if (v === "import" && imp.step !== "preview") imp = { step: "pick" };
         if (v === "backup") loadHistory();
-        if (v === "analysis" && view !== "analysis") anSel = null; // beim Öffnen immer die heutige Einheit
+        if (v === "analysis" && !anKeep && !view.startsWith("analysis")) anSel = null; // beim Öffnen aus dem Menü immer die heutige Einheit
+        anKeep = false;
         const changed = v !== view,
           kind = how || (TABS.includes(v) ? "tab" : "push");
         const apply = () => {
@@ -24200,6 +24232,7 @@
         if (d.act === "an-run") return runAnalysis(+d.i);
         if (d.act === "an-pick") {
           anSel = +d.i;
+          if (d.go) { anKeep = true; return go(d.go); }
           return render();
         }
         if (d.act === "cmp-tab") {

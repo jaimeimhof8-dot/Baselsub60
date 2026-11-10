@@ -2,6 +2,7 @@
 // auch wenn die Uhr jeden Kilometer als eigene Runde aufgezeichnet hat (Auto-Lap). Reine Funktionen, ohne DOM.
 import { parseReps, paceOf, repSummary as looseSummary } from "./dashboard.js";
 import { mmss } from "./util.js";
+import { alignLaps } from "./align.js";
 
 /** Wiederholungen aus den Runden, passend zur Plan-Vorgabe ("4×1 km", "2×2 km").
  * Zusammenhängende schnelle Runden werden auf die Plan-Distanz zusammengefasst, langsame (Trabpause, Ein-/Auslaufen) zählen nicht.
@@ -146,9 +147,14 @@ export function watchCheck(act, { steps = null, intervalText = "" } = {}) {
     if (!laps.length) out.splits = { state: "none", got: 0, total, mode: null, count: 0 };
     else {
       const r = alignSplits(laps, steps);
-      out.splits = r.times
-        ? { state: "ok", got: r.times.filter((t, k) => t != null && steps[k].kind !== "rest").length, total, mode: r.mode, count: r.count }
-        : { state: "bad", got: 0, total, mode: null, count: r.count };
+      const dp = r.times ? null : alignLaps(laps, steps);
+      if (r.times) out.splits = { state: "ok", got: r.times.filter((t, k) => t != null && steps[k].kind !== "rest").length, total, mode: r.mode, count: r.count };
+      else if (dp && dp.sure.some((x, k) => x && steps[k].kind !== "rest")) {
+        // Nur sicher zugeordnete Schritte zählen; unsichere bleiben leer (nichts raten)
+        const got = dp.sure.filter((x, k) => x && steps[k].kind !== "rest").length;
+        const unsure = dp.sure.filter((x, k) => x === false && steps[k].kind !== "rest").length;
+        out.splits = { state: "ok", got, total, mode: "dp", count: dp.count, tail: dp.tail, unsure };
+      } else out.splits = { state: "bad", got: 0, total, mode: null, count: r.count };
     }
   }
   if (intervalText) {

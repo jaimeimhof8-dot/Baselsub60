@@ -10,7 +10,8 @@ import { alignLaps } from "./align.js";
 export function segmentRuns(laps, planText) {
   const reps = parseReps(planText);
   if (!reps) return null;
-  const L = (laps || []).map((l, i) => ({ ...l, i, p: paceOf(l) }));
+  const shortReps = reps.dist <= 200; // Strides: Uhr misst «100 m» oft als 90–99 m (paceOf verlangt 100 m)
+  const L = (laps || []).map((l, i) => ({ ...l, i, p: shortReps && l && l.t && l.d >= reps.dist * 0.6 ? l.t / (l.d / 1000) : paceOf(l) }));
   const valid = L.filter((l) => l.p && l.t >= (reps.dist <= 200 ? 10 : 20));
   if (valid.length < 1) return null;
 

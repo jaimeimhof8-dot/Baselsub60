@@ -40,14 +40,19 @@ export const fmtPace = (p) => (p ? mmss(p) + "/km" : "–");
  * -> {kind: "intervals"|"steady"|"none", work: [Index], reps?: {n, dist}}
  */
 export function intervals(laps, planText = "") {
-  const L = (laps || []).map((l, i) => ({ ...l, i, p: paceOf(l) }));
   const reps = parseReps(planText);
-  // Kurze Wiederholungen (Steigerungsläufe 100–200 m) dauern oft nur 14–25 s: die 30-s-Grenze würde sie sonst alle verwerfen
-  const minT = reps && reps.dist <= 200 ? 10 : 30;
+  // Kurze Wiederholungen (Steigerungsläufe 100–200 m): Die Uhr misst «100 m» oft als 90–99 m und die Runde dauert nur 14–25 s.
+  // Darum für sie: Mindestdistanz 60 % der Plan-Strecke (statt 100 m), Mindestdauer 10 s (statt 30 s), Abweichung bis 25 % (statt 15 %).
+  const short = !!reps && reps.dist <= 200;
+  const L = (laps || []).map((l, i) => ({ ...l, i, p: short && l && l.t && l.d >= reps.dist * 0.6 ? l.t / (l.d / 1000) : paceOf(l) }));
+  const minT = short ? 10 : 30;
   const valid = L.filter((l) => l.p && l.t >= minT);
   if (valid.length < 2) return { kind: "none", work: [] };
   if (reps) {
-    const fit = valid.filter((l) => Math.abs(l.d - reps.dist) <= reps.dist * 0.15).sort((a, b) => a.p - b.p).slice(0, reps.n);
+    let fit = valid.filter((l) => Math.abs(l.d - reps.dist) <= reps.dist * (short ? 0.25 : 0.15)).sort((a, b) => a.p - b.p);
+    // Kurze Wiederholungen: Die Trab-Rückkehr hat dieselbe Strecke, aber ein viel langsameres Tempo: nur Runden nahe am schnellsten Tempo zählen
+    if (short && fit.length) fit = fit.filter((l) => l.p <= fit[0].p * 1.4);
+    fit = fit.slice(0, reps.n);
     if (fit.length >= Math.min(2, reps.n)) return { kind: "intervals", work: fit.map((l) => l.i).sort((a, b) => a - b), reps };
   }
   const best = Math.min(...valid.map((l) => l.p));

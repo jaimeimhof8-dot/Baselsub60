@@ -13119,6 +13119,14 @@
       .cmp-zr > span b { font-family: var(--f-head); font-size: 15px; color: var(--text); font-variant-numeric: tabular-nums; }
       @media (prefers-reduced-motion: no-preference) { .cmp-tip { animation: cmpfade 0.12s ease-out; } @keyframes cmpfade { from { opacity: 0; } } }
       .s7-an-tg.more { margin-top: 10px; font-size: 14px; }
+      /* Analyse-Tab: Auswahl früherer Einheiten */
+      .an-pick { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 10px; margin: 0 0 8px; scrollbar-width: thin; }
+      .an-pick button { all: unset; box-sizing: border-box; flex: 0 0 auto; min-height: 44px; display: grid; align-content: center; gap: 1px; padding: 6px 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; color: var(--muted); font-size: 12px; }
+      .an-pick button b { color: var(--text); font-size: 14px; font-weight: 600; }
+      .an-pick button.on { border-color: #e6b94d; background: rgba(230, 185, 77, 0.12); }
+      .an-pick button.on b { color: #e6b94d; }
+      .an-pick button:focus-visible { outline: 2px solid #e6b94d; outline-offset: 2px; }
+      .an-empty { padding: 18px 0; color: var(--muted); }
       .s7-an-txt { display: grid; gap: 4px; margin-top: 6px; }
       .s7-an {
         border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -14304,6 +14312,19 @@
       </div>
       <nav class="mnav" aria-label="Training">
         <span class="mk">Training</span>
+        <button class="mi" data-v="analysis">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M4 17l5-5 4 3 7-8M15 7h5v5" /></svg
+          ><span class="l">Analyse</span>
+        </button>
         <button class="mi" data-v="review">
           <svg
             viewBox="0 0 24 24"
@@ -20718,7 +20739,7 @@
           anErr[dk] = e.message || coach.coachErrorText(-1, "");
         }
         delete anBusy[dk];
-        if (view === "today") render();
+        if (view === "today" || view === "analysis") render();
       }
       /* Schnell-Check ohne Netz (feste Regeln, src/analyse.js) */
       function s7Analysis(i, p) {
@@ -20797,7 +20818,7 @@
         if (!USER || USER.id !== uid) return;
         const row = ((r && r.data) || [])[0];
         PSES[iso] = r && r.error ? { state: "err", acts: [], at: Date.now() } : { state: "ok", acts: row && Array.isArray(row.acts) ? row.acts : [], at: Date.now() };
-        if (view === "today") render();
+        if (view === "today" || view === "analysis") render();
       }
       /* -> {tabs, panel, hint, on}: Tabs nur mit Partner-Daten und eigener Uhr-Aktivität; sonst ein ruhiger Hinweis mit konkretem Grund */
       function s7CmpParts(i, p) {
@@ -21060,8 +21081,7 @@
         <h2 class="s6-title">${esc(s7Title(p.t))}</h2><div class="s6-title-d"><h1>${esc(s7Title(p.t))}</h1></div>
         <p class="s7-fl"><b>${st.done - p.i.filter((_, j) => S.xs[dk + "|" + j]).length}</b> von ${st.n} Übungen${p.i.some((_, j) => S.xs[dk + "|" + j]) ? ` · ${p.i.filter((_, j) => S.xs[dk + "|" + j]).length} gestrichen` : ""} · Anstrengung <b>${rpe != null ? rpe : "–"}</b> von 10</p>
         ${open.length ? `<p class="s7-fp">Nicht gemacht: ${esc(open.join(", "))}.${can ? " Die offenen Übungen kannst Du verschieben." : ""}</p>` : ""}
-        ${s7AnHtml(i, p)}
-        <div class="s7-fa">${can ? `<button type="button" class="s6-btn" data-act="later" data-i="${i}">Offene verschieben</button>` : ""}<button type="button" class="s6-btn" data-act="all-done" data-i="${i}">Ändern</button></div></article>`;
+        <div class="s7-fa">${can ? `<button type="button" class="s6-btn" data-act="later" data-i="${i}">Offene verschieben</button>` : ""}<button type="button" class="s6-btn" data-act="all-done" data-i="${i}">Ändern</button><button type="button" class="s6-btn gold" data-v="analysis">Analyse ansehen</button></div></article>`;
         const wk = `<section class="s6-card s7-fw"><div><span class="s6-kick">Woche ${w + 1}</span><b>${D.ok} <small>/ ${D.plan} Einheiten</small></b></div></section>`;
         return card;
       }
@@ -21177,6 +21197,45 @@
         }
         const goal = `<section class="s6-card s6-goal"><span class="s6-kick">Ziel</span><b class="s7-gb">&lt; 60:00</b><span class="s7-gd">Sa 13.02.2027</span><span class="s7-gs">HYROX Basel · Doubles Men PRO mit ${esc(PARTNER)}</span></section>`;
         return `${intro}<div class="s6 s6-today">${head}${rail}<div class="s6-main">${hero}${more}${hintsHtml}</div><div class="s6-side">${goal}${s7Ready(i)}${ciHtml}</div></div>`;
+      }
+      /* ---- Analyse-Tab: heutige Einheit, dazu frühere Analysen zum Zurückschauen ---- */
+      let anSel = null; // null = heute
+      function anFinished(i) {
+        const p = dayPlan(i),
+          dk = keyI(i);
+        if (!p || p.k === "rest" || S.off[dk] || S.later[dk]) return false;
+        const st = dayStatus(i),
+          rpe = S.rpe[dk];
+        return !!st.n && (st.done >= st.n || (rpe != null && st.done > 0));
+      }
+      function anTabView() {
+        const today = Math.max(0, Math.min(LAST, TODAY)),
+          i = anSel != null ? anSel : today,
+          p = dayPlan(i),
+          dk = keyI(i),
+          isT = i === today;
+        const days = [];
+        for (let x = today; x >= 0 && days.length < 60; x--) {
+          if (x === today || anFinished(x) || S.analysis[keyI(x)]) days.push(x);
+        }
+        const chips = days
+          .map((x) => {
+            const q = dayPlan(x);
+            if (!q) return "";
+            return `<button type="button" class="${x === i ? "on" : ""}" data-act="an-pick" data-i="${x}" aria-pressed="${x === i}"><b>${x === today ? "Heute" : esc(DAYS[dow(x)] + " " + fmt(dateFromIdx(x)))}</b><span>${esc(s7Title(q.t))}</span></button>`;
+          })
+          .join("");
+        const d = dateFromIdx(i),
+          head = s6Head(
+            `${DAYSF[dow(i)]}, ${fmt(d)}${isT ? " · Heute" : ""}`,
+            "Analyse",
+            p && p.k !== "rest" ? esc(s7Title(p.t)) : "",
+          );
+        let body;
+        if (!p || p.k === "rest") body = `<p class="an-empty">${isT ? "Heute ist Ruhetag, es gibt nichts auszuwerten." : "An diesem Tag war Ruhetag."}</p>`;
+        else if (anFinished(i) || S.analysis[dk] || actsOf(i).length) body = `<article class="s6-hero s7-fin" data-day="${i}" style="--kc:var(--${p.k})"><div class="s6-hero-top"><span class="s6-chip"><i style="background:var(--${p.k})"></i>${S6_KIND[p.k] || p.k}</span></div><h2 class="s6-title">${esc(s7Title(p.t))}</h2><div class="s6-title-d"><h1>${esc(s7Title(p.t))}</h1></div>${s7AnHtml(i, p)}</article>`;
+        else body = `<p class="an-empty">${isT ? "Die heutige Einheit ist noch nicht erledigt. Sobald du sie abschliesst, findest du hier die Analyse." : "Zu diesem Tag gibt es keine Analyse."}</p>`;
+        return `<div class="s6">${head}<div class="s6-main"><nav class="an-pick" aria-label="Einheit wählen">${chips}</nav>${body}</div></div>`;
       }
       /* ---- Woche ---- */
       function s6RunKm(w) {
@@ -23323,6 +23382,7 @@
         onb: vOnb,
         dashboard: s6Dashboard,
         review: s6Review,
+        analysis: anTabView,
       };
       function render() {
         if (drag && drag.on) return void (renderHeld = true); // während des Ziehens nicht neu aufbauen
@@ -23348,6 +23408,7 @@
             "coach",
             "dashboard",
             "review",
+            "analysis",
             "plan",
             "profile",
             "backup",
@@ -23595,6 +23656,7 @@
         }
         if (v === "import" && imp.step !== "preview") imp = { step: "pick" };
         if (v === "backup") loadHistory();
+        if (v === "analysis" && view !== "analysis") anSel = null; // beim Öffnen immer die heutige Einheit
         const changed = v !== view,
           kind = how || (TABS.includes(v) ? "tab" : "push");
         const apply = () => {
@@ -24114,6 +24176,10 @@
           return leaveCheckin(t);
         }
         if (d.act === "an-run") return runAnalysis(+d.i);
+        if (d.act === "an-pick") {
+          anSel = +d.i;
+          return render();
+        }
         if (d.act === "cmp-tab") {
           cmpTab[keyI(+d.i)] = d.t === "cmp" ? "cmp" : "an";
           return render();

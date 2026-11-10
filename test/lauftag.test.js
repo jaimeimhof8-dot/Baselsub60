@@ -124,3 +124,26 @@ test("Review M1–M3: Parser liest nichts, was er nicht versteht", () => {
   const ok = lauftagSteps(["3×1 km @ 4:00/km (4:00), Trabpause 200 m @ 6:30/km (1:18)"]);
   assert.equal(ok.filter((s) => s.kind === "rest").length, 2, "ohne Anzahl: Pause zwischen allen Wiederholungen");
 });
+
+// ---- Zweiter Review ----
+test("Review2 H1: zügiger Rückweg (64 s/200 m, 5:20/km) zählt nicht als Wiederholung", () => {
+  const P = lauftagSteps(["4 km Zone 2 @ 5:20/km (21:20) → 3×200 m @ 4:00/km (0:48)"]);
+  const r = alignLauf([{ d: 4000, t: 1280 }, { d: 200, t: 48 }, { d: 200, t: 64 }, { d: 200, t: 48 }], P);
+  assert.ok(!r || !r.lines[0].done);
+});
+test("Review2 H1b: nur 3 von 4 Steigerungen, Rückwege 29 s (4:50/km) – Zeile nicht erledigt", () => {
+  const r = alignLauf([{ d: 1000, t: 330 }, { d: 100, t: 22 }, { d: 100, t: 29 }, { d: 100, t: 22 }, { d: 100, t: 29 }, { d: 100, t: 22 }], lauftagSteps(LINES));
+  assert.ok(r);
+  assert.equal(r.lines[1].done, false);
+  assert.ok(!/0:29/.test(r.lines[1].text));
+});
+test("Review2 M1: Auslaufen (1 km in 4:50) zählt nicht als dritte Wiederholung", () => {
+  const P = lauftagSteps(["Einlaufen 1 km @ 5:30/km (5:30)", "3×1 km @ 4:00/km (4:00), Trabpause 200 m @ 6:30/km (1:18)", "Auslaufen 1 km @ 5:30/km (5:30)"]);
+  const r = alignLauf([{ d: 1000, t: 330 }, { d: 1000, t: 240 }, { d: 200, t: 78 }, { d: 1000, t: 240 }, { d: 200, t: 78 }, { d: 1000, t: 290 }], P);
+  assert.ok(!r || !r.lines[1].done);
+});
+test("Review2 M3: fehlende feste Trabpause zwischen zwei Wiederholungen macht den Rest unsicher", () => {
+  const P = lauftagSteps(["Einlaufen 1 km @ 5:30/km (5:30)", "2×2 km @ 4:14/km (8:28), Trabpause 400 m @ 6:30/km (2:36)", "Auslaufen 600 m @ 5:30/km (3:18)"]);
+  const r = alignLauf([{ d: 1000, t: 330 }, { d: 2000, t: 508 }, { d: 2000, t: 562 }], P);
+  assert.ok(!r || !r.lines[1].done);
+});

@@ -113,6 +113,10 @@ export function alignLauf(laps, steps) {
   if ((f[n][m] - 0.15 * tail) / got.length > 0.6) return null; // schlechte Gesamtpassung: nichts raten (nicht aufgezeichnete Schlussschritte zählen nicht)
   const lastLap = match[last].lap[1];
   // Sicherheit: nur bei Strecke (GPS), Einzelrunde, Strecke ≤ 15 % daneben und lückenlosem Anfang (sonst könnte die Reihenfolge verschoben sein)
+  // Tempo der Rückwege (Trab) dieser Einheit: Grundlage, um Steigerungen von Rückwegen zu unterscheiden (nicht das Plan-Tempo)
+  const jogPaces = match.filter((x, k) => steps[k].soft && x.lap && !x.pair && x.lap[0] === x.lap[1] && x.lap[1] >= x.lap[0])
+    .map((x, k0) => { const t = T[x.lap[0]].t, d = T[x.lap[0]].d; return d >= 50 ? t / (d / 1000) : null; }).filter(Boolean).sort((a, b) => a - b);
+  const jogMed = jogPaces.length ? jogPaces[Math.floor(jogPaces.length / 2)] : null;
   // hard: grosse Unstimmigkeit (Reihenfolge der langen Schritte unsicher), gilt für den Rest der Einheit.
   // softLine: Zweifel an einem kurzen Schritt (Steigerung, Rückweg), gilt nur bis zum Ende dieser Plan-Zeile: Die Strecken der langen Schritte
   // (600/1000/1400 m) unterscheiden sich klar von 100 m, ein zweifelhafter Lauf von 100 m kann sie nicht verschieben.
@@ -130,7 +134,7 @@ export function alignLauf(laps, steps) {
   for (let k = 0; k < n; k++) {
     const x = match[k], s = steps[k];
     if (softLine !== null && s.line !== softLine) softLine = null;
-    if (!x.lap) { if (k < last && !isRest(k)) doubt(s); continue; }
+    if (!x.lap) { if (k < last && !isRest(k)) doubt(s); else if (k < last && !s.soft && k > got[0]) hard = false; continue; } // feste Trabpause fehlt zwischen zwei Schritten: Strecke steckt in einer anderen Runde
     const t = pre[x.lap[1] + 1] - pre[x.lap[0]], d = dpre[x.lap[1] + 1] - dpre[x.lap[0]];
     x.t = Math.round(t); x.d = Math.round(d);
     for (let q = 0; q < x.lap[0]; q++) if (!used.has(q) && (T[q].d >= 60 || T[q].t >= 60)) hard = false;
@@ -139,7 +143,9 @@ export function alignLauf(laps, steps) {
     const tt = s.goal > 0 ? Math.abs(Math.log(t / s.goal)) : 0;
     // Zeit muss zum Ziel passen. Kurze Läufe (Steigerungen): Tempo höchstens 35 % langsamer als geplant, sonst ist es der Trab zurück.
     // Lange Läufe: ±22 %. Ein- und Auslaufen (locker, unterschiedlich schnell): ±65 %.
-    const timeOk = s.goal <= 0 ? true : s.kind === "run" ? (s.dist <= 200 ? t / (d / 1000) <= 1.35 * (s.goal / (s.dist / 1000)) : tt <= 0.2) : tt <= 0.5;
+    const pace = d > 0 ? t / (d / 1000) : Infinity;
+    // Steigerung: höchstens 25 % langsamer als das Plan-Tempo UND deutlich schneller als der Trab der Einheit (≤ 80 %); der Trab schwankt, darum beides.
+    const timeOk = s.goal <= 0 ? true : s.kind === "run" ? (s.dist <= 200 ? pace <= 1.25 * (s.goal / (s.dist / 1000)) && (jogMed == null || pace <= 0.8 * jogMed) : tt <= 0.15) : tt <= 0.5;
     // Zu kurze Runde (Strecke deutlich unter Plan) ist vermutlich nur ein Teil des Schritts (Doppeldruck): dort enger als bei zu langer Strecke (GPS)
     const under = s.dist > 0 && d > 0 && Math.log(d / s.dist) < -0.12;
     x.sure = rigidNow() && !x.pair && x.lap[0] === x.lap[1] && !s.soft && !isRest(k) && dd <= tol(k) && !under && timeOk;
@@ -151,13 +157,13 @@ export function alignLauf(laps, steps) {
   }
   // Sammelrunde «Steigerung + Rückweg»: nur als gelaufen gewertet, wenn sie deutlich schneller ist als die Rückwege dieser Einheit
   // (sonst könnte es auch «Rückweg + Rückweg» sein, wenn eine Steigerung fehlt)
-  const jog = match.filter((x, k) => steps[k].soft && x.lap && !x.pair && x.d >= 60 && x.d <= 160).map((x) => x.t / (x.d / 1000)).sort((a, b) => a - b);
-  const jogMed = jog.length ? jog[Math.floor(jog.length / 2)] : null;
   match.forEach((x, k) => {
     if (!x.pair || (k > 0 && match[k - 1].pair && match[k - 1].lap && match[k - 1].lap[0] === x.lap[0])) return; // nur am ersten Schritt der Sammelrunde
     const nx = match[k + 1], soft = steps[k].soft || (steps[k + 1] && steps[k + 1].soft);
     const t = pre[x.lap[1] + 1] - pre[x.lap[0]], d = dpre[x.lap[1] + 1] - dpre[x.lap[0]];
-    x.pairOk = !!soft && jogMed != null && d >= 20 && t / (d / 1000) <= 0.9 * jogMed;
+    // Trab-Anteil der Sammelrunde abziehen: übrig bleibt die Zeit der Steigerung selbst, sie muss zum Plan passen
+    const run = steps[k].soft ? steps[k + 1] : steps[k];
+    x.pairOk = !!soft && jogMed != null && !!run && run.goal > 0 && d >= 20 && t - (Math.max(0, d - run.dist) / 1000) * jogMed <= 1.35 * run.goal;
     if (nx) nx.pairOk = x.pairOk;
   });
   const lines = [];

@@ -11,7 +11,7 @@ export function segmentRuns(laps, planText) {
   const reps = parseReps(planText);
   if (!reps) return null;
   const L = (laps || []).map((l, i) => ({ ...l, i, p: paceOf(l) }));
-  const valid = L.filter((l) => l.p && l.t >= 20);
+  const valid = L.filter((l) => l.p && l.t >= (reps.dist <= 200 ? 10 : 20));
   if (valid.length < 1) return null;
 
   // Referenz-Pace: die schnellsten Runden, bis die geplante Gesamtdistanz erreicht ist

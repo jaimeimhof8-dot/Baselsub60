@@ -113,3 +113,11 @@ test("watchCheck: völlig anderes Bild bleibt «bad»", () => {
   const w = watchCheck({ src: "garmin", lapsV: 3, laps: [{ t: 2400, d: 8000 }] }, { steps: STEPS });
   assert.equal(w.splits.state, "bad");
 });
+
+import { intervals } from "../src/dashboard.js";
+test("Steigerungsläufe 4×100 m (je ~18 s) werden als Intervalle erkannt, nicht verworfen", () => {
+  const laps = [{ d: 1500, t: 540 }, { d: 100, t: 18 }, { d: 100, t: 45 }, { d: 100, t: 17 }, { d: 100, t: 46 }, { d: 100, t: 18 }, { d: 100, t: 44 }, { d: 100, t: 17 }, { d: 1000, t: 250 }];
+  const r = intervals(laps, "4×100 m Steigerungen");
+  assert.equal(r.kind, "intervals");
+  assert.equal(r.work.length, 4);
+});

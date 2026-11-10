@@ -15122,8 +15122,25 @@
         }
         if (taken) row(done >= n ? "ok" : "wait", `Plan: ${done} von ${n} Zeilen abgehakt`);
         else row("wait", "Plan: noch nicht übernommen");
-        const diagBtn = a.laps && a.laps.length ? `<button class="btn ghost sm mt-1" data-act="diag-copy" data-i="${i}" data-a="${esc(a.id)}">Diagnose kopieren</button>` : "";
-        return `<ul class="gchk" aria-label="Prüfung der Übernahme">${rows.join("")}</ul>${diagBtn}`;
+        // Vorschau bei unsicherer Zuordnung: sichere Schritte stehen fest, unsichere trägt der Nutzer nur nach Bestätigung ein
+        let prev = "";
+        if (isPlan && steps && steps.length && a.laps && a.laps.length && !alignSplits(a.laps, steps).times) {
+          const dp = alignLaps(a.laps, steps);
+          if (dp && dp.sure.some((x) => x === false)) {
+            const li = steps
+              .map((st, k) => {
+                if (st.kind === "rest" || dp.times[k] == null) return "";
+                const nm = `${esc(st.name || st.kind)} · ${mmss(dp.times[k])}${st.goal ? ` (Ziel ${mmss(st.goal)})` : ""}`;
+                return dp.sure[k]
+                  ? `<li class="tk"><span>✓ ${nm}</span></li>`
+                  : `<li><label class="tk"><input type="checkbox" data-pk="${k}"><span>? ${nm} – nicht sicher, nur bei Bestätigung</span></label></li>`;
+              })
+              .join("");
+            prev = `<div class="take" data-prev="${i}"><div class="sub">Zuordnung prüfen: Haken setzen bei Zeiten, die stimmen.</div><ul class="gchk">${li}</ul><button class="btn sm mt-1" data-act="prev-ok" data-i="${i}" data-a="${esc(a.id)}">Bestätigte übernehmen</button></div>`;
+          }
+        }
+        const diagBtn = `<button class="btn ghost sm mt-1" data-act="diag-copy" data-i="${i}" data-a="${esc(a.id)}">Diagnose kopieren</button>`;
+        return `<ul class="gchk" aria-label="Prüfung der Übernahme">${rows.join("")}</ul>${prev}${diagBtn}`;
       }
       /* Diagnose einer Einheit als JSON (Runden, Plan, Zuordnungsergebnis) zum Weitergeben bei Problemen mit der Rundenübernahme */
       function diagText(i, aid) {
@@ -22757,13 +22774,17 @@
       }
       /* Lap-Runden der Uhr (Garmin/Strava) den Plan-Schritten zuordnen: Treffer {times, hr, mode, act} oder null */
       function watchSplitsFor(i, steps) {
-        for (const a of actsOf(i)) {
-          if (!a.laps || !a.laps.length) continue;
+        const acts = actsOf(i).filter((a) => a.laps && a.laps.length);
+        for (const a of acts) {
           const r = alignSplits(a.laps, steps);
           if (r.times) return { ...r, act: a };
-          // Rückfall bei fehlenden/doppelten Runden oder Absturz: nur eindeutig zugeordnete Schritte übernehmen, der Rest bleibt leer
+        }
+        // Rückfall bei fehlenden/doppelten Runden oder Absturz, erst nachdem keine Aktivität exakt passt:
+        // nur eindeutig zugeordnete Arbeitsschritte übernehmen, der Rest (auch Puls) bleibt leer
+        for (const a of acts) {
           const dp = alignLaps(a.laps, steps);
-          if (dp && dp.sure.some((x) => x)) return { ...dp, times: dp.times.map((t, k) => (dp.sure[k] ? t : null)), act: a };
+          if (dp && dp.sure.some((x, k) => x && steps[k].kind !== "rest"))
+            return { times: dp.times.map((t, k) => (dp.sure[k] ? t : null)), hr: dp.hr.map((h, k) => (dp.sure[k] ? h : null)), mode: "dp", count: dp.count, act: a };
         }
         return null;
       }
@@ -24716,6 +24737,19 @@
         }
         if (d.act === "gm-off") return garminOff();
         if (d.act === "gm-mfa-x") return garminMfaCancel();
+        if (d.act === "prev-ok") {
+          const i = +d.i, a = S.strava.acts[d.a], st = s7Steps(dayPlan(i));
+          const box = document.querySelector(`[data-prev="${i}"]`);
+          if (!a || !st || !box) return render();
+          const ok = new Set([...box.querySelectorAll("input[data-pk]:checked")].map((x) => +x.dataset.pk)),
+            dp = alignLaps(a.laps || [], st);
+          if (!dp) return toast("Zuordnung nicht mehr möglich", true);
+          writeSplits(keyI(i), st, dp.times.map((t, k) => (dp.sure[k] || ok.has(k) ? t : null)), false);
+          S.wsplit[keyI(i)] = a.id;
+          save();
+          toast(ok.size ? `${ok.size} bestätigte Zeit${ok.size > 1 ? "en" : ""} übernommen` : "Nur sichere Zeiten übernommen");
+          return render();
+        }
         if (d.act === "diag-copy") {
           const txt = diagText(+d.i, d.a);
           if (!txt) return toast("Keine Daten für die Diagnose", true);

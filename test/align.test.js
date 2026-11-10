@@ -113,3 +113,58 @@ test("watchCheck: völlig anderes Bild bleibt «bad»", () => {
   const w = watchCheck({ src: "garmin", lapsV: 3, laps: [{ t: 2400, d: 8000 }] }, { steps: STEPS });
   assert.equal(w.splits.state, "bad");
 });
+
+import { intervals } from "../src/dashboard.js";
+test("Steigerungsläufe 4×100 m (je ~18 s) werden als Intervalle erkannt, nicht verworfen", () => {
+  const laps = [{ d: 1500, t: 540 }, { d: 100, t: 18 }, { d: 100, t: 45 }, { d: 100, t: 17 }, { d: 100, t: 46 }, { d: 100, t: 18 }, { d: 100, t: 44 }, { d: 100, t: 17 }, { d: 1000, t: 250 }];
+  const r = intervals(laps, "4×100 m Steigerungen");
+  assert.equal(r.kind, "intervals");
+  assert.equal(r.work.length, 4);
+});
+
+// ---- Erweiterter Zufallstest (Review-Befund): mehrere Plan-Layouts, Mutation «zwei Schritte in einer Runde» ----
+const L1 = (kind, goal) => ({ kind, goal });
+const LAYOUTS = {
+  station: STEPS,
+  intervalle: [L1("warm", 600), ...Array.from({ length: 6 }, () => [L1("run", 240), L1("rest", 90)]).flat(), L1("cool", 600)],
+  intervalleOhnePause: [L1("warm", 600), ...Array.from({ length: 6 }, () => L1("run", 240)), L1("cool", 600)],
+  zweiLaeufe: [L1("warm", 600), L1("run", 300), L1("run", 300), L1("station", 120), L1("run", 300), L1("run", 300), L1("cool", 600)],
+  nurStationen: Array.from({ length: 8 }, () => L1("station", 90)),
+};
+const mkLaps = (steps, R) => steps.map((s, k) => ({ t: Math.round(s.goal * (1 + (R() - 0.5) * 0.12)), d: s.kind === "run" ? 1000 : s.kind === "warm" || s.kind === "cool" ? 1500 : 0, hr: 150, _s: [k] }));
+const MUTS = {
+  vergessen: (laps, R) => { const i = Math.floor(R() * (laps.length - 1)); const a = laps[i], b = laps[i + 1]; laps.splice(i, 2, { t: a.t + b.t, d: a.d + b.d, hr: 150, _s: [...a._s, ...b._s] }); },
+  abbruch: (laps, R) => { laps.splice(Math.max(3, laps.length - 1 - Math.floor(R() * 4))); },
+  fehlt: (laps, R) => { laps.splice(Math.floor(R() * laps.length), 1); },
+  zusatz: (laps, R) => { laps.splice(Math.floor(R() * laps.length), 0, { t: 5 + Math.floor(R() * 8), d: 0, hr: 150, _s: [-1] }); },
+  doppelt: (laps, R) => { const i = Math.floor(R() * laps.length), l = laps[i], c = Math.max(5, Math.floor(l.t * R())); laps.splice(i, 1, { ...l, t: c, d: Math.round(l.d * c / l.t) }, { ...l, t: Math.max(1, l.t - c), d: l.d - Math.round(l.d * c / l.t) }); },
+};
+for (const [ln, steps] of Object.entries(LAYOUTS)) for (const [mn, mut] of Object.entries(MUTS)) {
+  test(`Zufallstest ${ln} / ${mn}: nie «sicher» auf fremder Runde`, () => {
+    let sureSteps = 0;
+    for (let seed = 1; seed <= 400; seed++) {
+      const R = rng(seed * 31 + 7);
+      const laps = mkLaps(steps, R);
+      mut(laps, R);
+      const r = alignLaps(laps, steps);
+      if (!r) continue;
+      steps.forEach((_, k) => {
+        if (!r.sure[k] || r.laps[k] == null) return;
+        sureSteps++;
+        const owners = new Set(r.merged[r.laps[k]].parts.flatMap((p) => p._s));
+        owners.delete(-1);
+        assert.ok(owners.size === 1 && owners.has(k), `${ln}/${mn} Seed ${seed}: Schritt ${k} sicher, Runden gehören zu ${[...owners]}`);
+      });
+    }
+  });
+}
+test("Review H1: vergessener Druck (Einlaufen + Lauf in einer Runde) wird nie als sicher gemeldet", () => {
+  const P = LAYOUTS.zweiLaeufe;
+  const laps = [{ t: 900, d: 3060 }, { t: 300, d: 1260 }, { t: 120, d: 0 }, { t: 300, d: 1260 }, { t: 300, d: 1260 }, { t: 600, d: 1800 }];
+  const r = alignLaps(laps, P);
+  assert.ok(!r || !r.sure[0]);
+});
+test("Ungültige Eingaben: kein Absturz", () => {
+  assert.equal(alignLaps([{ t: 240 }], [null]), null);
+  assert.doesNotThrow(() => alignLaps([{ t: "240", d: NaN }, { t: NaN }], STEPS));
+});

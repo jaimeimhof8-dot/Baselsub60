@@ -129,6 +129,19 @@ Regel: **Aufpasser (Opus)** schreibt nie Produktivcode, **Macher (Sonnet)** schr
 - Zufallstest (500 Läufe im Test, 20 000 einmalig): keine als «sicher» gemeldete Zuordnung auf der Runde eines anderen Schritts. Einschränkung: Die Testdaten sind synthetisch.
 - **Noch offen:** Vorschau-Karte zum Bestätigen, Lauf-Profil mit Strides (parseReps/segmentRuns), echte Daten, Aufpasser-Review (S3).
 
+## 6c. Aufpasser-Review (Opus, blind, 10.11.) und Nacharbeit
+
+Urteil des Reviews: **nicht freigegeben**. Befunde und Stand:
+- H1 (vergessener Druck → falsch «sicher»): behoben (Nachbarlücke, Eigenkosten ≤ 0,2). Reproskripte des Reviewers: 0 Fehler.
+- H2 (`splitPhases` nutzte unsichere Schritte): behoben. Nur sichere Arbeitsschritte, sonst «keine Schätzung».
+- M1 (Lücke in gleichartigen Schritten wirkt wie Absturz): behoben für Nachbarn mit gleichem Typ und Ziel.
+- M2 (Puls nicht maskiert), M3 (Aktivitätsreihenfolge): behoben. N2 (ungültige Eingaben): behoben.
+- M5 (Laufzeit): Schutzgrenze `n·m > 10000` → keine Zuordnung. Kein Umbau auf Rückwärts-DP.
+- N3: Zufallstests für 5 Plan-Layouts × 5 Mutationen (vergessen, Abbruch, Zusatz, doppelt, fehlt). 38 Tests in `test/align.test.js`, gesamt 432 grün.
+- **Offen:** M4 (zu strenge Eindeutigkeit, Abdeckung leidet: eine Zusatzrunde macht oft alles unsicher, dann Vorschau), N1 (Gesamtzeit aus zusammengefassten Runden zu tief).
+- **Nicht erkennbar, auch nach Fix:** Fehlen genau eine ganze Planperiode (Lauf·Station·Pause) und danach Abbruch, ist das aus Zeiten und Distanz nicht von einem früheren Abbruch zu unterscheiden. Dafür bräuchte es zusätzlich Puls oder Startzeiten.
+- Der Review ist ein zweiter Blick, kein Beweis. Ein erneuter Review nach den Fixes steht aus.
+
 ## 7. Offene Fragen (alt)
 
 Beantwortet: Fehlerbild (keine Zuordnung bei vielen Runden), Runde bei jedem Wechsel, Auto-Lap an (Laufen), Profil «Hyrox» (Cardio).

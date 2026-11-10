@@ -21,7 +21,7 @@ export function parseReps(text) {
 /** Runden aus Garmin (/activity-service/activity/{id}/splits) oder Strava (/activities/{id}/laps) -> [{d, t, hr, w}] */
 export function normalizeLaps(raw) {
   const list = Array.isArray(raw) ? raw : (raw && (raw.lapDTOs || raw.laps)) || [];
-  return list.slice(0, 80).map((l) => ({
+  return list.slice(0, 200).map((l) => ({
     d: Math.round(+l.distance || 0),
     t: Math.round(+l.duration || +l.elapsed_time || +l.movingDuration || +l.moving_time || 0),
     hr: Math.round(+l.averageHR || +l.average_heartrate || 0) || null,
@@ -41,9 +41,11 @@ export const fmtPace = (p) => (p ? mmss(p) + "/km" : "–");
  */
 export function intervals(laps, planText = "") {
   const L = (laps || []).map((l, i) => ({ ...l, i, p: paceOf(l) }));
-  const valid = L.filter((l) => l.p && l.t >= 30);
-  if (valid.length < 2) return { kind: "none", work: [] };
   const reps = parseReps(planText);
+  // Kurze Wiederholungen (Steigerungsläufe 100–200 m) dauern oft nur 14–25 s: die 30-s-Grenze würde sie sonst alle verwerfen
+  const minT = reps && reps.dist <= 200 ? 10 : 30;
+  const valid = L.filter((l) => l.p && l.t >= minT);
+  if (valid.length < 2) return { kind: "none", work: [] };
   if (reps) {
     const fit = valid.filter((l) => Math.abs(l.d - reps.dist) <= reps.dist * 0.15).sort((a, b) => a.p - b.p).slice(0, reps.n);
     if (fit.length >= Math.min(2, reps.n)) return { kind: "intervals", work: fit.map((l) => l.i).sort((a, b) => a - b), reps };

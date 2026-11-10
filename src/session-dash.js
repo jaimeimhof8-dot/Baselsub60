@@ -154,9 +154,17 @@ export function splitPhases(laps, { steps = null, planText = "" } = {}) {
     } else {
       const LL = r.merged || L;
       if (r.merged) { out.laps = LL; out.phase = LL.map(() => "other"); out.step = LL.map(() => null); out.sub = LL.map(() => null); }
+      const dpSure = r.mode === "dp" ? steps.map((_, k) => !!r.sure[k] && steps[k].kind !== "rest") : null;
+      if (dpSure && !steps.some((st, k) => dpSure[k] && (st.kind === "run" || st.kind === "station"))) {
+        // kein einziger Arbeitsschritt sicher: keine Phasen, keine Schätzung
+        out.laps = L; out.phase = L.map(() => "other"); out.step = L.map(() => null); out.sub = L.map(() => null);
+        out.note = `Die ${r.count} Runden der Uhr passen nicht sicher zu den ${steps.length} Plan-Schritten. Keine Schätzung: Splits und Vergleiche werden nur bei sicherer Zuordnung gezeigt.`;
+        return out;
+      }
       steps.forEach((st, k) => {
         const li = r.laps[k];
         if (li == null || !LL[li]) return;
+        if (r.mode === "dp" && !r.sure[k] && st.kind !== "rest") return; // unsichere Arbeitsschritte bleiben «other»
         out.step[li] = k;
         out.phase[li] = st.kind === "warm" ? "warm" : st.kind === "cool" ? "cool" : st.kind === "rest" ? "rest" : st.kind === "run" || st.kind === "station" ? "work" : "other";
         out.sub[li] = st.kind === "run" || st.kind === "station" ? st.kind : null;

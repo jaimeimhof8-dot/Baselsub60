@@ -167,3 +167,35 @@ test("Review3: Dauerlauf mit Auto-Lap (5×1 km) wird weiter zugeordnet", () => {
   assert.ok(r);
   assert.equal(r.lines[0].done, true);
 });
+
+// ---- Vierter Review ----
+test("Review4 H: Einlaufen 3 km mit nur 2 km aufgezeichnet verschluckt keine Wiederholung (Auto-Lap-Gruppe prüft das Tempo)", () => {
+  const P = lauftagSteps(["Einlaufen 3 km @ 5:30/km (16:30)", "4×1 km @ 4:00/km (4:00)", "Auslaufen 1 km @ 5:30/km (5:30)"]);
+  for (const jog of [300, 360, 420, 480]) {
+    const laps = [{ d: 1000, t: 330 }, { d: 1000, t: 330 }];
+    for (let k = 0; k < 4; k++) { laps.push({ d: 1000, t: 240 }); if (k < 3) laps.push({ d: 1000, t: jog }); }
+    laps.push({ d: 1000, t: 330 });
+    const r = alignLauf(laps, P);
+    assert.ok(!r || !r.lines[0].done, `Trab ${jog}: «Einlaufen 3 km» darf nicht als erledigt gelten`);
+    if (r) assert.ok(!/15:00|14:30/.test(r.lines[0].text));
+  }
+});
+test("Review4 H2: Einlaufen 2 km als eine Runde statt 3 km → nicht erledigt", () => {
+  const P = lauftagSteps(["Einlaufen 3 km @ 5:30/km (16:30)", "4×1 km @ 4:00/km (4:00)", "Auslaufen 1 km @ 5:30/km (5:30)"]);
+  const laps = [{ d: 2000, t: 660 }, { d: 1000, t: 240 }, { d: 1000, t: 330 }, { d: 1000, t: 240 }];
+  const r = alignLauf(laps, P);
+  assert.ok(!r || !r.lines[0].done);
+});
+test("Review4 M: Dauerlauf 5 km mit Auto-Lap und kurzer Schlussrunde wird erkannt; 15 km mit 15 Runden ebenso", () => {
+  const P5 = lauftagSteps(["5 km Zone 2 @ 5:20/km (26:40)"]);
+  const r5 = alignLauf([...Array(5)].map(() => ({ d: 1000, t: 320 })).concat([{ d: 150, t: 48 }]), P5);
+  assert.ok(r5 && r5.lines[0].done);
+  const P15 = lauftagSteps(["15 km Zone 2 @ 5:20/km (80:00)"]);
+  const r15 = alignLauf([...Array(15)].map(() => ({ d: 1000, t: 320 })), P15);
+  assert.ok(r15 && r15.lines[0].done);
+});
+test("Review4 Folge: kurze Schlussrunde nach dem Dauerlauf ist bei folgendem 200-m-Schritt keine Zeit des Dauerlaufs", () => {
+  const P = lauftagSteps(["4 km Zone 2 @ 5:20/km (21:20) → 3×200 m @ 4:00/km (0:48)"]);
+  const r = alignLauf([{ d: 3907, t: 1344 }, { d: 141, t: 33 }], P);
+  assert.ok(!r || !/22:/.test(r.lines[0].text));
+});

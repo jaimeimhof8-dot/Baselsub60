@@ -88,8 +88,8 @@ export function alignLauf(laps, steps) {
     if (c >= INF) continue;
     if (i < n) {
       const s = steps[i];
-      const gmax = s.dist >= 3000 ? 12 : 3; // lange Dauerläufe: Auto-Lap (jeder km eine Runde) darf zusammengefasst werden
-      for (let g = 1; g <= gmax && j + g <= m; g++) relax(i + 1, j + g, c + cost(s.dist, s.goal, s.soft, pre[j + g] - pre[j], dpre[j + g] - dpre[j]) + (g - 1) * (s.dist >= 3000 ? 0.05 : 0.3), "m", i, j, g);
+      const gmax = s.dist >= 3000 ? Math.ceil(s.dist / 1000) + 2 : 3; // lange Dauerläufe: Auto-Lap (jeder km eine Runde) darf zusammengefasst werden
+      for (let g = 1; g <= gmax && j + g <= m; g++) relax(i + 1, j + g, c + cost(s.dist, s.goal, s.soft, pre[j + g] - pre[j], dpre[j + g] - dpre[j]) + (g - 1) * (s.dist >= 3000 ? 0.02 : 0.3), "m", i, j, g);
       if (i + 1 < n && j < m) { // eine Runde deckt zwei Schritte (vergessener Druck)
         const s2 = steps[i + 1];
         relax(i + 2, j + 1, c + cost(s.dist + s2.dist, s.goal > 0 && s2.goal > 0 ? s.goal + s2.goal : 0, s.soft && s2.soft, T[j].t, T[j].d) + 0.5, "p", i, j, 1);
@@ -143,14 +143,21 @@ export function alignLauf(laps, steps) {
     // Kurze Strecken: GPS-Fehler ist absolut (±10–25 m), darum grosszügiger. Die Zeit muss ausserdem zum Planziel passen (sonst ist es eine andere Runde, z. B. der Trab zurück).
     const tt = s.goal > 0 ? Math.abs(Math.log(t / s.goal)) : 0;
     // Zeit muss zum Ziel passen. Kurze Läufe (Steigerungen): Tempo höchstens 35 % langsamer als geplant, sonst ist es der Trab zurück.
-    // Lange Läufe: ±22 %. Ein- und Auslaufen (locker, unterschiedlich schnell): ±65 %.
+    // Lange Läufe: ±22 %. Ein- und Auslaufen (locker, unterschiedlich schnell): ±35 % (sonst wird die erste Wiederholung zum «Einlaufen», wenn die Aufzeichnung erst danach beginnt).
     const pace = d > 0 ? t / (d / 1000) : Infinity;
     // Steigerung: höchstens 25 % langsamer als das Plan-Tempo UND deutlich schneller als der Trab der Einheit (≤ 80 %); der Trab schwankt, darum beides.
-    const timeOk = s.goal <= 0 ? true : s.kind === "run" ? (s.dist <= 200 ? pace <= 1.25 * (s.goal / (s.dist / 1000)) && (jogMed == null || pace <= 0.8 * jogMed) : tt <= 0.15) : tt <= 0.5;
+    const timeOk = s.goal <= 0 ? true : s.kind === "run" ? (s.dist <= 200 ? pace <= 1.25 * (s.goal / (s.dist / 1000)) && (jogMed == null || pace <= 0.8 * jogMed) : tt <= 0.15) : tt <= 0.3;
     // Zu kurze Runde (Strecke deutlich unter Plan) ist vermutlich nur ein Teil des Schritts (Doppeldruck): dort enger als bei zu langer Strecke (GPS)
     const under = s.dist > 0 && d > 0 && Math.log(d / s.dist) < -0.12;
     // Dauerlauf-Gruppe: mehrere Auto-Lap-Runden (je ≥ 300 m) zu einem langen Schritt (≥ 3 km) sind zulässig
-    const autoLap = s.dist >= 3000 && x.lap[1] > x.lap[0] && T.slice(x.lap[0], x.lap[1] + 1).every((l) => l.d >= 300);
+    // Auto-Lap-Gruppe: Runden von je ≥ 300 m (nur die letzte darf kürzer sein, Rest der Strecke) im gleichen Tempo (±15 % vom Median).
+    // Ohne Tempoprüfung würden bei fehlendem Einlaufen Wiederholungen und Rückwege mit in den langen Schritt fallen.
+    const grp = T.slice(x.lap[0], x.lap[1] + 1);
+    // Die kurze Schlussrunde nur zulassen, wenn danach kein kurzer Schritt folgt (sonst könnte sie dessen erste Runde sein, z. B. «4 km → 3×200 m»)
+    const shortTailOk = k === n - 1 || steps[k + 1].dist >= 600;
+    const body = shortTailOk && grp.length > 1 && grp[grp.length - 1].d < 300 && grp[grp.length - 1].d >= 20 ? grp.slice(0, -1) : grp;
+    const gp = body.map((l) => (l.d > 0 ? l.t / (l.d / 1000) : Infinity)).sort((a, b) => a - b), gmed = gp[Math.floor(gp.length / 2)];
+    const autoLap = s.dist >= 3000 && x.lap[1] > x.lap[0] && body.length > 0 && body.every((l) => l.d >= 300 && Math.abs(Math.log(l.t / (l.d / 1000) / gmed)) <= 0.15);
     x.sure = rigidNow() && !x.pair && (x.lap[0] === x.lap[1] || autoLap) && !s.soft && !isRest(k) && dd <= tol(k) && !under && timeOk;
     // Ein zweifelhaft zugeordneter Schritt (Strecke oder Zeit passt nicht) kann die Reihenfolge verschoben haben: alles danach ist nicht mehr sicher.
     // Sammelrunden (pair) sind davon ausgenommen: Ihre Gesamtstrecke bestätigt die Reihenfolge.

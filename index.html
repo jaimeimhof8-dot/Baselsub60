@@ -15118,7 +15118,7 @@
           else row("none", "Splits: keine Runden, nichts zuzuordnen");
         }
         const lt = isPlan ? lauftagFor(i, a) : null;
-        if (lt && lt.none) row("bad", lt.wait ? "Runden werden noch geholt – bitte nach dem nächsten Garmin-Abruf übernehmen" : "Zuordnung: Die Uhr-Runden passen nicht sicher zum Plan. Zeilen bitte von Hand wählen.");
+        if (lt && lt.none) row("bad", lt.wait ? "Runden werden noch geholt – bitte nach dem nächsten Garmin-Abruf übernehmen" : lt.nolaps ? "Keine Runden vorhanden – Zeilen bitte von Hand wählen" : "Zuordnung: Die Uhr-Runden passen nicht sicher zum Plan. Zeilen bitte von Hand wählen.");
         else if (lt) {
           const names = (dayPlan(i).i || []).map((t) => String(t).split(/\s[@(]/)[0].split(" → ").pop().replace(/\s\d.*$/, "").trim() || "Zeile");
           row(lt.lines.every((L) => L.done) ? "ok" : "wait", "Zuordnung: " + lt.lines.map((L) => `${names[L.j] || "Zeile " + (L.j + 1)} ${L.done ? "✓" : L.got ? L.got + "/" + L.of : "?"}`).join(" · ") + (lt.tail ? " – Aufzeichnung endet früher als der Plan" : ""));
@@ -15179,7 +15179,7 @@
         return `<div class="take" data-take="${i}"><div class="sub">Was hast du gemacht?</div>${p.i
           .map(
             (t, j) =>
-              `<label class="tk"><input type="checkbox" data-tk="${j}" ${had[j] || (lt && !any ? !!(ltLine(j) && ltLine(j).done) && !carried.has(j) : !any && !carried.has(j)) ? "checked" : ""}><span>${esc(t)}${lt && lt.none ? (lt.wait ? " <i>(Runden fehlen noch)</i>" : " <i>(Uhr nicht zuordenbar)</i>") : ltLine(j) && !ltLine(j).done ? (ltLine(j).got ? ` <i>(laut Uhr sicher erkannt: ${ltLine(j).got} von ${ltLine(j).of})</i>` : " <i>(laut Uhr nicht sicher erkennbar)</i>") : ""}</span></label>`,
+              `<label class="tk"><input type="checkbox" data-tk="${j}" ${had[j] || (lt && !any ? !!(ltLine(j) && ltLine(j).done) && !carried.has(j) : !any && !carried.has(j)) ? "checked" : ""}><span>${esc(t)}${lt && lt.none ? (lt.wait ? " <i>(Runden fehlen noch)</i>" : lt.nolaps ? " <i>(keine Runden vorhanden)</i>" : " <i>(Uhr nicht zuordenbar)</i>") : ltLine(j) && !ltLine(j).done ? (ltLine(j).got ? ` <i>(laut Uhr sicher erkannt: ${ltLine(j).got} von ${ltLine(j).of})</i>` : " <i>(laut Uhr nicht sicher erkennbar)</i>") : ""}</span></label>`,
           )
           .join(
             "",
@@ -15204,7 +15204,7 @@
         if (!st) return null; // Plan nicht sicher lesbar: bisheriges Verhalten
         // Plan lesbar, aber keine (brauchbare) Zuordnung: none = true. Dann wird NICHTS vorausgewählt oder automatisch abgehakt.
         // Keine Runden (noch nicht geholt, Abruf fehlgeschlagen, Import ohne Runden): nichts abhaken, bei neuem Abruf wird neu bewertet
-        if (!a.laps || !a.laps.length) return { none: true, wait: a.src === "garmin" && a.lapsV !== 3, lines: [] };
+        if (!a.laps || !a.laps.length) return { none: true, nolaps: true, wait: a.src === "garmin" && a.lapsV !== 3, lines: [] };
         const r = alignLauf(a.laps, st);
         return r || { none: true, lines: [] };
       }

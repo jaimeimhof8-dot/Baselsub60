@@ -14665,6 +14665,7 @@
       import { normTime } from "./src/timeinput.js";
       import { repSummary, watchCheck, alignFuzzy } from "./src/laps.js";
       import { alignLaps } from "./src/align.js";
+      import { lauftagSteps, alignLauf } from "./src/lauftag.js";
       import { planSteps } from "./src/garmin-workout.js";
       import {
         flatten,
@@ -15264,7 +15265,13 @@
             row("bad", `Splits nicht zuordenbar: Uhr ${sp.count} Runden, Plan ${sp.total} Arbeitsschritte. Zeiten von Hand eintragen.`);
           else row("none", "Splits: keine Runden, nichts zuzuordnen");
         }
-        if (w.intervals) {
+        const lt = isPlan ? lauftagFor(i, a) : null;
+        if (lt && lt.none) row("bad", lt.wait ? "Runden werden noch geholt – bitte nach dem nächsten Garmin-Abruf übernehmen" : lt.nolaps ? "Keine Runden vorhanden – Zeilen bitte von Hand wählen" : "Zuordnung: Die Uhr-Runden passen nicht sicher zum Plan. Zeilen bitte von Hand wählen.");
+        else if (lt) {
+          const names = (dayPlan(i).i || []).map((t) => String(t).split(/\s[@(]/)[0].split(" → ").pop().replace(/\s\d.*$/, "").trim() || "Zeile");
+          row(lt.lines.every((L) => L.done) ? "ok" : "wait", "Zuordnung: " + lt.lines.map((L) => `${names[L.j] || "Zeile " + (L.j + 1)} ${L.done ? "✓" : L.got ? L.got + "/" + L.of : "?"}`).join(" · ") + (lt.tail ? " – Aufzeichnung endet früher als der Plan" : ""));
+        }
+        if (w.intervals && !lt) {
           if (w.intervals.state === "ok") row("ok", `Intervalle erkannt: ${w.intervals.text}`);
           else row("none", "Intervalle: Runden passen nicht zur Plan-Vorgabe");
         }
@@ -15314,11 +15321,13 @@
           dk = keyI(i),
           had = p.i.map((_, j) => !!S.done[dk + "|" + j]),
           any = had.some(Boolean),
-          carried = new Set((S.later[dk] || {}).j || []); // Übungen, die auf morgen verschoben sind, nicht vorauswählen
+          carried = new Set((S.later[dk] || {}).j || []), // Übungen, die auf morgen verschoben sind, nicht vorauswählen
+          lt = lauftagFor(i, planAct(i)),
+          ltLine = (j) => (lt && lt.lines ? lt.lines.find((L) => L.j === j) : null);
         return `<div class="take" data-take="${i}"><div class="sub">Was hast du gemacht?</div>${p.i
           .map(
             (t, j) =>
-              `<label class="tk"><input type="checkbox" data-tk="${j}" ${had[j] || (!any && !carried.has(j)) ? "checked" : ""}><span>${esc(t)}</span></label>`,
+              `<label class="tk"><input type="checkbox" data-tk="${j}" ${had[j] || (lt && !any ? !!(ltLine(j) && ltLine(j).done) && !carried.has(j) : !any && !carried.has(j)) ? "checked" : ""}><span>${esc(t)}${lt && lt.none ? (lt.wait ? " <i>(Runden fehlen noch)</i>" : lt.nolaps ? " <i>(keine Runden vorhanden)</i>" : " <i>(Uhr nicht zuordenbar)</i>") : ltLine(j) && !ltLine(j).done ? (ltLine(j).got ? ` <i>(laut Uhr sicher erkannt: ${ltLine(j).got} von ${ltLine(j).of})</i>` : " <i>(laut Uhr nicht sicher erkennbar)</i>") : ""}</span></label>`,
           )
           .join(
             "",
@@ -15335,14 +15344,36 @@
             .sort((a, b) => (b.time || 0) - (a.time || 0))[0] || null
         );
       }
+      /* Lauftag (Einlaufen, Steigerungen, Leiter …): Runden der Uhr den Plan-Zeilen über die Strecke zuordnen. null, wenn der Plan nicht sicher lesbar ist. */
+      function lauftagFor(i, a) {
+        const p = dayPlan(i);
+        if (!p || p.k !== "lauf" || !a) return null;
+        const st = lauftagSteps(p.i);
+        if (!st) return null; // Plan nicht sicher lesbar: bisheriges Verhalten
+        // Plan lesbar, aber keine (brauchbare) Zuordnung: none = true. Dann wird NICHTS vorausgewählt oder automatisch abgehakt.
+        // Keine Runden (noch nicht geholt, Abruf fehlgeschlagen, Import ohne Runden): nichts abhaken, bei neuem Abruf wird neu bewertet
+        if (!a.laps || !a.laps.length) return { none: true, nolaps: true, wait: a.src === "garmin" && a.lapsV !== 3, lines: [] };
+        const r = alignLauf(a.laps, st);
+        return r || { none: true, lines: [] };
+      }
       function takeDay(i, js, silent) {
         const p = dayPlan(i),
           dk = keyI(i),
           a = planAct(i);
         js.forEach((j) => (S.done[dk + "|" + j] = 1));
         const spl = a && importWatchSplits(i); // Stationstag: Rundenzeiten der Uhr in die Planzeilen
+        const lt = lauftagFor(i, a); // Lauftag: nur wirklich gelaufene Zeilen, Zeiten aus den Runden
         let msg = `${js.length === p.i.length ? "Workout erledigt" : `${js.length} von ${p.i.length} Übungen erledigt`}${a ? " – von " + srcName(a) + " übernommen" : ""}`;
-        if (a) {
+        if (a && lt && lt.none) {
+          msg = `${js.length} von ${p.i.length} Zeilen abgehakt – die Uhr-Runden passen nicht sicher zum Plan, keine Zeiten übernommen`;
+        } else if (a && lt) {
+          // Zeiten je Zeile (abgehakte und teilweise gelaufene Zeilen wie «2 von 5»), vorhandene Handeinträge bleiben unberührt
+          lt.lines.forEach((L) => {
+            if (L.text && (js.includes(L.j) || (L.got > 0 && !L.done)) && !String(S.val[dk + "|" + L.j] || "").trim()) S.val[dk + "|" + L.j] = L.text;
+          });
+          const part = lt.lines.filter((L) => L.got > 0 && !L.done).length;
+          msg = `${js.length} von ${p.i.length} Zeilen abgehakt, Zeiten aus den Runden${part ? ` (${part} teilweise gelaufen)` : ""}`;
+        } else if (a) {
           const sum = strava.summary(a),
             r = p.i.findIndex((t) => dash.parseReps(t));
           if (
@@ -15370,7 +15401,8 @@
           }
         }
         if (spl && !silent) msg += " · Splits eingetragen";
-        S.dismiss["tk:" + i] = 1; // übernommen: der Vorschlag oben verschwindet, auch bei teilweiser Übernahme
+        // übernommen: der Vorschlag oben verschwindet, auch bei teilweiser Übernahme – ausser bei Lauftagen mit teilweise gelaufenen Zeilen (Auswahl bleibt offen)
+        if (!(lt && !lt.none && lt.lines.some((L) => L.got > 0 && !L.done))) S.dismiss["tk:" + i] = 1;
         save();
         if (!silent) toast(msg);
       }
@@ -15402,11 +15434,11 @@
           if (!cnt || done > 0) continue; // schon von Hand bearbeitet: nichts überschreiben
           const a = planAct(i);
           if (!a || !ingest.matchKind(a, p)) continue;
-          takeDay(
-            i,
-            p.i.map((_, j) => j),
-            true,
-          );
+          const lt = lauftagFor(i, a);
+          // Lauftag mit erkannten Runden: nur vollständig gelaufene Zeilen abhaken (sonst bleibt der Tag zur Auswahl offen)
+          const js = lt ? (lt.lines || []).filter((L) => L.done).map((L) => L.j) : p.i.map((_, j) => j);
+          if (lt && !js.length) continue; // Lauftag ohne sichere Zuordnung: nichts automatisch abhaken, der Nutzer wählt
+          takeDay(i, js, true);
           n++;
         }
         return n;
@@ -24858,7 +24890,7 @@
           const i = +d.i,
             p = dayPlan(i);
           // Mehrere Übungen: erst auswählen, was wirklich gemacht wurde
-          if (p && p.i.length > 1) {
+          if (p && (p.i.length > 1 || lauftagFor(i, planAct(i)))) {
             takeOpen = i;
             return render();
           }

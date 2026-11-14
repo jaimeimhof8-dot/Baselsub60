@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Entwurf Rennbezug: vier Anordnungen</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --f-head: "Barlow Condensed", "Arial Narrow", Impact, sans-serif; --f-body: "IBM Plex Sans", system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #06070a; color: #f5f5f7; font-family: var(--f-body); padding: 24px; }
+  .wrap { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+  .ph { width: 390px; background: #0e1016; border-radius: 28px; padding: 20px 20px 28px; }
+  .tag { font-family: var(--f-head); font-size: 30px; color: #e0bf6a; margin: 0 0 4px; }
+  .tag small { display: block; font-family: var(--f-body); font-size: 14px; color: #9a9ba3; font-weight: 400; }
+  .kick { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #9a9ba3; }
+  .sec { padding: 24px 0; border-top: 1px solid rgba(255,255,255,.08); display: flex; flex-direction: column; gap: 16px; }
+  .sec h3 { margin: 0; font-size: 18px; font-weight: 600; }
+  .note { margin: 0; font-size: 14px; line-height: 21px; color: #9a9ba3; }
+  .bad { color: #ffb340; }
+  .hd { font-family: var(--f-head); font-weight: 700; }
+  /* 1 Zeilenliste */
+  .r { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; align-items: baseline; padding: 12px 0; border-top: 1px solid rgba(255,255,255,.06); }
+  .r:first-of-type { border-top: none; }
+  .r .l { font-size: 16px; } .r .v { font-family: var(--f-head); font-weight: 700; font-size: 24px; text-align: right; }
+  .r .v small { font-family: var(--f-body); font-weight: 400; font-size: 13px; color: #9a9ba3; margin-left: 3px; }
+  .r .d { grid-column: 1 / -1; font-size: 14px; color: #9a9ba3; }
+  .r .d.bad { color: #ffb340; }
+  /* 2 grosse Zahl */
+  .big { display: flex; align-items: baseline; gap: 12px; } .big b { font-family: var(--f-head); font-size: 52px; line-height: 1; } .big span { font-size: 16px; color: #c9cad1; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; }
+  .col { padding: 0 14px; border-left: 1px solid rgba(255,255,255,.1); } .col:first-child { padding-left: 0; border-left: none; }
+  .col .k { font-size: 13px; color: #9a9ba3; } .col .v { font-family: var(--f-head); font-weight: 700; font-size: 32px; line-height: 1.15; }
+  .col .v small { font-family: var(--f-body); font-weight: 400; font-size: 14px; color: #9a9ba3; margin-left: 4px; }
+  .col .x { font-size: 14px; color: #9a9ba3; } .col .x.bad { color: #ffb340; }
+  /* 3 Tabelle */
+  .t { display: grid; grid-template-columns: 1fr 64px 76px 76px; gap: 0 8px; align-items: center; min-height: 56px; border-top: 1px solid rgba(255,255,255,.06); }
+  .t.h { min-height: 30px; border-top: none; font-size: 13px; color: #9a9ba3; }
+  .t span { font-size: 15px; } .t b, .t em { font-family: var(--f-head); font-weight: 700; font-size: 22px; text-align: right; font-style: normal; }
+  .t.h b, .t.h em { font-family: var(--f-body); font-size: 13px; font-weight: 400; }
+  .t em small { display: block; font-family: var(--f-body); font-weight: 400; font-size: 12px; color: #9a9ba3; line-height: 1.2; }
+  .t em.bad small { color: #ffb340; }
+  /* 4 Skala */
+  .sc { position: relative; height: 92px; margin: 4px 6px 0; }
+  .sc .ax { position: absolute; left: 0; right: 0; top: 46px; height: 2px; background: rgba(255,255,255,.14); }
+  .sc .m { position: absolute; top: 0; transform: translateX(-50%); text-align: center; white-space: nowrap; }
+  .sc .m b { display: block; font-family: var(--f-head); font-size: 24px; line-height: 1; }
+  .sc .m small { display: block; font-size: 12px; color: #9a9ba3; margin-top: 3px; }
+  .sc .m i { display: block; width: 2px; height: 18px; background: #9a9ba3; margin: 5px auto 0; }
+  .sc .m.me b { color: #64a8ff; } .sc .m.me i { background: #64a8ff; width: 3px; }
+  .sc .m.lo { top: 46px; } .sc .m.lo i { margin: 0 auto 5px; }
+  .sc .ends { position: absolute; left: 0; right: 0; top: 74px; display: flex; justify-content: space-between; font-size: 12px; color: #6d7176; }
+  /* Trend-Auswahl */
+  .tb { font-family: var(--f-head); font-size: 52px; line-height: 1; } .tb small { font-family: var(--f-body); font-size: 16px; color: #9a9ba3; margin-left: 8px; }
+  .tp { margin: 0; font-size: 16px; line-height: 24px; color: #c9cad1; }
+  .chips { display: flex; gap: 8px; overflow: hidden; }
+  .chip { flex: none; min-height: 40px; padding: 0 14px; border-radius: 20px; background: #161922; display: flex; align-items: center; font-size: 14px; color: #c9cad1; }
+  .chip.on { background: #f5f5f7; color: #0e1016; font-weight: 600; }
+  .seg { display: inline-flex; background: #161922; border-radius: 12px; padding: 3px; align-self: flex-start; }
+  .seg span { min-height: 36px; padding: 0 14px; border-radius: 9px; display: flex; align-items: center; font-size: 14px; color: #9a9ba3; }
+  .seg .on { background: #2a2f3d; color: #f5f5f7; font-weight: 600; }
+  .dds { display: flex; gap: 10px; }
+  .dd { flex: 1; min-height: 48px; padding: 0 14px; border-radius: 14px; background: #161922; display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 600; }
+  .dd svg { color: #9a9ba3; }
+  .tabs { display: flex; gap: 20px; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .tabs span { padding: 0 0 12px; font-size: 15px; color: #9a9ba3; white-space: nowrap; }
+  .tabs .on { color: #f5f5f7; font-weight: 600; border-bottom: 2px solid #64a8ff; margin-bottom: -1px; }
+  .rng { display: flex; gap: 16px; font-size: 14px; color: #9a9ba3; } .rng .on { color: #f5f5f7; font-weight: 600; text-decoration: underline; text-underline-offset: 5px; }
+  .ov { display: grid; grid-template-columns: 1fr 96px 70px; gap: 0 12px; align-items: center; min-height: 64px; border-top: 1px solid rgba(255,255,255,.06); }
+  .ov:first-of-type { border-top: none; }
+  .ov span { font-size: 15px; } .ov span small { display: block; font-size: 13px; color: #9a9ba3; } .ov span small.bad { color: #ffb340; }
+  .ov b { font-family: var(--f-head); font-size: 24px; text-align: right; }
+  svg.ln { width: 100%; height: auto; display: block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- 1 -->
+<div class="ph"><p class="tag">1 · Zeilenliste<small>Jede Zahl eine Zeile, Unterschied darunter. Trend: Knöpfe.</small></p>
+  <section class="sec"><h3>Gegen Rennplan</h3>
+    <div><div class="r"><span class="l">Pace Arbeit</span><span class="v">4:12<small>/km</small></span></div>
+    <div class="r"><span class="l">Prognose rechnet mit</span><span class="v">4:31<small>/km</small></span><span class="d">19 s schneller</span></div>
+    <div class="r"><span class="l">Für 60:00 nötig</span><span class="v">3:52<small>/km</small></span><span class="d bad">20 s langsamer</span></div>
+    <div class="r"><span class="l">Kompromiss-Delta</span><span class="v">+14<small>s/km</small></span></div>
+    <div class="r"><span class="l">Prognose rechnet mit</span><span class="v">+9<small>s/km</small></span><span class="d bad">5 s mehr</span></div></div>
+    <p class="note">Prognose 65:11 · Tests vom 02.11. · ändert sich nur durch Tests und Simulationen</p>
+  </section>
+  <section class="sec"><span class="kick">Trend</span>
+    <div class="chips"><span class="chip on">Pace Arbeit</span><span class="chip">Puls-Drift</span><span class="chip">Puls Ø</span><span class="chip">Kompromiss</span></div>
+    <div class="seg"><span>4 Wochen</span><span class="on">12 Wochen</span></div>
+    <div class="tb">4:12<small>/km</small></div><p class="tp">5 s schneller als bei der Einheit davor, 11 s schneller als vor 12 Wochen.</p>
+    <svg class="ln" viewBox="0 0 310 110"><line x1="0" x2="310" y1="96" y2="96" stroke="#6d7176" stroke-dasharray="4 5"/><text x="310" y="90" text-anchor="end" font-size="11" fill="#9a9ba3">60:00 braucht 3:52</text><path d="M18 22 C70 30 90 44 115 46 S190 60 212 62 S270 72 292 76" fill="none" stroke="#64a8ff" stroke-width="2.5"/><circle cx="18" cy="22" r="4.5" fill="#0e1016" stroke="#64a8ff" stroke-width="2"/><circle cx="115" cy="46" r="4.5" fill="#0e1016" stroke="#64a8ff" stroke-width="2"/><circle cx="212" cy="62" r="4.5" fill="#0e1016" stroke="#64a8ff" stroke-width="2"/><circle cx="292" cy="76" r="6" fill="#64a8ff"/></svg>
+  </section>
+</div>
+
+<!-- 2 -->
+<div class="ph"><p class="tag">2 · Grosse Zahl<small>Deine Pace gross, zwei Vergleiche daneben. Trend: Dropdowns wie im Diagramm.</small></p>
+  <section class="sec"><h3>Gegen Rennplan</h3>
+    <div class="big"><b>4:12</b><span>/km Pace Arbeit</span></div>
+    <div class="cols"><div class="col"><div class="k">Prognose rechnet mit</div><div class="v">4:31<small>/km</small></div><div class="x">19 s schneller</div></div>
+      <div class="col"><div class="k">Für 60:00 nötig</div><div class="v">3:52<small>/km</small></div><div class="x bad">20 s langsamer</div></div></div>
+    <div class="cols"><div class="col"><div class="k">Kompromiss-Delta</div><div class="v">+14<small>s/km</small></div></div>
+      <div class="col"><div class="k">Prognose rechnet mit</div><div class="v">+9<small>s/km</small></div><div class="x bad">5 s mehr</div></div></div>
+    <p class="note">Prognose 65:11 · Tests vom 02.11. · ändert sich nur durch Tests und Simulationen</p>
+  </section>
+  <section class="sec"><span class="kick">Trend</span>
+    <div class="dds"><span class="dd">Pace Arbeit<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg></span><span class="dd">12 Wochen<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg></span></div>
+    <div class="tb">4:12<small>/km</small></div><p class="tp">5 s schneller als bei der Einheit davor, 11 s schneller als vor 12 Wochen.</p>
+    <svg class="ln" viewBox="0 0 310 110"><line x1="0" x2="310" y1="96" y2="96" stroke="#6d7176" stroke-dasharray="4 5"/><text x="310" y="90" text-anchor="end" font-size="11" fill="#9a9ba3">60:00 braucht 3:52</text><path d="M18 22 C70 30 90 44 115 46 S190 60 212 62 S270 72 292 76" fill="none" stroke="#64a8ff" stroke-width="2.5"/><circle cx="18" cy="22" r="4.5" fill="#0e1016" stroke="#64a8ff" stroke-width="2"/><circle cx="115" cy="46" r="4.5" fill="#0e1016" stroke="#64a8ff" stroke-width="2"/><circle cx="212" cy="62" r="4.5" fill="#0e1016" stroke="#64a8ff" stroke-width="2"/><circle cx="292" cy="76" r="6" fill="#64a8ff"/></svg>
+  </section>
+</div>
+
+<!-- 3 -->
+<div class="ph"><p class="tag">3 · Tabelle<small>Ist, Prognose und 60:00 in Spalten. Trend: Reiter.</small></p>
+  <section class="sec"><h3>Gegen Rennplan</h3>
+    <div><div class="t h"><span></span><b>Ist</b><em>Prognose</em><em>Für 60:00</em></div>
+    <div class="t"><span>Pace Arbeit /km</span><b>4:12</b><em>4:31<small>19 s schneller</small></em><em class="bad">3:52<small>20 s langsamer</small></em></div>
+    <div class="t"><span>Kompromiss-Delta s/km</span><b>+14</b><em class="bad">+9<small>5 s mehr</small></em><em>–</em></div></div>
+    <p class="note">Prognose 65:11 · Tests vom 02.11. · ändert sich nur durch Tests und Simulationen</p>
+  </section>
+  <section class="sec"><span class="kick">Trend</span>
+    <div class="tabs"><span class="on">Pace</span><span>Drift</span><span>Puls</span><span>Kompromiss</span><span>Locker</span></div>
+    <div class="rng"><span>4 Wochen</span><span class="on">12 Wochen</span></div>
+    <div class="tb">4:12<small>/km</small></div><p class="tp">5 s schneller als bei der Einheit davor, 11 s schneller als vor 12 Wochen.</p>
+    <svg class="ln" viewBox="0 0 310 110"><line x1="0" x2="310" y1="96" y2="96" stroke="#6d7176" stroke-dasharray="4 5"/><text x="310" y="90" text-anchor="end" font-size="11" fill="#9a9ba3">60:00 braucht 3:52</text><path d="M18 22 C70 30 90 44 115 46 S190 60 212 62 S270 72 292 76" fill="none" stroke="#64a8ff" stroke-width="2.5"/><circle cx="18" cy="22" r="4.5" fill="#0e1016" stroke="#64a8ff" stroke-width="2"/><circle cx="115" cy="46" r="4.5" fill="#0e1016" stroke="#64a8ff" stroke-width="2"/><circle cx="212" cy="62" r="4.5" fill="#0e1016" stroke="#64a8ff" stroke-width="2"/><circle cx="292" cy="76" r="6" fill="#64a8ff"/></svg>
+  </section>
+</div>
+
+<!-- 4 -->
+<div class="ph"><p class="tag">4 · Skala<small>Drei Marken auf einer Linie. Trend: alle Kennzahlen auf einen Blick.</small></p>
+  <section class="sec"><h3>Gegen Rennplan</h3>
+    <div class="sc"><div class="ax"></div>
+      <div class="m" style="left:12%"><b>3:52</b><small>für 60:00</small><i></i></div>
+      <div class="m me lo" style="left:46%"><i></i><b>4:12</b><small>du heute</small></div>
+      <div class="m" style="left:80%"><b>4:31</b><small>Prognose</small><i></i></div>
+    </div>
+    <p class="tp">19 s schneller als die Prognose rechnet, <span class="bad">20 s langsamer als für 60:00 nötig.</span></p>
+    <div class="r"><span class="l">Kompromiss-Delta</span><span class="v">+14<small>s/km</small></span><span class="d bad">5 s mehr als die Prognose rechnet (+9)</span></div>
+    <p class="note">Prognose 65:11 · Tests vom 02.11. · ändert sich nur durch Tests und Simulationen</p>
+  </section>
+  <section class="sec"><span class="kick">Trend · 12 Wochen</span>
+    <div><div class="ov"><span>Pace Arbeit<small>11 s schneller</small></span><svg class="ln" viewBox="0 0 96 30"><path d="M3 6 L32 13 L62 18 L93 23" fill="none" stroke="#64a8ff" stroke-width="2"/></svg><b>4:12</b></div>
+    <div class="ov"><span>Puls-Drift<small>3 bpm weniger</small></span><svg class="ln" viewBox="0 0 96 30"><path d="M3 9 L32 7 L62 15 L93 20" fill="none" stroke="#64a8ff" stroke-width="2"/></svg><b>+6</b></div>
+    <div class="ov"><span>Puls Ø Arbeit<small>gleich</small></span><svg class="ln" viewBox="0 0 96 30"><path d="M3 15 L32 13 L62 16 L93 15" fill="none" stroke="#64a8ff" stroke-width="2"/></svg><b>171</b></div>
+    <div class="ov"><span>Kompromiss-Delta<small class="bad">4 s mehr</small></span><svg class="ln" viewBox="0 0 96 30"><path d="M3 22 L32 20 L62 12 L93 8" fill="none" stroke="#64a8ff" stroke-width="2"/></svg><b>+14</b></div>
+    <div class="ov"><span>Lockerer Lauf<small>6 s schneller bei Puls 142</small></span><svg class="ln" viewBox="0 0 96 30"><path d="M3 8 L32 12 L62 15 L93 21" fill="none" stroke="#64a8ff" stroke-width="2"/></svg><b>5:48</b></div></div>
+  </section>
+</div>
+
+</div>
+</body>
+</html>

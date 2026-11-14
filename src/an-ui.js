@@ -37,6 +37,30 @@ export function anResultHtml({ kind, color, meta, title, d }, esc = esc0) {
   return `<section class="an2-res" aria-label="Ergebnis"><div class="an2-meta"><i style="background:${color}"></i>${esc(kind)}${meta ? " · " + esc(meta) : ""}</div><h2>${esc(title)}</h2>${big ? `<div class="an2-big"><b>${esc(big)}</b><span>${lab}</span></div>` : ""}${cols ? `<div class="an2-cols">${cols}</div>` : ""}${d.openNote ? `<p class="an2-note">${esc(d.openNote)}</p>` : ""}</section>`;
 }
 
+/**
+ * Block «Gegen Rennplan»: die Pace der Arbeitsläufe neben dem Tempo, mit dem die Prognose rechnet, und dem Tempo für 60:00.
+ * res = racePlanRows() aus src/race-link.js. Nur Zahlen und Unterschiede, kein Urteil; Orange nur für langsamer / mehr.
+ * total: Prognose gesamt in s · testsAt: Datum der Tests als Text (oder leer).
+ */
+export function anRaceHtml(res, { total = null, testsAt = "" } = {}, esc = esc0) {
+  if (!res) return "";
+  const sec = (body) => `<section class="an2-sec an2-race" aria-label="Gegen Rennplan"><h3>Gegen Rennplan</h3>${body}</section>`;
+  if (res.state === "nokm") return sec(`<p class="an2-note">Kein Vergleich: Intervalle sind nicht rund 1 km lang. Im Rennen sind es 8 × 1 km.</p>`);
+  if (res.state === "notests") return sec(`<p class="an2-note">Noch keine Testwerte. Nach dem Lauf-Pacing-Test und dem Stationen-Benchmark steht hier der Vergleich mit dem Renntempo.</p><button type="button" class="an2-btn" data-v="profile">Tests eintragen</button>`);
+  const R = (id) => res.rows.find((r) => r.id === id);
+  const diff = (r, up, down) => (r.d == null ? "" : `<div class="x${r.bad ? " bad" : ""}">${r.d === 0 ? "gleich" : Math.abs(r.d) + " s " + (r.d > 0 ? up : down)}</div>`);
+  const col = (k, v, unit, x) => `<div class="an2-col"><div class="k">${k}</div><div class="v">${v}<small>${unit}</small></div>${x}</div>`;
+  const pace = R("pace"), fc = R("fc"), need = R("need"), comp = R("comp"), cfc = R("compfc");
+  let h = `<div class="an2-big"><b>${mmss(pace.v)}</b><span>/km Pace Arbeit</span></div>`;
+  const a = [];
+  if (fc) a.push(col("Prognose rechnet mit", mmss(fc.v), "/km", diff(fc, "langsamer", "schneller")));
+  if (need) a.push(need.v == null ? `<div class="an2-col"><div class="k">Für 60:00 nötig</div><div class="v">–</div><div class="x">${esc(need.why || "")}</div></div>` : col("Für 60:00 nötig", mmss(need.v), "/km", diff(need, "langsamer", "schneller")));
+  if (a.length) h += `<div class="an2-cols two">${a.join("")}</div>`;
+  if (comp) h += `<div class="an2-cols two">${col("Kompromiss-Delta", sg(comp.v), "s/km", "")}${cfc ? col("Prognose rechnet mit", sg(cfc.v), "s/km", diff(cfc, "mehr", "weniger")) : ""}</div>`;
+  const foot = [total ? "Prognose " + mmss(Math.round(total)) : "", testsAt ? "Tests vom " + esc(testsAt) : "", "ändert sich nur durch Tests und Simulationen"].filter(Boolean).join(" · ");
+  return sec(h + `<p class="an2-note">${foot}</p>`);
+}
+
 /** Gut / Nicht gut / Nächstes Mal. Leere Blöcke entfallen. */
 export function anCoachHtml(an, esc = esc0) {
   const blk = (t, rows, cls) => (rows.length ? `<div class="an2-blk ${cls}"><div class="h"><i></i><span>${t}</span></div>${rows.map((r) => `<p><b>${esc(r.n)}</b> ${esc(r.t)}</p>`).join("")}</div>` : "");

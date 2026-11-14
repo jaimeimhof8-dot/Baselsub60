@@ -13141,6 +13141,10 @@
       .an2-col .v { font-family: var(--f-head); font-weight: 700; font-size: 32px; line-height: 1.15; white-space: nowrap; }
       .an2-col .v small { font-family: var(--f-body); font-weight: 400; font-size: 14px; color: #9a9ba3; margin-left: 4px; }
       .an2-col.warn .v, .an2-col.warn .v small { color: #ffb340; }
+      .an2-cols.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .an2-col .x { font-size: 14px; line-height: 20px; color: #9a9ba3; }
+      .an2-col .x.bad { color: #ffb340; }
+      .an2-race .an2-btn { flex: none; }
       .an2-note { margin: 0; font-size: 14px; line-height: 21px; color: #9a9ba3; }
       .an2-sec { padding: 28px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; gap: 24px; }
       .an2-sec > h3 { margin: 0; font-size: 18px; font-weight: 600; }
@@ -14641,7 +14645,8 @@
       import { sessionDash, compareToPrev, splitPhases, phaseStats, workDash, sourceInfo, dashSections } from "./src/session-dash.js";
       import { reviewAll, keyLine } from "./src/dash-all.js";
       import { dashV3, dashV3Html, anCardHtml, actHeaderHtml, intervalPlan } from "./src/dash-v3.js";
-      import { anHead, anResultHtml, anCoachHtml, anProposalHtml, anDetailsHtml, anListHtml, anTrendHtml, anCmpBody, anChartData, anChartHtml, attachAnChart } from "./src/an-ui.js";
+      import { racePlanRows } from "./src/race-link.js";
+      import { anHead, anResultHtml, anRaceHtml, anCoachHtml, anProposalHtml, anDetailsHtml, anListHtml, anTrendHtml, anCmpBody, anChartData, anChartHtml, attachAnChart } from "./src/an-ui.js";
       import { seriesOf as anSeriesOf, zoneTimes as anZoneTimes } from "./src/series.js";
       import { compareSessions, pickAct } from "./src/compare.js";
       import { comparePanelHtml, attachCharts } from "./src/charts.js";
@@ -21439,7 +21444,17 @@
           else if (rec.state === "applied") prop = `<p class="an2-note">Planänderung übernommen.</p>`;
         }
         const zones = act && act.series ? anZoneTimes(anSeriesOf(act), maxHr) : null;
+        /* Gegen Rennplan: Pace der 1-km-Arbeitsläufe neben dem Tempo der Prognose und dem Tempo für 60:00 (src/race-link.js). Nur Zahlen. */
+        let race = "";
+        try {
+          const W = act && act.laps && act.laps.length ? s7Work(p, act) : null;
+          if (W) {
+            const fc = rvForecast(), at = S.tests && S.tests.at ? new Date(S.tests.at) : null;
+            race = anRaceHtml(racePlanRows({ ph: W.ph, st: W.st, fc, goal: review.GOAL_S, easy: isEasyRun(p), kind: p.k }), { total: fc && fc.total, testsAt: at && !isNaN(at) ? fmt(at) : "" }, esc);
+          }
+        } catch (e) {}
         return anResultHtml({ kind: S6_KIND[p.k] || p.k, color: `var(--${p.k})`, meta: anMeta(act), title: s7Title(p.t), d }, esc)
+          + race
           + (cd ? `<section class="an2-sec" aria-label="Verlauf"><h3>Verlauf</h3>${anChartHtml("an-" + dk, cd, { me: ME, pa: PARTNER })}</section>` : "")
           + anCoachHtml(d.an, esc)
           + (R && R.summary ? `<p class="an2-note" style="padding:0 0 24px">${esc(R.summary)}</p>` : "")

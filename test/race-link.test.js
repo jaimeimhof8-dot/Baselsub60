@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { RACE_LAP, raceLaps, paceOfLaps, racePlanRows } from "../src/race-link.js";
+import { anRaceHtml } from "../src/an-ui.js";
 
 // Phasen wie aus splitPhases: Einlaufen, dann Arbeit/Pause im Wechsel
 const phOf = (work, { conf = "sure", sub = null } = {}) => {
@@ -101,4 +102,40 @@ test("racePlanRows: Prognose mit unvollständigen Feldern erfindet nichts", () =
   const res = racePlanRows({ ph: phOf(km(252)), st: {}, fc: { total: 3900, pace: 271 }, kind: "lauf" });
   assert.equal(row(res, "fc").v, 271);
   assert.equal(row(res, "need"), undefined);
+});
+
+test("anRaceHtml: grosse Zahl, zwei Vergleiche, Fusszeile, kein Grün", () => {
+  const res = racePlanRows({ ph: phOf(km(252)), st: { compromise: { avg: 14 } }, fc: FC, kind: "station" });
+  const h = anRaceHtml(res, { total: 3911, testsAt: "02.11." });
+  assert.match(h, /Gegen Rennplan/);
+  assert.match(h, /<b>4:12<\/b>/);
+  assert.match(h, /4:31/);
+  assert.match(h, /<div class="x">19 s schneller<\/div>/);
+  assert.match(h, /3:52/);
+  assert.match(h, /<div class="x bad">20 s langsamer<\/div>/);
+  assert.match(h, /\+14/);
+  assert.match(h, /<div class="x bad">5 s mehr<\/div>/);
+  assert.match(h, /Prognose 65:11 · Tests vom 02\.11\. · ändert sich nur durch Tests und Simulationen/);
+  assert.doesNotMatch(h, /30d158|green|class="ok"/);
+});
+
+test("anRaceHtml: gleich schnell, weniger Delta, ohne Testdatum", () => {
+  const res = racePlanRows({ ph: phOf(km(271)), st: { compromise: { avg: 6 } }, fc: FC, kind: "station" });
+  const h = anRaceHtml(res, { total: 3911 });
+  assert.match(h, /<div class="x">gleich<\/div>/);
+  assert.match(h, /<div class="x">3 s weniger<\/div>/);
+  assert.doesNotMatch(h, /Tests vom/);
+});
+
+test("anRaceHtml: leer, Hinweise, fehlender Wert mit Grund", () => {
+  assert.equal(anRaceHtml(null), "");
+  assert.equal(anRaceHtml(undefined), "");
+  assert.match(anRaceHtml({ state: "nokm", rows: [] }), /Intervalle sind nicht rund 1 km lang/);
+  const nt = anRaceHtml({ state: "notests", rows: [] });
+  assert.match(nt, /Noch keine Testwerte/);
+  assert.match(nt, /data-v="profile"/);
+  const res = racePlanRows({ ph: phOf(km(252)), st: {}, fc: { ...FC, st: 3400 }, kind: "lauf" });
+  const h = anRaceHtml(res, { total: 5868 });
+  assert.match(h, /Stationen und Roxzone allein lassen kein sub 60 zu/);
+  assert.doesNotMatch(h, /NaN|undefined|null/);
 });

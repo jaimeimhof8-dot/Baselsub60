@@ -51,7 +51,7 @@ export function anRaceHtml(res, { total = null, testsAt = "" } = {}, esc = esc0)
   const diff = (r, up, down) => (r.d == null ? "" : `<div class="x${r.bad ? " bad" : ""}">${r.d === 0 ? "gleich" : Math.abs(r.d) + " s " + (r.d > 0 ? up : down)}</div>`);
   const col = (k, v, unit, x) => `<div class="an2-col"><div class="k">${k}</div><div class="v">${v}<small>${unit}</small></div>${x}</div>`;
   const pace = R("pace"), fc = R("fc"), need = R("need"), comp = R("comp"), cfc = R("compfc");
-  let h = `<div class="an2-big"><b>${mmss(pace.v)}</b><span>/km Pace Arbeit</span></div>`;
+  let h = `<div class="an2-big"><b>${mmss(pace.v)}</b><span>/km · ${pace.n === 1 ? "1-km-Lauf" : (pace.n || "") + " Läufe à 1 km"}</span></div>`;
   const a = [];
   if (fc) a.push(col("Prognose rechnet mit", mmss(fc.v), "/km", diff(fc, "langsamer", "schneller")));
   if (need) a.push(need.v == null ? `<div class="an2-col"><div class="k">Für 60:00 nötig</div><div class="v">–</div><div class="x">${esc(need.why || "")}</div></div>` : col("Für 60:00 nötig", mmss(need.v), "/km", diff(need, "langsamer", "schneller")));

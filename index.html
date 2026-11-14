@@ -21447,7 +21447,7 @@
         /* Gegen Rennplan: Pace der 1-km-Arbeitsläufe neben dem Tempo der Prognose und dem Tempo für 60:00 (src/race-link.js). Nur Zahlen. */
         let race = "";
         try {
-          const W = act && act.laps && act.laps.length ? s7Work(p, act) : null;
+          const W = act && act.laps && act.laps.length && strava.fits(p.k, act.group) ? s7Work(p, act) : null;
           if (W) {
             const fc = rvForecast(), at = S.tests && S.tests.at ? new Date(S.tests.at) : null;
             race = anRaceHtml(racePlanRows({ ph: W.ph, st: W.st, fc, goal: review.GOAL_S, easy: isEasyRun(p), kind: p.k }), { total: fc && fc.total, testsAt: at && !isNaN(at) ? fmt(at) : "" }, esc);

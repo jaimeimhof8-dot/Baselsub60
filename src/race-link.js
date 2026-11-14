@@ -28,16 +28,19 @@ export function paceOfLaps(laps) {
  * Zeilen für den Block «Gegen Rennplan».
  *  ph: splitPhases · st: phaseStats · fc: buildForecast oder null · kind: Art der Einheit · easy: lockerer Lauf
  * -> null (kein Block) oder {state: "ok"|"nokm"|"notests", rows: [{id, v, d, bad, why?}]}
+ *    Zeile "pace" trägt n = Anzahl der verglichenen Läufe.
  *    v in Sekunden (s/km), d = Unterschied in Sekunden (positiv = Ist ist langsamer bzw. Delta ist grösser), bad = d > 0
  */
 export function racePlanRows({ ph, st, fc, goal = 3600, easy = false, kind } = {}) {
   if (easy || !["lauf", "station", "sim"].includes(kind) || !sure(ph)) return null;
+  // Dauerlauf ohne Wiederholungen im Plan: alle Runden gelten als Arbeit (auch Ein- und Auslaufen). Kein Intervall-Lauf, kein Vergleich.
+  if (ph.mode === "steady") return null;
   if (!ph.laps.some((l, i) => isRun(ph, i))) return null;
   const laps = raceLaps(ph), pace = paceOfLaps(laps);
   if (pace == null) return { state: "nokm", rows: [] };
   if (!fc || !pos(fc.total)) return { state: "notests", rows: [] };
 
-  const P = Math.round(pace), rows = [{ id: "pace", v: P, d: null, bad: false }];
+  const P = Math.round(pace), rows = [{ id: "pace", v: P, d: null, bad: false, n: laps.length }];
   const cmp = (id, v, base) => { const x = Math.round(v), d = base - x; rows.push({ id, v: x, d, bad: d > 0 }); };
   if (pos(fc.pace)) cmp("fc", fc.pace, P);
   if (pos(fc.st) && pos(fc.rox)) {
@@ -49,7 +52,7 @@ export function racePlanRows({ ph, st, fc, goal = 3600, easy = false, kind } = {
   if (c != null) {
     rows.push({ id: "comp", v: c, d: null, bad: false });
     // Aufschlag, mit dem die Prognose rechnet. Eicht eine Simulation die Laufzeiten, ist die Differenz kein reiner Aufschlag mehr: Zeile fehlt.
-    const add = pos(fc.pace) && pos(fc.T) ? Math.round(fc.pace - fc.T) : 0;
+    const add = !fc.runCal && pos(fc.pace) && pos(fc.T) ? Math.round(fc.pace - fc.T) : 0;
     if (add > 0) rows.push({ id: "compfc", v: add, d: c - add, bad: c - add > 0 });
   }
   return { state: "ok", rows };

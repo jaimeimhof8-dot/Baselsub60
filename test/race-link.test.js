@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { RACE_LAP, raceLaps, paceOfLaps, racePlanRows } from "../src/race-link.js";
 import { anRaceHtml } from "../src/an-ui.js";
+import { splitPhases, phaseStats } from "../src/session-dash.js";
+import { buildForecast } from "../src/forecast.js";
 
 // Phasen wie aus splitPhases: Einlaufen, dann Arbeit/Pause im Wechsel
 const phOf = (work, { conf = "sure", sub = null } = {}) => {
@@ -108,7 +110,7 @@ test("anRaceHtml: grosse Zahl, zwei Vergleiche, Fusszeile, kein Grün", () => {
   const res = racePlanRows({ ph: phOf(km(252)), st: { compromise: { avg: 14 } }, fc: FC, kind: "station" });
   const h = anRaceHtml(res, { total: 3911, testsAt: "02.11." });
   assert.match(h, /Gegen Rennplan/);
-  assert.match(h, /<b>4:12<\/b>/);
+  assert.match(h, /<b>4:12<\/b><span>\/km · 4 Läufe à 1 km<\/span>/);
   assert.match(h, /4:31/);
   assert.match(h, /<div class="x">19 s schneller<\/div>/);
   assert.match(h, /3:52/);
@@ -138,4 +140,34 @@ test("anRaceHtml: leer, Hinweise, fehlender Wert mit Grund", () => {
   const h = anRaceHtml(res, { total: 5868 });
   assert.match(h, /Stationen und Roxzone allein lassen kein sub 60 zu/);
   assert.doesNotMatch(h, /NaN|undefined|null/);
+});
+
+test("racePlanRows: Simulation eicht die Laufzeiten -> Aufschlag-Zeile fehlt auch bei pace > T", () => {
+  const res = racePlanRows({ ph: phOf(km(252)), st: { compromise: { avg: 14 } }, fc: { ...FC, T: 236, pace: 300, runCal: true }, kind: "station" });
+  assert.equal(row(res, "comp").v, 14);
+  assert.equal(row(res, "compfc"), undefined);
+});
+
+test("racePlanRows: Dauerlauf mit Auto-Lap ohne Wiederholungen im Plan (echtes splitPhases) -> kein Block", () => {
+  const laps = Array.from({ length: 10 }, () => ({ d: 1000, t: 331, hr: 150 }));
+  const ph = splitPhases(laps, { steps: null, planText: "" });
+  assert.equal(ph.mode, "steady");
+  assert.equal(racePlanRows({ ph, st: phaseStats(ph), fc: FC, kind: "lauf" }), null);
+  const one = splitPhases([{ d: 6200, t: 2100, hr: 150 }], { steps: null, planText: "" });
+  assert.equal(racePlanRows({ ph: one, st: phaseStats(one), fc: FC, kind: "lauf" }), null);
+});
+
+test("racePlanRows: Intervall-Lauf über echtes splitPhases und echtes buildForecast", () => {
+  const L = (d, t, hr) => ({ d, t, hr });
+  const laps = [L(1500, 495, 128), L(1000, 244, 163), L(400, 170, 150), L(1000, 241, 170), L(400, 168, 156), L(1000, 243, 175), L(400, 172, 158), L(1000, 249, 180), L(1500, 520, 140)];
+  const ph = splitPhases(laps, { steps: null, planText: "4×1 km @ 4:05, 400 m Trabpause" });
+  const fc = buildForecast({ laufPersons: [["4:20", "4:22", "4:24", "4:26"], ["4:18", "4:21", "4:25", "4:28"]], station: ["4:10", "2:40", "4:30", "4:00", "4:20", "1:40", "4:10", "5:30"].map((v) => [v, v]) });
+  assert.ok(fc.total > 0);
+  const res = racePlanRows({ ph, st: phaseStats(ph), fc, kind: "lauf" });
+  assert.equal(res.state, "ok");
+  assert.equal(row(res, "pace").n, 4);
+  assert.equal(row(res, "pace").v, 244);
+  assert.equal(row(res, "fc").v, Math.round(fc.pace));
+  assert.equal(row(res, "need").v, Math.round((3600 - fc.st - fc.rox) / 8));
+  for (const r of res.rows) assert.ok(r.v === null || Number.isFinite(r.v));
 });

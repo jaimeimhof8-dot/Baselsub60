@@ -13119,155 +13119,195 @@
       .cmp-zr > span b { font-family: var(--f-head); font-size: 15px; color: var(--text); font-variant-numeric: tabular-nums; }
       @media (prefers-reduced-motion: no-preference) { .cmp-tip { animation: cmpfade 0.12s ease-out; } @keyframes cmpfade { from { opacity: 0; } } }
       .s7-an-tg.more { margin-top: 10px; font-size: 14px; }
-      /* Analyse-Bereich nach dem Entwurf */
-      .an2 { padding: 24px 20px 56px; max-width: 760px; margin: 0 auto; color: #f5f5f7; font-family: var(--f-body); }
-      .an2-kick { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #9a9ba3; }
-      .an2-head { display: flex; justify-content: space-between; align-items: center; }
-      .an2-head h1 { margin: 6px 0 0; font-family: var(--f-head); font-weight: 700; font-size: 44px; line-height: 1; letter-spacing: 0.01em; }
-      .an2-burger { all: unset; box-sizing: border-box; width: 48px; height: 48px; border-radius: 50%; background: #161922; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #f5f5f7; }
-      .an2-burger:focus-visible, .an2-btn:focus-visible, .an2-link:focus-visible, .an2-dd > button:focus-visible, .an2-row:focus-visible, .an2-plot:focus-visible { outline: 2px solid #e0bf6a; outline-offset: 2px; }
-      .an2-empty { padding: 28px 0; color: #9a9ba3; font-size: 16px; line-height: 24px; }
-      .an2-res { padding: 28px 0; display: flex; flex-direction: column; gap: 20px; }
-      .an2-meta { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #9a9ba3; }
-      .an2-meta i { width: 8px; height: 8px; border-radius: 50%; display: block; }
-      .an2-res h2 { margin: 0; font-family: var(--f-head); font-weight: 700; font-size: 34px; line-height: 1.05; }
-      .an2-big { display: flex; align-items: baseline; gap: 14px; }
-      .an2-big b { font-family: var(--f-head); font-size: 52px; line-height: 1; }
-      .an2-big span { font-size: 16px; color: #c9cad1; }
-      .an2-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .an2-col { padding: 0 12px; border-left: 1px solid rgba(255, 255, 255, 0.1); min-width: 0; }
-      .an2-col:first-child { padding-left: 0; border-left: none; }
-      .an2-col .k { font-size: 13px; color: #9a9ba3; }
-      .an2-col .v { font-family: var(--f-head); font-weight: 700; font-size: 32px; line-height: 1.15; white-space: nowrap; }
-      .an2-col .v small { font-family: var(--f-body); font-weight: 400; font-size: 14px; color: #9a9ba3; margin-left: 4px; }
-      .an2-col.warn .v, .an2-col.warn .v small { color: #ffb340; }
-      .an2-note { margin: 0; font-size: 14px; line-height: 21px; color: #9a9ba3; }
-      .an2-sec { padding: 28px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; gap: 24px; }
-      .an2-sec > h3 { margin: 0; font-size: 18px; font-weight: 600; }
-      .an2-blk { display: flex; flex-direction: column; gap: 10px; }
-      .an2-blk .h { display: flex; align-items: center; gap: 10px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #9a9ba3; }
-      .an2-blk .h i { width: 10px; height: 10px; border-radius: 50%; background: #64a8ff; display: block; }
-      .an2-blk.bad .h { color: #ffb340; } .an2-blk.bad .h i { background: #ffb340; } .an2-blk.bad b { color: #ffb340; }
-      .an2-blk.next .h { color: #e0bf6a; } .an2-blk.next .h i { background: #e0bf6a; }
-      .an2-blk p { margin: 0; font-size: 16px; line-height: 24px; }
-      .an2-blk b { font-family: var(--f-head); font-size: 20px; margin-right: 4px; }
-      .an2-prop .t { margin: 0; font-size: 18px; line-height: 26px; font-weight: 500; }
-      .an2-prop .t small { display: block; font-size: 14px; color: #9a9ba3; font-weight: 400; }
-      .an2 .btns { display: flex; gap: 12px; }
-      .an2-btn { all: unset; box-sizing: border-box; flex: 1; min-height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: #1f2330; font-size: 16px; font-weight: 600; cursor: pointer; color: #f5f5f7; text-align: center; }
-      .an2-btn.gold { background: #e0bf6a; color: #16181a; }
-      .an2-btn:disabled { opacity: 0.5; cursor: default; }
-      .an2-link { all: unset; align-self: center; min-height: 44px; padding: 0 16px; display: flex; align-items: center; justify-content: center; color: #9a9ba3; font-size: 16px; cursor: pointer; width: 100%; box-sizing: border-box; }
-      .an2-details { padding: 12px 0; gap: 0; }
-      .an2-dt { border-top: 1px solid rgba(255, 255, 255, 0.07); }
-      .an2-dt:first-child { border-top: none; }
-      .an2-dt summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 68px; padding: 10px 0; color: #9a9ba3; }
-      .an2-dt summary::-webkit-details-marker { display: none; }
-      .an2-dt summary b { display: block; font-size: 17px; font-weight: 600; color: #f5f5f7; }
-      .an2-dt summary small { display: block; font-size: 14px; margin-top: 2px; }
-      .an2-dt[open] summary svg { transform: rotate(180deg); }
-      .an2-dt .body { padding: 0 0 12px; }
-      .an2-lr { display: grid; grid-template-columns: 32px 1fr 64px 52px; gap: 0 12px; align-items: center; min-height: 52px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
-      .an2-lr.hd { border-top: none; min-height: 32px; font-size: 13px; color: #9a9ba3; }
-      .an2-lr b { font-family: var(--f-head); font-size: 22px; }
-      .an2-lr .n { text-align: right; font-family: var(--f-head); font-weight: 700; font-size: 22px; }
-      .an2-lr.hd .n { font-family: var(--f-body); font-size: 13px; font-weight: 400; }
-      .an2-lr .h { text-align: right; font-size: 16px; color: #c9cad1; }
-      .an2-lr.hd .h { font-size: 13px; color: #9a9ba3; }
-      .an2-lr .ok { color: #9cc7ff; font-size: 15px; }
-      .an2-lr .bad, .an2-lr .n.bad { color: #ffb340; }
-      .an2-lr span.bad { font-size: 15px; }
-      .an2-z { display: grid; grid-template-columns: 32px 1fr 52px; gap: 12px; align-items: center; min-height: 36px; font-size: 14px; color: #9a9ba3; }
-      .an2-z div { height: 12px; border-radius: 6px; background: #161922; }
-      .an2-z i { display: block; height: 100%; border-radius: 6px; }
-      .an2-z .n { text-align: right; font-size: 15px; color: #c9cad1; }
-      .an2-dr { display: grid; grid-template-columns: 1fr auto auto; gap: 0 20px; align-items: center; min-height: 52px; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 16px; }
-      .an2-dr .m { color: #9a9ba3; } .an2-dr b { font-weight: 600; } .an2-dr b.bad { color: #ffb340; }
-      .an2-wk { margin: 28px 0 12px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #9a9ba3; font-weight: 500; }
-      .an2-row { all: unset; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: 52px 1fr 18px; gap: 16px; align-items: center; min-height: 80px; padding: 14px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; color: #f5f5f7; }
-      .an2-row .d { text-align: center; }
-      .an2-row .d small { display: block; font-size: 13px; color: #9a9ba3; }
-      .an2-row .d b { font-family: var(--f-head); font-size: 28px; line-height: 1.1; }
-      .an2-row .t > span { display: block; font-size: 17px; font-weight: 600; line-height: 24px; }
-      .an2-row .t i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
-      .an2-row .t small { display: block; font-size: 14px; color: #9a9ba3; margin-top: 2px; }
-      .an2-row svg { color: #9a9ba3; }
-      .an2-trend { padding: 28px 0 8px; display: flex; flex-direction: column; gap: 10px; }
-      .an2-trend .big { display: flex; align-items: baseline; gap: 10px; }
-      .an2-trend .big b { font-family: var(--f-head); font-size: 52px; line-height: 1; }
-      .an2-trend .big small { font-size: 16px; color: #9a9ba3; }
-      .an2-trend p { margin: 0; font-size: 16px; line-height: 24px; color: #c9cad1; }
-      .an2-ct { display: flex; flex-direction: column; }
-      .an2-cr { display: grid; grid-template-columns: 1fr 76px 76px; gap: 0 12px; align-items: center; min-height: 56px; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 16px; }
-      .an2-cr.hd { border-top: none; min-height: 36px; font-size: 14px; }
-      .an2-cr > span { color: #c9cad1; }
-      .an2-cr b { text-align: right; font-family: var(--f-head); font-size: 24px; }
-      .an2-cr.hd b { font-family: var(--f-body); font-size: 14px; }
-      .an2-cr .p { color: #c9cad1; }
-      .an2-ir { display: grid; grid-template-columns: 32px 1fr 1fr 64px; gap: 0 12px; align-items: center; min-height: 52px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
-      .an2-ir.hd { border-top: none; min-height: 32px; font-size: 13px; color: #9a9ba3; }
-      .an2-ir b { font-family: var(--f-head); font-size: 22px; }
-      .an2-ir span { text-align: right; font-family: var(--f-head); font-weight: 700; font-size: 22px; }
-      .an2-ir.hd span { font-family: var(--f-body); font-size: 13px; font-weight: 400; }
-      .an2-ir .p { color: #c9cad1; }
-      .an2-ir em { font-style: normal; text-align: right; font-size: 15px; color: #c9cad1; }
-      /* Diagramm */
-      .an2-chart { display: flex; flex-direction: column; gap: 16px; --ph: 240px; }
-      .an2-ctl { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; position: relative; z-index: 10; }
-      .an2-dd { position: relative; flex: 1 1 0; min-width: 0; }
-      .an2-dd > button { all: unset; box-sizing: border-box; width: 100%; min-height: 56px; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-radius: 14px; background: #161922; cursor: pointer; color: #9a9ba3; }
-      .an2-dd > button span { min-width: 0; }
-      .an2-dd > button small { display: block; font-size: 12px; }
-      .an2-dd > button b { display: block; font-size: 16px; font-weight: 600; color: #f5f5f7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .an2-list { position: absolute; top: 62px; left: 0; width: 240px; max-width: 90vw; padding: 6px; border-radius: 16px; background: #232736; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6); z-index: 20; }
-      .an2-list.lap { left: auto; right: 0; }
-      .an2-list[hidden] { display: none; }
-      .an2-list button { all: unset; box-sizing: border-box; width: 100%; min-height: 48px; padding: 0 12px; display: flex; align-items: center; gap: 10px; border-radius: 10px; font-size: 16px; cursor: pointer; color: #f5f5f7; }
-      .an2-list button[aria-selected="true"] { background: rgba(255, 255, 255, 0.08); }
-      .an2-list button i { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
-      .an2-list button span { flex: 1; }
-      .an2-list button em { font-style: normal; font-size: 13px; color: #e0bf6a; }
-      .an2-list button small { font-size: 14px; color: #9a9ba3; }
-      .an2-zoom { display: none; gap: 4px; }
-      .an2-zoom button { all: unset; box-sizing: border-box; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #161922; font-size: 22px; cursor: pointer; color: #f5f5f7; }
-      .an2-zoom .w { width: auto; min-width: 56px; padding: 0 12px; font-size: 14px; font-weight: 600; }
-      .an2-zoom button:disabled { opacity: 0.4; cursor: default; }
-      @media (min-width: 900px), (orientation: landscape) and (max-height: 520px) { .an2-zoom { display: flex; } }
-      @media (min-width: 900px) { .an2-chart { --ph: 320px; } }
-      @media (orientation: landscape) and (max-height: 520px) { .an2-chart { --ph: min(200px, 42vh); } .an2 { max-width: none; } }
-      .an2-read { min-height: 20px; font-size: 14px; color: #c9cad1; }
-      .an2-plotbox { position: relative; height: calc(var(--ph) + 26px); }
-      .an2-yl { position: absolute; top: 0; width: 38px; height: var(--ph); font-size: 11px; line-height: 12px; }
-      .an2-yl.l { left: 0; } .an2-yl.r { right: 0; color: #ff8a84; }
-      .an2-yl span { position: absolute; transform: translateY(-50%); }
-      .an2-yl.l span { right: 6px; } .an2-yl.r span { left: 6px; }
-      .an2-plot { position: absolute; left: 38px; right: 38px; top: 0; height: var(--ph); overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: crosshair; }
-      .an2-plot > .g { position: absolute; left: 0; right: 0; height: 1px; background: rgba(255, 255, 255, 0.08); pointer-events: none; }
-      .an2-plot .band { position: absolute; top: 0; bottom: 0; background: rgba(255, 255, 255, 0.05); pointer-events: none; }
-      .an2-plot .band.on { background: rgba(255, 255, 255, 0.14); box-shadow: inset 0 0 0 1.5px #e0bf6a; }
-      .an2-plot .band span { position: absolute; top: 4px; left: 0; right: 0; text-align: center; font-size: 11px; font-weight: 600; color: #c9cad1; }
-      .an2-plot .bar { position: absolute; padding: 0 8%; box-sizing: border-box; pointer-events: none; }
-      .an2-plot .bar i { display: block; width: 100%; height: 100%; border-radius: 4px; }
-      .an2-plot .bar i.ok { background: #64a8ff; } .an2-plot .bar i.bad { background: #ffb340; }
-      .an2-plot .bar span { position: absolute; left: 0; right: 0; text-align: center; font-size: 12px; font-weight: 600; }
-      .an2-plot .bar span.ok { color: #9cc7ff; } .an2-plot .bar span.bad { color: #ffb340; }
-      .an2-plot svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
-      .an2-plot .sel { position: absolute; top: 0; bottom: 0; background: rgba(224, 191, 106, 0.16); border-left: 2px solid #e0bf6a; border-right: 2px solid #e0bf6a; box-sizing: border-box; pointer-events: none; }
-      .an2-plot .cross { position: absolute; top: 0; bottom: 0; width: 1px; background: #f5f5f7; opacity: 0.8; pointer-events: none; }
-      .an2-plot [hidden] { display: none; }
-      .an2-xl { position: absolute; left: 38px; right: 38px; top: calc(var(--ph) + 6px); height: 14px; }
-      .an2-xl span { position: absolute; transform: translateX(-50%); font-size: 11px; line-height: 14px; color: #9a9ba3; white-space: nowrap; }
-      .an2-leg { display: flex; gap: 18px; font-size: 13px; color: #c9cad1; }
-      .an2-leg span { display: inline-flex; align-items: center; gap: 8px; }
-      .an2-leg i { width: 18px; height: 3px; border-radius: 2px; display: block; }
-      .an2-leg i.d { height: 0; border-top: 3px dashed #f5f5f7; background: none; }
-      .an2-rng { display: flex; flex-direction: column; gap: 12px; }
-      .an2-cells { display: grid; gap: 14px 12px; }
-      .an2-cells.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .an2-cells.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .an2-cells > div { border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 10px; min-width: 0; }
-      .an2-cells small { display: block; font-size: 13px; color: #9a9ba3; white-space: nowrap; min-height: 16px; }
-      .an2-cells b { display: block; font-family: var(--f-head); font-size: 28px; line-height: 1.1; margin-top: 2px; white-space: nowrap; }
+      /* Analyse-Bereich nach dem Entwurf «Analyse-Tab Garmin-Stil» (src/an-ui.js, src/an-plot.js). Alle Klassen mit Präfix an3-, Wurzel .an3 */
+
+      .an3 { --bg: #06070a; --card: #0e1016; --well: #161922; --raise: #1b1e29; --text: #f5f5f7; --muted: #a1a2aa; --line: rgba(255,255,255,.09); --edge: inset 0 1px 0 rgba(255,255,255,.06); --accent: #e0bf6a; --on-accent: #16181a; --ok: #30d158; --warn: #ff9f0a; --bad: #ff6961; --f-head: "Barlow Condensed", "Arial Narrow", Impact, sans-serif; color: var(--text); font-size: 15px; line-height: 1.4; padding: 20px 16px 40px; max-width: 760px; margin: 0 auto; }
+      :where(.an3) * { box-sizing: border-box; }
+      .an3-zb { position: absolute; left: 0; right: 0; background: rgba(48,209,88,.1); border-block: 1px dashed rgba(48,209,88,.45); pointer-events: none; }
+      .an3-zb span { position: absolute; left: 6px; bottom: 2px; font-size: 11px; color: #8fe3a8; font-weight: 600; }
+      .an3-warnt { color: var(--warn); }
+      .an3-empty { padding: 28px 0; color: var(--muted); font-size: 16px; line-height: 24px; }
+      .an3-dl i.an3-warn { background: var(--warn); }
+      .an3-cols .an3-warn .an3-v { color: var(--warn); }
+      .an3-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 40; display: flex; align-items: flex-end; }
+      .an3-chartwrap { position: relative; }
+      .an3-cur { z-index: 2; } .an3-plot { touch-action: pan-y; }
+      .an3 .an3-tr[disabled] { opacity: .5; }
+      .an3-h.an3-ok { color: var(--ok); } .an3-h.an3-bad { color: var(--bad); }
+      :where(.an3) * { box-sizing: border-box; }
+      :where(.an3) button { font: inherit; color: inherit; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; text-align: center; }
+      :where(.an3) svg { flex: none; display: block; }
+      :where(.an3) button:focus-visible, :where(.an3) [tabindex]:focus-visible, .an3 summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+      .an3-kick { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+      .an3-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+      .an3-head h1 { margin: 4px 0 0; font-family: var(--f-head); font-weight: 700; font-size: 44px; line-height: 1; }
+      .an3-iconbtn { width: 48px; height: 48px; border-radius: 50%; background: var(--well); border: 0; flex: none; }
+      .an3-picker { display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; gap: 8px; margin-bottom: 16px; }
+      .an3-picker .an3-iconbtn { border-radius: 14px; }
+      .an3-picker .an3-iconbtn:disabled { opacity: .35; cursor: default; }
+      .an3-picker .an3-ttl { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-width: 0; line-height: 1.25; gap: 2px; }
+      .an3-picker .an3-ttl b { font-size: 16px; font-weight: 650; }
+      .an3-picker .an3-ttl small { color: var(--muted); font-size: 13px; }
+      .an3-res { background: var(--card); border-radius: 20px; padding: 20px 16px 16px; box-shadow: var(--edge); }
+      .an3-meta { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+      .an3-meta i { width: 9px; height: 9px; border-radius: 50%; background: var(--lauf); flex: none; }
+      .an3-res h2 { margin: 8px 0 12px; font-size: 22px; line-height: 1.15; font-weight: 650; text-wrap: balance; }
+      .an3-big { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 16px; }
+      .an3-big b { font-family: var(--f-head); font-size: 56px; line-height: .9; font-weight: 700; }
+      .an3-big span { color: var(--muted); font-size: 14px; }
+      .an3-pill { display: inline-flex; align-items: center; min-height: 24px; padding: 0 10px; border-radius: 99px; font-size: 12px; font-weight: 700; }
+      .an3-pill.an3-ok { background: rgba(48,209,88,.16); color: var(--ok); }
+      .an3-pill.an3-bad { background: rgba(255,105,97,.16); color: var(--bad); }
+      .an3-pill.an3-warn { background: rgba(255,159,10,.16); color: var(--warn); }
+      .an3-pill.an3-mu { background: var(--well); color: var(--muted); }
+      .an3-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; border-top: 1px solid var(--line); padding-top: 16px; }
+      .an3-cols .an3-k { font-size: 12px; color: var(--muted); line-height: 1.25; }
+      .an3-cols .an3-v { font-family: var(--f-head); font-size: 30px; font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; }
+      .an3-cols .an3-v small { font-size: 13px; color: var(--muted); margin-left: 3px; font-family: var(--f-body); font-weight: 500; }
+      .an3-cols .an3-warn .an3-v { color: var(--warn); }
+      .an3-dl { display: flex; align-items: center; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+      .an3-dl i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; }
+      .an3-sec { margin-top: 28px; }
+      .an3-sec h3 { margin: 0 0 12px; font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; gap: 8px; }
+      .an3-sec h3 .an3-cl { text-transform: none; letter-spacing: 0; font-weight: 500; font-variant-numeric: tabular-nums; }
+      .an3-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+      .an3-seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; background: var(--well); border-radius: 14px; }
+      .an3-seg button { border: 0; background: transparent; min-height: 40px; padding: 0 16px; border-radius: 11px; color: var(--muted); font-weight: 600; font-size: 14px; }
+      .an3-seg button[aria-selected="true"] { background: var(--raise); color: var(--text); box-shadow: var(--edge); }
+      .an3-chip { min-height: 48px; padding: 0 14px; gap: 8px; white-space: nowrap; border-radius: 14px; border: 1px solid var(--line); background: var(--well); font-size: 14px; font-weight: 600; }
+      .an3-chip.an3-go { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+      .an3-sp { flex: 1; }
+      .an3-stack { touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+      .an3-ch { margin-bottom: 16px; }
+      .an3-chh { display: flex; align-items: center; gap: 8px; padding: 0 0 6px 48px; min-height: 28px; }
+      .an3-chh i { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+      .an3-chh .an3-n { font-size: 13px; color: var(--muted); }
+      .an3-chh .an3-val { margin-left: auto; font-family: var(--f-head); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .an3-chh .an3-val small { font-family: var(--f-body); font-size: 12px; color: var(--muted); margin-left: 4px; font-weight: 500; }
+      .an3-chb { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 4px; }
+      .an3-yl { position: relative; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+      .an3-yl span { position: absolute; right: 4px; transform: translateY(-50%); }
+      .an3-plot { position: relative; height: 112px; background: var(--card); border-radius: 10px; overflow: hidden; cursor: crosshair; }
+      .an3-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+      .an3-plot .an3-g { position: absolute; left: 0; right: 0; height: 1px; background: var(--line); }
+      .an3-band { position: absolute; top: 0; bottom: 0; background: rgba(100,168,255,.09); }
+      .an3-band.an3-on { background: rgba(224,191,106,.22); }
+      .an3-band span { position: absolute; top: 4px; left: 5px; font-size: 11px; font-weight: 700; color: var(--muted); }
+      .an3-cur { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--text); opacity: .85; pointer-events: none; }
+      .an3-brush { position: absolute; top: 0; bottom: 0; background: rgba(224,191,106,.18); border-inline: 1px solid var(--accent); pointer-events: none; }
+      .an3-xl { position: relative; height: 20px; margin: 0 0 0 48px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+      .an3-xl span { position: absolute; transform: translateX(-50%); }
+      .an3-leg { display: flex; gap: 16px; font-size: 13px; color: var(--muted); margin: 0 0 12px 48px; }
+      .an3-leg i { display: inline-block; width: 18px; height: 0; border-top: 2.5px solid; vertical-align: middle; margin-right: 6px; }
+      .an3-leg i.an3-d { border-top-style: dashed; }
+      .an3-hint { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+      .an3-rng { position: sticky; bottom: 0; z-index: 4; margin: 16px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background: rgba(14,16,22,.95); backdrop-filter: blur(12px); border-top: 1px solid var(--line); }
+      .an3-rng .an3-kick { margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 28px; }
+      .an3-rng .an3-kick button { background: none; border: 0; color: var(--accent); font-weight: 600; letter-spacing: 0; text-transform: none; font-size: 14px; min-height: 44px; padding: 0 4px; margin: -8px -4px; }
+      .an3-rc { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+      .an3-rc small { display: block; font-size: 12px; color: var(--muted); }
+      .an3-rc b { font-family: var(--f-head); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; white-space: nowrap; }
+      .an3-rc b em { font-style: normal; font-family: var(--f-body); font-size: 12px; font-weight: 500; color: var(--muted); margin-left: 3px; }
+      .an3-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-top: 28px; }
+      .an3-tabs button { background: none; border: 0; min-height: 48px; padding: 0 12px; color: var(--muted); font-weight: 600; position: relative; }
+      .an3-tabs button[aria-selected="true"] { color: var(--text); }
+      .an3-tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: -1px; height: 2px; background: var(--accent); border-radius: 2px; }
+      .an3-tbl { margin-top: 8px; }
+      .an3-tr { display: grid; grid-template-columns: minmax(0, 1fr) 52px 44px 48px 40px 52px; gap: 6px; align-items: center; min-height: 48px; padding: 0 8px; border: 0; background: none; width: 100%; text-align: left; border-bottom: 1px solid var(--line); font-size: 14px; font-variant-numeric: tabular-nums; border-radius: 8px; }
+      .an3-tr.an3-hd { min-height: 32px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; cursor: default; }
+      .an3-tr > * { white-space: nowrap; }
+      .an3-tr > :not(:first-child) { text-align: right; justify-self: end; }
+      :where(.an3) button.an3-tr:hover { background: var(--well); }
+      .an3-tr.an3-on { background: rgba(224,191,106,.14); }
+      .an3-tr.an3-pause { color: var(--muted); }
+      .an3-tr.an3-st { grid-template-columns: minmax(0, 1fr) 56px 56px 60px; }
+      .an3-tr.an3-cmp { grid-template-columns: minmax(0, 1fr) 64px 64px 56px; }
+      .an3-ok { color: var(--ok); }
+      .an3-bad { color: var(--bad); }
+      .an3-mu { color: var(--muted); }
+      .an3-z { display: grid; grid-template-columns: 32px minmax(0, 1fr) 52px; align-items: center; gap: 12px; min-height: 48px; font-variant-numeric: tabular-nums; }
+      .an3-z .an3-t { height: 14px; background: var(--well); border-radius: 7px; overflow: hidden; }
+      .an3-z .an3-t i { display: block; height: 100%; border-radius: 7px; }
+      .an3-z small { color: var(--muted); display: block; font-size: 12px; line-height: 1.3; margin-top: 2px; }
+      .an3-z > span:last-child { text-align: right; }
+      .an3-kv { display: grid; grid-template-columns: 1fr auto; }
+      .an3-kv > * { padding: 12px 8px; border-bottom: 1px solid var(--line); }
+      .an3-kv > :nth-child(odd) { color: var(--muted); }
+      .an3-kv > :nth-child(even) { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+      .an3-note { font-size: 12px; color: var(--muted); margin: 12px 8px 0; line-height: 1.45; }
+      .an3 details.an3-coach { margin-top: 28px; background: var(--card); border-radius: 16px; box-shadow: var(--edge); }
+      .an3 details.an3-coach summary { min-height: 56px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 600; cursor: pointer; list-style: none; }
+      .an3 details.an3-coach summary::-webkit-details-marker { display: none; }
+      .an3 details.an3-coach[open] summary svg { transform: rotate(180deg); }
+      .an3 details.an3-coach .an3-in { padding: 0 16px 16px; display: grid; gap: 16px; font-size: 14px; }
+      .an3-in p { margin: 0; }
+      .an3-in .an3-h { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; font-weight: 700; margin-bottom: 4px; }
+      .an3-pad { height: 32px; }
+      .an3-card { background: var(--card); border-radius: 20px; padding: 20px 16px; box-shadow: var(--edge); margin-top: 16px; }
+      .an3-card .an3-big { margin: 8px 0 8px; }
+      .an3-card .an3-big b { font-size: 48px; }
+      .an3-wk { display: grid; gap: 8px; }
+      .an3-wr { display: grid; grid-template-columns: 44px minmax(0, 1fr) 52px; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+      .an3-wr .an3-tr2 { height: 16px; display: flex; gap: 2px; }
+      .an3-wr .an3-tr2 i { display: block; height: 100%; border-radius: 4px; }
+      .an3-wr b { color: var(--text); text-align: right; font-weight: 600; }
+      .an3-lst h3 { margin: 28px 0 8px; font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+      .an3-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 20px; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 8px 12px; margin-bottom: 8px; background: var(--card); border: 0; border-radius: 14px; text-align: left; }
+      .an3-row .an3-d { display: grid; place-items: center; }
+      .an3-row .an3-d small { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; }
+      .an3-row .an3-d b { font-family: var(--f-head); font-size: 26px; font-weight: 600; line-height: 1; }
+      .an3-row .an3-t { display: grid; gap: 2px; min-width: 0; }
+      .an3-row .an3-t span { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+      .an3-row .an3-t i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+      .an3-row .an3-t small { color: var(--muted); font-size: 13px; }
+      .an3-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.55); z-index: 20; display: flex; }
+      .an3-overlay.an3-sh { align-items: flex-end; }
+      .an3-overlay.an3-dr { justify-content: flex-end; }
+      .an3-sheet { width: 100%; background: var(--card); border-radius: 22px 22px 0 0; padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px)); box-shadow: var(--edge); }
+      .an3-sheet h4 { margin: 0 0 4px; font-size: 18px; }
+      .an3-sheet p { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+      .an3-opt { display: flex; align-items: center; gap: 12px; min-height: 52px; border-bottom: 1px solid var(--line); }
+      .an3-opt input { width: 22px; height: 22px; accent-color: var(--accent); flex: none; }
+      .an3-opt label { flex: 1; display: flex; align-items: center; gap: 10px; min-height: 52px; min-width: 0; }
+      .an3-opt i.an3-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+      .an3-opt .an3-gr { color: var(--muted); letter-spacing: 2px; user-select: none; width: 20px; text-align: center; }
+      .an3-opt.an3-off { opacity: .5; }
+      .an3-opt small { color: var(--muted); }
+      .an3-pw { position: relative; flex: none; }
+      .an3-iconbtn.an3-sq { border-radius: 14px; border: 1px solid var(--line); position: relative; }
+      .an3-iconbtn .an3-bd { position: absolute; top: 9px; right: 9px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+      .an3-popbg { position: fixed; inset: 0; z-index: 15; }
+      .an3-pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 16; width: 200px; padding: 8px; background: var(--raise); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 12px 32px rgba(0,0,0,.5), var(--edge); }
+      .an3-pop .an3-pk { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 8px 12px 6px; }
+      .an3-pop button { width: 100%; justify-content: space-between; min-height: 48px; padding: 0 12px; border: 0; background: none; border-radius: 10px; font-size: 15px; font-weight: 500; }
+      .an3-pop button:hover { background: var(--well); }
+      .an3-pop button[aria-checked="true"] { color: var(--accent); font-weight: 650; }
+      .an3-strip { display: flex; align-items: center; gap: 16px; min-height: 40px; padding: 0 12px; margin-bottom: 8px; background: var(--well); border-radius: 12px; font-size: 14px; font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; overflow: hidden; }
+      .an3-strip b { color: var(--text); font-weight: 650; }
+      .an3-strip.an3-idle { background: transparent; padding-inline: 2px; font-size: 13px; }
+      .an3-dtl { margin-top: 12px; background: var(--card); border-radius: 14px; box-shadow: var(--edge); }
+      .an3-dtl summary { min-height: 48px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 14px; cursor: pointer; list-style: none; }
+      .an3-dtl summary::-webkit-details-marker { display: none; }
+      .an3-dtl[open] summary svg { transform: rotate(180deg); }
+      .an3-dtl > div { padding: 0 8px 12px; }
+      .an3-tr.an3-vl { grid-template-columns: minmax(0, 1fr) 56px 56px 56px; }
+      .an3-gh { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+      .an3-cols.an3-g { border-top: 0; padding-top: 8px; }
+      .an3-prog { margin-top: 12px; background: var(--card); border-radius: 16px; padding: 16px; box-shadow: var(--edge); }
+      .an3-prog .an3-pr { display: flex; align-items: center; gap: 10px; margin-top: 6px; font-family: var(--f-head); font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums; }
+      .an3-prog .an3-pr svg { color: var(--muted); }
+      .an3-ct { display: grid; gap: 2px; min-width: 0; }
+      .an3-ct small { color: var(--muted); font-weight: 500; font-size: 13px; line-height: 1.3; white-space: normal; }
+      .an3-ct .an3-warn { color: var(--warn); font-weight: 700; }
+      .an3-ct .an3-ok { font-weight: 700; }
+      .an3 details.an3-coach summary { min-height: 64px; padding-block: 8px; }
+      .an3-cs .an3-h.an3-mu { color: var(--muted); }
+      .an3-cs .an3-h.an3-warn { color: var(--warn); }
+      .an3-cs .an3-h.an3-acc { color: var(--accent); }
+      .an3-prop { background: var(--well); border-radius: 14px; padding: 16px; }
+      .an3-prop p { margin: 6px 0 0; }
+      .an3-linkb { background: none; border: 0; min-height: 44px; padding: 0 4px; margin-top: 4px; color: var(--muted); font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
+      .an3-cfoot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); padding-top: 4px; }
       #msub .mi.sub { padding-left: 44px; }
       .s7-an-txt { display: grid; gap: 4px; margin-top: 6px; }
       .s7-an {
@@ -14468,6 +14508,7 @@
           ><span class="l">Analyse</span>
         </button>
         <div id="msub" hidden>
+          <button class="mi sub" data-v="analysis"><span class="l">Einheit</span></button>
           <button class="mi sub" data-v="analysisv"><span class="l">Verlauf</span></button>
           <button class="mi sub" data-v="analysisc"><span class="l">Vergleich mit <span data-partner>Partner</span></span></button>
         </div>
@@ -14641,8 +14682,9 @@
       import { sessionDash, compareToPrev, splitPhases, phaseStats, workDash, sourceInfo, dashSections } from "./src/session-dash.js";
       import { reviewAll, keyLine } from "./src/dash-all.js";
       import { dashV3, dashV3Html, anCardHtml, actHeaderHtml, intervalPlan } from "./src/dash-v3.js";
-      import { anHead, anResultHtml, anCoachHtml, anProposalHtml, anDetailsHtml, anListHtml, anTrendHtml, anCmpBody, anChartData, anChartHtml, attachAnChart } from "./src/an-ui.js";
-      import { seriesOf as anSeriesOf, zoneTimes as anZoneTimes } from "./src/series.js";
+      import { anHead, anPicker, anResultHtml, anProgHtml, anSection, anTabsHtml, anTableHtml, anZonesHtml, anKvHtml, anEmpty, anCoachHtml, anProposalHtml, anCoachFoot, anPeriodHtml, anTrendHtml, anWeeksHtml, anListHtml, anCmpHtml, anChartData, anChartHtml, anRangeHtml, anPaintAll, attachAnChart } from "./src/an-ui.js";
+      import { sessionKind, anSessionModel, zoneRows, kmSplits, timeBlocks, elevGain } from "./src/an-session.js";
+      import { seriesOf as anSeriesOf } from "./src/series.js";
       import { compareSessions, pickAct } from "./src/compare.js";
       import { comparePanelHtml, attachCharts } from "./src/charts.js";
       import { alignSplits } from "./src/laps.js";
@@ -17022,7 +17064,12 @@
           const have = Object.values(S.strava.acts)
             .filter((a) => a.src === "garmin" && a.lapsV === 3)
             .map((a) => a.id);
-          const haveSeries = () => Object.values(S.strava.acts).filter((a) => a.src === "garmin" && (a.series || a.seriesTried)).map((a) => a.id);
+          /* Nur Einheiten melden, die fertig sind: Reihe (oder «Garmin hat nichts») UND Garmin-Zonen; die 6 neuesten zusätzlich in voller Auflösung (1 s) */
+          const haveSeries = () => {
+            const garmin = Object.values(S.strava.acts).filter((a) => a.src === "garmin"),
+              newest = new Set([...garmin].sort((x, y) => String(y.start || y.date || "").localeCompare(String(x.start || x.date || ""))).slice(0, 6).map((a) => a.id));
+            return garmin.filter((a) => (a.series || a.seriesTried) && (a.zones || a.zonesTried || a.seriesTried) && !(newest.has(a.id) && a.series && !a.series.hi)).map((a) => a.id);
+          };
           let r = await gmInvoke({ action: "sync", from, to, have, haveSeries: haveSeries() });
           let n = mergeActs(r.acts || []);
           // Backfill der Zeitreihen in Schritten (der Server lädt je Abruf höchstens 15 Einheiten); höchstens zwei weitere Runden, ein Fehler bricht nichts ab
@@ -17491,7 +17538,7 @@
         v.st.length === 8 &&
         v.st.every((x) => parseT(x) > 0);
       /* Prognose aus den aktuellen Tests (ich + Partner) und den eingetragenen Simulationen */
-      function rvForecast() {
+      function rvForecast(skipSim = null) {
         const me = myTests(),
           pa = partnerTests();
         const at = S.tests && S.tests.at ? Date.parse(S.tests.at) : NaN;
@@ -17500,7 +17547,7 @@
           laufPersons: [me.lauf, pa.lauf],
           station: me.station.map((v, r) => [v, pa.station[r]]),
           sims: Object.entries(S.simres || {})
-            .filter(([, v]) => simOk(v))
+            .filter(([d, v]) => simOk(v) && d !== skipSim)
             .sort(([a], [b]) => (a < b ? -1 : 1))
             .map(([d, v]) => ({
               intensity: v.i,
@@ -21397,8 +21444,9 @@
         const goal = `<section class="s6-card s6-goal"><span class="s6-kick">Ziel</span><b class="s7-gb">&lt; 60:00</b><span class="s7-gd">Sa 13.02.2027</span><span class="s7-gs">HYROX Basel · Doubles Men PRO mit ${esc(PARTNER)}</span></section>`;
         return `${intro}<div class="s6 s6-today">${head}${rail}<div class="s6-main">${hero}${more}${hintsHtml}</div><div class="s6-side">${goal}${s7Ready(i)}${ciHtml}</div></div>`;
       }
-      /* ---- Analyse-Bereich (Menü): Heute, Verlauf, Vergleich. Aufbau nach dem Entwurf, Bausteine in src/an-ui.js ---- */
-      let anSel = null, anKeep = false; // anSel: null = heute
+      /* ---- Analyse-Bereich (Menü, drei Ansichten nur im Analyse-Tab): Einheit, Verlauf, Vergleich.
+         Entwurf «Analyse-Tab Garmin-Stil» (docs/analyse-tab-anforderungen.md), Bausteine src/an-ui.js und src/an-plot.js, Modell je Einheitstyp src/an-session.js ---- */
+      let anSel = null, anKeep = false, anSubTab = "", anPeriod = 8; // anSel: null = heute
       function anFinished(i) {
         const p = dayPlan(i), dk = keyI(i);
         if (!p || p.k === "rest" || S.off[dk] || S.later[dk]) return false;
@@ -21406,106 +21454,241 @@
         return !!st.n && (st.done >= st.n || (rpe != null && st.done > 0));
       }
       const anToday = () => Math.max(0, Math.min(LAST, TODAY));
-      const anPlain = (msg) => `<p class="an2-empty">${msg}</p>`;
-      const anKick = (i) => `${DAYSF[dow(i)]}, ${fmt(dateFromIdx(i))}${i === anToday() ? " · Heute" : ""}`;
-      /* Intervalle (1-km-Runden der Arbeitsphasen) mit Zeitbereich, Pace, Puls und Abweichung vom Ziel */
-      function anIntervals(ph, plan) {
+      const anHasData = (x) => { const q = dayPlan(x); return !!q && q.k !== "rest" && (anFinished(x) || !!S.analysis[keyI(x)] || actsOf(x).length > 0); };
+      function anNeighbor(from, dir) { for (let x = from + dir; x >= 0 && x <= anToday(); x += dir) if (anHasData(x)) return x; return null; }
+      const kmTxt = (m) => (m / 1000).toFixed(2).replace(".", ",");
+      const sg = (n) => (n > 0 ? "+" : n < 0 ? "−" : "±") + Math.abs(n); // Vorzeichen mit Minuszeichen
+      /* Alle Abschnitte einer Einheit aus den Runden (Warm up, Läufe, Pausen, Auslaufen) mit Zeitbereich in Sekunden */
+      function anSections(ph) {
         const out = [];
         if (!ph || !ph.laps) return out;
-        let t = 0;
+        let t = 0, r = 0, s = 0;
         ph.laps.forEach((l, k) => {
-          const t0 = t;
+          const t0 = t, phz = ph.phase[k], sub = ph.sub[k] || "run";
           t += l.t;
-          if (ph.phase[k] === "work" && (ph.sub[k] || "run") === "run" && l.d >= 100) {
-            const n = out.length, row = plan && plan.rows[n];
-            out.push({ k: n + 1, t0, t1: t, pace: l.t / (l.d / 1000), hr: l.hr || null, diff: row ? row.diff : null });
-          }
+          const run = phz === "work" && sub === "run" && l.d >= 100;
+          const label = phz === "warm" ? "Warm up" : phz === "cool" ? "Auslaufen" : phz === "rest" ? "Pause" : phz === "work" ? (run ? "Lauf " + ++r : "Station " + ++s) : "Abschnitt";
+          out.push({ t0, t1: t, label, phase: phz, run, k: run ? r : 0, d: l.d || 0, hr: l.hr || null, w: l.w || null });
         });
         return out;
       }
+      /* Arbeitsläufe (Intervalle) mit Zeitbereich, Pace, Puls und Abweichung vom Ziel */
+      function anIntervals(ph, plan) {
+        return anSections(ph).filter((s) => s.run).map((s, n) => ({ k: s.k, t0: s.t0, t1: s.t1, d: s.d, pace: (s.t1 - s.t0) / (s.d / 1000), hr: s.hr, diff: plan && plan.rows[n] ? plan.rows[n].diff : null, label: s.label }));
+      }
       const anMeta = (act) => (act ? [act.time ? Math.round(act.time / 60) + " min" : "", act.dist ? (act.dist / 1000).toFixed(1).replace(".", ",") + " km" : ""].filter(Boolean).join(" · ") : "");
-      function anBody(i, p) {
-        const dk = keyI(i), rec = S.analysis[dk], busy = !!anBusy[dk], stale = !!rec && rec.sig !== s7AnSig(i, p);
-        let blocks = [];
-        try { blocks = s7DashParts(i, p, rec && !busy ? rec.data : null); } catch (e) {}
-        const b = blocks.find((x) => x.planned) || blocks[0];
-        if (!b || !b.d) return anPlain("Für diese Einheit gibt es noch keine Auswertung.");
-        const { d, act, ph, maxHr } = b, ivs = anIntervals(ph, d.plan), cd = act ? anChartData(act, ivs) : null;
-        const R = rec && !busy ? rec.data : null;
+      /* Prognose vor und nach einer Simulation: nur wenn der Tag ein Simulationsergebnis hat, das die Rennprognose bewegt */
+      function anForecast(i) {
+        const iso = isoI(i), v = S.simres && S.simres[iso];
+        if (!simOk(v)) return null;
+        const a = rvForecast(), b = rvForecast(iso);
+        return a && b ? { from: b.total, to: a.total, parts: { run: a.run - b.run, st: a.st - b.st, rox: a.rox - b.rox }, lo: a.lo, hi: a.hi } : null;
+      }
+      /* Puls zum Zeitpunkt t Sekunden (für den Puls-Abfall in den Pausen) */
+      const anHrAt = (S0, t) => { if (!S0 || !S0.hr) return null; let b = 0; for (let i = 0; i < S0.t.length; i++) if (Math.abs(S0.t[i] - t) < Math.abs(S0.t[b] - t)) b = i; return S0.hr[b]; };
+      const esc2 = (s) => esc(String(s));
+      /* Inhalt des aktiven Reiters unter dem Diagramm */
+      function anSubHtml(kind, tab, c) {
+        const { key, act, S0, d, secs, maxHr } = c;
+        const sel = (a, b, l) => `${key}|${a}|${b}|${l}`;
+        if (tab === "Intervalle" || (tab === "Abschnitte" && kind === "compromise")) {
+          const goal = kind === "interval";
+          const rows = secs.map((s) => {
+            const dur = s.t1 - s.t0, pace = s.d >= 100 ? mmss(dur / (s.d / 1000)) : "–", iv = c.ivs.find((q) => q.label === s.label);
+            let last = "";
+            if (goal && s.run) { const df = iv && iv.diff; last = df == null ? "" : { t: sg(df) + " s", c: df <= 0 ? "ok" : "bad" }; }
+            else if (goal && s.phase === "rest") { const a = anHrAt(S0, s.t0), b = anHrAt(S0, s.t1); last = a != null && b != null ? { t: "↓" + Math.max(0, Math.round(a - b)), c: "mu" } : ""; }
+            return { cells: goal ? [s.label, mmss(dur), kmTxt(s.d), pace, s.hr || "", last] : [s.label, mmss(dur), kmTxt(s.d), pace, s.hr || ""], pause: s.phase === "rest" || s.phase === "warm" || s.phase === "cool", sel: dur > 5 ? sel(s.t0, s.t1, s.label) : "" };
+          });
+          if (!rows.length) return anEmpty("Die Runden der Uhr lassen sich nicht den Abschnitten zuordnen.");
+          return anTableHtml({ cols: goal ? "minmax(0,1fr) 52px 44px 48px 40px 52px" : "minmax(0,1fr) 52px 44px 48px 40px", head: goal ? ["Abschnitt", "Zeit", "km", "Pace", "Puls", "Ziel"] : ["Abschnitt", "Zeit", "km", "Pace", "Puls"], rows, note: goal ? "Ziel je Intervall aus dem Plan. In den Pausen zeigt «↓» den Puls-Abfall in bpm. Zeile antippen zoomt alle Diagramme auf den Abschnitt." : "Zeile antippen zoomt alle Diagramme auf den Abschnitt. Das Zielband für Zone 3 liegt im Pulsdiagramm." }, esc);
+        }
+        if (tab === "Kilometer") {
+          const sp = kmSplits(S0);
+          let rows;
+          if (sp.length) rows = sp.map((q) => ({ cells: [q.d >= 999 ? "km " + q.k : kmTxt(q.d) + " km", mmss(q.t1 - q.t0), mmss(q.pace), q.hr ? Math.round(q.hr) : "", q.cad ? Math.round(q.cad) : ""], sel: sel(q.t0, q.t1, "Kilometer " + q.k) }));
+          else if (act && act.laps && act.laps.length) { let t = 0; rows = act.laps.filter((l) => l.t > 0).map((l, n) => { const r = { cells: [(l.d / 1000).toFixed(2).replace(".", ",") + " km", mmss(l.t), l.d >= 100 ? mmss(l.t / (l.d / 1000)) : "–", l.hr || "", ""], sel: S0 ? sel(t, t + l.t, "Runde " + (n + 1)) : "" }; t += l.t; return r; }); }
+          else return anEmpty("Keine Runden und keine Zeitreihe von der Uhr.");
+          return anTableHtml({ cols: "minmax(0,1fr) 56px 56px 44px 44px", head: ["Abschnitt", "Zeit", "Pace", "Puls", "Kad."], rows, note: "Kilometer aus der Zeitreihe der Uhr. Zeile antippen zoomt alle Diagramme auf den Abschnitt." }, esc);
+        }
+        if (tab === "Abschnitte") {
+          const bl = timeBlocks(S0, 600);
+          if (!bl.length) return anEmpty("Keine Zeitreihe von der Uhr.");
+          const rows = bl.map((q) => ({ cells: [Math.round((q.t0 - S0.t[0]) / 60) + " bis " + Math.round((q.t1 - S0.t[0]) / 60) + " min", mmss(q.t1 - q.t0), q.pw ? Math.round(q.pw) : "", q.hr ? Math.round(q.hr) : "", q.cad ? Math.round(q.cad) : ""], sel: sel(q.t0, q.t1, "Block " + q.k) }));
+          return anTableHtml({ cols: "minmax(0,1fr) 52px 44px 44px 44px", head: ["Abschnitt", "Zeit", "Watt", "Puls", "U/min"], rows, note: "Blöcke zu 10 Minuten. Zeile antippen zoomt alle Diagramme auf den Block." }, esc);
+        }
+        if (tab === "Stationen") {
+          const plan = d && d.plan;
+          if (!plan) return anEmpty("Die Runden passen nicht zu den Plan-Schritten.");
+          const worst = plan.rows.reduce((a, r) => (r.diff > a.diff ? r : a), plan.rows[0]);
+          return anTableHtml({ cols: "minmax(0,1fr) 56px 56px 60px", head: ["Station", "Zeit", "Ziel", "Δ"], rows: plan.rows.map((r) => ({ cells: [r.name + (r === worst && r.diff > 0 ? " · schwächste" : ""), mmss(r.t), { t: mmss(r.goal), c: "mu" }, { t: sg(r.diff) + " s", c: r.diff <= 0 ? "ok" : "bad" }] })), note: "Kompromiss Ø: wie viel langsamer du direkt nach einer Station läufst als im Plan. Die Referenz ist nur 1 km." }, esc);
+        }
+        if (tab === "Zonen") {
+          const z = zoneRows(act, S0, maxHr);
+          if (!z) return anEmpty("Keine Pulswerte oder keine Zonen.");
+          return anZonesHtml(z.rows, z.estimated ? "Zonen geschätzt: 50, 60, 70, 80, 90 % vom höchsten gemessenen Puls, weil Garmin keine Zonen geliefert hat." : "Grenzen und Zeiten wie in Garmin Connect für diese Einheit.", esc);
+        }
+        if (tab === "Vorher") {
+          const cm = d && d.cmp;
+          if (!cm || !cm.rows.length) return anEmpty(esc2(cm && cm.note ? cm.note.replace(/^keine Daten, Grund: /, "Keine Daten: ") : "Noch keine frühere gleiche Einheit mit Uhr-Daten."));
+          return anTableHtml({ cols: "minmax(0,1fr) 72px 72px 64px", head: [cm.title.replace(/^Vergleich mit /, "Gegenüber "), "Vorher", "Jetzt", "Diff."], rows: cm.rows.map((r) => ({ cells: [{ t: r.k, c: "mu" }, r.was, r.now, { t: r.d, c: r.tone ? "bad" : "mu" }] })), note: "" }, esc);
+        }
+        // Mehr: nur, was die Uhr geliefert hat
+        const eg = elevGain(S0), pairs = [];
+        if (act && act.time) pairs.push(["Dauer", mmss(act.time) + " min"]);
+        if (act && act.dist) pairs.push(["Distanz", kmTxt(act.dist) + " km"]);
+        if (act && act.hr) pairs.push(["Ø Puls", act.hr + " bpm"]);
+        if (act && act.maxHr) pairs.push(["Max. Puls", act.maxHr + " bpm"]);
+        if (act && act.watts) pairs.push(["Ø Leistung", act.watts + " W"]);
+        if (act && act.te) pairs.push(["Training Effect", [act.te.a > 0 ? String(act.te.a).replace(".", ",") + " aerob" : "", act.te.n > 0 ? String(act.te.n).replace(".", ",") + " anaerob" : ""].filter(Boolean).join(" · ")]);
+        if (act && act.load) pairs.push(["Belastungswert", String(act.load)]);
+        if (act && act.kcal) pairs.push(["Kalorien", String(act.kcal)]);
+        if (eg) pairs.push(["Anstieg / Abstieg", eg.up + " m / " + eg.down + " m"]);
+        return pairs.length ? anKvHtml(pairs, "Nur Werte, die die Uhr geliefert hat. Fehlt ein Wert, entfällt die Zeile.", esc) : anEmpty("Keine weiteren Werte von der Uhr.");
+      }
+      /* Coach-Block (eingeklappt): Urteil in Worten, danach Zahlen gegen Plan, letzte Einheit, Saison, mögliche Ursache und der Text des Coaches */
+      function anCoach(i, p, c) {
+        const dk = keyI(i), rec = S.analysis[dk], busy = !!anBusy[dk], stale = !!rec && rec.sig !== s7AnSig(i, p), R = rec && !busy ? rec.data : null;
+        const { d, model, ivs, kind, S0, secs } = c, h = model.headline, line = (n, t) => `<b>${esc2(n)}</b> ${esc2(t)}`;
+        const pr = (arr) => (arr && arr.length ? arr.map((x) => (x.title ? line(x.title, x.detail) : line(x.n, x.t))).join("<br>") : "");
+        let verdict = "", tone = "", teaser = "";
+        if (R) teaser = esc2(R.headline);
+        else if (kind === "interval" || kind === "station") { const m = /^(\d+) von (\d+)$/.exec(h.big); if (m) { const hit = +m[1], n = +m[2]; verdict = hit === n ? "Sehr gut" : hit >= n - 1 ? "Solide" : "Unter Plan"; tone = hit === n ? "ok" : "warn"; teaser = `${h.big} ${esc2(h.label)}`; } }
+        else if (h.status) { verdict = h.status.text; tone = h.status.tone; teaser = `${esc2(h.big)} ${esc2(h.label)}`; }
+        else if (h.big && h.big !== "–") teaser = `${esc2(h.big)} ${esc2(h.label)}`;
+        const secsOut = [];
+        if (R && R.summary) secsOut.push({ cls: "mu", t: "Einordnung", html: esc2(R.summary) + (R.form && R.form.text ? "<br>" + line(R.form.rating || "Form", R.form.text) : "") });
+        const good = R && R.strengths.length ? pr(R.strengths) : pr(d && d.an && d.an.good), bad = R && R.weaknesses.length ? pr(R.weaknesses) : pr(d && d.an && d.an.bad);
+        secsOut.push({ cls: "ok", t: "Gut", html: good }, { cls: "bad", t: "Nicht gut", html: bad });
+        if (kind === "interval") {
+          const plan = d && d.plan, goalPace = plan && plan.rows.length && ivs.length ? Math.round(plan.rows[0].goal / (ivs[0].d / 1000)) : null;
+          const wk = ivs.length ? ivs.reduce((a, q) => a + (q.t1 - q.t0), 0) / (ivs.reduce((a, q) => a + q.d, 0) / 1000) : null;
+          if (goalPace && wk) secsOut.push({ cls: "mu", t: "Gegen den Plan", html: `Pace Arbeit ${mmss(wk)} gegen das Ziel ${mmss(goalPace)}: ${sg(Math.round(wk - goalPace))} s pro km.` });
+        }
+        const cm = d && d.cmp;
+        if (cm && cm.rows.length) secsOut.push({ cls: "mu", t: cm.title.replace(/^Vergleich mit /, "Gegenüber "), html: cm.rows.map((r) => `${esc2(r.k)} ${esc2(r.now)} statt ${esc2(r.was)} (${esc2(r.d)})`).join("<br>") });
+        if (kind === "interval") {
+          const tr = anTrendPoints(i);
+          if (tr.length >= 3) { const mn = Math.min(...tr.map((x) => x.pc)), cur = tr[tr.length - 1].pc; secsOut.push({ cls: "mu", t: "Gegen deine Saison", html: cur <= mn ? `${mmss(cur)} ist die schnellste Arbeits-Pace der letzten ${tr.length} Intervall-Läufe.` : `${mmss(cur)} liegt ${Math.round(cur - mn)} s hinter deiner besten Arbeits-Pace (${mmss(mn)}) der letzten ${tr.length} Intervall-Läufe.` }); }
+          const rest = secs.filter((s) => s.phase === "rest").map((s) => { const a = anHrAt(S0, s.t0), b = anHrAt(S0, s.t1); return a != null && b != null ? Math.round(a - b) : null; }).filter((v) => v != null);
+          if (rest.length >= 2) secsOut.push({ cls: "warn", t: "Puls-Abfall in den Pausen", html: `${rest.join(", ")} bpm${rest[rest.length - 1] < rest[0] ? ": die Erholung wird schwächer." : "."}` });
+        }
+        if (R && R.execution && (R.execution.pacing || R.execution.rest || R.execution.technique)) secsOut.push({ cls: "mu", t: "Ausführung", html: [R.execution.pacing && line("Tempo", R.execution.pacing), R.execution.rest && line("Pausen", R.execution.rest), R.execution.technique && line("Technik", R.execution.technique)].filter(Boolean).join("<br>") });
+        const nextTxt = R && R.nextFocus ? R.nextFocus : d && d.an && d.an.next ? d.an.next : "";
+        if (nextTxt) secsOut.push({ cls: "acc", t: "Nächstes Mal", html: esc2(nextTxt) });
+        if (R && R.dataGaps && R.dataGaps.length) secsOut.push({ cls: "mu", t: "Fehlende Daten", html: R.dataGaps.map(esc2).join("<br>") });
         let prop = "";
         if (R && R.actions && R.actions.length) {
           const { valid } = coachCheck(R.actions);
           if (valid.length && rec.state === "open") prop = anProposalHtml(valid.map((a) => ({ text: propText(a), why: a.reason || "" })), i, valid.some((a) => a.type === "edit"), esc);
-          else if (rec.state === "applied") prop = `<p class="an2-note">Planänderung übernommen.</p>`;
+          else if (rec.state === "applied") prop = `<p class="an3-note">Planänderung übernommen.</p>`;
         }
-        const zones = act && act.series ? anZoneTimes(anSeriesOf(act), maxHr) : null;
-        return anResultHtml({ kind: S6_KIND[p.k] || p.k, color: `var(--${p.k})`, meta: anMeta(act), title: s7Title(p.t), d }, esc)
-          + (cd ? `<section class="an2-sec" aria-label="Verlauf"><h3>Verlauf</h3>${anChartHtml("an-" + dk, cd, { me: ME, pa: PARTNER })}</section>` : "")
-          + anCoachHtml(d.an, esc)
-          + (R && R.summary ? `<p class="an2-note" style="padding:0 0 24px">${esc(R.summary)}</p>` : "")
-          + prop
-          + anDetailsHtml({ d, ivs, zones, maxHr }, esc)
-          + `<div class="an2-sec"><button type="button" class="an2-btn" data-act="an-run" data-i="${i}"${busy ? " disabled" : ""}>${busy ? "Coach liest die Einheit …" : !rec ? "Coach-Analyse starten" : stale ? "Neu analysieren" : "Nochmals analysieren"}</button>${anErr[dk] ? `<p class="an2-note">${esc(anErr[dk])}</p>` : ""}${stale ? `<p class="an2-note">Seit der Analyse haben sich Werte oder Uhr-Daten geändert.</p>` : ""}</div>`;
+        const at = rec ? new Date(rec.at) : null, when = at ? `Analysiert ${at.getDate()}.${at.getMonth() + 1}. ${String(at.getHours()).padStart(2, "0")}:${String(at.getMinutes()).padStart(2, "0")}` : "Noch keine Coach-Analyse";
+        const foot = anCoachFoot(esc2(when + (stale ? ". Seit der Analyse haben sich Werte oder Uhr-Daten geändert." : ".") + (anErr[dk] ? " " + anErr[dk] : "")), busy ? "Coach liest die Einheit …" : !rec ? "Coach-Analyse starten" : stale ? "Neu analysieren" : "Nochmals analysieren", i, busy);
+        return anCoachHtml({ teaser, verdict, tone, sections: secsOut, prop, foot });
+      }
+      function anBody(i, p) {
+        const dk = keyI(i);
+        let blocks = [];
+        try { blocks = s7DashParts(i, p, S.analysis[dk] && !anBusy[dk] ? S.analysis[dk].data : null); } catch (e) {}
+        const b = blocks.find((x) => x.planned) || blocks[0];
+        if (!b || !b.d) return anEmpty("Für diese Einheit gibt es noch keine Auswertung.");
+        const { d, act, ph, maxHr } = b, kind = sessionKind(p, act), secs = anSections(ph), ivs = anIntervals(ph, d.plan);
+        const model = anSessionModel({ kind, act, d, ivs, maxHr, zone2: /Zone\s*2/i.test(p.t || "") || (p.i || []).some((t) => /Zone\s*2/i.test(t)), conf: ph && ph.conf });
+        const S0 = act ? anSeriesOf(act) : null, key = "an-" + dk;
+        const bands = (kind === "interval" || kind === "compromise" ? ivs : []).map((q) => ({ k: q.k, t0: q.t0, t1: q.t1, label: q.label }));
+        const sections = secs.map((s) => ({ t0: s.t0, t1: s.t1, label: s.label }));
+        const cd = model.chart && act ? anChartData({ act, ivs: bands, sections, keys: model.chart.keys, defaults: model.chart.defaults, zoneBand: model.chart.zoneBand }) : null;
+        const tabs = model.tabs, tab = tabs.includes(anSubTab) ? anSubTab : tabs[0] || "";
+        const col = `var(--${p.k})`, fc = anForecast(i);
+        const meta = [S6_KIND[p.k] || p.k, shortDay(i), anMeta(act)].filter(Boolean).join(" · ");
+        const c = { key, act, S0, d, secs, ivs, maxHr, model, kind };
+        return anResultHtml(model, { meta, title: s7Title(p.t), color: col }, esc) + anProgHtml(fc)
+          + (cd ? anSection("Diagramme", anChartHtml(key, cd)) + anRangeHtml(key) : "")
+          + anTabsHtml(tabs, tab) + (tab ? `<div id="an3-sub">${anSubHtml(kind, tab, c)}</div>` : "")
+          + anCoach(i, p, c) + `<div class="an3-pad"></div>`;
       }
       function anTabView() {
-        const today = anToday(), i = anSel != null ? anSel : today, p = dayPlan(i), dk = keyI(i);
+        const today = anToday(), i = anSel != null ? anSel : today, p = dayPlan(i);
+        const count = (to) => { let n = 0; for (let x = 0; x <= to; x++) if (anHasData(x)) n++; return n; };
+        const run = p && p.k !== "rest";
+        const nav = anPicker({ date: shortDay(i) + (i === today ? " · heute" : ""), sub: run ? (S6_KIND[p.k] || p.k) + " · Einheit " + count(i) + " von " + count(today) : "Ruhetag", prev: anNeighbor(i, -1), next: anNeighbor(i, 1) });
         let body;
-        if (!p || p.k === "rest") body = anPlain(i === today ? "Heute ist Ruhetag, es gibt nichts auszuwerten." : "An diesem Tag war Ruhetag.");
-        else if (anFinished(i) || S.analysis[dk] || actsOf(i).length) body = anBody(i, p);
-        else body = anPlain(i === today ? "Die heutige Einheit ist noch nicht erledigt. Sobald du sie abschliesst, findest du hier die Analyse." : "Zu diesem Tag gibt es keine Analyse.");
-        const back = i !== today ? `<button type="button" class="an2-link" data-act="an-pick" data-i="${today}">Zurück zu heute</button>` : "";
-        return `<div class="an2">${anHead(anKick(i), "Analyse")}${body}${back}</div>`;
+        if (!run) body = anEmpty(i === today ? "Heute ist Ruhetag, es gibt nichts auszuwerten." : "An diesem Tag war Ruhetag.");
+        else if (anHasData(i)) body = anBody(i, p);
+        else body = anEmpty(i === today ? "Die heutige Einheit ist noch nicht erledigt. Sobald du sie abschliesst, findest du hier die Analyse." : "Zu diesem Tag gibt es keine Analyse.");
+        return `<div class="an3">${anHead("Analyse · " + shortDay(i), "Einheit")}${nav}${body}</div>`;
       }
-      function anTrend(today) {
-        const pts = [];
-        for (let x = today; x >= 0 && pts.length < 5; x--) {
+      /* Pace der letzten Intervall-Läufe (älteste zuerst) mit Datum, höchstens im gewählten Zeitraum */
+      function anTrendPoints(today, weeks = 99) {
+        const pts = [], from = Math.max(0, today - weeks * 7);
+        for (let x = today; x >= from && pts.length < 8; x--) {
           const q = dayPlan(x);
           if (!q || q.k !== "lauf" || !anFinished(x)) continue;
           const a = actsOf(x).find((y) => strava.fits(q.k, y.group) && y.laps && y.laps.length);
           if (!a) continue;
           const w = s7Work(q, a), pc = w && w.st.work && w.st.work.pace;
-          if (pc && ["sure", "likely"].includes(w.ph.conf)) pts.push({ pc });
+          if (pc && ["sure", "likely"].includes(w.ph.conf) && (q.i || []).some((t) => dash.parseReps(t))) { const dd = dateFromIdx(x); pts.push({ pc, label: String(dd.getDate()).padStart(2, "0") + "." + String(dd.getMonth() + 1).padStart(2, "0") + ".", x }); }
         }
         return pts.reverse();
       }
+      function anWeekData(today, n) {
+        const w1 = Math.floor(today / 7), rows = [], zrows = [], zc = ["#a1a2aa", "#64a8ff", "#30d158", "#ff9f0a", "#ff6961"];
+        for (let w = Math.max(0, w1 - n + 1); w <= w1; w++) {
+          let run = 0, ride = 0; const zs = [0, 0, 0, 0, 0];
+          for (let d0 = 0; d0 < 7; d0++) for (const a of actsOf(w * 7 + d0)) {
+            if (a.group === "run") run += (a.dist || 0) / 1000; else if (a.group === "ride") ride += (a.dist || 0) / 1000;
+            if (a.zones && a.zones.secs) a.zones.secs.forEach((v, k) => (zs[k] += v));
+          }
+          if (run + ride > 0) rows.push({ label: "KW " + (w + 1), parts: [{ v: run, color: "var(--lauf)" }, { v: ride, color: "var(--bike)" }], total: Math.round(run + ride) + " km" });
+          const zt = zs.reduce((a, b) => a + b, 0);
+          if (zt > 0) zrows.push({ label: "KW " + (w + 1), parts: zs.map((v, k) => ({ v: (v / zt) * 100, color: zc[k] })), total: Math.round((zs[0] / zt) * 100) + "%" });
+        }
+        return { rows, zrows, zc };
+      }
       function anVerlaufView() {
-        const today = anToday(), rows = [];
+        const today = anToday(), list = [];
+        let lastW = 0;
         for (let x = today, n = 0; x >= 0 && n < 80; x--) {
           const q = dayPlan(x);
           if (!q || q.k === "rest" || !(x === today || anFinished(x) || S.analysis[keyI(x)])) continue;
-          const w = Math.floor(x / 7) + 1, last = rows[rows.length - 1];
-          if (!last || last.w !== w) rows.push({ w });
-          rows.push({ x, dow: DAYS[dow(x)], day: dateFromIdx(x).getDate(), color: `var(--${q.k})`, title: s7Title(q.t), sub: S.analysis[keyI(x)] ? "Coach-Analyse vorhanden" : S6_KIND[q.k] || q.k, today: x === today });
+          const w = Math.floor(x / 7) + 1;
+          if (w !== lastW) { list.push({ w }); lastW = w; }
+          list.push({ x, dow: DAYS[dow(x)], day: dateFromIdx(x).getDate(), color: `var(--${q.k})`, title: s7Title(q.t), sub: S.analysis[keyI(x)] ? "Coach-Analyse vorhanden" : S6_KIND[q.k] || q.k });
           n++;
         }
+        const weeks = anPeriod, wd = anWeekData(today, weeks);
+        let goal = null;
+        for (let x = today; x >= 0 && goal == null; x--) { const q = dayPlan(x); if (q && q.k === "lauf") { const m = /@\s*(\d{1,2}):(\d{2})/.exec((q.i || []).join(" ")); if (m) goal = +m[1] * 60 + +m[2]; } }
         let trend = "";
-        try { trend = anTrendHtml(anTrend(today)); } catch (e) {}
-        return `<div class="an2">${anHead("Verlauf · Woche " + (Math.floor(today / 7) + 1), "Analyse")}${trend}<div class="an2-list-wrap">${rows.length ? anListHtml(rows, esc) : anPlain("Noch keine abgeschlossene Einheit.")}</div></div>`;
+        try { trend = anTrendHtml(anTrendPoints(today, weeks), goal); } catch (e) {}
+        const zl = wd.zc.map((c, k) => ({ label: "Z" + (k + 1), color: c }));
+        return `<div class="an3">${anHead("Analyse · Woche " + (Math.floor(today / 7) + 1), "Verlauf")}${anPeriodHtml([[4, "4 Wochen"], [8, "8 Wochen"], [12, "Saison"]], anPeriod)}${trend}${anWeeksHtml("Wochenumfang", wd.rows, [{ label: "Lauf", color: "#64a8ff" }, { label: "Rad", color: "#4cd964" }])}${anWeeksHtml("Zonenverteilung", wd.zrows, zl, "Rechts der Anteil Zone 1, nach den Garmin-Zonen jeder Einheit.")}${list.length ? anListHtml(list, esc) : anEmpty("Noch keine abgeschlossene Einheit.")}<div class="an3-pad"></div></div>`;
       }
       function anCmpView() {
-        const today = anToday(), i = anSel != null ? anSel : today, p = dayPlan(i), kick = "Vergleich mit " + esc(PARTNER);
-        let body = anPlain("An diesem Tag gibt es keine Einheit zum Vergleichen.");
+        const today = anToday(), i = anSel != null ? anSel : today, p = dayPlan(i);
+        let body = anEmpty("An diesem Tag gibt es keine Einheit zum Vergleichen.");
         if (p && p.k !== "rest") {
           cmpTab[keyI(i)] = "cmp";
           const c = s7CmpParts(i, p), e = PSES[isoI(i)], mine = actsOf(i), fit = mine.filter((a) => strava.fits(p.k, a.group)), me = pickAct(fit.length ? fit : mine, ""),
             pa = e && e.state === "ok" && e.acts.length && me ? pickAct(e.acts, me.group) : null;
-          if (!me || !pa) body = c.hint || anPlain("Der Vergleich mit " + esc(PARTNER) + " lädt.");
+          if (!me || !pa) body = c.hint ? c.hint.replace(/class="[^"]*"/g, 'class="an3-note"') : anEmpty("Der Vergleich mit " + esc(PARTNER) + " lädt.");
           else {
             const planText = (p.i || []).find((t) => dash.parseReps(t)) || "", Wm = s7Work(p, me), Wp = s7Work(p, pa);
             const pm = intervalPlan(Wm.ph, planText), pp = intervalPlan(Wp.ph, planText), im = anIntervals(Wm.ph, pm), ip = anIntervals(Wp.ph, pp);
             const wk = (W) => (W.st && W.st.work) || {}, dr = (W) => (W.st && W.st.drift ? sg(W.st.drift.bpm) : "–");
             const rows = [
-              { k: "Im Ziel", me: pm ? pm.hit + " von " + pm.n : "–", pa: pp ? pp.hit + " von " + pp.n : "–" },
-              { k: "Pace Arbeit", me: wk(Wm).pace ? mmss(wk(Wm).pace) : "–", pa: wk(Wp).pace ? mmss(wk(Wp).pace) : "–" },
-              { k: "Puls Ø Arbeit", me: wk(Wm).hr || "–", pa: wk(Wp).hr || "–" },
-              { k: "Puls-Drift", me: dr(Wm), pa: dr(Wp) },
+              { k: "Im Ziel", a: pm ? pm.hit + " von " + pm.n : "–", b: pp ? pp.hit + " von " + pp.n : "–" },
+              { k: "Pace Arbeit", a: wk(Wm).pace ? mmss(wk(Wm).pace) : "–", b: wk(Wp).pace ? mmss(wk(Wp).pace) : "–", d: wk(Wm).pace && wk(Wp).pace ? sg(Math.round(wk(Wm).pace - wk(Wp).pace)) + " s" : "" },
+              { k: "Puls Ø Arbeit", a: wk(Wm).hr || "–", b: wk(Wp).hr || "–", d: wk(Wm).hr && wk(Wp).hr ? sg(Math.round(wk(Wm).hr - wk(Wp).hr)) : "" },
+              { k: "Puls-Drift", a: dr(Wm), b: dr(Wp) },
             ];
-            const pairs = im.map((v, k) => ({ k: v.k, me: mmss(v.pace), pa: ip[k] ? mmss(ip[k].pace) : "–", d: ip[k] ? sg(Math.round(v.pace - ip[k].pace)) + " s" : "–" }));
-            const cd = anChartData(me, im, pa);
-            body = anCmpBody({ names: { me: ME, pa: PARTNER }, kind: S6_KIND[p.k] || p.k, color: `var(--${p.k})`, day: shortDay(i), title: s7Title(p.t), rows, pairs, chart: cd ? anChartHtml("anc-" + keyI(i), cd, { me: ME, pa: PARTNER }) : "" }, esc);
+            const pairs = im.map((v, k) => ({ k: v.k, a: mmss(v.pace), b: ip[k] ? mmss(ip[k].pace) : "–", d: ip[k] ? sg(Math.round(v.pace - ip[k].pace)) + " s" : "–" }));
+            const key = "anc-" + keyI(i), cd = anChartData({ act: me, pact: pa, ivs: im.map((q) => ({ k: q.k, t0: q.t0, t1: q.t1, label: q.label })), sections: anSections(Wm.ph).map((s) => ({ t0: s.t0, t1: s.t1, label: s.label })), keys: ["pace", "hr"], defaults: ["pace", "hr"], names: { me: ME, pa: PARTNER } });
+            body = anPicker({ date: shortDay(i), sub: s7Title(p.t) + " · " + ME + " und " + PARTNER, prev: null, next: null }) + anCmpHtml({ names: { me: ME, pa: PARTNER }, rows, pairs, chart: cd ? anChartHtml(key, cd) : "", range: cd ? anRangeHtml(key) : "" }, esc);
           }
         }
-        return `<div class="an2">${anHead(kick, "Analyse")}${body}<div class="an2-sec" style="border:none"><button type="button" class="an2-btn" data-v="analysisv">Andere Einheit wählen</button></div></div>`;
+        return `<div class="an3">${anHead("Analyse · mit " + esc(PARTNER), "Vergleich")}${body}<div class="an3-pad"></div></div>`;
       }
       /* ---- Woche ---- */
       function s6RunKm(w) {
@@ -23676,6 +23859,7 @@
             ? document.activeElement.id
             : "";
         $("#main").innerHTML = VIEWS[view]();
+        anPaintAll();
         $("#main").classList.toggle(
           "s6m",
           [
@@ -24456,6 +24640,8 @@
           return leaveCheckin(t);
         }
         if (d.act === "an-run") return runAnalysis(+d.i);
+        if (d.act === "an-sub") { anSubTab = d.t || ""; return render(); }
+        if (d.act === "an-period") { anPeriod = +d.p || 8; return render(); }
         if (d.act === "an-pick") {
           anSel = +d.i;
           if (d.go) { anKeep = true; return go(d.go); }

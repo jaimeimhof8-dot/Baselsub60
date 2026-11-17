@@ -15,7 +15,7 @@
 //       {action: "disconnect"}                   → {ok}
 //       {action: "refresh-all"} + x-cron-secret  → {refreshed, failed}
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { normalizeAct, normalizeLaps, reduceSeries, reduceWell, relevant } from "./reduce.js";
+import { normalizeAct, normalizeLaps, reduceSeries, reduceWell, reduceZones, relevant } from "./reduce.js";
 import { buildWorkout } from "./workout.js";
 
 const KEY = Deno.env.get("GARMIN_TOKEN_KEY") ?? "";
@@ -169,6 +169,9 @@ async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string,
   // Zeitreihen gibt es nur für die 30 neuesten Einheiten (Speicher in plan_state). Fehlt sie bei gespeicherten Einheiten, wird sie hier nachgeholt (Backfill).
   const byNew = [...acts].sort((x, y) => String(y.start).localeCompare(String(x.start)));
   const top30 = new Set(byNew.slice(0, 30).map((a) => a.id as string));
+  // Die 6 neuesten Einheiten in voller Auflösung (1 Punkt je Sekunde), die übrigen reduziert (≤ 600 Punkte). Der Client meldet in haveSeries nur Einheiten,
+  // die schon die passende Auflösung und die Garmin-Pulszonen haben (siehe index.html haveSeries), alles andere wird hier nachgeholt.
+  const top6 = new Set(byNew.slice(0, 6).map((a) => a.id as string));
   const needS = (a: Record<string, unknown>) => top30.has(a.id as string) && !haveSeries.has(a.id as string);
   const todo = byNew.filter((a) => !have.has(a.id as string) || needS(a)).slice(0, 15);
   const series = { ok: 0, empty: 0, err: 0, left: byNew.filter(needS).length - todo.filter(needS).length, last: "" };
@@ -183,9 +186,12 @@ async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string,
       if (!needS(a)) return;
       if (rate) { series.left++; return; }
       try {
-        const r = await api(ctx, `/activity-service/activity/${id}/details?maxChartSize=1000&maxPolylineSize=0`);
-        const s = r ? reduceSeries(r) : null;
-        if (s) { a.series = s; series.ok++; }
+        const hi = top6.has(a.id as string);
+        const r = await api(ctx, `/activity-service/activity/${id}/details?maxChartSize=${hi ? 4000 : 1000}&maxPolylineSize=0`);
+        const s = r ? reduceSeries(r, hi ? 3700 : 600) : null;
+        // Pulszonen dieser Aktivität (Grenzen wie in Garmin Connect); fehlen sie, rechnet die App mit dem höchsten Puls und sagt es
+        try { const z = reduceZones(await api(ctx, `/activity-service/activity/${id}/hrTimeInZones`)); if (z) a.zones = z; else a.zonesTried = 1; } catch (e) { if ((e as { code?: string }).code === "relogin") throw e; }
+        if (s) { if (hi) s.hi = 1; a.series = s; series.ok++; }
         else { a.seriesTried = 1; series.empty++; series.last = r ? "keine verwertbare Reihe (Felder: " + keysOf(r) + ")" : "leere Antwort"; console.error("garmin details leer", a.id, series.last); }
       } catch (e) {
         const c = e as { code?: string; status?: number };

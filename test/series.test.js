@@ -180,3 +180,17 @@ test("Rundenrückfall: Blöcke mit Breite = Dauer, nie Linie; Hinweis mit Handlu
   assert.match(comparePanelHtml("miss2", compareSessions(tried, me, {}), undefined, { me: tried, pa: me }), /Garmin liefert für diese Einheit keine Zeitreihe/);
   assert.doesNotMatch(comparePanelHtml("ok", compareSessions(act(100, 0), act(100, 0), {}), undefined, { me: act(100, 0), pa: act(100, 0) }), /Zeitreihe fehlt/);
 });
+
+test("zoneTimes mit Garmin-Grenzen: 160 bpm ist Zone 3, nicht Zone 4", () => {
+  const S = { t: [0, 10, 20, 30], hr: [160, 160, 160, 100] };
+  assert.deepEqual(zoneTimes(S, 187, [114, 141, 157, 167, 175]), [0, 0, 20, 0, 0], "unter Zone 1 zählt nicht");
+  assert.deepEqual(zoneTimes(S, 187), [10, 0, 0, 20, 0], "eigene Rechnung (50 bis 90 % von 187): 160 bpm ist Zone 4, 100 bpm Zone 1");
+  assert.equal(zoneTimes(S, null, null), null);
+});
+
+test("seriesOf übernimmt Leistung und Auflösung", () => {
+  const S = seriesOf({ series: { n: 3, res: 1, t: [0, 1, 2], d: [0, 3, 6], hr: [100, 101, 102], v: [300, 300, 300], el: [], cad: [], pw: [200, 210, 220] } });
+  assert.deepEqual(S.pw, [200, 210, 220]);
+  assert.equal(S.res, 1);
+  assert.equal(seriesOf({ series: { n: 2, t: [0, 1], hr: [100, 101] } }).pw, null);
+});

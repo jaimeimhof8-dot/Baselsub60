@@ -83,7 +83,7 @@ export function mergeActs(store, list, minDate = "") {
     if (!a || !a.date || a.date < minDate || !relevant(a)) continue;
     // Bereits geladene Runden behalten, wenn die neue Version keine mitbringt
     // got = Zeitpunkt der ersten Übernahme (bleibt bei späteren Abrufen erhalten, für die Anzeige «Übernommen am»)
-    if (store[a.id]) { const got = store[a.id].got || a.got; store[a.id] = { ...(!a.laps && store[a.id].laps ? { ...a, laps: store[a.id].laps, lapsV: store[a.id].lapsV } : a), ...(!a.series && store[a.id].series ? { series: store[a.id].series } : {}), ...(!a.seriesTried && !a.series && store[a.id].seriesTried ? { seriesTried: 1 } : {}), ...(got ? { got } : {}) }; continue; }
+    if (store[a.id]) { const got = store[a.id].got || a.got; store[a.id] = { ...(!a.laps && store[a.id].laps ? { ...a, laps: store[a.id].laps, lapsV: store[a.id].lapsV } : a), ...(!a.series && store[a.id].series ? { series: store[a.id].series } : {}), ...(!a.zones && store[a.id].zones ? { zones: store[a.id].zones } : {}), ...(!a.zones && !a.zonesTried && store[a.id].zonesTried ? { zonesTried: 1 } : {}), ...(!a.seriesTried && !a.series && store[a.id].seriesTried ? { seriesTried: 1 } : {}), ...(got ? { got } : {}) }; continue; }
     const dups = Object.values(store).filter((x) => sameAct(x, a));
     if (dups.length && a.src !== "garmin") continue;
     for (const d of dups) delete store[d.id];
@@ -95,11 +95,32 @@ export function mergeActs(store, list, minDate = "") {
 }
 
 /** Zeitreihen (ca. 16 KB je Aktivität) nur für die neuesten `keep` Aktivitäten behalten, ältere verlieren nur die Reihe (Runden und Kennzahlen bleiben). -> Anzahl entfernter Reihen */
-export function trimSeries(store, keep = 30) {
+export function trimSeries(store, keep = 30, full = 6) {
   const withS = Object.values(store).filter((a) => a && a.series).sort((x, y) => String(y.start || y.date || "").localeCompare(String(x.start || x.date || "")));
   const drop = withS.slice(keep);
   for (const a of drop) delete a.series;
+  // volle Auflösung (1 s, ca. 100 KB) nur für die neuesten `full` Einheiten, die übrigen auf höchstens 600 Punkte verdichten (ca. 16 KB)
+  for (const a of withS.slice(full, keep)) if (a.series.hi || a.series.n > 650) a.series = thinSeries(a.series, 600);
   return drop.length;
+}
+
+/** Zeitreihe auf höchstens maxN Punkte verdichten (Mittel je Block, Distanz und Zeit vom Blockende). Lücken bleiben null. */
+export function thinSeries(s, maxN = 600) {
+  if (!s || !(s.n > maxN)) return s;
+  const step = Math.ceil(s.n / maxN), out = { n: 0, res: Math.max(1, Math.round((s.res || 1) * step)) };
+  const keys = ["t", "d", "hr", "v", "el", "cad", "pw"].filter((k) => Array.isArray(s[k]));
+  for (const k of keys) out[k] = [];
+  for (let i = 0; i < s.n; i += step) {
+    const j = Math.min(s.n - 1, i + step - 1);
+    for (const k of keys) {
+      if (k === "t" || k === "d") { out[k].push(s[k][j]); continue; }
+      let sum = 0, c = 0;
+      for (let q = i; q <= j; q++) if (s[k][q] != null) { sum += s[k][q]; c++; }
+      out[k].push(c ? Math.round(sum / c) : null);
+    }
+  }
+  out.n = out.t.length;
+  return out;
 }
 
 /* ---------- Erholung ---------- */

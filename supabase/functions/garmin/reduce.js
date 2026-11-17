@@ -21,6 +21,7 @@ export const relevant = (a) => !!a && a.group !== "other" && (+a.time || 0) >= 1
 
 const day = (s) => { const m = String(s || "").match(/^(\d{4}-\d{2}-\d{2})/); return m ? m[1] : null; };
 const round = (v) => (v == null || isNaN(+v) ? null : Math.round(+v));
+const num1 = (v) => (v == null || v === "" || isNaN(+v) || +v <= 0 ? null : Math.round(+v * 10) / 10);
 
 /** Eine Aktivität aus /activitylist-service/activities/search/activities -> {id, name, type, group, date, start, dist, time, hr, watts, src} */
 export function normalizeAct(g) {
@@ -31,6 +32,9 @@ export function normalizeAct(g) {
     date: day(local), start: local.slice(0, 16) || null,
     dist: Math.round(+g.distance || 0), time: Math.round(+g.duration || +g.movingDuration || 0), // Zeit wie in Garmin Connect (Summe der Runden), nicht nur die bewegte Zeit
     hr: g.averageHR ? Math.round(g.averageHR) : null, maxHr: g.maxHR ? Math.round(g.maxHR) : null, kcal: g.calories ? Math.round(g.calories) : null, watts: g.avgPower ? Math.round(g.avgPower) : null, src: "garmin",
+    // Training Effect und Belastungswert von Garmin, nur wenn die Uhr sie liefert (sonst fehlt das Feld, nichts wird erfunden)
+    ...(num1(g.aerobicTrainingEffect) != null || num1(g.anaerobicTrainingEffect) != null ? { te: { a: num1(g.aerobicTrainingEffect), n: num1(g.anaerobicTrainingEffect) } } : {}),
+    ...(round(g.activityTrainingLoad) != null && +g.activityTrainingLoad > 0 ? { load: round(g.activityTrainingLoad) } : {}),
   };
 }
 
@@ -110,16 +114,16 @@ export function reduceSeries(raw, maxN = 600) {
   const idx = {};
   for (const m of desc) if (m && m.key != null && Number.isInteger(m.metricsIndex)) idx[m.key] = m.metricsIndex;
   const col = (...keys) => { for (const k of keys) if (idx[k] != null) return idx[k]; return null; };
-  const cT = col("sumDuration"), cTs = col("directTimestamp"), cD = col("sumDistance"), cHr = col("directHeartRate"), cV = col("directSpeed"), cEl = col("directElevation"), cCad = col("directDoubleCadence", "directRunCadence", "directBikeCadence");
+  const cT = col("sumDuration"), cTs = col("directTimestamp"), cD = col("sumDistance"), cHr = col("directHeartRate"), cV = col("directSpeed"), cEl = col("directElevation"), cCad = col("directDoubleCadence", "directRunCadence", "directBikeCadence"), cPw = col("directPower");
   const get = (r, c) => { const v = c == null || !r || !r.metrics ? null : r.metrics[c]; return typeof v === "number" && isFinite(v) ? v : null; };
   const t0 = cT == null && cTs != null ? get(rows[0], cTs) : 0;
   const pts = rows.map((r) => ({
     t: cT != null ? get(r, cT) : (get(r, cTs) != null && t0 != null ? (get(r, cTs) - t0) / 1000 : null),
-    d: get(r, cD), hr: get(r, cHr), v: get(r, cV), el: get(r, cEl), cad: get(r, cCad),
+    d: get(r, cD), hr: get(r, cHr), v: get(r, cV), el: get(r, cEl), cad: get(r, cCad), pw: get(r, cPw),
   })).filter((p) => p.t != null && p.t >= 0);
   if (pts.length < 2) return null;
   for (let i = 1; i < pts.length; i++) if (pts[i].t < pts[i - 1].t) return null; // Zeit muss aufsteigen
-  const step = Math.max(1, Math.ceil(pts.length / maxN)), out = { n: 0, t: [], d: [], hr: [], v: [], el: [], cad: [] };
+  const step = Math.max(1, Math.ceil(pts.length / maxN)), out = { n: 0, t: [], d: [], hr: [], v: [], el: [], cad: [], pw: [] };
   const avg = (b, k) => { const x = b.map((p) => p[k]).filter((q) => q != null); return x.length ? x.reduce((s, q) => s + q, 0) / x.length : null; };
   for (let i = 0; i < pts.length; i += step) {
     const b = pts.slice(i, i + step), last = b[b.length - 1];
@@ -129,8 +133,30 @@ export function reduceSeries(raw, maxN = 600) {
     const v = avg(b, "v"); out.v.push(v == null ? null : Math.round(v * 100));
     const e = avg(b, "el"); out.el.push(e == null ? null : Math.round(e * 10));
     out.cad.push(round(avg(b, "cad")));
+    out.pw.push(round(avg(b, "pw")));
   }
   out.n = out.t.length;
+  if (!out.pw.some((x) => x != null)) delete out.pw; // keine Leistungsreihe: Feld weglassen (spart Platz)
+  out.res = Math.max(1, Math.round((out.t[out.n - 1] - out.t[0]) / Math.max(1, out.n - 1))); // Sekunden je Punkt: 1 = volle Auflösung
   const any = ["hr", "v", "el", "cad"].some((k) => out[k].some((x) => x != null));
   return any && out.n >= 2 ? out : null;
+}
+
+/**
+ * Pulszonen einer Aktivität aus /activity-service/activity/{id}/hrTimeInZones (Liste je Zone: zoneNumber, zoneLowBoundary, secsInZone).
+ * -> {bounds: [untere Grenze Z1 … Z5 in bpm], secs: [Sekunden Z1 … Z5]} oder null (nichts erfinden, wenn Zonen fehlen oder unlogisch sind).
+ */
+export function reduceZones(raw) {
+  const list = Array.isArray(raw) ? raw : raw && Array.isArray(raw.zones) ? raw.zones : null;
+  if (!list) return null;
+  const byNo = {};
+  for (const z of list) if (z && Number.isInteger(+z.zoneNumber) && +z.zoneNumber >= 1 && +z.zoneNumber <= 5) byNo[+z.zoneNumber] = z;
+  const bounds = [], secs = [];
+  for (let k = 1; k <= 5; k++) {
+    const z = byNo[k], b = z && z.zoneLowBoundary != null ? Math.round(+z.zoneLowBoundary) : NaN;
+    if (!z || !isFinite(b) || b <= 0) return null;
+    bounds.push(b); secs.push(Math.max(0, Math.round(+z.secsInZone || 0)));
+  }
+  for (let k = 1; k < 5; k++) if (bounds[k] <= bounds[k - 1]) return null; // Grenzen müssen aufsteigen
+  return { bounds, secs };
 }

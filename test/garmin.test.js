@@ -257,3 +257,62 @@ test("Backfill: nachgeladene Reihe kommt in die vorhandene Aktivität, seriesTri
   mergeActs2(s2, [{ id: "g2", date: "2026-10-13", group: "run", time: 3000, src: "garmin" }]);
   assert.equal(s2.g2.seriesTried, 1);
 });
+
+import { reduceZones } from "../supabase/functions/garmin/reduce.js";
+test("Training Effect und Belastungswert nur übernehmen, wenn Garmin sie liefert", () => {
+  const a = normalizeAct({ ...RUN, aerobicTrainingEffect: 3.84, anaerobicTrainingEffect: 2.2, activityTrainingLoad: 187.3 });
+  assert.deepEqual(a.te, { a: 3.8, n: 2.2 });
+  assert.equal(a.load, 187);
+  const b = normalizeAct(RUN);
+  assert.ok(!("te" in b) && !("load" in b), "ohne Werte kein Feld");
+  const c = normalizeAct({ ...RUN, aerobicTrainingEffect: 0, anaerobicTrainingEffect: null, activityTrainingLoad: 0 });
+  assert.ok(!("te" in c) && !("load" in c), "0 heisst: keine Messung");
+});
+
+test("Zeitreihe in voller Auflösung: 1 Punkt je Sekunde, Leistung und Auflösung", () => {
+  const keys = ["sumDuration", "sumDistance", "directHeartRate", "directSpeed", "directElevation", "directRunCadence", "directPower"];
+  const raw = { metricDescriptors: keys.map((key, metricsIndex) => ({ key, metricsIndex })),
+    activityDetailMetrics: Array.from({ length: 3200 }, (_, i) => ({ metrics: [i, i * 3.2, 150 + (i % 20), 3.3, 500, 170, 250 + (i % 7)] })) };
+  const s = reduceSeries(raw, 3700);
+  assert.equal(s.n, 3200);
+  assert.equal(s.res, 1);
+  assert.equal(s.pw.length, 3200);
+  assert.equal(s.pw[0], 250);
+  const low = reduceSeries(raw, 600);
+  assert.ok(low.n <= 600 && low.res >= 5, "reduzierte Reihe nennt ihre gröbere Auflösung");
+  const noPw = reduceSeries({ metricDescriptors: keys.slice(0, 6).map((key, metricsIndex) => ({ key, metricsIndex })), activityDetailMetrics: raw.activityDetailMetrics.slice(0, 50).map((r) => ({ metrics: r.metrics.slice(0, 6) })) });
+  assert.ok(!("pw" in noPw), "ohne Leistung kein Feld");
+});
+
+test("Pulszonen einer Aktivität von Garmin", () => {
+  const raw = [{ zoneNumber: 1, zoneLowBoundary: 114, secsInZone: 886 }, { zoneNumber: 2, zoneLowBoundary: 141, secsInZone: 498 }, { zoneNumber: 3, zoneLowBoundary: 157, secsInZone: 312 },
+    { zoneNumber: 4, zoneLowBoundary: 167, secsInZone: 937 }, { zoneNumber: 5, zoneLowBoundary: 175, secsInZone: 263 }];
+  assert.deepEqual(reduceZones(raw), { bounds: [114, 141, 157, 167, 175], secs: [886, 498, 312, 937, 263] });
+  assert.deepEqual(reduceZones([...raw].reverse()).bounds, [114, 141, 157, 167, 175], "Reihenfolge egal");
+  assert.equal(reduceZones(raw.slice(0, 4)), null, "unvollständig");
+  assert.equal(reduceZones([...raw.slice(0, 4), { zoneNumber: 5, zoneLowBoundary: 150, secsInZone: 1 }]), null, "Grenzen müssen aufsteigen");
+  assert.equal(reduceZones(null), null);
+  assert.equal(reduceZones({}), null);
+});
+
+import { thinSeries as thin2, trimSeries as trim2 } from "../src/garmin.js";
+test("Zeitreihe verdichten: höchstens maxN Punkte, Auflösung wächst, Lücken bleiben null", () => {
+  const n = 3000, s = { n, hi: 1, res: 1, t: Array.from({ length: n }, (_, i) => i), d: Array.from({ length: n }, (_, i) => i * 3), hr: Array.from({ length: n }, (_, i) => (i < 5 ? null : 150)), v: Array.from({ length: n }, () => 300), el: Array.from({ length: n }, () => 5000), cad: Array.from({ length: n }, () => 170) };
+  const t = thin2(s, 600);
+  assert.ok(t.n <= 600 && t.n >= 500);
+  assert.equal(t.res, 5);
+  for (const k of ["t", "d", "hr", "v", "el", "cad"]) assert.equal(t[k].length, t.n);
+  assert.equal(t.hr[0], null, "erster Block nur Lücke (5 von 5 null)");
+  assert.equal(t.hr[2], 150);
+  assert.ok(!t.hi, "verdichtet ist nicht mehr voll aufgelöst");
+  assert.equal(thin2({ n: 100, t: [] }, 600).n, 100, "kleine Reihe bleibt");
+});
+
+test("trimSeries: nur die 6 neuesten behalten die volle Auflösung", () => {
+  const store = {};
+  for (let i = 0; i < 10; i++) store["g" + i] = { id: "g" + i, date: "2026-10-" + String(10 + i), start: "2026-10-" + String(10 + i) + "T08:00", series: { n: 3000, hi: 1, res: 1, t: Array.from({ length: 3000 }, (_, k) => k), hr: Array.from({ length: 3000 }, () => 150) } };
+  trim2(store);
+  assert.equal(store.g9.series.n, 3000);
+  assert.equal(store.g4.series.n, 3000);
+  assert.ok(store.g3.series.n <= 600, "7. neueste und älter: verdichtet");
+});

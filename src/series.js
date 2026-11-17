@@ -16,7 +16,7 @@ export function seriesOf(act) {
   const s = act && act.series;
   if (s && Array.isArray(s.t) && s.t.length >= 2) {
     const n = s.t.length;
-    return { src: "series", t: s.t, d: arr(s.d, n), hr: arr(s.hr, n), v: arr(s.v, n), el: arr(s.el, n), cad: arr(s.cad, n) };
+    return { src: "series", res: s.res || null, t: s.t, d: arr(s.d, n), hr: arr(s.hr, n), v: arr(s.v, n), el: arr(s.el, n), cad: arr(s.cad, n), pw: Array.isArray(s.pw) && s.pw.length === n ? s.pw : null };
   }
   const laps = (act && act.laps ? act.laps : []).filter((l) => l && l.t > 0);
   if (!laps.length) return null;
@@ -161,9 +161,10 @@ export function timeGap(act) {
 }
 
 /** Sekunden in den Pulszonen Z1 bis Z5 (50–60 %, … 90–100 % von maxHr). Nur Zeit mit Pulswert zählt, nichts wird dazugerechnet. -> [s, s, s, s, s] oder null */
-export function zoneTimes(S, maxHr) {
-  if (!S || !maxHr || !S.t || S.t.length < 2) return null;
-  const z = hrZones(maxHr), out = [0, 0, 0, 0, 0];
+export function zoneTimes(S, maxHr, bounds = null) {
+  const own = Array.isArray(bounds) && bounds.length === 5 && bounds.every((b) => b > 0);
+  if (!S || !(own || maxHr) || !S.t || S.t.length < 2) return null;
+  const z = own ? bounds : hrZones(maxHr), out = [0, 0, 0, 0, 0]; // bounds = untere Grenzen Z1 bis Z5 (Garmin), sonst 50/60/70/80/90 % vom höchsten Puls
   let any = false;
   for (let i = 1; i < S.t.length; i++) {
     const h = S.hr[i];

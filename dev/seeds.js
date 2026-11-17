@@ -57,7 +57,45 @@ window.TL_SEEDS = (() => {
     return S;
   };
   window.TL_PARTNER_DEMO = { [iso(3)]: [{ group: "run", time: sum(lapsPa2, "t"), dist: sum(lapsPa2, "d"), hr: avgHr(lapsPa2), laps: lapsPa2 }], [iso(1)]: [{ group: "run", time: sum(lapsPa, "t"), dist: sum(lapsPa, "d"), hr: avgHr(lapsPa), laps: lapsPa, series: mkSeries(lapsPa, 29, 0.4) }] };
+
+  // Beispielstand «analyse»: fünf Einheitstypen mit 1-s-Zeitreihen, Garmin-Zonen und Training Effect (nur Testkopie, erfundene Werte).
+  // Direktlink: http://localhost:8081/?seed=analyse&heute=2026-10-22   (Di 13.10. Intervall-Lauf, Mi 14.10. Zone-2-Rad, Do 22.10. Kompromiss-Einheit). Der lockere Lauf braucht einen Plantag ohne Wiederholungen und ist hier nicht enthalten.
+  const GZ = { bounds: [114, 141, 157, 167, 175], secs: [886, 498, 312, 937, 263] };
+  const mk1 = (segs, seed, kind) => {
+    const r = rng(seed), T = segs[segs.length - 1].t1, o = { n: 0, res: 1, hi: 1, t: [], d: [], hr: [], v: [], el: [], cad: [] };
+    if (kind === "bike") o.pw = [];
+    let v = segs[0].v, hr = segs[0].hr[0], d = 0, cad = segs[0].cad;
+    for (let t = 0; t <= T; t++) {
+      const sg = segs.find((q) => t >= q.t0 && t < q.t1) || segs[segs.length - 1], k = (t - sg.t0) / (sg.t1 - sg.t0);
+      v += (sg.v - v) * 0.15; hr += (sg.hr[0] + (sg.hr[1] - sg.hr[0]) * k - hr) * 0.02 + (r() - 0.5) * 0.9; cad += (sg.cad - cad) * 0.08 + (r() - 0.5) * 3;
+      const vn = Math.max(0.5, v * (1 + (r() - 0.5) * 0.09));
+      o.t.push(t); o.d.push(Math.round(d)); o.hr.push(Math.round(hr)); o.v.push(Math.round(vn * 100)); o.cad.push(Math.round(cad));
+      o.el.push(kind === "bike" ? null : Math.round((412 + 7 * Math.sin(t / 380) + 3 * Math.sin(t / 95)) * 10));
+      if (kind === "bike") o.pw.push(Math.round(sg.pw * (1 + (r() - 0.5) * 0.12)));
+      d += v;
+    }
+    o.n = o.t.length;
+    return o;
+  };
+  const seg = (t0, t1, pace, hr0, hr1, cad, extra = {}) => ({ t0, t1, v: 1000 / pace, hr: [hr0, hr1], cad, ...extra });
+  const analyse = () => {
+    const S = voll();
+    for (const i of [1, 2, 10]) { for (let j = 0; j < 6; j++) S.done[day(i) + "|" + j] = true; S.rpe[day(i)] = 6; }
+    const iv = [seg(0, 653, 336, 128, 152, 162), seg(653, 1013, 240, 160, 174, 180), seg(1013, 1131, 560, 172, 150, 150), seg(1131, 1489, 240.5, 158, 176, 181), seg(1489, 1610, 570, 174, 152, 150), seg(1610, 1971, 239.5, 160, 177, 181), seg(1971, 2092, 580, 176, 154, 150), seg(2092, 2460, 245, 162, 183, 178), seg(2460, 3222, 362, 166, 134, 163)];
+    const lapsIv = [L(1940, 653, 140), L(1500, 360, 167), L(200, 118, 158), L(1500, 358, 168), L(200, 121, 160), L(1500, 361, 169), L(200, 121, 162), L(1500, 368, 172), L(2100, 762, 150)];
+    const bike = [seg(0, 300, 1000 / 7.6, 112, 132, 82, { pw: 150 }), seg(300, 3300, 1000 / 7.8, 134, 146, 88, { pw: 190 }), seg(3300, 3600, 1000 / 7.0, 146, 128, 80, { pw: 120 })];
+    const comp = [seg(0, 600, 420, 120, 140, 160), seg(600, 1080, 300, 150, 164, 172), seg(1080, 1200, 700, 160, 140, 140), seg(1200, 1680, 305, 152, 166, 172), seg(1680, 1900, 500, 150, 130, 150)];
+    const lapsComp = [L(1500, 600, 130), L(1600, 480, 158), L(150, 120, 150), L(1550, 480, 160), L(400, 220, 140)];
+    const act = (id, i, group, type, name, series, laps, extra) => ({ id, src: "garmin", date: iso(i), start: iso(i) + "T18:05", got: Date.now(), type, group, name, time: series.t[series.n - 1], dist: series.d[series.n - 1], hr: Math.round(series.hr.reduce((a, b) => a + b, 0) / series.n), maxHr: 187, lapsV: 3, laps, series, zones: GZ, ...extra });
+    S.strava = { acts: {
+      a1: act("a1", 1, "run", "Run", "Thun Laufen", mk1(iv, 7), lapsIv, { te: { a: 3.8, n: 2.2 }, load: 187 }),
+      a2: act("a2", 2, "ride", "Ride", "Indoor-Radfahren", mk1(bike, 11, "bike"), [L(3000, 1800, 138), L(3000, 1800, 144)], { watts: 188, te: { a: 2.6, n: 0 }, load: 96 }),
+      a4: act("a4", 10, "strength", "Workout", "Kraft + Compromised Running", mk1(comp, 17), lapsComp, { te: { a: 3.1, n: 1.4 }, load: 140 }),
+    } };
+    return S;
+  };
   return {
+    analyse,
     vergleich,
     leer: () => ({ onb: { strava: true } }),
     voll,

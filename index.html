@@ -13123,6 +13123,7 @@
 
       .an3 { --bg: #06070a; --card: #0e1016; --well: #161922; --raise: #1b1e29; --text: #f5f5f7; --muted: #a1a2aa; --line: rgba(255,255,255,.09); --edge: inset 0 1px 0 rgba(255,255,255,.06); --accent: #e0bf6a; --on-accent: #16181a; --ok: #30d158; --warn: #ff9f0a; --bad: #ff6961; --f-head: "Barlow Condensed", "Arial Narrow", Impact, sans-serif; color: var(--text); font-size: 15px; line-height: 1.4; padding: 20px 16px 40px; max-width: 760px; margin: 0 auto; }
       :where(.an3) * { box-sizing: border-box; }
+      @media (min-width: 600px) { .an3-rng { border-radius: 14px; margin-inline: 0; padding-inline: 16px; border: 1px solid var(--line); } }
       .an3-zb { position: absolute; left: 0; right: 0; background: rgba(48,209,88,.1); border-block: 1px dashed rgba(48,209,88,.45); pointer-events: none; }
       .an3-zb span { position: absolute; left: 6px; bottom: 2px; font-size: 11px; color: #8fe3a8; font-weight: 600; }
       .an3-warnt { color: var(--warn); }
@@ -13201,7 +13202,7 @@
       .an3-leg i { display: inline-block; width: 18px; height: 0; border-top: 2.5px solid; vertical-align: middle; margin-right: 6px; }
       .an3-leg i.an3-d { border-top-style: dashed; }
       .an3-hint { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
-      .an3-rng { position: sticky; bottom: 0; z-index: 4; margin: 16px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background: rgba(14,16,22,.95); backdrop-filter: blur(12px); border-top: 1px solid var(--line); }
+      .an3-rng { position: sticky; bottom: var(--an-nav, calc(var(--tabs-h, 62px) + 28px + env(safe-area-inset-bottom, 0px))); z-index: 4; margin: 16px -16px 0; padding: 12px 16px; background: rgba(14,16,22,.95); backdrop-filter: blur(12px); border-top: 1px solid var(--line); }
       .an3-rng .an3-kick { margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 28px; }
       .an3-rng .an3-kick button { background: none; border: 0; color: var(--accent); font-weight: 600; letter-spacing: 0; text-transform: none; font-size: 14px; min-height: 44px; padding: 0 4px; margin: -8px -4px; }
       .an3-rc { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
@@ -23843,6 +23844,14 @@
         analysisv: anVerlaufView,
         analysisc: anCmpView,
       };
+      /* Die Ausschnittsleiste im Analyse-Tab haftet knapp über der Tab-Leiste: Abstand aus ihrer echten Höhe (sie ist je nach Bildschirm Leiste oder schwebende Pille) */
+      function anNavGap() {
+        const n = $("#nav");
+        if (!n || n.hidden) return;
+        const r = n.getBoundingClientRect();
+        if (r.height) document.documentElement.style.setProperty("--an-nav", (r.top > innerHeight / 2 ? Math.round(innerHeight - r.top + 8) : 12) + "px"); // am Rechner liegt die Leiste oben: dann nur ein kleiner Rand
+      }
+      addEventListener("resize", anNavGap);
       function render() {
         if (drag && drag.on) return void (renderHeld = true); // während des Ziehens nicht neu aufbauen
         RC = null;
@@ -23860,6 +23869,7 @@
             : "";
         $("#main").innerHTML = VIEWS[view]();
         anPaintAll();
+        anNavGap();
         $("#main").classList.toggle(
           "s6m",
           [

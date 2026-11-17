@@ -191,7 +191,7 @@ async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string,
         const s = r ? reduceSeries(r, hi ? 3700 : 600) : null;
         // Pulszonen dieser Aktivität (Grenzen wie in Garmin Connect); fehlen sie, rechnet die App mit dem höchsten Puls und sagt es
         try { const z = reduceZones(await api(ctx, `/activity-service/activity/${id}/hrTimeInZones`)); if (z) a.zones = z; else a.zonesTried = 1; } catch (e) { if ((e as { code?: string }).code === "relogin") throw e; }
-        if (s) { if (hi) s.hi = 1; a.series = s; series.ok++; }
+        if (s) { if (hi) (s as Record<string, unknown>).hi = 1; a.series = s; series.ok++; }
         else { a.seriesTried = 1; series.empty++; series.last = r ? "keine verwertbare Reihe (Felder: " + keysOf(r) + ")" : "leere Antwort"; console.error("garmin details leer", a.id, series.last); }
       } catch (e) {
         const c = e as { code?: string; status?: number };

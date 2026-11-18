@@ -14075,15 +14075,15 @@
       /* «+» sitzt im Eingabefeld; Menü als saubere Liste */
       .s7-dock .s6-inp {
         margin-left: 0 !important;
-        padding-left: 52px !important;
+        padding-left: 56px !important;
       }
       .s7-plus {
         left: 8px !important;
         bottom: 8px !important;
       }
       .s7-plus > summary {
-        width: 40px !important;
-        height: 40px !important;
+        width: var(--tap) !important;
+        height: var(--tap) !important;
         background: rgba(255, 255, 255, 0.1) !important;
         box-shadow: none !important;
         -webkit-backdrop-filter: none !important;
@@ -23925,20 +23925,25 @@
       const IOS = "cubic-bezier(.32,.72,0,1)",
         EASE_IN = "cubic-bezier(.4,0,1,1)";
       const calm = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let vtSeq = 0; // Nummer des letzten Seitenwechsels: ein abgebrochener älterer darf den neueren nicht zurücksetzen
       function transition(type, update) {
         if (calm() || !document.startViewTransition) {
           update();
           return;
         }
         const html = document.documentElement,
-          y0 = scrollY;
+          y0 = scrollY,
+          id = ++vtSeq;
         html.dataset.vt = type;
         const t = document.startViewTransition(() => {
           update();
           html.style.setProperty("--vt-s", scrollY - y0 + "px");
         });
-        t.finished.finally(() => {
-          if (html.dataset.vt === type) delete html.dataset.vt;
+        // „Übersprungen“ (schnelles Antippen) ist kein Fehler: abfangen, damit keine unbehandelte Ablehnung entsteht
+        t.ready.catch(() => {});
+        t.finished.catch(() => {}).then(() => {
+          if (vtSeq !== id) return;
+          delete html.dataset.vt;
           html.style.removeProperty("--vt-s");
         });
       }

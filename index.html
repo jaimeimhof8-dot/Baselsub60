@@ -21817,7 +21817,24 @@
               : { valid: [], invalid: [] };
           const dot = (i) =>
             `<i style="background:var(--${(dayPlan(i) || { k: "rest" }).k})"></i>`;
+          // Abgeschlossene Vorschläge sind im Verlauf roh gespeichert (nur date/to, kein i/j) und die Tage können inzwischen außerhalb des Plans liegen
+          const closedRow = (a) => {
+            const ix = (s) => {
+                const i = typeof s === "string" ? idxOfIso(s) : NaN;
+                return Number.isFinite(i) && dayPlan(i) ? i : null;
+              },
+              i = ix(a.date),
+              j = ix(a.to);
+            const label =
+              a.type === "swap" && i != null && j != null
+                ? `${shortDay(i)} ↔ ${shortDay(j)} tauschen`
+                : i != null && a.type !== "swap"
+                  ? coach.actionLabel(a).replace(a.date, shortDay(i))
+                  : coach.actionLabel(a);
+            return `<div>${i != null ? dot(i) : ""}${esc(label)}</div>${a.reason ? `<div class="why">${esc(a.reason)}</div>` : ""}`;
+          };
           const rowFor = (a) => {
+            if (!open) return closedRow(a || {});
             if (a.type === "swap") {
               const pi = dayPlan(a.i),
                 pj = dayPlan(a.j);
@@ -23844,7 +23861,13 @@
           document.activeElement && $("#main").contains(document.activeElement)
             ? document.activeElement.id
             : "";
-        $("#main").innerHTML = VIEWS[view]();
+        // Ein Fehler in einer Ansicht darf die Navigation nicht einfrieren: Hinweis zeigen, Tab-Leiste bleibt bedienbar
+        try {
+          $("#main").innerHTML = VIEWS[view]();
+        } catch (e) {
+          console.error("Ansicht " + view + " fehlgeschlagen:", e);
+          $("#main").innerHTML = `<div class="s6"><section class="s6-card" role="alert"><h2>Diese Ansicht konnte nicht geladen werden</h2><p>${esc(e && e.message ? e.message : String(e))}</p></section></div>`;
+        }
         anPaintAll();
         anNavGap();
         $("#main").classList.toggle(

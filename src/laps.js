@@ -73,11 +73,17 @@ export function alignSplits(laps, steps) {
   const w = work.length;
   const layouts = (L) => {
     // Gleiche Rundenzahl ist kein Beweis (z. B. Absturz nach 16 von 24 Runden = scheinbar «Pausen nicht gelappt»):
-    // Strecke und Puls müssen zur Zuordnung passen, sonst entscheidet die vorsichtige Zuordnung (alignLaps)
-    // Zusätzlich muss die Zuordnung mit Zeit/Strecke/Puls-Kosten (alignLaps) jeden Schritt derselben Runde geben
-    // und jeden Arbeitsschritt mit Zielzeit als sicher bestätigen (Pausen: dieselbe Runde genügt) (ohne Zielzeit kann sie nichts bestätigen, dann zählt nur layoutOk). Sonst entscheidet alignLaps allein (nur sichere Schritte, Rest per Vorschau).
-    const agree = (idx) => { if (!idx.some((q, k) => q != null && steps[k].goal > 0) || n * L.length > 10000) return true; const dp = alignLaps(L, steps); return (!!dp && idx.every((q, k) => q == null || !(steps[k].goal > 0) || ((dp.sure[k] || steps[k].kind === "rest") && dp.span[k] && dp.span[k][0] === q && dp.span[k][1] === q))); };
-    const pick = (idx, mode) => (layoutOk(L, steps, idx) && agree(idx) ? { times: idx.map((k) => (k == null ? null : Math.round(L[k].t))), hr: idx.map((k) => (k == null ? null : L[k].hr || null)), laps: idx, mode, count: L.length } : null);
+    // Strecke, Puls und Dauer müssen passen (layoutOk), und die vorsichtige Zuordnung (alignLaps) muss jedem Schritt mit Zielzeit
+    // dieselbe Runde geben und jeden Arbeitsschritt als sicher bestätigen. Pausenzeiten werden nur eingetragen, wenn alignLaps auch
+    // sie als sicher meldet, sonst bleiben sie leer. Ohne Zielzeiten kann alignLaps nichts bestätigen: dann zählt nur layoutOk.
+    const pick = (idx, mode) => {
+      if (!layoutOk(L, steps, idx)) return null;
+      const need = idx.some((q, k) => q != null && steps[k].goal > 0) && n * L.length <= 10000;
+      const dp = need ? alignLaps(L, steps) : null;
+      if (need && (!dp || !idx.every((q, k) => q == null || !(steps[k].goal > 0) || ((dp.sure[k] || steps[k].kind === "rest") && dp.span[k] && dp.span[k][0] === q && dp.span[k][1] === q)))) return null;
+      const use = (k, q) => q != null && !(dp && steps[k].kind === "rest" && steps[k].goal > 0 && !dp.sure[k]);
+      return { times: idx.map((q, k) => (use(k, q) ? Math.round(L[q].t) : null)), hr: idx.map((q, k) => (use(k, q) ? L[q].hr || null : null)), laps: idx, mode, count: L.length };
+    };
     if (L.length === n) return pick(steps.map((_, k) => k), "direct");
     if (w !== n && L.length === w) { const idx = Array(n).fill(null); work.forEach((x, m) => (idx[x.k] = m)); return pick(idx, "work"); }
     if (w > 1 && (L.length === 2 * w || L.length === 2 * w - 1)) { const idx = Array(n).fill(null); work.forEach((x, m) => (idx[x.k] = 2 * m)); return pick(idx, "alt"); }

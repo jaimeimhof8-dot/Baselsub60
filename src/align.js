@@ -263,6 +263,14 @@ export function alignLaps(laps, steps) {
     if (sure[k]) why[k] = null;
     else if (!why[k]) why[k] = f < 0 && tail > 0 ? "ruhige Runde vor dem Abbruch" : "Störung direkt daneben";
   }
+  // Pausenzeit eintragen ist strenger als «Pause hält die Kette»: Die Kette darf eine nach Bedarf längere Pause überspannen (Puls belegt sie),
+  // die Zeit selbst wird aber nur eingetragen, wenn sie höchstens 20 % vom Ziel abweicht und die Pause mindestens 45 s geplant ist.
+  // Kürzere Pausen sind von einem Übergang oder zu spät gedrückten Lap nicht zu unterscheiden.
+  for (let k = 0; k < n; k++) {
+    if (!sure[k] || steps[k].kind !== "rest") continue;
+    if (!(steps[k].goal >= 45)) { sure[k] = false; why[k] = "kurze Pause: Runde nicht eindeutig"; }
+    else if (dev(k) > 0.2) { sure[k] = false; why[k] = "Pausenzeit weicht stark vom Ziel ab"; }
+  }
 
   const merged = [], idx = [];
   asg.forEach((a, k) => {

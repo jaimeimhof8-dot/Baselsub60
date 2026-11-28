@@ -119,6 +119,11 @@ Jaime: Format A («Runde N: SkiErg … → 1 km …, Pause»), Pulsgurt vorhande
 - Ergometer-Strecke: Haben die anderen Stationen mit derselben Planstrecke Meter, muss die Runde auch welche haben.
 - Feste Zuordnung (gleiche Rundenzahl): Bestätigung nur noch für Arbeitsschritte verlangt, bei Pausen genügt dieselbe Runde.
 
+**Nacharbeit nach Prüfer-Review 2 («nicht freigegeben»: Pausenzeiten zu oft falsch als sicher, 38 Fälle)**
+- Pausen: Die Kette darf eine nach Bedarf längere Pause überspannen (Puls belegt sie), die **Pausenzeit eingetragen** wird aber nur bei ≤ 20 % Abweichung und nur bei geplanten Pausen ≥ 45 s. Kürzere Pausen sind von einem Übergang oder zu spät gedrückten Lap nicht zu unterscheiden und bleiben leer.
+- Gleiches in der festen Zuordnung: Pausenzeiten nur, wenn alignLaps sie als sicher meldet.
+- Ergebnis mit den Skripten des Prüfers (14 400 gestörte Einheiten): falsch «sicher» 38 → 2 (beide «fehlt + Trink-Runde»), falsch eingetragene Zeiten über die feste Zuordnung 0.
+
 **Messung saubere Einheiten** (8 × SkiErg 500 m → 1 km → Pause, Streuung ±7 % Arbeit / ±15 % Pause, je 100 Einheiten; Anteil Arbeitsschritte, die in der App übernommen werden; alt = 100 %, weil gleiche Rundenzahl blind übernommen wurde):
 
 | Pause | 15 s | 30 s | 60 s | 90 s | 120 s | 180 s |
@@ -133,10 +138,10 @@ Ohne Puls bei 90–120-s-Pausen bleibt es schwach: SkiErg 1:55 und Pause 2:00 si
 | | alt | neu |
 |---|---|---|
 | in der App übernommene Arbeitsschritte | 32,2 % | 33,3 % |
-| still falsch eingetragen (gleiche Rundenzahl, blind übernommen) | 38 386 | 2 |
-| falsch als «sicher» (vorsichtige Zuordnung) | 18 | 16 |
+| still falsch eingetragen (gleiche Rundenzahl, blind übernommen) | 38 386 | 1 |
+| falsch als «sicher» (vorsichtige Zuordnung) | 18 | 15 |
 
-Die verbleibenden 16 + 2 Fälle enthalten alle die Störung «fehlt» (Runde samt Zeit weg), meist zusammen mit einer Trink-Runde, die genau so lang ist wie der fehlende Schritt. Das ist aus Zeit, Strecke und Puls nicht erkennbar.
+Prüfkriterium dieser Messung (wie `test/align.test.js`): Eine Runde ist richtig, wenn ≥ 75 % ihrer *Schritt*-Zeit vom zugeordneten Schritt stammt. Zeit ohne Schritt (Übergang, Trinken) zählt nicht als fremd. Eine reine Zusatzrunde gilt als richtige Pause, wenn die echte Pausenrunde fehlt. «fehlt» höchstens einmal je Einheit. Mit dem strengeren Kriterium des Prüfers (Fremdanteil an der ganzen Rundenzeit) sind es mehr, vor allem bei zu spät gedrückten Laps. Die verbleibenden Fälle enthalten «fehlt» (Runde samt Zeit weg), meist mit einer Trink-Runde genau so lang wie der fehlende Schritt.
 
 Jaimes Szenarien (8 Runden, mit Puls): +1 oder +4 Übergangsrunden 25–30 s → 100 %. Vergessener Druck Ski+Lauf in Runde 2 → 88 % (Maximum). Lauf+Pause → 75 %. Zusatzrunde 70 s (Trinken) → 88 %. Absturz nach 16 von 24 Runden → alle vorhandenen Arbeitsschritte bis auf den letzten sicher. Übergangsrunden über 35 % des kürzesten Planschritts (bei 60-s-Pausen: über 21 s) gelten nicht mehr als harmlos, ebenso Übergänge mit ≥ 100 m (Gehen). Dann sinkt die Abdeckung (Prüfer: 77 % bzw. 32 % bei 60-s-Pausen).
 

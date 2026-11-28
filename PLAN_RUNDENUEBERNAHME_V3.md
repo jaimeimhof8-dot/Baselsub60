@@ -87,3 +87,42 @@ Ziel: Güte ≥ 0,9 bei den Fällen 15–17. 0 falsche «sichere» Zuordnungen i
 2. Du drückst bei jedem Wechsel die Lap-Taste, auch vor der Pause.
 3. Der Puls ist in den Runden vorhanden (Brustgurt oder Handgelenk). Ohne Puls bringen Punkt 3 und 4 wenig.
 4. Ob Garmin in `lapDTOs` den Workout-Schritt mitliefert, ist ungeprüft.
+
+## 6. Umgesetzt (28.11.2026)
+
+Jaime: Format A («Runde N: SkiErg … → 1 km …, Pause»), Pulsgurt vorhanden. Umgesetzt: Punkte 1, 2, 3, 4, 7, 8. Nicht umgesetzt: 5 (Workout auf die Uhr), 6 (Minuten-Intervalle).
+
+**`src/align.js` (alignLaps)**
+- Übergangsrunden: kurz (< 35 % des kürzesten Planschritts, max. 45 s), ohne Strecke → stören die Verankerung nicht mehr.
+- Puls als Typ-Signal (nur wenn ≥ 80 % der Runden Puls haben und er ≥ 10 Schläge schwankt): Pause = Pulsabfall gegenüber der Runde davor, Arbeit = kein Pulstal. Dazu: Pause mit Arbeitspuls (über 12 Schläge über den Pausen in der Nähe) ist nie sicher.
+- Neue Operation «eine Runde für zwei Schritte» (vergessener Druck), nur wenn die Runde zur Summe der Ziele deutlich besser passt als zu jedem einzelnen.
+- `rigid` ersetzt: sicher ist ein Schritt, wenn er vom **Start** oder vom **Ende** her lückenlos verankert ist (Ende nur bei vollständiger Aufzeichnung), und der nächste Schritt in Richtung Störung auch sauber passt. Zwischen zwei Störungen ist nie etwas sicher.
+- Abweichung vom Ziel relativ zum Tagesniveau (Median der gleichen Schrittart ohne den Schritt selbst): ein langsamer Tag ist keine Störung.
+- Station mit Strecke ist plausibel, wenn der Plan die Strecke vorsieht («SkiErg 500 m»).
+- Neu im Ergebnis: `why` (Grund je unsicherem Schritt), `span`, `pair`, `hrUsed`.
+
+**`src/laps.js`**
+- `alignSplits` (gleiche Rundenzahl) trägt nicht mehr blind ein: `layoutOk` (Strecke, Puls, Dauer bis Faktor 1,65) und Bestätigung durch alignLaps für jeden Schritt mit Ziel. Behebt u. a. «Absturz nach 16 von 24 Runden» = scheinbar «Pausen nicht gelappt» (vorher still falsche Zeiten).
+- `watchCheck` liefert `reason` (erster Grund in Klartext).
+
+**`index.html`**: Prüfliste und Meldung nennen den Grund. «Diagnose kopieren» (v2) enthält das volle alignLaps-Ergebnis je Schritt.
+
+**`supabase/functions/garmin/index.ts`**: Leere `/splits`-Antwort in den ersten 2 Tagen nach der Einheit → beim nächsten Abruf nochmals versuchen. **Wirkt erst nach Neu-Deployen der Edge Function.**
+
+**Messung** (36 000 Zufallseinheiten, 6 Plan-Layouts, Puls ±3/±8/ohne, 1–3 Störungen je Einheit):
+
+| | alt | neu |
+|---|---|---|
+| sicher übernommene Arbeitsschritte | 14,7 % | 30,3 % |
+| falsch als «sicher» (vorsichtige Zuordnung) | 58 | 43 |
+| still falsch eingetragen (feste Zuordnung) | 36 235 | 2 |
+
+Jaimes Plan (8 × SkiErg → 1 km → Pause, mit Puls): +1 oder +4 Übergangsrunden → 100 % sicher (vorher 13 %). Vergessener Druck Ski+Lauf in Runde 2 → 88 % (Maximum, die zwei verschmolzenen Schritte fehlen; vorher 6 %).
+
+**Bekannte Grenzen** (kein Verfahren kann das aus Zeit, Strecke und Puls erkennen):
+- Eine ganze Runde ausgelassen bei lauter gleichen Intervallen: welche, ist offen. Alle verbleibenden Fehlzuordnungen im Zufallstest gehören zu diesem Typ («fehlt»).
+- Eine Trink-Runde, die genau wie eine fehlende Station aussieht (8 gleiche Stationen ohne Strecke).
+- Ein Lap-Druck zur falschen Zeit (Runde enthält Teile zweier Schritte).
+- Ohne Puls sind SkiErg 1:55 und Pause 2:00 nicht trennbar: nach einem vergessenen Druck bleibt dann der Rest unsicher (Vorschau zum Bestätigen).
+
+Tests: 515 grün (`npm test`), davon 18 neue Zufallstests mit Puls und Übergangsrunden (je 300 Einheiten) sowie Szenarien für Format A.

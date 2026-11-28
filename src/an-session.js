@@ -109,7 +109,7 @@ function chartOf(kind, S, zb, ivBands) {
 /**
  * Modell der Einheit. Eingaben: kind (sessionKind), act (Uhr-Aktivität | null), d (dashV3-Ergebnis | null), ivs [{k, t0, t1, d, pace, hr, diff}] (Arbeitsabschnitte),
  * maxHr (Rückfall für Zonen), zone2 (Plan nennt Zone 2), conf (Sicherheit der Phasen-Erkennung).
- * -> {kind, headline: {big, label, status: {text, tone} | null}, numbers[≤3], garmin[≤3], dataState, chart, tabs}
+ * -> {kind, headline: {big, label, status: {text, tone} | null}, numbers (Stationstag 5, sonst ≤ 3), garmin[≤3], dataState, chart, tabs}
  */
 export function anSessionModel({ kind, act, d = null, ivs = [], maxHr = null, zone2 = false, conf = null }) {
   const S = act ? seriesOf(act) : null, zb = zoneBoundsOf(act, maxHr), out = { kind, headline: { big: "", label: "", status: null }, numbers: [], garmin: [], dataState: dataState(act, S, { zones: zb, conf: kind === "interval" || kind === "compromise" || kind === "station" ? conf : null }), chart: chartOf(kind, S, zb, ivs), tabs: [] };
@@ -138,7 +138,11 @@ export function anSessionModel({ kind, act, d = null, ivs = [], maxHr = null, zo
     const plan = plan0 && sr.length ? { ...plan0, rows: sr, n: sr.length, hit: sr.filter((r) => r.diff <= 0).length } : null;
     out.headline = plan ? { big: `${plan.hit} von ${plan.n}`, label: "Stationen im Ziel", status: plan.n - plan.hit ? { text: `${plan.n - plan.hit} verfehlt`, tone: "bad" } : { text: "alle im Ziel", tone: "ok" } } : { big: "–", label: "Runden passen nicht zum Plan", status: null };
     const tile = (k) => d && d.tiles && d.tiles.find((t) => t.k === k);
+    // Reihe 1: Gesamtdauer (wie Garmin, alle Runden), nur Stationen, nur Läufe. Reihe 2: Kompromiss, schwächste Station.
+    out.numbers.push(act && act.time > 0 ? num("Gesamtdauer", mmss(act.time), "min") : na("Gesamtdauer", "keine Dauer von der Uhr"));
     out.numbers.push(plan ? num("Stationszeit", mmss(plan.rows.reduce((s, r) => s + r.t, 0)), "min") : na("Stationszeit", "Runden passen nicht zum Plan"));
+    const rr = plan0 ? plan0.rows.filter((r) => r.kind === "run") : [];
+    out.numbers.push(rr.length ? num("Laufzeit", mmss(rr.reduce((s, r) => s + r.t, 0)), "min") : na("Laufzeit", plan0 ? "keine Läufe sicher zugeordnet" : "Runden passen nicht zum Plan"));
     const comp = tile("Kompromiss-Delta");
     out.numbers.push(comp && !comp.na ? num("Kompromiss Ø", comp.v.replace(/ s\/km$/, ""), "s/km", /^\+(\d+)/.test(comp.v) && +/^\+(\d+)/.exec(comp.v)[1] >= 10 ? "warn" : "") : na("Kompromiss Ø", comp && comp.why ? comp.why : "kein Referenz-km"));
     if (plan && plan.rows.length) { const w = plan.rows.reduce((a, r) => (r.diff > a.diff ? r : a), plan.rows[0]); out.numbers.push(num("Schwächste", sg(w.diff), "s")); out.worst = w.name; } else out.numbers.push(na("Schwächste", "kein Plan-Vergleich"));

@@ -109,20 +109,42 @@ Jaime: Format A («Runde N: SkiErg … → 1 km …, Pause»), Pulsgurt vorhande
 
 **`supabase/functions/garmin/index.ts`**: Leere `/splits`-Antwort in den ersten 2 Tagen nach der Einheit → beim nächsten Abruf nochmals versuchen. **Wirkt erst nach Neu-Deployen der Edge Function.**
 
-**Messung** (36 000 Zufallseinheiten, 6 Plan-Layouts, Puls ±3/±8/ohne, 1–3 Störungen je Einheit):
+**Nacharbeit nach Prüfer-Review 1 («nicht freigegeben»: Rückschritt bei sauberen Einheiten mit kurzen Pausen)**
+- Grenze «harmlose Kurzrunde» ohne festes 20-s-Minimum (15-s-Pausen sind Pausen, keine Störung). Überzählige Runde nur billig, wenn harmlos.
+- Zusammenfassen zweier echter Runden kostet mehr (0,5 extra).
+- Letzte Runde < 15 s wird nur abgeschnitten, wenn sie auch für den letzten Planschritt zu kurz ist (geplante 15-s-Schlusspause bleibt).
+- Pausen-Puls als Beleg erst ab 45 s Planpause. Mit Puls dürfen Pausen bis Faktor 1,65 vom Ziel abweichen (man erholt sich nach Bedarf).
+- Arbeitsschritt mit Pausenpuls (über 20 Schläge unter gleichartigen Schritten in der Nähe) ist nie sicher.
+- Verankerung vom Ende verlangt den doppelten Mindestabstand (ein Absturz plus Zusatzrunden kann wie ein vollständiges Ende aussehen).
+- Ergometer-Strecke: Haben die anderen Stationen mit derselben Planstrecke Meter, muss die Runde auch welche haben.
+- Feste Zuordnung (gleiche Rundenzahl): Bestätigung nur noch für Arbeitsschritte verlangt, bei Pausen genügt dieselbe Runde.
+
+**Messung saubere Einheiten** (8 × SkiErg 500 m → 1 km → Pause, Streuung ±7 % Arbeit / ±15 % Pause, je 100 Einheiten; Anteil Arbeitsschritte, die in der App übernommen werden; alt = 100 %, weil gleiche Rundenzahl blind übernommen wurde):
+
+| Pause | 15 s | 30 s | 60 s | 90 s | 120 s | 180 s |
+|---|---|---|---|---|---|---|
+| mit Puls | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % |
+| ohne Puls | 85 % | 91 % | 97 % | 40 % | 35 % | 82 % |
+
+Ohne Puls bei 90–120-s-Pausen bleibt es schwach: SkiErg 1:55 und Pause 2:00 sind nur über die Zeit nicht trennbar, sobald eine Runde deutlich abweicht. Mit Pulsgurt kein Thema.
+
+**Messung gestörte Einheiten** (36 000 Zufallseinheiten, 6 Plan-Layouts, Puls ±3/±8/ohne, 1–3 Störungen je Einheit aus vergessen, doppelt, Zusatz, Übergang, Trinken, Abbruch, fehlt (höchstens einmal)):
 
 | | alt | neu |
 |---|---|---|
-| sicher übernommene Arbeitsschritte | 14,7 % | 30,3 % |
-| falsch als «sicher» (vorsichtige Zuordnung) | 58 | 43 |
-| still falsch eingetragen (feste Zuordnung) | 36 235 | 2 |
+| in der App übernommene Arbeitsschritte | 32,2 % | 33,3 % |
+| still falsch eingetragen (gleiche Rundenzahl, blind übernommen) | 38 386 | 2 |
+| falsch als «sicher» (vorsichtige Zuordnung) | 18 | 16 |
 
-Jaimes Plan (8 × SkiErg → 1 km → Pause, mit Puls): +1 oder +4 Übergangsrunden → 100 % sicher (vorher 13 %). Vergessener Druck Ski+Lauf in Runde 2 → 88 % (Maximum, die zwei verschmolzenen Schritte fehlen; vorher 6 %).
+Die verbleibenden 16 + 2 Fälle enthalten alle die Störung «fehlt» (Runde samt Zeit weg), meist zusammen mit einer Trink-Runde, die genau so lang ist wie der fehlende Schritt. Das ist aus Zeit, Strecke und Puls nicht erkennbar.
+
+Jaimes Szenarien (8 Runden, mit Puls): +1 oder +4 Übergangsrunden 25–30 s → 100 %. Vergessener Druck Ski+Lauf in Runde 2 → 88 % (Maximum). Lauf+Pause → 75 %. Zusatzrunde 70 s (Trinken) → 88 %. Absturz nach 16 von 24 Runden → alle vorhandenen Arbeitsschritte bis auf den letzten sicher. Übergangsrunden über 35 % des kürzesten Planschritts (bei 60-s-Pausen: über 21 s) gelten nicht mehr als harmlos, ebenso Übergänge mit ≥ 100 m (Gehen). Dann sinkt die Abdeckung (Prüfer: 77 % bzw. 32 % bei 60-s-Pausen).
 
 **Bekannte Grenzen** (kein Verfahren kann das aus Zeit, Strecke und Puls erkennen):
-- Eine ganze Runde ausgelassen bei lauter gleichen Intervallen: welche, ist offen. Alle verbleibenden Fehlzuordnungen im Zufallstest gehören zu diesem Typ («fehlt»).
-- Eine Trink-Runde, die genau wie eine fehlende Station aussieht (8 gleiche Stationen ohne Strecke).
+- Eine ganze Runde ausgelassen bei lauter gleichen Intervallen: welche, ist offen.
+- Uhr zu spät gestartet (erste Runde fehlt ganz): der Start gilt als fest, ohne Puls wird verschoben zugeordnet.
+- Eine Trink-Runde, die genau wie ein fehlender Schritt aussieht.
 - Ein Lap-Druck zur falschen Zeit (Runde enthält Teile zweier Schritte).
-- Ohne Puls sind SkiErg 1:55 und Pause 2:00 nicht trennbar: nach einem vergessenen Druck bleibt dann der Rest unsicher (Vorschau zum Bestätigen).
+- Edge Function: Solange eine junge Einheit (< 2 Tage) leere Runden liefert, belegt sie bei jedem Abruf einen der 15 Plätze und der Client rechnet ab Planstart neu. Wirkt erst nach Neu-Deployen.
 
-Tests: 515 grün (`npm test`), davon 18 neue Zufallstests mit Puls und Übergangsrunden (je 300 Einheiten) sowie Szenarien für Format A.
+Tests: 515 grün (`npm test`), davon 18 neue Zufallstests (Puls ±3, ±8, ohne; je 300 Einheiten) sowie Szenarien für Format A. Laufzeit laut Prüfer: 24 Schritte × 40 Runden ≤ 30 ms.

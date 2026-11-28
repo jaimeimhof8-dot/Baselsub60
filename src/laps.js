@@ -75,8 +75,8 @@ export function alignSplits(laps, steps) {
     // Gleiche Rundenzahl ist kein Beweis (z. B. Absturz nach 16 von 24 Runden = scheinbar «Pausen nicht gelappt»):
     // Strecke und Puls müssen zur Zuordnung passen, sonst entscheidet die vorsichtige Zuordnung (alignLaps)
     // Zusätzlich muss die Zuordnung mit Zeit/Strecke/Puls-Kosten (alignLaps) jeden Schritt derselben Runde geben
-    // und jeden dieser Schritte mit Zielzeit als sicher bestätigen (ohne Zielzeit kann sie nichts bestätigen, dann zählt nur layoutOk). Sonst entscheidet alignLaps allein (nur sichere Schritte, Rest per Vorschau).
-    const agree = (idx) => { if (!idx.some((q, k) => q != null && steps[k].goal > 0) || n * L.length > 10000) return true; const dp = alignLaps(L, steps); return (!!dp && idx.every((q, k) => q == null || !(steps[k].goal > 0) || (dp.sure[k] && dp.span[k] && dp.span[k][0] === q && dp.span[k][1] === q))); };
+    // und jeden Arbeitsschritt mit Zielzeit als sicher bestätigen (Pausen: dieselbe Runde genügt) (ohne Zielzeit kann sie nichts bestätigen, dann zählt nur layoutOk). Sonst entscheidet alignLaps allein (nur sichere Schritte, Rest per Vorschau).
+    const agree = (idx) => { if (!idx.some((q, k) => q != null && steps[k].goal > 0) || n * L.length > 10000) return true; const dp = alignLaps(L, steps); return (!!dp && idx.every((q, k) => q == null || !(steps[k].goal > 0) || ((dp.sure[k] || steps[k].kind === "rest") && dp.span[k] && dp.span[k][0] === q && dp.span[k][1] === q))); };
     const pick = (idx, mode) => (layoutOk(L, steps, idx) && agree(idx) ? { times: idx.map((k) => (k == null ? null : Math.round(L[k].t))), hr: idx.map((k) => (k == null ? null : L[k].hr || null)), laps: idx, mode, count: L.length } : null);
     if (L.length === n) return pick(steps.map((_, k) => k), "direct");
     if (w !== n && L.length === w) { const idx = Array(n).fill(null); work.forEach((x, m) => (idx[x.k] = m)); return pick(idx, "work"); }
@@ -84,7 +84,8 @@ export function alignSplits(laps, steps) {
     return null;
   };
   let T = all.slice();
-  while (T.length > 1 && T[T.length - 1].t < 15) T = T.slice(0, -1);
+  const lastGoal = (steps[n - 1] && steps[n - 1].goal) || 0;
+  while (T.length > 1 && T[T.length - 1].t < 15 && !(lastGoal > 0 && T[T.length - 1].t >= lastGoal * 0.5)) T = T.slice(0, -1);
   const hit = layouts(T) || layouts(all);
   const L = T;
   return hit || { times: null, count: L.length };

@@ -22,7 +22,9 @@ export function alignLaps(laps, steps) {
   const n = (steps || []).length;
   if (steps && steps.some((x) => !x)) return null;
   let T = (laps || []).filter((l) => l && Number.isFinite(+l.t) && +l.t > 0).map((l) => ({ ...l, t: +l.t, d: Number.isFinite(+l.d) ? +l.d : 0 }));
-  while (T.length > 1 && T[T.length - 1].t < 15) T = T.slice(0, -1); // Stopp-Druck am Ende
+  // Stopp-Druck am Ende: kurze Schlussrunde, die auch für den letzten Planschritt klar zu kurz ist (eine geplante 15-s-Pause bleibt)
+  const lastGoal = (steps && steps.length && steps[steps.length - 1] && steps[steps.length - 1].goal) || 0;
+  while (T.length > 1 && T[T.length - 1].t < 15 && !(lastGoal > 0 && T[T.length - 1].t >= lastGoal * 0.5)) T = T.slice(0, -1);
   const m = T.length;
   if (!n || !m) return null;
   if (n * m > 10000) return null; // Rechenaufwand der Eindeutigkeitsprüfung: lieber keine Zuordnung als ein blockiertes Gerät
@@ -37,9 +39,10 @@ export function alignLaps(laps, steps) {
   const pre = [0], dpre = [0];
   T.forEach((l, i) => { pre.push(pre[i] + l.t); dpre.push(dpre[i] + (l.d || 0)); });
   // Harmlose Zusatzrunde (Übergang, Doppeldruck): kurz, ohne Strecke, höchstens 35 % des kürzesten Planschritts (max. 45 s).
+  // Kein festes Minimum: Bei 15-s-Pausen ist eine 15-s-Runde eine Pause, keine Störung.
   // Sie kann keinen Planschritt enthalten und löst darum keine Verschiebung aus.
   const goals = steps.map((s) => s.goal).filter((g) => g > 0);
-  const shortMax = goals.length ? Math.max(20, Math.min(45, Math.min(...goals) * 0.35)) : 20;
+  const shortMax = goals.length ? Math.min(45, Math.min(...goals) * 0.35) : 20;
   const harmless = (l) => l.t < shortMax && (l.d || 0) < 100;
 
   // Puls als Typ-Beleg (Pulsgurt): Eine Pausenrunde liegt im Puls deutlich unter ihren Nachbarrunden, eine Arbeitsrunde nicht.
@@ -68,7 +71,8 @@ export function alignLaps(laps, steps) {
     const sc = restScore(a, b);
     if (sc == null) return 0;
     const kind = steps[k].kind;
-    if (kind === "rest") return sc.drop != null && sc.drop < 3 ? HR_PEN : 0;
+    // In kurzen Pausen (< 45 s) fällt der Puls kaum: dort ist der Abfall kein Beleg
+    if (kind === "rest") return steps[k].goal >= 45 && sc.drop != null && sc.drop < 3 ? HR_PEN : 0;
     if (kind === "station" || kind === "run") return sc.valley >= 6 ? HR_PEN : 0;
     return 0;
   };
@@ -89,7 +93,10 @@ export function alignLaps(laps, steps) {
         for (let g = 1; g <= MAX_GROUP && j + g <= m; g++) {
           if (banned && banned.k === i && j <= banned.lap && banned.lap <= j + g - 1) continue;
           const hp = hrCost(i, j, j + g - 1);
-          relax(i + 1, j + g, c + pairCost(i, j, j + g - 1) + (g - 1) * 0.3, h[i][j] + hp, "m", i, j, g);
+          // Zusammenfassen: 0,3 je Zusatzrunde, plus 0,5 je weitere nicht harmlose Runde (zwei echte Runden in einem Schritt sind selten)
+          let real = 0;
+          for (let q = j; q < j + g; q++) if (!harmless(T[q])) real++;
+          relax(i + 1, j + g, c + pairCost(i, j, j + g - 1) + (g - 1) * 0.3 + Math.max(0, real - 1) * 0.5, h[i][j] + hp, "m", i, j, g);
         }
         // Vergessener Druck zwischen zwei Schritten: eine Runde enthält beide (Zeit gegen die Summe der Ziele). Keiner der beiden bekommt
         // eine Einzelzeit, aber die Runden daneben bleiben richtig zugeordnet.
@@ -105,7 +112,7 @@ export function alignLaps(laps, steps) {
         // Schritt nicht aufgezeichnet: am Ende (Absturz, Abbruch) billig, mittendrin teuer
         relax(i + 1, j, c + (j === m ? 0.2 : isWork(i) ? 1.5 : 0.1), h[i][j], "s", i, j, 0);
       }
-      if (j < m) relax(i, j + 1, c + (T[j].t < 45 ? 0.15 : 1.0), h[i][j], "l", i, j, 0); // überzählige Runde
+      if (j < m) relax(i, j + 1, c + (harmless(T[j]) ? 0.15 : T[j].t < 45 ? 0.6 : 1.0), h[i][j], "l", i, j, 0); // überzählige Runde
     }
     return { total: f[n][m], hrPart: h[n][m], bk };
   }
@@ -164,7 +171,7 @@ export function alignLaps(laps, steps) {
   const anomaly = steps.some((st, k) => k <= lastMatched && !asg[k] && (isWork(k) || !systematicRest)) ||
     asg.some((x) => x && x[0] !== x[1]) || dbl.some(Boolean) ||
     T.some((l, q) => q <= lastLap && !covered.has(q) && !harmless(l)) ||
-    matched.some((k) => dev(k) > 0.12); // grosse Abweichung vom Planziel: Zeichen für Verschiebung
+    matched.some((k) => dev(k) > (hrOk && steps[k].kind === "rest" ? 0.5 : 0.15)); // grosse Abweichung vom Tagesniveau: Zeichen für Verschiebung
   // Mit Puls zählen die Typ-Kosten mit: Station und Pause gleicher Dauer unterscheiden sich dann über den Puls
   const distinct = (k, a) => {
     for (const j of [k - 1, k + 1]) if (j >= 0 && j < n && steps[j].goal > 0 && steps[k].goal > 0 && pairCost(j, a[0], a[1]) < pairCost(k, a[0], a[1]) + 0.25) return false;
@@ -183,12 +190,12 @@ export function alignLaps(laps, steps) {
     if (a[0] !== a[1]) return "mehrere Runden zusammengefasst";
     // Nachbarschritt unbelegt: die Runde könnte beide Schritte enthalten (vergessener Druck) oder dem Nachbarn gehören
     if ([k - 1, k + 1].some((j) => j >= 0 && j <= lastMatched && !asg[j] && (isWork(j) || !systematicRest))) return "Nachbarschritt ohne Runde";
-    if (dev(k) > 0.2) return "Zeit weicht stark vom Ziel ab";
+    // Pausen hält man nach Bedarf: mit Puls als Beleg erst ab Faktor 1,65 auffällig, sonst wie Arbeit ab 20 %
+    if (dev(k) > (hrOk && steps[k].kind === "rest" ? 0.5 : 0.2)) return "Zeit weicht stark vom Ziel ab";
     // Aufzeichnung endet früher und der Schritt gleicht einem Nachbarschritt: eine Lücke wäre nicht von einem Abbruch zu unterscheiden
     if (tail > 0 && [k - 1, k + 1].some((j) => j >= 0 && j < n && steps[j].kind === steps[k].kind && steps[j].goal === steps[k].goal)) return "Abbruch, gleicher Nachbarschritt";
-    // Pause mit Arbeitspuls: Pulspegel weicht von den Pausen in der Nähe ab (bis zu 4, je 2 davor und danach). Nur für Pausen, denn
-    // Arbeitsschritte schwanken je nach Lage (frischer Referenzlauf tiefer als Läufe nach Stationen).
-    if (hrOk && steps[k].kind === "rest") {
+    // Pulspegel gegen die gleichartigen Schritte in der Nähe (bis zu 4, je 2 davor und danach): Pause mit Arbeitspuls oder Arbeit mit Pausenpuls
+    if (hrOk && (steps[k].kind === "rest" || steps[k].kind === "station" || steps[k].kind === "run")) {
       const own = hrOf(a[0], a[1]);
       const near = [];
       for (const dir of [-1, 1]) for (let j = k + dir, c = 0; j >= 0 && j < n && c < 2; j += dir)
@@ -196,11 +203,22 @@ export function alignLaps(laps, steps) {
       if (own != null && near.length >= 2) {
         near.sort((x, y) => x - y);
         const mh = near.length % 2 ? near[(near.length - 1) / 2] : (near[near.length / 2 - 1] + near[near.length / 2]) / 2;
-        if (Math.abs(own - mh) > 12) return "Puls passt nicht zu einer Pause";
+        if (steps[k].kind === "rest" && Math.abs(own - mh) > 12) return "Puls passt nicht zu einer Pause";
+        // Arbeit mit Pausenpuls: nur nach unten und grosszügig (frischer Referenzlauf liegt natürlich etwas tiefer)
+        if (steps[k].kind !== "rest" && own < mh - 20) return "Puls zu tief für diesen Arbeitsschritt";
       }
     }
+    // Ergometer misst Strecke: Haben die anderen Stationen mit derselben Planstrecke Meter, muss diese Runde auch welche haben
+    const pd = steps[k].kind === "station" ? planDist(steps[k]) : 0;
+    if (pd >= 300) {
+      const d = dpre[a[1] + 1] - dpre[a[0]];
+      const others = matched.filter((j) => j !== k && !dbl[j] && steps[j].kind === "station" && planDist(steps[j]) === pd);
+      if (others.length >= 2 && others.filter((j) => dpre[asg[j][1] + 1] - dpre[asg[j][0]] >= 0.6 * pd).length >= 0.75 * others.length && d < 0.3 * pd)
+        return "Strecke passt nicht zur Station";
+    }
     const alt = altOf(k, a[0]);
-    if (!alt || alt.total - best.total < MARGIN) return "andere Zuordnung fast gleich gut";
+    // Vom Ende her verankert (strict) ist riskanter (ein Absturz kann wie ein vollständiges Ende aussehen): doppelter Abstand verlangt
+    if (!alt || alt.total - best.total < (strict ? 2 * MARGIN : MARGIN)) return "andere Zuordnung fast gleich gut";
     if ((strict || anomaly || (tail > 0 && k === lastMatched)) && !distinct(k, a)) return "gleicht dem Nachbarschritt";
     return null;
   };
@@ -291,7 +309,7 @@ export function layoutOk(laps, steps, idx) {
     if (hrOk) {
       const sc = rest(q);
       if (sc == null) continue;
-      if (kind === "rest" && sc.drop != null && sc.drop < -3) return false; // Pause deutlich über der Runde davor: das war Arbeit
+      if (kind === "rest" && steps[k].goal >= 45 && sc.drop != null && sc.drop < -3) return false; // Pause deutlich über der Runde davor: das war Arbeit
       if ((kind === "station" || kind === "run") && sc.valley >= 10) return false; // Arbeitsschritt klar im Pulstal: das war eine Pause
     }
   }

@@ -194,7 +194,6 @@ const HR = { warm: 135, run: 166, station: 160, rest: 140, cool: 142, other: 150
 const mkHr = (steps, R, noise) => steps.map((s, k) => { const t = Math.round(s.goal * (1 + (R() - 0.5) * 0.16)); return { t, d: s.kind === "run" ? 1000 : s.kind === "warm" || s.kind === "cool" ? 1500 : 0, hr: Math.round(HR[s.kind] + k * 0.3 + (R() - 0.5) * 2 * noise), _o: { [k]: t } }; });
 const addO = (a, b) => { const o = { ...a }; for (const [k, v] of Object.entries(b || {})) o[k] = (o[k] || 0) + v; return o; };
 const mix = (a, b) => ({ t: a.t + b.t, d: a.d + b.d, hr: Math.round((a.hr * a.t + b.hr * b.t) / (a.t + b.t)), _o: addO(a._o, b._o) });
-const ownsMost = (lap, k) => ((lap._o || {})[k] || 0) >= 0.75 * lap.t;
 const MUTS_HR = {
   vergessen: (laps, R) => { const i = Math.floor(R() * (laps.length - 1)); laps.splice(i, 2, mix(laps[i], laps[i + 1])); },
   abbruch: (laps, R) => { laps.splice(Math.max(3, laps.length - 1 - Math.floor(R() * 4))); },
@@ -217,20 +216,28 @@ for (const noise of [3, 8, 0]) for (const [ln, steps] of Object.entries(LAYOUTS_
       let laps = mkHr(steps, R, noise);
       if (!noise) laps = laps.map((l) => ({ ...l, hr: 150 }));
       const names = Object.keys(MUTS_HR).filter((x) => !(ln === "nurStationen" && x === "trinken"));
-      for (let q = 1 + Math.floor(R() * 3); q > 0; q--) MUTS_HR[names[Math.floor(R() * names.length)]](laps, R);
+      // «fehlt» höchstens einmal: Fehlen zwei Runden samt Zeit (ganze Periode ausgelassen), ist bei gleichen Perioden nicht erkennbar, welche
+      let gone = false;
+      for (let q = 1 + Math.floor(R() * 3); q > 0; q--) { const nm = names[Math.floor(R() * names.length)]; if (nm === "fehlt" && gone) continue; if (nm === "fehlt") gone = true; MUTS_HR[nm](laps, R); }
       const r = alignLaps(laps, steps);
       if (r) steps.forEach((_, k) => {
         if (!r.sure[k] || r.laps[k] == null) return;
         sure++;
+        // Fremd ist nur Zeit anderer Plan-Schritte. Zeit ohne Schritt (Übergang, Trinken) zählt nicht. Eine reine Zusatzrunde ist nur
+        // als Pause richtig, wenn die echte Pausenrunde fehlt: dann war das die Pause (gleiche Stelle, Pausenpuls).
         const M = r.merged[r.laps[k]], own = M.parts.reduce((x, p) => x + ((p._o || {})[k] || 0), 0);
-        assert.ok(own >= 0.75 * M.t, `${ln} Seed ${seed}: Schritt ${k} sicher, aber Runde gehört überwiegend anderen (${JSON.stringify(M.parts.map((p) => p._o))})`);
+        const stepTime = M.parts.reduce((x, p) => x + Object.values(p._o || {}).reduce((a, b) => a + b, 0), 0);
+        const restHere = stepTime === 0 && steps[k].kind === "rest" && !laps.some((l) => (l._o || {})[k]);
+        assert.ok(restHere || (stepTime > 0 && own >= 0.75 * stepTime), `${ln} Seed ${seed}: Schritt ${k} sicher, aber Runde gehört überwiegend anderen (${JSON.stringify(M.parts.map((p) => p._o))})`);
       });
       // Feste Zuordnung (gleiche Rundenzahl) darf ebenfalls nie eine fremde Runde eintragen
       const s = alignSplits(laps, steps);
       if (s.times) steps.forEach((_, k) => {
         const q = s.laps[k];
         if (q == null) return;
-        assert.ok(ownsMost(laps[q], k), `${ln} Seed ${seed}: alignSplits ${s.mode} legt fremde Runde auf Schritt ${k} (${JSON.stringify(laps[q]._o)})`);
+        const restHere = !Object.keys(laps[q]._o || {}).length && steps[k].kind === "rest" && !laps.some((l) => (l._o || {})[k]);
+        const st = Object.values(laps[q]._o || {}).reduce((a, b) => a + b, 0);
+        assert.ok(restHere || (st > 0 && ((laps[q]._o || {})[k] || 0) >= 0.75 * st), `${ln} Seed ${seed}: alignSplits ${s.mode} legt fremde Runde auf Schritt ${k} (${JSON.stringify(laps[q]._o)})`);
       });
     }
     assert.ok(sure > 150, `zu wenig Abdeckung: ${sure} sichere Schritte`);

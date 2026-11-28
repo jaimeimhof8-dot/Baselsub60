@@ -107,34 +107,56 @@ const recency = (s) => (ok(s.ageDays) ? Math.pow(0.5, s.ageDays / HALF_LIFE_DAYS
 
 /**
  * k aus Simulationen eichen. sims: [{intensity (0–1), stations (Team-Stationszeit der Simulation, s), parts?: 8 Stationszeiten,
- * run?: Laufzeit 8 km, rox?: Roxzone, ageDays?: Alter}]; benchSum = Summe der Mittel aller 8 Solo-Benchmarks; solo = die 8 Solo-Mittel.
+ * run?: Laufzeit 8 km, rox?: Roxzone, ageDays?: Alter}]; benchSum = Summe der Mittel aller 8 Solo-Benchmarks; solo = die 8 Solo-Mittel
+ * (fehlender Benchmark = null).
+ * Teil-Simulation (Brick, Halb-Simulation): parts hat nur einige gültige Zeiten (Rest NaN/leer). Ihr k ist Summe der gemessenen
+ * Stationen ÷ Summe der Solo-Mittel genau dieser Stationen; sie zählt im Gesamt-k nur mit ihrem Anteil an der Solo-Summe.
  * ≥ 85 % Intensität: k = beobachteter Wert. Ohne ageDays zählen die letzten zwei gleich, mit ageDays zählen jüngere mehr.
  * Darunter: nur Untergrenze («mindestens so langsam»).
- * Mit parts und solo: perStation = je Station eigenes k, zum Gesamt-k hin geglättet (eine Simulation reicht nie für ein Extrem).
- * @returns {{k: number|null, floor: number|null, n: number, perStation: number[]|null, run: number|null, rox: number|null}}
+ * perStation = je Station eigenes k, zum Gesamt-k hin geglättet (eine Simulation reicht nie für ein Extrem); null für Stationen,
+ * die in keiner Simulation gemessen wurden.
+ * @returns {{k: number|null, floor: number|null, n: number, partial: number, perStation: (number|null)[]|null, run: number|null, rox: number|null}}
  */
 export function calibrateK(sims, benchSum, solo = null) {
-  const none = { k: null, floor: null, n: 0, perStation: null, run: null, rox: null };
-  if (!ok(benchSum)) return none;
-  const obs = (sims || []).filter((s) => s && ok(s.stations) && ok(s.intensity)).map((s) => ({ ...s, k: s.stations / benchSum, i: s.intensity, w: recency(s) }));
+  const none = { k: null, floor: null, n: 0, partial: 0, perStation: null, run: null, rox: null };
+  const soloOk = Array.isArray(solo) && solo.length === 8;
+  const soloAll = soloOk ? sum(solo.filter(ok)) : 0;
+  // k einer Simulation und ihr Anteil an der Solo-Summe (1 = alle 8 Stationen)
+  const kOf = (s) => {
+    if (soloOk && Array.isArray(s.parts) && s.parts.length === 8) {
+      const idx = s.parts.map((v, r) => (ok(v) && ok(solo[r]) ? r : -1)).filter((r) => r >= 0);
+      if (idx.length && (idx.length < 8 || !ok(benchSum))) {
+        const so = sum(idx.map((r) => solo[r]));
+        return { k: sum(idx.map((r) => s.parts[r])) / so, cov: so / soloAll, part: idx.length < 8 };
+      }
+    }
+    return ok(s.stations) && ok(benchSum) ? { k: s.stations / benchSum, cov: 1, part: false } : null;
+  };
+  const obs = (sims || []).filter((s) => s && ok(s.intensity)).map((s) => ({ s, c: kOf(s) })).filter((x) => x.c)
+    .map(({ s, c }) => ({ ...s, k: c.k, cov: c.cov, part: c.part, i: s.intensity, w: recency(s) }));
+  if (!obs.length) return none;
   const anyAge = obs.some((s) => ok(s.ageDays));
   const strongAll = obs.filter((s) => s.i >= SIM_MIN);
   const strong = anyAge ? strongAll.slice(-4) : strongAll.slice(-2);
   const weak = obs.filter((s) => s.i < SIM_MIN).map((s) => s.k);
-  const k = strong.length ? weighted(strong.map((s) => ({ v: s.k, w: s.w }))) : null;
+  const k = strong.length ? weighted(strong.map((s) => ({ v: s.k, w: s.w * s.cov }))) : null;
   let perStation = null;
-  if (k != null && Array.isArray(solo) && solo.length === 8 && solo.every(ok)) {
-    const withParts = strong.filter((s) => Array.isArray(s.parts) && s.parts.length === 8 && s.parts.every(ok));
+  if (k != null && soloOk) {
+    const withParts = strong.filter((s) => Array.isArray(s.parts) && s.parts.length === 8);
     if (withParts.length) {
-      const nEff = withParts.reduce((a, s) => a + s.w, 0);
       perStation = solo.map((v, r) => {
-        const kr = weighted(withParts.map((s) => ({ v: s.parts[r] / v, w: s.w })));
+        const has = ok(v) ? withParts.filter((s) => ok(s.parts[r])) : [];
+        if (!has.length) return null;
+        const nEff = has.reduce((a, s) => a + s.w, 0);
+        const kr = weighted(has.map((s) => ({ v: s.parts[r] / v, w: s.w })));
         return (nEff * kr + SHRINK * k) / (nEff + SHRINK);
       });
+      if (perStation.every((x) => x == null)) perStation = null;
     }
   }
-  const pick = (f) => weighted(strong.filter((s) => ok(s[f])).map((s) => ({ v: s[f], w: s.w })));
-  return { k, floor: weak.length ? Math.max(...weak) : null, n: obs.length, perStation, run: pick("run"), rox: pick("rox") };
+  // Laufen und Roxzone nur aus ganzen Simulationen (8 km, alle Wege)
+  const pick = (f) => weighted(strong.filter((s) => !s.part && ok(s[f])).map((s) => ({ v: s[f], w: s.w })));
+  return { k, floor: weak.length ? Math.max(...weak) : null, n: obs.length, partial: obs.filter((s) => s.part).length, perStation, run: pick("run"), rox: pick("rox") };
 }
 
 /**
@@ -210,15 +232,18 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
     if (!sm) return;
     let parts = sm.parts;
     if (Array.isArray(parts) && parts.length === 8) {
+      // Leere Felder = Station nicht gemessen (Teil-Simulation). Ein unmöglicher Wert verwirft die ganze Simulation.
       const cs = parts.map((x, r) => checkStation(r, x));
-      const bad = cs.findIndex((c) => !c.ok);
+      const bad = cs.findIndex((c) => !c.ok && !c.empty);
       if (bad >= 0) { issues.push({ kind: "sim", who: "", label: `Simulation ${i + 1}: ${STATION_NAMES[bad]}`, raw: String(parts[bad]), reason: cs[bad].reason || "unplausibel" }); return; }
-      parts = cs.map((c) => c.s);
-      simsOk.push({ ...sm, parts, stations: sum(parts) });
+      parts = cs.map((c) => (c.ok ? c.s : NaN));
+      const got = parts.filter(ok);
+      if (!got.length) return;
+      simsOk.push({ ...sm, parts, stations: sum(got) });
     } else if (ok(sm.stations) && sm.stations >= sum(STATION_BOUNDS.map((b) => b[0])) && sm.stations <= sum(STATION_BOUNDS.map((b) => b[1]))) simsOk.push(sm);
     else issues.push({ kind: "sim", who: "", label: `Simulation ${i + 1}`, raw: String(sm.stations), reason: "Stationssumme unplausibel, bitte prüfen." });
   });
-  const cal = calibrateK(simsOk, benchSum, allBench ? solo : null);
+  const cal = calibrateK(simsOk, benchSum, solo);
 
   let k = KS.mitte, kLo = KS.gut, kHi = KS.vorsichtig;
   if (cal.k != null) { k = cal.k; kLo = k * 0.97; kHi = k * 1.03; }
@@ -233,9 +258,12 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
   const teamAt = (kk, fbF, note) => {
     const idx = solo.map((v, r) => (v == null ? -1 : r)).filter((r) => r >= 0);
     const sumModel = idx.reduce((a, r) => a + solo[r] * kk, 0), sumAnchor = idx.reduce((a, r) => a + anchor[r], 0) || 1;
+    // Teil-Eichung: gemessene Stationen mit eigenem k, die übrigen nach der Verteilung von St. Gallen auf ihre Modellsumme
+    const free = idx.filter((r) => !(kr && kr[r] != null));
+    const sumModelF = free.reduce((a, r) => a + solo[r] * kk, 0), sumAnchorF = free.reduce((a, r) => a + anchor[r], 0) || 1;
     return solo.map((v, r) => {
       if (v == null) return fb[r] * fbF;
-      const x = kr ? v * kr[r] * (kk / k) : anchor[r] * (sumModel / sumAnchor), [lo, hi] = TEAM_BOUNDS[r];
+      const x = kr && kr[r] != null ? v * kr[r] * (kk / k) : kr ? anchor[r] * (sumModelF / sumAnchorF) : anchor[r] * (sumModel / sumAnchor), [lo, hi] = TEAM_BOUNDS[r];
       if (x < lo || x > hi) { if (note) clamped.add(r); return Math.min(hi, Math.max(lo, x)); }
       return x;
     });
@@ -280,7 +308,7 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
   const basis = [
     `Laufen: Pacing-Test, Team Ø ${fmt(T)}/km`,
     `Stationen: gültiger Benchmark ${8 - missing} von 8`,
-    cal.k != null ? `Simulationen: ${cal.n} eingetragen, k geeicht (${k.toFixed(2).replace(".", ",")})${kr ? ", je Station" : ""}${runCal ? ", Laufen gemessen" : ""}${roxCal ? ", Roxzone gemessen" : ""}` : cal.floor != null ? "Simulation unter 85 %: zeigt nur eine Untergrenze" : "Noch keine Simulation ab 85 %: k ist eine Annahme",
+    cal.k != null ? `Simulationen: ${cal.n} eingetragen${cal.partial ? ` (davon ${cal.partial} mit nur einem Teil der Stationen)` : ""}, k geeicht (${k.toFixed(2).replace(".", ",")})${kr ? (kr.every((x) => x != null) ? ", je Station" : `, je Station für ${kr.filter((x) => x != null).length} von 8`) : ""}${runCal ? ", Laufen gemessen" : ""}${roxCal ? ", Roxzone gemessen" : ""}` : cal.floor != null ? "Simulation unter 85 %: zeigt nur eine Untergrenze" : "Noch keine Simulation ab 85 %: k ist eine Annahme",
   ];
   const parts = [
     { name: "Laufen", source: runCal ? "gemessen (Simulation)" : "gemessen + geschätzt", note: runCal ? "aus Simulation" : `Test 4×1 km gemessen, Ermüdung (+${Math.round(lv.fatigue)} s/km) und Tempoverlust geschätzt` },

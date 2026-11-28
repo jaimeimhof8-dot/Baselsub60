@@ -304,6 +304,8 @@ export function phaseStats(ph, { steps = null, maxHr = null } = {}) {
     // Kompromiss-Delta: Lauf direkt nach einer Station gegen den frischen Referenzlauf (ohne Station davor)
     const lapOf = (k) => { const i = ph.step.indexOf(k); return i >= 0 ? L[i] : null; };
     const ref = steps.map((s, k) => (s.kind === "run" && /Referenz/.test(s.name || "") ? paceOf(lapOf(k)) : null)).filter(Boolean)[0];
+    // Grund, falls kein Kompromiss-Delta: kein frischer Referenzlauf im Plan oder keine sicher zugeordneten Läufe nach einer Station
+    st.compromiseWhy = steps.some((s) => s.kind === "run" && /Referenz/.test(s.name || "")) ? (ref ? "keine sicher zugeordneten Läufe nach einer Station" : "Referenz-km nicht sicher zugeordnet") : "kein frischer Referenz-km im Plan";
     if (ref) {
       const ds = [];
       steps.forEach((s, k) => {

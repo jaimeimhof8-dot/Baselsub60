@@ -3,6 +3,7 @@
 import { seriesOf, hrZones, zoneTimes } from "./series.js";
 import { mmss } from "./util.js";
 import { DRIFT_WARN } from "./dash-v3.js";
+import { simSteps } from "./simsteps.js";
 
 /** Ab dieser Entkopplung Leistung zu Puls (%, erste zu zweiter Hälfte) gilt eine lockere Radeinheit als «Puls driftet». */
 export const DECOUPLE_WARN = 5;
@@ -16,6 +17,7 @@ export function sessionKind(plan, act) {
   const p = plan || {}, text = [p.t, ...(p.i || [])].join(" ");
   if (p.k === "kraft") return "strength";
   if (p.k === "bike" || (!p.k && act && act.group === "ride") || (act && act.group === "ride" && p.k !== "station")) return "bike";
+  if (p.k === "sim" && simSteps(p.i)) return "station"; // Simulation mit «Run N → Station»: Auswertung wie Stationstag
   if (p.k === "station") return /compromised\s*running\s*\d/i.test(text) && !/stationen unter zeitdruck/i.test(text) ? "compromise" : "station";
   if (p.k === "lauf") return /\d+\s*[×x]\s*\d+(?:[,.]\d+)?\s*(?:km|m|′|')/.test(text) ? "interval" : "easy"; // Wiederholungen im Plan = Intervall-Lauf, auch ohne Zieltempo
   if (!p.k && act && act.group === "run") return "easy";
@@ -131,7 +133,9 @@ export function anSessionModel({ kind, act, d = null, ivs = [], maxHr = null, zo
   }
 
   if (kind === "station") {
-    const plan = d && d.plan;
+    // Nur Stationen zählen (Plan gegen Ist enthält auch die Läufe; ohne Art-Angabe wie bisher alle Zeilen)
+    const plan0 = d && d.plan, sr = plan0 ? plan0.rows.filter((r) => !r.kind || r.kind === "station") : [];
+    const plan = plan0 && sr.length ? { ...plan0, rows: sr, n: sr.length, hit: sr.filter((r) => r.diff <= 0).length } : null;
     out.headline = plan ? { big: `${plan.hit} von ${plan.n}`, label: "Stationen im Ziel", status: plan.n - plan.hit ? { text: `${plan.n - plan.hit} verfehlt`, tone: "bad" } : { text: "alle im Ziel", tone: "ok" } } : { big: "–", label: "Runden passen nicht zum Plan", status: null };
     const tile = (k) => d && d.tiles && d.tiles.find((t) => t.k === k);
     out.numbers.push(plan ? num("Stationszeit", mmss(plan.rows.reduce((s, r) => s + r.t, 0)), "min") : na("Stationszeit", "Runden passen nicht zum Plan"));

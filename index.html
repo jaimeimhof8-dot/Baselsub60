@@ -14562,6 +14562,8 @@
         </button>
       </nav>
       <div id="acct"></div>
+      <!-- App-Version (gleich wie der Cache-Name in sw.js): zeigt, ob das Gerät die neueste Version ausführt -->
+      <p id="appv" style="margin:12px 16px;font-size:12px;color:var(--muted)">App-Version 141</p>
     </div>
     <div id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -23223,6 +23225,9 @@
           const id = dk + "|" + j;
           if (!arr.some((x) => x != null)) continue;
           if (onlyEmpty && String(S.val[id] || "").trim()) continue;
+          // Steht in der Zeile etwas anderes als Zeiten (z. B. «202 kg» von Hand), nie überschreiben: das ist ein Eintrag, keine Uhr-Zeit
+          const cur = String(S.val[id] || "").trim();
+          if (cur && !cur.split(" · ").every((x) => /^(\d{1,2}:\d\d|–)$/.test(x.trim()))) continue;
           // Hat die Uhr für einen Teil der Zeile keine sichere Zeit, bleibt der bisherige Wert dieses Teils (z. B. Handeintrag) stehen
           const old = String(S.val[id] || "").split(" · ").map((x) => x.trim());
           S.val[id] = arr.map((x, q) => (x != null ? mmss(x) : old[q] && old[q] !== "–" && arr.length === old.length ? old[q] : "–")).join(" · ");

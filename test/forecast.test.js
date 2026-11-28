@@ -55,7 +55,7 @@ test("Simulation ab 85 % eicht k und verengt die Spanne, eine mit 70 % nur die U
 });
 
 test("calibrateK braucht alle acht Benchmarks", () => {
-  assert.deepEqual(calibrateK([{ intensity: 0.9, stations: 1200 }], null), { k: null, floor: null, n: 0, perStation: null, run: null, rox: null });
+  assert.deepEqual(calibrateK([{ intensity: 0.9, stations: 1200 }], null), { k: null, cover: 0, floor: null, n: 0, partial: 0, perStation: null, run: null, rox: null });
   assert.equal(calibrateK([{ intensity: 0.9, stations: 1200 }, { intensity: 0.95, stations: 1000 }], 1500).k, (0.8 + 1000 / 1500) / 2);
 });
 
@@ -238,4 +238,75 @@ test("Simulation ohne Teilzeiten: unmögliche Summe eicht nicht (kein k = 0,2)",
 test("Simulation: «357» und «13» in Laufen/Roxzone werden wie überall gelesen (3:57 bzw. keine Zeit)", () => {
   assert.equal(parseTimeStrict("357"), 237);
   assert.ok(Number.isNaN(parseTimeStrict("13")));
+});
+
+// ---- Teil-Simulationen (Brick, Halb-Simulation): nur die gemessenen Stationen eichen ----
+const SOLO8 = JAIME.st.map((v, r) => harm(v, JIMOH.st[r]));
+// Brick-Simulation vom 28.11.2026: Sled Push 1:48, Sled Pull 4:04, Lunges 2:58, Wall Balls 3:26 (Handeingaben)
+const BRICK = ["", "1:48", "4:04", "", "", "", "2:58", "3:26"];
+
+test("Teil-Simulation: k = gemessene Stationen ÷ Solo-Mittel genau dieser Stationen, nur diese Stationen bekommen ein eigenes k", () => {
+  const f = buildForecast({ ...REAL, sims: [{ intensity: 0.9, parts: BRICK, ageDays: 0 }] });
+  const idx = [1, 2, 6, 7], kExp = (108 + 244 + 178 + 206) / idx.reduce((a, r) => a + SOLO8[r], 0);
+  assert.ok(f.calibrated);
+  const cov = idx.reduce((a, r) => a + SOLO8[r], 0) / SOLO; // halbe Stationszeit gemessen: k halb Messung, halb Annahme
+  assert.ok(Math.abs(f.k - (cov * kExp + (1 - cov) * K.mitte)) < 1e-9, `${f.k} gegen ${kExp}`);
+  assert.equal(f.perStation.filter((x) => x != null).length, 4);
+  assert.equal(f.perStation[0], null);
+  assert.ok(f.basis.some((b) => /nur einem Teil der Stationen/.test(b) && /4 von 8/.test(b)));
+  assert.ok(f.issues.length === 0);
+});
+
+test("Teil-Simulation: ungemessene Stationen behalten die Verteilung von St. Gallen und summieren auf Solo × k", () => {
+  const f = buildForecast({ ...REAL, sims: [{ intensity: 0.9, parts: BRICK, ageDays: 0 }] });
+  const free = [0, 3, 4, 5];
+  const got = free.reduce((a, r) => a + f.stations[r], 0), want = free.reduce((a, r) => a + SOLO8[r] * f.k, 0);
+  assert.ok(Math.abs(got - want) < 2, `${got} gegen ${want}`); // Grenzen können einzelne Werte leicht verschieben
+});
+
+test("Teil-Simulation zählt im Gesamt-k nur mit ihrem Anteil, eicht weder Laufen noch Roxzone", () => {
+  const full = SOLO8.map((v) => v * 1.0), part = SOLO8.map((v, r) => (r === 1 ? v * 0.8 : NaN));
+  const c = calibrateK([{ intensity: 0.9, parts: full, stations: SOLO, ageDays: 0, run: 2000, rox: 300 }, { intensity: 0.9, parts: part, stations: SOLO8[1] * 0.8, ageDays: 0, run: 1500, rox: 100 }], SOLO, SOLO8);
+  const cov = SOLO8[1] / SOLO;
+  assert.ok(Math.abs(c.k - (1 + 0.8 * cov) / (1 + cov)) < 1e-9);
+  assert.equal(c.partial, 1);
+  assert.equal(c.run, 2000);
+  assert.equal(c.rox, 300);
+});
+
+test("Teil-Simulation: leere Felder sind nicht gemessen, ein unmöglicher Wert verwirft sie, ganz leer zählt nicht", () => {
+  const empty = buildForecast({ ...REAL, sims: [{ intensity: 0.9, parts: ["", "", "", "", "", "", "", ""] }] });
+  assert.ok(!empty.calibrated && empty.issues.length === 0);
+  const bad = buildForecast({ ...REAL, sims: [{ intensity: 0.9, parts: ["", "13", "4:04", "", "", "", "", ""] }] });
+  assert.ok(!bad.calibrated);
+  assert.equal(bad.issues.length, 1);
+  assert.match(bad.issues[0].label, /Sled Push/);
+});
+
+test("Teil-Simulation unter 85 %: nur Untergrenze, schneller wird die Prognose dadurch nie", () => {
+  const base = buildForecast(REAL);
+  const slow = buildForecast({ ...REAL, sims: [{ intensity: 0.8, parts: BRICK, ageDays: 0 }] });
+  assert.ok(!slow.calibrated);
+  assert.ok(slow.total >= base.total - 1e-6);
+});
+
+test("Teil-Simulation eicht auch, wenn beim Partner Benchmarks fehlen (gemessene Stationen haben einen Solo-Wert)", () => {
+  const station = REAL.station.map((p, r) => (r >= 4 ? [p[0], ""] : p));
+  const f = buildForecast({ ...REAL, station, sims: [{ intensity: 0.9, parts: BRICK, ageDays: 0 }] });
+  assert.ok(f.calibrated);
+});
+
+test("Volle Simulation bleibt voll, auch wenn ein Benchmark fehlt: Laufen und Roxzone werden geeicht", () => {
+  const solo = SOLO8.map((v, r) => (r === 3 ? null : v));
+  const c = calibrateK([{ intensity: 0.9, parts: SOLO8.map((v) => v), stations: SOLO, run: 2000, rox: 300, ageDays: 0 }], null, solo);
+  assert.equal(c.partial, 0);
+  assert.equal(c.cover, 1);
+  assert.equal(c.run, 2000);
+});
+
+test("Eine einzelne gemessene Station macht die Prognose nicht sicher: k und Spanne bleiben nahe an der Annahme", () => {
+  const base = buildForecast(REAL);
+  const one = buildForecast({ ...REAL, sims: [{ intensity: 0.9, parts: ["", "", "", "", "", "", "", "4:40"], ageDays: 0 }] });
+  assert.ok(Math.abs(one.k - K.mitte) < 0.1, "k " + one.k);
+  assert.ok(one.hi - one.lo > (base.hi - base.lo) * 0.7, `Spanne ${one.hi - one.lo} gegen ${base.hi - base.lo}`);
 });

@@ -55,7 +55,7 @@ test("Simulation ab 85 % eicht k und verengt die Spanne, eine mit 70 % nur die U
 });
 
 test("calibrateK braucht alle acht Benchmarks", () => {
-  assert.deepEqual(calibrateK([{ intensity: 0.9, stations: 1200 }], null), { k: null, floor: null, n: 0, partial: 0, perStation: null, run: null, rox: null });
+  assert.deepEqual(calibrateK([{ intensity: 0.9, stations: 1200 }], null), { k: null, cover: 0, floor: null, n: 0, partial: 0, perStation: null, run: null, rox: null });
   assert.equal(calibrateK([{ intensity: 0.9, stations: 1200 }, { intensity: 0.95, stations: 1000 }], 1500).k, (0.8 + 1000 / 1500) / 2);
 });
 
@@ -249,7 +249,8 @@ test("Teil-Simulation: k = gemessene Stationen ÷ Solo-Mittel genau dieser Stati
   const f = buildForecast({ ...REAL, sims: [{ intensity: 0.9, parts: BRICK, ageDays: 0 }] });
   const idx = [1, 2, 6, 7], kExp = (108 + 244 + 178 + 206) / idx.reduce((a, r) => a + SOLO8[r], 0);
   assert.ok(f.calibrated);
-  assert.ok(Math.abs(f.k - kExp) < 1e-9, `${f.k} gegen ${kExp}`);
+  const cov = idx.reduce((a, r) => a + SOLO8[r], 0) / SOLO; // halbe Stationszeit gemessen: k halb Messung, halb Annahme
+  assert.ok(Math.abs(f.k - (cov * kExp + (1 - cov) * K.mitte)) < 1e-9, `${f.k} gegen ${kExp}`);
   assert.equal(f.perStation.filter((x) => x != null).length, 4);
   assert.equal(f.perStation[0], null);
   assert.ok(f.basis.some((b) => /nur einem Teil der Stationen/.test(b) && /4 von 8/.test(b)));
@@ -293,4 +294,19 @@ test("Teil-Simulation eicht auch, wenn beim Partner Benchmarks fehlen (gemessene
   const station = REAL.station.map((p, r) => (r >= 4 ? [p[0], ""] : p));
   const f = buildForecast({ ...REAL, station, sims: [{ intensity: 0.9, parts: BRICK, ageDays: 0 }] });
   assert.ok(f.calibrated);
+});
+
+test("Volle Simulation bleibt voll, auch wenn ein Benchmark fehlt: Laufen und Roxzone werden geeicht", () => {
+  const solo = SOLO8.map((v, r) => (r === 3 ? null : v));
+  const c = calibrateK([{ intensity: 0.9, parts: SOLO8.map((v) => v), stations: SOLO, run: 2000, rox: 300, ageDays: 0 }], null, solo);
+  assert.equal(c.partial, 0);
+  assert.equal(c.cover, 1);
+  assert.equal(c.run, 2000);
+});
+
+test("Eine einzelne gemessene Station macht die Prognose nicht sicher: k und Spanne bleiben nahe an der Annahme", () => {
+  const base = buildForecast(REAL);
+  const one = buildForecast({ ...REAL, sims: [{ intensity: 0.9, parts: ["", "", "", "", "", "", "", "4:40"], ageDays: 0 }] });
+  assert.ok(Math.abs(one.k - K.mitte) < 0.1, "k " + one.k);
+  assert.ok(one.hi - one.lo > (base.hi - base.lo) * 0.7, `Spanne ${one.hi - one.lo} gegen ${base.hi - base.lo}`);
 });

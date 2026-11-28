@@ -118,16 +118,17 @@ const recency = (s) => (ok(s.ageDays) ? Math.pow(0.5, s.ageDays / HALF_LIFE_DAYS
  * @returns {{k: number|null, floor: number|null, n: number, partial: number, perStation: (number|null)[]|null, run: number|null, rox: number|null}}
  */
 export function calibrateK(sims, benchSum, solo = null) {
-  const none = { k: null, floor: null, n: 0, partial: 0, perStation: null, run: null, rox: null };
+  const none = { k: null, cover: 0, floor: null, n: 0, partial: 0, perStation: null, run: null, rox: null };
   const soloOk = Array.isArray(solo) && solo.length === 8;
   const soloAll = soloOk ? sum(solo.filter(ok)) : 0;
   // k einer Simulation und ihr Anteil an der Solo-Summe (1 = alle 8 Stationen)
   const kOf = (s) => {
     if (soloOk && Array.isArray(s.parts) && s.parts.length === 8) {
       const idx = s.parts.map((v, r) => (ok(v) && ok(solo[r]) ? r : -1)).filter((r) => r >= 0);
+      const measured = s.parts.filter(ok).length; // Teil-Simulation = weniger als 8 Stationen gemessen (nicht: Benchmark fehlt)
       if (idx.length && (idx.length < 8 || !ok(benchSum))) {
         const so = sum(idx.map((r) => solo[r]));
-        return { k: sum(idx.map((r) => s.parts[r])) / so, cov: so / soloAll, part: idx.length < 8 };
+        return { k: sum(idx.map((r) => s.parts[r])) / so, cov: measured < 8 ? so / soloAll : 1, part: measured < 8 };
       }
     }
     return ok(s.stations) && ok(benchSum) ? { k: s.stations / benchSum, cov: 1, part: false } : null;
@@ -156,7 +157,9 @@ export function calibrateK(sims, benchSum, solo = null) {
   }
   // Laufen und Roxzone nur aus ganzen Simulationen (8 km, alle Wege)
   const pick = (f) => weighted(strong.filter((s) => !s.part && ok(s[f])).map((s) => ({ v: s[f], w: s.w })));
-  return { k, floor: weak.length ? Math.max(...weak) : null, n: obs.length, partial: obs.filter((s) => s.part).length, perStation, run: pick("run"), rox: pick("rox") };
+  // Abdeckung (0–1): wie viel der Stationszeit gemessen ist. Unter 1 mischt buildForecast k und Spanne mit der Annahme.
+  const cover = Math.min(1, sum(strong.map((s) => s.cov)));
+  return { k, cover, floor: weak.length ? Math.max(...weak) : null, n: obs.length, partial: obs.filter((s) => s.part).length, perStation, run: pick("run"), rox: pick("rox") };
 }
 
 /**
@@ -246,7 +249,8 @@ export function buildForecast({ lauf = [], laufPersons = null, station = [], bas
   const cal = calibrateK(simsOk, benchSum, solo);
 
   let k = KS.mitte, kLo = KS.gut, kHi = KS.vorsichtig;
-  if (cal.k != null) { k = cal.k; kLo = k * 0.97; kHi = k * 1.03; }
+  // Gemessen: ±3 %. Teil-Simulation: zwischen Messung und Annahme nach Abdeckung (eine einzelne Station macht die Prognose nicht sicher)
+  if (cal.k != null) { const c = cal.cover; k = c * cal.k + (1 - c) * k; kLo = c * cal.k * 0.97 + (1 - c) * kLo; kHi = c * cal.k * 1.03 + (1 - c) * kHi; }
   if (cal.floor != null) { k = Math.max(k, cal.floor); kLo = Math.max(kLo, cal.floor); kHi = Math.max(kHi, k); }
   const kr = cal.perStation && cal.k != null && cal.floor == null ? cal.perStation : null; // je Station nur ohne widersprechende Untergrenze
 

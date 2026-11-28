@@ -316,3 +316,13 @@ test("trimSeries: nur die 6 neuesten behalten die volle Auflösung", () => {
   assert.equal(store.g4.series.n, 3000);
   assert.ok(store.g3.series.n <= 600, "7. neueste und älter: verdichtet");
 });
+
+test("normalizeLaps: Gesamtdauer inkl. Stopp (e) und Startzeit (s) für die Diagnose, nur wenn vorhanden", async () => {
+  const { normalizeLaps: nl } = await import("../supabase/functions/garmin/reduce.js");
+  const out = nl({ lapDTOs: [
+    { distance: 0, duration: 120, elapsedDuration: 185, averageHR: 150, startTimeGMT: "2026-11-20 17:02:03.0" },
+    { distance: 1000, duration: 245, elapsedDuration: 245, averageHR: 168 },
+  ] });
+  assert.deepEqual(out[0], { d: 0, t: 120, hr: 150, w: null, e: 185, s: "2026-11-20T17:02:03" });
+  assert.deepEqual(out[1], { d: 1000, t: 245, hr: 168, w: null });
+});

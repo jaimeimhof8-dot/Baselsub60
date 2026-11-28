@@ -180,7 +180,13 @@ async function sync(ctx: { tok: Tok; dirty: boolean }, from: string, to: string,
     await Promise.all(todo.slice(i, i + 5).map(async (a) => {
       const id = String(a.id).slice(1);
       if (!have.has(a.id as string)) {
-        try { const r = await api(ctx, `/activity-service/activity/${id}/splits`); a.laps = normalizeLaps(r); a.lapsV = 3; }
+        try {
+          const r = await api(ctx, `/activity-service/activity/${id}/splits`);
+          // Leere Antwort (404/204) kurz nach dem Hochladen heisst oft «noch nicht bereit»: dann nicht als «geholt» markieren,
+          // damit der nächste Abruf es nochmals versucht. Nach 2 Tagen gilt leer als «Uhr hat keine Runden».
+          const young = Date.now() - Date.parse(String(a.start || a.date)) < 2 * DAY;
+          if (r != null || !young) { a.laps = normalizeLaps(r); a.lapsV = 3; }
+        }
         catch (e) { if ((e as { code?: string }).code === "relogin") throw e; }
       }
       if (!needS(a)) return;

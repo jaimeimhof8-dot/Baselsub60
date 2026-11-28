@@ -1,0 +1,208 @@
+# Plan: Rundenübernahme Compromised Running (v3)
+
+Stand 28.11.2026. Nur Analyse und Plan, kein Produktivcode geändert. Baut auf `PLAN_RUNDENUEBERNAHME_V2.md` auf.
+
+## 1. Befund: Warum «nicht zuordenbar»?
+
+Der Abruf ist nicht das Problem. Die Runden kommen über `/activity-service/activity/{id}/splits` an. Es scheitert an der Zuordnung.
+
+### Ursache A (Hauptursache, nachgestellt): Eine einzige Unregelmässigkeit macht den ganzen Rest «unsicher»
+
+`src/align.js:103–118`: Sobald vor einem Schritt irgendetwas nicht 1:1 passt, wird `rigid = false`. Danach wird für **keinen** weiteren Schritt die Eindeutigkeit geprüft (`alt = null`), und alle folgenden Schritte sind «nicht sicher». Als Unregelmässigkeit zählt schon:
+- eine zusätzliche Runde ab 20 s (Übergang, doppelt gedrückt),
+- ein vergessener Druck (zwei Schritte in einer Runde) oder ein Schritt ganz ohne Runde,
+- ein einziger Schritt, der selbst als unsicher gilt.
+
+Eine Abweichung vom Planziel über 13 % (`anomaly`, Zeile 97) setzt `rigid` nicht. Sie verschärft aber die Prüfung (`distinct`): Der Schritt muss sich dann klar von seinen Nachbarschritten abheben.
+
+Nachgestellt mit `src/align.js` (Plan: 4 × SkiErg 500 m (Ziel 1:55) → 1 km (4:05) → 120 s Pause; ✓ = sicher, ? = unsicher, – = Pause):
+
+| Fall | Ergebnis heute |
+|---|---|
+| 12 Runden, genau wie geplant | alles übernommen (`alignSplits` «direct») |
+| Läufe 5:00 statt 4:05, Ski 2:30 statt 1:55 | alles übernommen (Rundenzahl stimmt, es wird gar nicht geprüft) |
+| **+1 Übergangsrunde 25 s nach Runde 1** | `✓✓-??-??-??-`, Güte 0,25 |
+| 1 Druck vergessen in Runde 2 | `✓?-??-??-??-`, Güte 0,13 |
+| Pausen nicht gelappt + 1 Übergang | `✓?-??-??-??-`, Güte 0,13 |
+| Absturz nach 7 Runden | `✓✓-✓✓-??-??-`, Güte 0,80 |
+
+Fazit: Die Regel ist widersprüchlich. Stimmt die Rundenzahl genau, wird **blind** übernommen, auch bei 30 % Abweichung. Ist eine harmlose 25-s-Runde zu viel, wird ab dort **nichts** mehr übernommen. Bei 8 Runden (24 Schritten) ist eine solche Kleinigkeit fast sicher, darum scheitert es gerade bei langen Einheiten.
+
+### Ursache B (strukturell): Station und Pause sind für den Algorithmus gleich
+
+Die Kosten nutzen nur **Dauer** und **Distanz ≥ 300 m** (Zeilen 27–29). SkiErg 1:55 und Pause 2:00 sind nach Dauer gleich, und beide haben keine Strecke. Ohne einen weiteren Hinweis lässt sich eine Verschiebung um eine Runde nicht ausschliessen. **Der Puls wird nicht genutzt**, obwohl jede Runde ihn mitbringt (`hr`). In der Pause fällt er deutlich, auf der Station steigt er.
+
+Experiment in einer Kopie (nicht im Repo): Ohne die `rigid`-Sperre steigt die Güte im Übergangsfall von 0,25 auf 0,50. Dafür **schlägt der Zufallstest fehl** (`test/align.test.js` #8, eine falsche Runde wird als «sicher» gemeldet). Die Sperre einfach zu lockern ist also falsch. Es fehlt ein zusätzliches Signal.
+
+### Ursache C (wahrscheinlich, je nach Plantext): Manche Compromised-Running-Tage haben gar keine Schritte
+
+`s7Steps` (`index.html:22854`) erzeugt Schritte nur aus Zeilen im Format `Runde N: Station (Ziel m:ss) → 1 km @ m:ss/km (m:ss), X Pause`. Zeilen wie **«Compromised Running 2×10′ Zone 3, 2′ Pause»** (`src/plan-data.js`, `src/plan-later.js`) ergeben `null`. Auch `parseReps` versteht nur Distanzen (`4×1 km`), keine Minuten. An solchen Tagen gibt es keinen Weg, der Runden zuordnet.
+
+### Ursache D (Diagnose blind): Der Knopf zeigt den Grund nicht
+
+`diagText` (`index.html:15328`) gibt die Ergebnisse von `alignSplits` und `alignFuzzy` aus (beide bei Abweichungen `null`) und dazu `watchCheck`. Das Ergebnis von `alignLaps` selbst fehlt: `sure` je Schritt, `quality`, `cost` und der **Grund**. Deshalb sagt die Diagnose nur «nicht zuordenbar».
+
+### Nebenbefund (Abruf)
+
+Antwortet Garmin auf `/splits` mit 404 oder leer, setzt `index.ts:183` trotzdem `lapsV = 3` mit `laps = []`. Die Einheit wird nie wieder abgefragt.
+
+## 2. Lösungsansatz (Reihenfolge nach Nutzen/Aufwand)
+
+1. **Diagnose ehrlich machen (klein, zuerst).** `alignLaps` vollständig in die Diagnose aufnehmen, dazu ein Grund je unsicherem Schritt (`"nach Zusatzrunde 4 (25 s)"`, `"Station/Pause nach Zeit nicht unterscheidbar"`). Die Rohfelder der Garmin-Runden (Feldnamen, ohne Werte) mitschicken, damit Punkt 5 prüfbar wird. In der App-Meldung den Grund in einem Satz anzeigen statt nur «nicht zuordnen».
+2. **Übergangsrunden vor der Zuordnung bereinigen.** Runden < 45 s ohne Strecke (< 100 m), deren Dauer zu keinem Planschritt passt (kein Schritt mit Ziel < 60 s), als «Übergang» markieren und an die Nachbarrunde hängen. Sie zählen dann nicht mehr als Unregelmässigkeit. Damit fällt der häufigste Fall weg. Risiko (Prüfer): Echte kurze Runden könnten verschluckt werden, und die Zeit des Nachbarn wird länger. Deshalb die Übergangszeit getrennt ausweisen (`trans`) und nicht in die Schrittzeit rechnen.
+3. **Puls als drittes Signal.** Typ-Kosten aus dem Pulsverlauf: Eine Pausenrunde hat einen deutlich tieferen Ø-Puls als die Arbeitsrunde davor (z. B. ≥ 8 Schläge oder ≥ 5 %). Damit lassen sich Station und Pause unterscheiden, und eine Verschiebung um eine Runde wird teuer. Fehlt der Puls, gilt das bisherige Verhalten.
+4. **`rigid` ersetzen durch eine gezielte Verschiebungsprüfung.** Statt «nach der ersten Unregelmässigkeit nichts mehr» für jeden Schritt rechnen: beste Lösung, wenn dieser Schritt um ±1 Runde bzw. ±1 Planperiode verschoben ist. Sicher nur, wenn der Abstand ≥ `MARGIN` ist. Erst mit Punkt 3 einschalten, denn ohne Puls fällt der Zufallstest (siehe Experiment).
+5. **Langfristig der robusteste Weg: Workout auf die Uhr schicken.** `push-workout` gibt es schon für Lauftage (`src/garmin-workout.js`). Für Compromised-Running-Tage ein strukturiertes Workout mit «Schritt endet per Lap-Taste» schicken. Dann führt die Uhr durch die Schritte, die Rundenzahl entspricht der Schrittzahl, und `alignSplits` «direct» greift. Möglicherweise liefert Garmin dazu je Runde den Workout-Schritt (`wktStepIndex`/`intensityType` in `lapDTOs`). **Nicht geprüft**, Punkt 1 klärt es mit echten Daten. Falls ja: Zuordnung über den Index, ohne jede Schätzung.
+6. **Minuten-Intervalle verstehen (Ursache C).** Parser für `N×M′ …, P′ Pause` → Schritte Lauf (Ziel M·60 s) und Pause. Danach läuft dieselbe Zuordnung.
+7. **Blinde Übernahme bei gleicher Rundenzahl absichern.** Auch bei «direct» Typ und Puls prüfen. Weicht etwas grob ab (z. B. Laufrunde ohne Strecke bei GPS-Profil), die Vorschau anzeigen statt still einzutragen.
+8. **Nebenbefund beheben:** `lapsV = 3` nur setzen, wenn Garmin wirklich geantwortet hat. «Noch nicht verfügbar» (404/204 kurz nach dem Hochladen) von «Aktivität hat keine Runden» trennen, z. B. mit Wiederholung bis 48 h nach dem Start.
+
+## 3. Sessions (Aufpasser schreibt keinen Produktivcode, Macher schreibt nicht seine eigene Abnahme)
+
+- **S0 Aufpasser:** Spec-Ergänzung `docs/laps-v3-spec.md` mit Abnahmetabelle (Fälle unten). **Stopp: Jaime bestätigt.**
+- **S1 Macher:** Punkt 1 (Diagnose) + 8 bauen. Jaime liefert 2–3 echte Diagnosen von Compromised-Running-Tagen → Fixtures `test/fixtures/laps-cr-*.json`.
+- **S2 Macher:** Punkte 2, 3, 4 in `src/align.js`. Bestehende Tests bleiben unverändert grün, und der Zufallstest bekommt Puls-Varianten dazu.
+- **S3 Aufpasser blind:** Fuzz-Review, mindestens 20 000 Läufe. Keine falsche «sichere» Zuordnung. Danach Abdeckung messen.
+- **S4 Macher:** Punkte 6 und 7, danach Punkt 5, sofern S1 zeigt, dass Garmin den Schritt-Index liefert.
+- **S5 Aufpasser:** Endabnahme mit echten Fixtures, Screenshot der Vorschau, dann PR.
+
+## 4. Abnahmefälle (zusätzlich zu v2)
+
+| # | Fall | Erwartung |
+|---|---|---|
+| 15 | +1 Übergangsrunde 25 s | alle Schritte sicher |
+| 16 | +3 Übergangsrunden verteilt (8 Runden) | alle sicher |
+| 17 | 1 Druck vergessen in Runde 2, Puls vorhanden | Runde 2 unsicher, **Runden 3–8 sicher** |
+| 18 | wie 17, ohne Puls | Runde 2 unsicher, danach höchstens «unsicher», nie falsch |
+| 19 | Station 1:55 und Pause 2:00, Puls fällt in der Pause | keine Verwechslung |
+| 20 | «Compromised Running 2×10′, 2′ Pause» | 2 Läufe zugeordnet |
+| 21 | gleiche Rundenzahl, aber Runden vertauscht (Lauf ohne Strecke) | Vorschau statt stiller Übernahme |
+| 22 | Garmin `/splits` 404 | beim nächsten Sync neu gefragt |
+
+Ziel: Güte ≥ 0,9 bei den Fällen 15–17. 0 falsche «sichere» Zuordnungen im Fuzz-Test.
+
+## 5. Annahmen und offene Fragen
+
+1. Deine Compromised-Running-Tage folgen dem Format `Runde N: … → 1 km …` (Ursache A/B). Bei `2×10′` greift Ursache C. **Welches Format haben deine betroffenen Tage?**
+2. Du drückst bei jedem Wechsel die Lap-Taste, auch vor der Pause.
+3. Der Puls ist in den Runden vorhanden (Brustgurt oder Handgelenk). Ohne Puls bringen Punkt 3 und 4 wenig.
+4. Ob Garmin in `lapDTOs` den Workout-Schritt mitliefert, ist ungeprüft.
+
+## 6. Umgesetzt (28.11.2026)
+
+Jaime: Format A («Runde N: SkiErg … → 1 km …, Pause»), Pulsgurt vorhanden. Umgesetzt: Punkte 1, 2, 3, 4, 7, 8. Nicht umgesetzt: 5 (Workout auf die Uhr), 6 (Minuten-Intervalle).
+
+**`src/align.js` (alignLaps)**
+- Übergangsrunden: kurz (< 35 % des kürzesten Planschritts, max. 45 s), ohne Strecke → stören die Verankerung nicht mehr.
+- Puls als Typ-Signal (nur wenn ≥ 80 % der Runden Puls haben und er ≥ 10 Schläge schwankt): Pause = Pulsabfall gegenüber der Runde davor, Arbeit = kein Pulstal. Dazu: Pause mit Arbeitspuls (über 12 Schläge über den Pausen in der Nähe) ist nie sicher.
+- Neue Operation «eine Runde für zwei Schritte» (vergessener Druck), nur wenn die Runde zur Summe der Ziele deutlich besser passt als zu jedem einzelnen.
+- `rigid` ersetzt: sicher ist ein Schritt, wenn er vom **Start** oder vom **Ende** her lückenlos verankert ist (Ende nur bei vollständiger Aufzeichnung), und der nächste Schritt in Richtung Störung auch sauber passt. Zwischen zwei Störungen ist nie etwas sicher.
+- Abweichung vom Ziel relativ zum Tagesniveau (Median der gleichen Schrittart ohne den Schritt selbst): ein langsamer Tag ist keine Störung.
+- Station mit Strecke ist plausibel, wenn der Plan die Strecke vorsieht («SkiErg 500 m»).
+- Neu im Ergebnis: `why` (Grund je unsicherem Schritt), `span`, `pair`, `hrUsed`.
+
+**`src/laps.js`**
+- `alignSplits` (gleiche Rundenzahl) trägt nicht mehr blind ein: `layoutOk` (Strecke, Puls, Dauer bis Faktor 1,65) und Bestätigung durch alignLaps für jeden Schritt mit Ziel. Behebt u. a. «Absturz nach 16 von 24 Runden» = scheinbar «Pausen nicht gelappt» (vorher still falsche Zeiten).
+- `watchCheck` liefert `reason` (erster Grund in Klartext).
+
+**`index.html`**: Prüfliste und Meldung nennen den Grund. «Diagnose kopieren» (v2) enthält das volle alignLaps-Ergebnis je Schritt.
+
+**`supabase/functions/garmin/index.ts`**: Leere `/splits`-Antwort in den ersten 2 Tagen nach der Einheit → beim nächsten Abruf nochmals versuchen. **Wirkt erst nach Neu-Deployen der Edge Function.**
+
+**Nacharbeit nach Prüfer-Review 1 («nicht freigegeben»: Rückschritt bei sauberen Einheiten mit kurzen Pausen)**
+- Grenze «harmlose Kurzrunde» ohne festes 20-s-Minimum (15-s-Pausen sind Pausen, keine Störung). Überzählige Runde nur billig, wenn harmlos.
+- Zusammenfassen zweier echter Runden kostet mehr (0,5 extra).
+- Letzte Runde < 15 s wird nur abgeschnitten, wenn sie auch für den letzten Planschritt zu kurz ist (geplante 15-s-Schlusspause bleibt).
+- Pausen-Puls als Beleg erst ab 45 s Planpause. Mit Puls dürfen Pausen bis Faktor 1,65 vom Ziel abweichen (man erholt sich nach Bedarf).
+- Arbeitsschritt mit Pausenpuls (über 20 Schläge unter gleichartigen Schritten in der Nähe) ist nie sicher.
+- Verankerung vom Ende verlangt den doppelten Mindestabstand (ein Absturz plus Zusatzrunden kann wie ein vollständiges Ende aussehen).
+- Ergometer-Strecke: Haben die anderen Stationen mit derselben Planstrecke Meter, muss die Runde auch welche haben.
+- Feste Zuordnung (gleiche Rundenzahl): Bestätigung nur noch für Arbeitsschritte verlangt, bei Pausen genügt dieselbe Runde.
+
+**Nacharbeit nach Prüfer-Review 2 («nicht freigegeben»: Pausenzeiten zu oft falsch als sicher, 38 Fälle)**
+- Pausen: Die Kette darf eine nach Bedarf längere Pause überspannen (Puls belegt sie), die **Pausenzeit eingetragen** wird aber nur bei ≤ 20 % Abweichung und nur bei geplanten Pausen ≥ 45 s. Kürzere Pausen sind von einem Übergang oder zu spät gedrückten Lap nicht zu unterscheiden und bleiben leer.
+- Gleiches in der festen Zuordnung: Pausenzeiten nur, wenn alignLaps sie als sicher meldet.
+- Ergebnis mit den Skripten des Prüfers: `sim2.mjs` (19 200 Einheiten) falsch «sicher» 38 → 2 (beide «fehlt + Trink-Runde», die Trink-Runde stand dort, wo die Pausenrunde fehlte), `sim.mjs` (14 400 Einheiten) 11 → 0. Falsch eingetragene Zeiten über die feste Zuordnung: 0.
+- Preis: Pausenzeiten unter 45 s und Pausen mit über 20 % Abweichung bleiben leer (auch auf sauberen Einheiten). Arbeitsschritte sind davon nicht betroffen.
+- Prüfer-Review 3: **freigegeben**.
+
+**Messung saubere Einheiten** (8 × SkiErg 500 m → 1 km → Pause, Streuung ±7 % Arbeit / ±15 % Pause, je 100 Einheiten; Anteil Arbeitsschritte, die in der App übernommen werden; alt = 100 %, weil gleiche Rundenzahl blind übernommen wurde):
+
+| Pause | 15 s | 30 s | 60 s | 90 s | 120 s | 180 s |
+|---|---|---|---|---|---|---|
+| mit Puls | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % |
+| ohne Puls | 85 % | 91 % | 97 % | 40 % | 35 % | 82 % |
+
+Ohne Puls bei 90–120-s-Pausen bleibt es schwach: SkiErg 1:55 und Pause 2:00 sind nur über die Zeit nicht trennbar, sobald eine Runde deutlich abweicht. Mit Pulsgurt kein Thema.
+
+**Messung gestörte Einheiten** (36 000 Zufallseinheiten, 6 Plan-Layouts, Puls ±3/±8/ohne, 1–3 Störungen je Einheit aus vergessen, doppelt, Zusatz, Übergang, Trinken, Abbruch, fehlt (höchstens einmal)):
+
+| | alt | neu |
+|---|---|---|
+| in der App übernommene Arbeitsschritte | 32,2 % | 33,3 % |
+| still falsch eingetragen (gleiche Rundenzahl, blind übernommen) | 38 386 | 1 |
+| falsch als «sicher» (vorsichtige Zuordnung) | 18 | 15 |
+
+Prüfkriterium dieser Messung (wie `test/align.test.js`): Eine Runde ist richtig, wenn ≥ 75 % ihrer *Schritt*-Zeit vom zugeordneten Schritt stammt. Zeit ohne Schritt (Übergang, Trinken) zählt nicht als fremd. Eine reine Zusatzrunde gilt als richtige Pause, wenn die echte Pausenrunde fehlt. «fehlt» höchstens einmal je Einheit. Mit dem Kriterium des Prüfers (Fremdanteil an der ganzen Rundenzeit) ergibt sich dasselbe Bild (2 Fälle in `sim2.mjs`). Die verbleibenden Fälle enthalten «fehlt» (Runde samt Zeit weg), meist mit einer Trink-Runde genau so lang wie der fehlende Schritt.
+
+Jaimes Szenarien (8 Runden, mit Puls): +1 oder +4 Übergangsrunden 25–30 s → 100 %. Vergessener Druck Ski+Lauf in Runde 2 → 88 % (Maximum). Lauf+Pause → 75 %. Zusatzrunde 70 s (Trinken) → 88 %. Absturz nach 16 von 24 Runden → alle vorhandenen Arbeitsschritte bis auf den letzten sicher. Übergangsrunden über 35 % des kürzesten Planschritts (bei 60-s-Pausen: über 21 s) gelten nicht mehr als harmlos, ebenso Übergänge mit ≥ 100 m (Gehen). Dann sinkt die Abdeckung (Prüfer: 77 % bzw. 32 % bei 60-s-Pausen).
+
+**Bekannte Grenzen** (kein Verfahren kann das aus Zeit, Strecke und Puls erkennen):
+- Eine ganze Runde ausgelassen bei lauter gleichen Intervallen: welche, ist offen.
+- Uhr zu spät gestartet (erste Runde fehlt ganz): der Start gilt als fest, ohne Puls wird verschoben zugeordnet.
+- Eine Trink-Runde, die genau wie ein fehlender Schritt aussieht.
+- Ein Lap-Druck zur falschen Zeit (Runde enthält Teile zweier Schritte).
+- Edge Function: Solange eine junge Einheit (< 2 Tage) leere Runden liefert, belegt sie bei jedem Abruf einen der 15 Plätze und der Client rechnet ab Planstart neu. Wirkt erst nach Neu-Deployen.
+
+Tests: 515 grün (`npm test`), davon 18 neue Zufallstests (Puls ±3, ±8, ohne; je 300 Einheiten) sowie Szenarien für Format A. Laufzeit laut Prüfer: 24 Schritte × 40 Runden ≤ 30 ms.
+
+
+## 7. Fall A: So drückt Jaime Lap (28.11.2026, aus dem Nebenchat)
+
+Einlaufen → Lap → Lauf (Laufband) → Lap → Station **inkl. Roxzone** → Lap → Lauf → Lap → Pause → Lap … Jeder Plan-Schritt hat eine eigene Runde, es gibt keine eigenen Roxzone-Runden. Nach dem Einlaufen gibt es manchmal eine Runde, die nicht im Plan steht: ein Stopp mit Neustart (kurze Runde) oder Warten ohne Stopp (Pausenrunde), unterschiedlich lang.
+
+**Umgesetzt**
+1. **Wartepause nach dem Einlaufen** (`waitLike`): höchstens 2 Runden direkt nach dem Einlaufen, ohne Strecke, ≤ 5 Min, Puls ≥ 10 Schläge unter dem Einlaufen oder < 30 s (Neustart). Kostet fast nichts, bricht die Verankerung nicht. Nur ohne Pause an zweiter Stelle nach dem Einlaufen (`waitPlan`): Bei «Einlaufen → Lauf → Pause» wäre eine Wartepause nicht von der ersten Pause nach einem ausgelassenen Lauf zu unterscheiden (im Zufallstest 7 Fehlzuordnungen, mit der Einschränkung 0).
+2. **Roxzone in der Stationsrunde**: zweiter Durchgang mit Zielen nach Tagesniveau (Median Ist/Ziel je Schrittart, Stationen bis Faktor 2, sonst 1,65). Ein Beispiel: 1:55 Station + 60 s Roxzone ergibt etwa Station × 1,53. Zusätzlich passt sich die Schwelle «Abweichung = Störung» an die Streuung der Schrittart an (mit Puls mindestens 0,2). Mit Puls genügt ein Nachbarabstand von 0,15.
+3. **Laufband ohne Strecke** (`runDistEvidence`): Strecke ist nur ein Typ-Beleg, wenn die Läufe selbst Strecke liefern (Runden mit ≥ 60 % der geplanten Laufstrecke, mindestens halb so viele wie Laufschritte). Ein Einlaufen draussen mit GPS oder ein Ergometer mit 500 m täuschen das nicht mehr vor.
+4. **Stoppzeit**: noch offen. Der Abruf speichert neu je Runde `e` (Gesamtdauer inkl. Stopp, nur wenn anders als `t`) und `s` (Startzeit UTC). «Diagnose kopieren» (v3) zeigt das, dazu `level` und `wait`. **Wirkt erst nach Neu-Deployen der Edge Function** und für neu geladene Einheiten.
+
+**Messung Fall A** (Einlaufen + 8 × [SkiErg 500 m inkl. Roxzone → 1 km → Pause 90 s], mit Puls, App-Ergebnis = übernommene Arbeitsschritte):
+
+| Fall | Roxzone 40 s | 60 s | 90 s |
+|---|---|---|---|
+| sauber, Laufband 0 m | 17/17 | 17/17 | 17/17 |
+| + Wartepause 95 s | 17/17 | 17/17 | 17/17 |
+| + Stopp-Runde 9 s | 17/17 | 17/17 | 17/17 |
+| + Stopp 24 s und Wartepause 70 s | 17/17 | 17/17 | 17/17 |
+| + vergessener Druck Station+Lauf | 15/17 | 15/17 | 8/17 |
+
+Einlaufen draussen 2 km, Laufband 0 m, Ergometer 500 m: wie Roxzone 60 s. 15-s-Pausen: 17/17. Ohne Puls (Roxzone 60 s): 17/17 sauber.
+
+Grenze: Bei 90 s Roxzone, Laufband ohne Strecke **und** vergessenem Druck liegen Station (≈ 205 s) und Lauf (≈ 245 s) zu nahe beieinander. Der Rest geht in die Vorschau zum Bestätigen.
+
+**Sicherheit nach Fall A**: 36 000 Zufallseinheiten 15 falsch «sicher» (wie vor Fall A, alle mit «fehlt»), 1 still falsch eingetragen. In der App übernommen 34,7 % (vorher 33,3 %). Prüfer-Skripte `sim.mjs` / `sim2.mjs`: 0 / 1 falsch «sicher», 0 / 0 falsch eingetragen. Saubere Einheiten ohne Puls wurden besser (90-s-Pausen 40 → 67 %, 120 s 35 → 81 %), mit Puls weiterhin 100 %.
+
+Tests: 519 grün, neu u. a. «Fall A sauber» (180 Einheiten, alle Arbeitsschritte sicher), «Fall A gestört» (600 Einheiten, nie sicher auf fremder Runde), Strecken-Beleg, Diagnose-Felder.
+
+
+## 8. Nacharbeit nach Prüfer-Review 4 («nicht freigegeben»: zweiter Durchgang bestätigt falsche Zuordnung selbst)
+
+- Tagesniveau nur aus Schritten, die im ersten Durchgang sicher sind. Im zweiten Durchgang ist nur sicher, was im ersten sicher war oder in beiden dieselbe Runde bekommt.
+- Schon der erste Durchgang rechnet relativ zum Tagesniveau (Stationen bis Faktor 2), auch der Nachbarvergleich. So ist er bei Roxzone selbst sicher.
+- Ergometer-Meter als eigener Typ-Beleg, auch ohne Laufstrecke (Laufband).
+- Widerspricht der Puls irgendwo dem Schritttyp, gilt das Ende nicht als Anker (Absturz an einer Rundengrenze plus Wartepausen).
+- Zweite Wartepause wird mit dem Einlaufen verglichen. Stopp-Runde (< 30 s) als Wartepause nur mit Puls.
+
+Stand: 519 Tests grün. Fall A mit Puls: im Prüfer-Skript `fallA2.mjs` 0 Fehlzuordnungen (vorher 32), Gegenbeispiel mit Puls (`dumpA`) meldet nichts mehr als sicher. 36 000 Zufallseinheiten: 15 falsch «sicher» (alle «fehlt»), 1 still falsch eingetragen.
+
+**Offen, ohne Puls:** In Fall A ohne Puls bleiben im Prüfer-Skript 35 Arbeitsschritte und 7 eingetragene Zeiten falsch, fast alle «erste Station fehlt ganz, eine Warte-Runde gleicher Länge steht an ihrer Stelle». Ohne Puls ist das nicht erkennbar. Mit Pulsgurt tritt es nicht auf. Dieser letzte Stand ist vom Prüfer-Agenten nicht mehr nachgeprüft (auf Jaimes Wunsch abgeschlossen).
+
+## 9. Simulationstage («Brick-Simulation», 28.11.2026)
+
+- Neu `src/simsteps.js`: liest «Run N: 1 km @ 4:05/km (4:05) → Station … (Ziel m:ss, …)», auch in der ab Plantag 16 aufgeteilten Form (Lauf und Station in zwei Zeilen). Hinweis- und Taktikzeilen sowie Steigerungen ergeben keinen Schritt. Einlaufen/Auslaufen sind **optional** (`opt`): Sie stecken oft in einer eigenen Aktivität, fehlen dann ohne Störung und zählen nicht in «x von y».
+- `s7Steps` (index.html) nutzt den Parser für `k: "sim"`. Damit gelten Zuordnung, Prüfliste, Diagnose, Analyse und Split-Ansicht auch für Simulationstage.
+- Stationen mit Puls: Abweichung vom Ziel erst ab Faktor 1,65 auffällig (Stationsziele sind Teamziele, echte Zeiten streuen stark; z. B. Sled Push 1:48 statt 3:03).
+- Echter Test mit Jaimes Einheit vom 28.11. (Garmin «Hyrox», 8 Runden + 1-s-Stopp, Einlaufen separat): alle 8 Arbeitsschritte auf der richtigen Runde und sicher.
+- Messung: 36 000 Zufallseinheiten 23 falsch «sicher» (vorher 15). Die zusätzlichen sind «fehlt + Trink-Runde» (ausgelassener Schritt, an seiner Stelle eine Trinkpause gleicher Länge mit Arbeitspuls) und ein Lap-Druck zur falschen Zeit bei 8 gleichen Stationen. Beide Klassen sind aus Zeit, Strecke und Puls nicht erkennbar. Still falsch eingetragen: 2 (alt: 38 386). Dieser Stand ist nicht mehr vom Prüfer-Agenten geprüft.
+- Edge Function `garmin` Version 18 deployt (28.11.2026).

@@ -14685,6 +14685,7 @@
       import { normTime } from "./src/timeinput.js";
       import { repSummary, watchCheck, alignFuzzy } from "./src/laps.js";
       import { alignLaps } from "./src/align.js";
+      import { simSteps } from "./src/simsteps.js";
       import { lauftagSteps, alignLauf } from "./src/lauftag.js";
       import { planSteps } from "./src/garmin-workout.js";
       import {
@@ -15280,9 +15281,9 @@
           const sp = w.splits;
           if (sp.state === "ok") {
             const wr = S.wsplit[dk] === a.id;
-            row(wr ? "ok" : "wait", `Splits: ${sp.got} von ${sp.total} Schritten mit Uhrzeit${sp.tail ? `, Aufzeichnung ${sp.tail} Schritte vor Plan-Ende beendet` : ""}${sp.unsure ? `, ${sp.unsure} nicht sicher zuordenbar (bleiben leer, bitte von Hand prüfen)` : ""}${wr ? " – im Plan eingetragen" : " – werden beim Übernehmen eingetragen"}`);
+            row(wr ? "ok" : "wait", `Splits: ${sp.got} von ${sp.total} Schritten mit Uhrzeit${sp.tail ? `, Aufzeichnung ${sp.tail} Schritte vor Plan-Ende beendet` : ""}${sp.unsure ? `, ${sp.unsure} nicht sicher zuordenbar (bleiben leer, bitte von Hand prüfen${sp.reason ? "; zuerst " + sp.reason : ""})` : ""}${wr ? " – im Plan eingetragen" : " – werden beim Übernehmen eingetragen"}`);
           } else if (sp.state === "bad")
-            row("bad", `Splits nicht zuordenbar: Uhr ${sp.count} Runden, Plan ${sp.total} Arbeitsschritte. Zeiten von Hand eintragen.`);
+            row("bad", `Splits nicht zuordenbar: Uhr ${sp.count} Runden, Plan ${sp.total} Arbeitsschritte.${sp.reason ? " Grund: " + sp.reason + "." : ""} Zeiten von Hand eintragen.`);
           else row("none", "Splits: keine Runden, nichts zuzuordnen");
         }
         const lt = isPlan ? lauftagFor(i, a) : null;
@@ -15323,15 +15324,21 @@
         if (!a) return "";
         const steps = p && planAct(i) === a ? s7Steps(p) : null,
           cut = (r) => r && { mode: r.mode || null, count: r.count, times: r.times || null, laps: r.laps || null, merges: r.merges, skipped: r.skipped };
-        let split = null, fuzzy = null, check = null;
+        let split = null, fuzzy = null, check = null, dp = null;
         try { if (steps && steps.length) { split = cut(alignSplits(a.laps || [], steps)); fuzzy = cut(alignFuzzy(a.laps || [], steps)); } } catch (e) { split = { error: String(e) }; }
+        // Vollständiges Ergebnis der vorsichtigen Zuordnung: je Schritt Runde, sicher/unsicher und Grund
+        try {
+          const r = steps && steps.length ? alignLaps(a.laps || [], steps) : null;
+          dp = r && { quality: Math.round(r.quality * 100) / 100, hrUsed: r.hrUsed, tail: r.tail, incomplete: r.incomplete, cost: r.cost, level: r.level || null, wait: r.wait || [],
+            steps: steps.map((st, k) => ({ k, kind: st.kind, name: st.name || "", goal: st.goal || 0, laps: r.span[k], pair: r.pair[k] || undefined, t: r.times[k], sure: r.sure[k], why: r.why[k] || undefined })) };
+        } catch (e) { dp = { error: String(e) }; }
         try { check = watchCheck(a, { steps, intervalText: p && p.i ? p.i.find((t) => dash.parseReps(t)) || "" : "" }); } catch (e) { check = { error: String(e) }; }
         return JSON.stringify({
-          v: 1,
+          v: 3,
           act: { id: a.id, src: a.src, type: a.type, group: a.group, date: a.date, start: a.start, time: a.time, dist: a.dist, lapsV: a.lapsV },
           laps: a.laps || [],
           plan: { kind: p ? p.k : null, lines: p ? p.i : null, steps },
-          result: { alignSplits: split, alignFuzzy: fuzzy, watchCheck: check },
+          result: { alignSplits: split, alignFuzzy: fuzzy, alignLaps: dp, watchCheck: check },
         });
       }
       /* Übernehmen-Auswahl: welche Übungen wurden gemacht? (Tag-Index oder null) */
@@ -22852,6 +22859,8 @@
       };
       /* Plan eines Stationstags → Schritte: Einlaufen, Referenzlauf, je Runde Station · Lauf · Pause, Auslaufen. Sonst null (dann normaler Fokusmodus). */
       function s7Steps(p) {
+        // Simulationstag («Run N: 1 km … → Station … (Ziel m:ss)»): eigener Parser (src/simsteps.js)
+        if (p && p.k === "sim" && (p.i || []).length) return simSteps(p.i);
         if (!p || p.k !== "station" || !(p.i || []).length) return null;
         const all = p.i.join(" | "),
           f200 =
@@ -23259,10 +23268,11 @@
           r = watchSplitsFor(at, st);
         }
         if (!r) {
-          const a = actsOf(at).find((x) => x.laps && x.laps.length);
+          const a = actsOf(at).find((x) => x.laps && x.laps.length),
+            why = a ? (watchCheck(a, { steps: st }).splits || {}).reason || "" : "";
           return toast(
             a
-              ? "Die Uhr hat " + alignSplits(a.laps, st).count + " Runden, der Plan " + st.length + " Schritte (Lauf, Station, Pause). So lassen sie sich nicht zuordnen – Zeiten von Hand eintragen."
+              ? "Die Uhr hat " + alignSplits(a.laps, st).count + " Runden, der Plan " + st.length + " Schritte (Lauf, Station, Pause). Keine Runde sicher zuordenbar" + (why ? " – " + why : "") + ". Zeiten von Hand eintragen oder in der Prüfliste bestätigen."
               : "Noch keine Garmin-Einheit mit Runden gefunden. Uhr mit Garmin Connect synchronisieren und nochmals versuchen.",
             true,
           );

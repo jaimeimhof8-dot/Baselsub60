@@ -2,7 +2,7 @@
 // auch wenn die Uhr jeden Kilometer als eigene Runde aufgezeichnet hat (Auto-Lap). Reine Funktionen, ohne DOM.
 import { parseReps, paceOf, repSummary as looseSummary } from "./dashboard.js";
 import { mmss } from "./util.js";
-import { alignLaps } from "./align.js";
+import { alignLaps, layoutOk } from "./align.js";
 
 /** Wiederholungen aus den Runden, passend zur Plan-Vorgabe ("4×1 km", "2×2 km").
  * Zusammenhängende schnelle Runden werden auf die Plan-Distanz zusammengefasst, langsame (Trabpause, Ein-/Auslaufen) zählen nicht.
@@ -72,14 +72,26 @@ export function alignSplits(laps, steps) {
   const work = steps.map((st, k) => ({ st, k })).filter((x) => x.st.kind !== "rest");
   const w = work.length;
   const layouts = (L) => {
-    const pick = (idx, mode) => ({ times: idx.map((k) => (k == null ? null : Math.round(L[k].t))), hr: idx.map((k) => (k == null ? null : L[k].hr || null)), laps: idx, mode, count: L.length });
+    // Gleiche Rundenzahl ist kein Beweis (z. B. Absturz nach 16 von 24 Runden = scheinbar «Pausen nicht gelappt»):
+    // Strecke, Puls und Dauer müssen passen (layoutOk), und die vorsichtige Zuordnung (alignLaps) muss jedem Schritt mit Zielzeit
+    // dieselbe Runde geben und jeden Arbeitsschritt als sicher bestätigen. Pausenzeiten werden nur eingetragen, wenn alignLaps auch
+    // sie als sicher meldet, sonst bleiben sie leer. Ohne Zielzeiten kann alignLaps nichts bestätigen: dann zählt nur layoutOk.
+    const pick = (idx, mode) => {
+      if (!layoutOk(L, steps, idx)) return null;
+      const need = idx.some((q, k) => q != null && steps[k].goal > 0) && n * L.length <= 10000;
+      const dp = need ? alignLaps(L, steps) : null;
+      if (need && (!dp || !idx.every((q, k) => q == null || !(steps[k].goal > 0) || ((dp.sure[k] || steps[k].kind === "rest") && dp.span[k] && dp.span[k][0] === q && dp.span[k][1] === q)))) return null;
+      const use = (k, q) => q != null && !(dp && steps[k].kind === "rest" && steps[k].goal > 0 && !dp.sure[k]);
+      return { times: idx.map((q, k) => (use(k, q) ? Math.round(L[q].t) : null)), hr: idx.map((q, k) => (use(k, q) ? L[q].hr || null : null)), laps: idx, mode, count: L.length };
+    };
     if (L.length === n) return pick(steps.map((_, k) => k), "direct");
     if (w !== n && L.length === w) { const idx = Array(n).fill(null); work.forEach((x, m) => (idx[x.k] = m)); return pick(idx, "work"); }
     if (w > 1 && (L.length === 2 * w || L.length === 2 * w - 1)) { const idx = Array(n).fill(null); work.forEach((x, m) => (idx[x.k] = 2 * m)); return pick(idx, "alt"); }
     return null;
   };
   let T = all.slice();
-  while (T.length > 1 && T[T.length - 1].t < 15) T = T.slice(0, -1);
+  const lastGoal = (steps[n - 1] && steps[n - 1].goal) || 0;
+  while (T.length > 1 && T[T.length - 1].t < 15 && !(lastGoal > 0 && T[T.length - 1].t >= lastGoal * 0.5)) T = T.slice(0, -1);
   const hit = layouts(T) || layouts(all);
   const L = T;
   return hit || { times: null, count: L.length };
@@ -144,18 +156,22 @@ export function watchCheck(act, { steps = null, intervalText = "" } = {}) {
   const wait = !!act && act.src === "garmin" && act.lapsV !== 3;
   const out = { laps: { n: laps.length, state: laps.length ? "ok" : wait ? "wait" : "none" }, splits: null, intervals: null };
   if (steps && steps.length) {
-    const total = steps.filter((s) => s.kind !== "rest").length;
+    let total = steps.filter((s) => s.kind !== "rest").length;
     if (!laps.length) out.splits = { state: "none", got: 0, total, mode: null, count: 0 };
     else {
       const r = alignSplits(laps, steps);
       const dp = r.times ? null : alignLaps(laps, steps);
+      // Erster Grund (Arbeitsschritt), warum etwas nicht sicher ist – für die Anzeige in Klartext
+      // Optionale Schritte (Einlaufen/Auslaufen in eigener Aktivität), die hier keine Runde haben, zählen nicht mit
+      if (dp) total -= steps.filter((s, k) => s.opt && s.kind !== "rest" && !dp.span[k]).length;
+      const reason = dp ? (() => { const k = steps.findIndex((st, q) => st.kind !== "rest" && dp.sure[q] === false && dp.why[q]); return k < 0 ? "" : `${steps[k].name || steps[k].kind} (Schritt ${k + 1}): ${dp.why[k]}`; })() : "Runden passen insgesamt nicht zum Plan";
       if (r.times) out.splits = { state: "ok", got: r.times.filter((t, k) => t != null && steps[k].kind !== "rest").length, total, mode: r.mode, count: r.count };
       else if (dp && dp.sure.some((x, k) => x && steps[k].kind !== "rest")) {
         // Nur sicher zugeordnete Schritte zählen; unsichere bleiben leer (nichts raten)
         const got = dp.sure.filter((x, k) => x && steps[k].kind !== "rest").length;
         const unsure = dp.sure.filter((x, k) => x === false && steps[k].kind !== "rest").length;
-        out.splits = { state: "ok", got, total, mode: "dp", count: dp.count, tail: dp.tail, unsure };
-      } else out.splits = { state: "bad", got: 0, total, mode: null, count: r.count };
+        out.splits = { state: "ok", got, total, mode: "dp", count: dp.count, tail: dp.tail, unsure, reason, hrUsed: dp.hrUsed };
+      } else out.splits = { state: "bad", got: 0, total, mode: null, count: r.count, reason, hrUsed: dp ? dp.hrUsed : false };
     }
   }
   if (intervalText) {

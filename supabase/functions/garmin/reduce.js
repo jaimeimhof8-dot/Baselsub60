@@ -41,10 +41,17 @@ export function normalizeAct(g) {
 /** Runden aus /activity-service/activity/{id}/splits -> [{d, t, hr, w}] (gleiches Format wie src/dashboard.js normalizeLaps) */
 export function normalizeLaps(raw) {
   const list = (raw && raw.lapDTOs) || [];
-  return list.slice(0, 200).map((l) => ({
-    d: Math.round(+l.distance || 0), t: Math.round(+l.duration || +l.elapsedDuration || +l.movingDuration || 0), // Rundenzeit wie auf der Uhr, nicht nur die bewegte Zeit
-    hr: Math.round(+l.averageHR || 0) || null, w: Math.round(+l.averagePower || 0) || null,
-  })).filter((l) => l.t > 0);
+  return list.slice(0, 200).map((l) => {
+    const t = Math.round(+l.duration || +l.elapsedDuration || +l.movingDuration || 0); // Rundenzeit wie auf der Uhr, nicht nur die bewegte Zeit
+    const e = Math.round(+l.elapsedDuration || 0);
+    return {
+      d: Math.round(+l.distance || 0), t,
+      hr: Math.round(+l.averageHR || 0) || null, w: Math.round(+l.averagePower || 0) || null,
+      // Nur zur Diagnose (gestopptes Workout): Gesamtdauer inkl. Stopp, falls anders als t, und Startzeit (UTC) der Runde
+      ...(e > 0 && e !== t ? { e } : {}),
+      ...(l.startTimeGMT ? { s: String(l.startTimeGMT).replace(" ", "T").slice(0, 19) } : {}),
+    };
+  }).filter((l) => l.t > 0);
 }
 
 /**

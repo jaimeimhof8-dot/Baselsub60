@@ -15328,12 +15328,12 @@
         // Vollständiges Ergebnis der vorsichtigen Zuordnung: je Schritt Runde, sicher/unsicher und Grund
         try {
           const r = steps && steps.length ? alignLaps(a.laps || [], steps) : null;
-          dp = r && { quality: Math.round(r.quality * 100) / 100, hrUsed: r.hrUsed, tail: r.tail, incomplete: r.incomplete, cost: r.cost,
+          dp = r && { quality: Math.round(r.quality * 100) / 100, hrUsed: r.hrUsed, tail: r.tail, incomplete: r.incomplete, cost: r.cost, level: r.level || null, wait: r.wait || [],
             steps: steps.map((st, k) => ({ k, kind: st.kind, name: st.name || "", goal: st.goal || 0, laps: r.span[k], pair: r.pair[k] || undefined, t: r.times[k], sure: r.sure[k], why: r.why[k] || undefined })) };
         } catch (e) { dp = { error: String(e) }; }
         try { check = watchCheck(a, { steps, intervalText: p && p.i ? p.i.find((t) => dash.parseReps(t)) || "" : "" }); } catch (e) { check = { error: String(e) }; }
         return JSON.stringify({
-          v: 2,
+          v: 3,
           act: { id: a.id, src: a.src, type: a.type, group: a.group, date: a.date, start: a.start, time: a.time, dist: a.dist, lapsV: a.lapsV },
           laps: a.laps || [],
           plan: { kind: p ? p.k : null, lines: p ? p.i : null, steps },

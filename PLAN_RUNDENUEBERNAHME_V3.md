@@ -122,7 +122,9 @@ Jaime: Format A («Runde N: SkiErg … → 1 km …, Pause»), Pulsgurt vorhande
 **Nacharbeit nach Prüfer-Review 2 («nicht freigegeben»: Pausenzeiten zu oft falsch als sicher, 38 Fälle)**
 - Pausen: Die Kette darf eine nach Bedarf längere Pause überspannen (Puls belegt sie), die **Pausenzeit eingetragen** wird aber nur bei ≤ 20 % Abweichung und nur bei geplanten Pausen ≥ 45 s. Kürzere Pausen sind von einem Übergang oder zu spät gedrückten Lap nicht zu unterscheiden und bleiben leer.
 - Gleiches in der festen Zuordnung: Pausenzeiten nur, wenn alignLaps sie als sicher meldet.
-- Ergebnis mit den Skripten des Prüfers (14 400 gestörte Einheiten): falsch «sicher» 38 → 2 (beide «fehlt + Trink-Runde»), falsch eingetragene Zeiten über die feste Zuordnung 0.
+- Ergebnis mit den Skripten des Prüfers: `sim2.mjs` (19 200 Einheiten) falsch «sicher» 38 → 2 (beide «fehlt + Trink-Runde», die Trink-Runde stand dort, wo die Pausenrunde fehlte), `sim.mjs` (14 400 Einheiten) 11 → 0. Falsch eingetragene Zeiten über die feste Zuordnung: 0.
+- Preis: Pausenzeiten unter 45 s und Pausen mit über 20 % Abweichung bleiben leer (auch auf sauberen Einheiten). Arbeitsschritte sind davon nicht betroffen.
+- Prüfer-Review 3: **freigegeben**.
 
 **Messung saubere Einheiten** (8 × SkiErg 500 m → 1 km → Pause, Streuung ±7 % Arbeit / ±15 % Pause, je 100 Einheiten; Anteil Arbeitsschritte, die in der App übernommen werden; alt = 100 %, weil gleiche Rundenzahl blind übernommen wurde):
 
@@ -141,7 +143,7 @@ Ohne Puls bei 90–120-s-Pausen bleibt es schwach: SkiErg 1:55 und Pause 2:00 si
 | still falsch eingetragen (gleiche Rundenzahl, blind übernommen) | 38 386 | 1 |
 | falsch als «sicher» (vorsichtige Zuordnung) | 18 | 15 |
 
-Prüfkriterium dieser Messung (wie `test/align.test.js`): Eine Runde ist richtig, wenn ≥ 75 % ihrer *Schritt*-Zeit vom zugeordneten Schritt stammt. Zeit ohne Schritt (Übergang, Trinken) zählt nicht als fremd. Eine reine Zusatzrunde gilt als richtige Pause, wenn die echte Pausenrunde fehlt. «fehlt» höchstens einmal je Einheit. Mit dem strengeren Kriterium des Prüfers (Fremdanteil an der ganzen Rundenzeit) sind es mehr, vor allem bei zu spät gedrückten Laps. Die verbleibenden Fälle enthalten «fehlt» (Runde samt Zeit weg), meist mit einer Trink-Runde genau so lang wie der fehlende Schritt.
+Prüfkriterium dieser Messung (wie `test/align.test.js`): Eine Runde ist richtig, wenn ≥ 75 % ihrer *Schritt*-Zeit vom zugeordneten Schritt stammt. Zeit ohne Schritt (Übergang, Trinken) zählt nicht als fremd. Eine reine Zusatzrunde gilt als richtige Pause, wenn die echte Pausenrunde fehlt. «fehlt» höchstens einmal je Einheit. Mit dem Kriterium des Prüfers (Fremdanteil an der ganzen Rundenzeit) ergibt sich dasselbe Bild (2 Fälle in `sim2.mjs`). Die verbleibenden Fälle enthalten «fehlt» (Runde samt Zeit weg), meist mit einer Trink-Runde genau so lang wie der fehlende Schritt.
 
 Jaimes Szenarien (8 Runden, mit Puls): +1 oder +4 Übergangsrunden 25–30 s → 100 %. Vergessener Druck Ski+Lauf in Runde 2 → 88 % (Maximum). Lauf+Pause → 75 %. Zusatzrunde 70 s (Trinken) → 88 %. Absturz nach 16 von 24 Runden → alle vorhandenen Arbeitsschritte bis auf den letzten sicher. Übergangsrunden über 35 % des kürzesten Planschritts (bei 60-s-Pausen: über 21 s) gelten nicht mehr als harmlos, ebenso Übergänge mit ≥ 100 m (Gehen). Dann sinkt die Abdeckung (Prüfer: 77 % bzw. 32 % bei 60-s-Pausen).
 
@@ -153,3 +155,32 @@ Jaimes Szenarien (8 Runden, mit Puls): +1 oder +4 Übergangsrunden 25–30 s →
 - Edge Function: Solange eine junge Einheit (< 2 Tage) leere Runden liefert, belegt sie bei jedem Abruf einen der 15 Plätze und der Client rechnet ab Planstart neu. Wirkt erst nach Neu-Deployen.
 
 Tests: 515 grün (`npm test`), davon 18 neue Zufallstests (Puls ±3, ±8, ohne; je 300 Einheiten) sowie Szenarien für Format A. Laufzeit laut Prüfer: 24 Schritte × 40 Runden ≤ 30 ms.
+
+
+## 7. Fall A: So drückt Jaime Lap (28.11.2026, aus dem Nebenchat)
+
+Einlaufen → Lap → Lauf (Laufband) → Lap → Station **inkl. Roxzone** → Lap → Lauf → Lap → Pause → Lap … Jeder Plan-Schritt hat eine eigene Runde, es gibt keine eigenen Roxzone-Runden. Nach dem Einlaufen gibt es manchmal eine Runde, die nicht im Plan steht: ein Stopp mit Neustart (kurze Runde) oder Warten ohne Stopp (Pausenrunde), unterschiedlich lang.
+
+**Umgesetzt**
+1. **Wartepause nach dem Einlaufen** (`waitLike`): höchstens 2 Runden direkt nach dem Einlaufen, ohne Strecke, ≤ 5 Min, Puls ≥ 10 Schläge unter dem Einlaufen oder < 30 s (Neustart). Kostet fast nichts, bricht die Verankerung nicht. Nur ohne Pause an zweiter Stelle nach dem Einlaufen (`waitPlan`): Bei «Einlaufen → Lauf → Pause» wäre eine Wartepause nicht von der ersten Pause nach einem ausgelassenen Lauf zu unterscheiden (im Zufallstest 7 Fehlzuordnungen, mit der Einschränkung 0).
+2. **Roxzone in der Stationsrunde**: zweiter Durchgang mit Zielen nach Tagesniveau (Median Ist/Ziel je Schrittart, Stationen bis Faktor 2, sonst 1,65). Ein Beispiel: 1:55 Station + 60 s Roxzone ergibt etwa Station × 1,53. Zusätzlich passt sich die Schwelle «Abweichung = Störung» an die Streuung der Schrittart an (mit Puls mindestens 0,2). Mit Puls genügt ein Nachbarabstand von 0,15.
+3. **Laufband ohne Strecke** (`runDistEvidence`): Strecke ist nur ein Typ-Beleg, wenn die Läufe selbst Strecke liefern (Runden mit ≥ 60 % der geplanten Laufstrecke, mindestens halb so viele wie Laufschritte). Ein Einlaufen draussen mit GPS oder ein Ergometer mit 500 m täuschen das nicht mehr vor.
+4. **Stoppzeit**: noch offen. Der Abruf speichert neu je Runde `e` (Gesamtdauer inkl. Stopp, nur wenn anders als `t`) und `s` (Startzeit UTC). «Diagnose kopieren» (v3) zeigt das, dazu `level` und `wait`. **Wirkt erst nach Neu-Deployen der Edge Function** und für neu geladene Einheiten.
+
+**Messung Fall A** (Einlaufen + 8 × [SkiErg 500 m inkl. Roxzone → 1 km → Pause 90 s], mit Puls, App-Ergebnis = übernommene Arbeitsschritte):
+
+| Fall | Roxzone 40 s | 60 s | 90 s |
+|---|---|---|---|
+| sauber, Laufband 0 m | 17/17 | 17/17 | 17/17 |
+| + Wartepause 95 s | 17/17 | 17/17 | 17/17 |
+| + Stopp-Runde 9 s | 17/17 | 17/17 | 17/17 |
+| + Stopp 24 s und Wartepause 70 s | 17/17 | 17/17 | 17/17 |
+| + vergessener Druck Station+Lauf | 15/17 | 15/17 | 8/17 |
+
+Einlaufen draussen 2 km, Laufband 0 m, Ergometer 500 m: wie Roxzone 60 s. 15-s-Pausen: 17/17. Ohne Puls (Roxzone 60 s): 17/17 sauber.
+
+Grenze: Bei 90 s Roxzone, Laufband ohne Strecke **und** vergessenem Druck liegen Station (≈ 205 s) und Lauf (≈ 245 s) zu nahe beieinander. Der Rest geht in die Vorschau zum Bestätigen.
+
+**Sicherheit nach Fall A**: 36 000 Zufallseinheiten 15 falsch «sicher» (wie vor Fall A, alle mit «fehlt»), 1 still falsch eingetragen. In der App übernommen 34,7 % (vorher 33,3 %). Prüfer-Skripte `sim.mjs` / `sim2.mjs`: 0 / 1 falsch «sicher», 0 / 0 falsch eingetragen. Saubere Einheiten ohne Puls wurden besser (90-s-Pausen 40 → 67 %, 120 s 35 → 81 %), mit Puls weiterhin 100 %.
+
+Tests: 519 grün, neu u. a. «Fall A sauber» (180 Einheiten, alle Arbeitsschritte sicher), «Fall A gestört» (600 Einheiten, nie sicher auf fremder Runde), Strecken-Beleg, Diagnose-Felder.

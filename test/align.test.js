@@ -309,3 +309,60 @@ test("watchCheck nennt den Grund, wenn Schritte nicht sicher sind (Anzeige in de
   assert.equal(bad.splits.state, "bad");
   assert.ok(bad.splits.reason);
 });
+
+// ---- Fall A (Jaime): Einlaufen → je Runde Station inkl. Roxzone → Lauf (Laufband, evtl. 0 m) → Pause; optional Wartepause/Stopp nach dem Einlaufen ----
+const planA = (P) => [{ kind: "warm", name: "2 km", goal: 720 }, ...Array.from({ length: 8 }, () => [{ kind: "station", name: "SkiErg", sub: "500 m", goal: 115 }, { kind: "run", name: "1 km", goal: 245 }, { kind: "rest", name: "Erholen", goal: P }]).flat()];
+function lapsA(st, R, { rox = 50, tm = true, erg = false, hr = true } = {}) {
+  return st.map((s, k) => {
+    const j = (a) => 1 + (R() - 0.5) * a;
+    const t = s.kind === "station" ? Math.round(s.goal * j(0.12) + rox * j(0.4)) : Math.round(s.goal * j(s.kind === "rest" ? 0.3 : 0.12));
+    const d = s.kind === "warm" ? (tm ? 0 : 2000) : s.kind === "run" ? (tm ? 0 : 1000) : s.kind === "station" && erg ? 500 : 0;
+    const dr = 10 * k / st.length, h = s.kind === "warm" ? 138 : s.kind === "station" ? 160 + dr : s.kind === "run" ? 168 + dr : 168 + dr - Math.min(28, 4 + t * 0.2);
+    return { t, d, hr: hr ? Math.round(h + (R() - 0.5) * 6) : null, _o: { [k]: t } };
+  });
+}
+const waitLap = (laps, R) => { laps.splice(1, 0, R() < 0.5 ? { t: 5 + Math.floor(R() * 20), d: 0, hr: laps[0].hr, _o: {} } : { t: 40 + Math.floor(R() * 150), d: 0, hr: laps[0].hr - 12 - Math.floor(R() * 18), _o: {} }); };
+test("Fall A sauber: Laufband ohne Strecke, Roxzone 40–90 s, mit und ohne Wartepause → alle Arbeitsschritte sicher (mit Puls)", () => {
+  for (const rox of [40, 60, 90]) for (const P of [15, 90, 120]) for (let seed = 1; seed <= 20; seed++) {
+    const st = planA(P), R = rng(seed * 13 + rox + P);
+    const laps = lapsA(st, R, { rox });
+    if (seed % 2) waitLap(laps, R);
+    const w = watchCheck({ src: "garmin", lapsV: 3, laps }, { steps: st });
+    assert.equal(w.splits.got, w.splits.total, `rox ${rox}, Pause ${P}, Seed ${seed}: ${w.splits.got}/${w.splits.total} ${w.splits.reason || ""}`);
+  }
+});
+test("Fall A gestört (Laufband 0 m, Roxzone, Wartepause, Ergometer-Meter, mit/ohne Puls): nie «sicher» auf fremder Runde", () => {
+  let sure = 0;
+  for (let seed = 1; seed <= 600; seed++) {
+    const R = rng(seed * 31 + 5), P = [15, 30, 90, 120][seed % 4], st = planA(P);
+    const laps = lapsA(st, R, { rox: 30 + Math.floor(R() * 70), tm: R() < 0.7, erg: R() < 0.3, hr: R() < 0.8 });
+    if (R() < 0.5) waitLap(laps, R);
+    const names = Object.keys(MUTS_HR);
+    let gone = false;
+    for (let q = Math.floor(R() * 3); q > 0; q--) { const nm = names[Math.floor(R() * names.length)]; if (nm === "fehlt" && gone) continue; if (nm === "fehlt") gone = true; MUTS_HR[nm](laps, R); }
+    const r = alignLaps(laps, st);
+    if (r) st.forEach((_, k) => {
+      if (!r.sure[k] || r.laps[k] == null) return;
+      sure++;
+      const M = r.merged[r.laps[k]], own = M.parts.reduce((x, p) => x + ((p._o || {})[k] || 0), 0);
+      const stepTime = M.parts.reduce((x, p) => x + Object.values(p._o || {}).reduce((a, b) => a + b, 0), 0);
+      const restHere = stepTime === 0 && st[k].kind === "rest" && !laps.some((l) => (l._o || {})[k]);
+      assert.ok(restHere || (stepTime > 0 && own >= 0.75 * stepTime), `Seed ${seed}: Schritt ${k} sicher auf fremder Runde ${JSON.stringify(M.parts.map((p) => p._o))}`);
+    });
+    const s = alignSplits(laps, st);
+    if (s.times) st.forEach((_, k) => {
+      const q = s.laps[k];
+      if (q == null || s.times[k] == null) return;
+      const o = laps[q]._o || {}, tot = Object.values(o).reduce((a, b) => a + b, 0);
+      assert.ok(tot > 0 ? (o[k] || 0) >= 0.75 * tot : st[k].kind === "rest" && !laps.some((l) => (l._o || {})[k]), `Seed ${seed}: alignSplits trägt fremde Runde in Schritt ${k} ein`);
+    });
+  }
+  assert.ok(sure > 3000, `zu wenig Abdeckung: ${sure}`);
+});
+test("Strecken-Beleg: Laufband 0 m oder nur Einlaufen/Ergometer mit Metern gilt nicht als Laufstrecke", async () => {
+  const { runDistEvidence } = await import("../src/align.js");
+  const st = planA(90);
+  assert.equal(runDistEvidence(lapsA(st, rng(1), { tm: true }), st), false);
+  assert.equal(runDistEvidence(lapsA(st, rng(1), { tm: true, erg: true }).map((l, i) => (i === 0 ? { ...l, d: 2000 } : l)), st), false);
+  assert.equal(runDistEvidence(lapsA(st, rng(1), { tm: false }), st), true);
+});

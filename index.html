@@ -20914,7 +20914,17 @@
         ]);
       };
       let anBusy = {},
-        anErr = {};
+        anErr = {},
+        anAuto = {}; // je Tag: Fingerabdruck, für den die veraltete Analyse schon automatisch neu angestossen wurde (höchstens einmal je Stand)
+      /* Gespeicherte Coach-Analyse veraltet (Werte oder Uhr-Daten haben sich seither geändert, z. B. Runden neu zugeordnet):
+         einmal automatisch neu erstellen, statt den alten Text («Runden nicht zugeordnet») stehen zu lassen */
+      function anAutoRefresh(i, p, rec, stale, busy) {
+        if (!rec || !stale || busy || !coachReady() || navigator.onLine === false) return;
+        const dk = keyI(i), sig = s7AnSig(i, p);
+        if (anAuto[dk] === sig) return;
+        anAuto[dk] = sig;
+        setTimeout(() => runAnalysis(i), 0);
+      }
       function anFnError(error) {
         const res =
           error.context && typeof error.context.json === "function"
@@ -21084,6 +21094,7 @@
           rec = S.analysis[dk],
           busy = !!anBusy[dk],
           stale = !!rec && rec.sig !== s7AnSig(i, p);
+        anAutoRefresh(i, p, rec, stale, busy);
         const li = (a) => a.map((t) => `<li>${esc(t)}</li>`).join("");
         const pair = (a) =>
           a
@@ -21222,7 +21233,8 @@
           // plan: Plan-Einheit zu dieser Aktivität (nur «Geplant») oder null (Zusatz-Einheit: gleichmässig, ohne Plan)
           const pp = plan || { k: "x", i: [], t: (act && act.name) || "" },
             group = act ? act.group : "",
-            kind = plan ? (plan.k === "kraft" ? "kraft" : plan.k === "station" ? "station" : planText ? "lauf" : "steady") : "steady",
+            // Simulationstag mit Lauf- und Stationsschritten («Run N → Station») wie ein Stationstag auswerten, nicht als Lauf (Steigerungen 4×100 m)
+            kind = plan ? (plan.k === "kraft" ? "kraft" : plan.k === "station" || (plan.k === "sim" && s7Steps(plan)) ? "station" : planText ? "lauf" : "steady") : "steady",
             W = act && kind !== "kraft" ? s7Work(pp, act) : null,
             wd = W ? workDash(W.st) : null,
             pv = act && plan && kind !== "kraft" ? s7Prev(i, plan, act.group) : null,
@@ -21503,7 +21515,9 @@
           return anTableHtml({ cols: "minmax(0,1fr) 52px 44px 44px 44px", head: ["Abschnitt", "Zeit", "Watt", "Puls", "U/min"], rows, note: "Blöcke zu 10 Minuten. Zeile antippen zoomt alle Diagramme auf den Block." }, esc);
         }
         if (tab === "Stationen") {
-          const plan = d && d.plan;
+          // Nur Stationen (Plan gegen Ist enthält auch die Läufe)
+          const p0 = d && d.plan, sr = p0 ? p0.rows.filter((r) => !r.kind || r.kind === "station") : [];
+          const plan = p0 && sr.length ? { ...p0, rows: sr } : null;
           if (!plan) return anEmpty("Die Runden passen nicht zu den Plan-Schritten.");
           const worst = plan.rows.reduce((a, r) => (r.diff > a.diff ? r : a), plan.rows[0]);
           return anTableHtml({ cols: "minmax(0,1fr) 56px 56px 60px", head: ["Station", "Zeit", "Ziel", "Δ"], rows: plan.rows.map((r) => ({ cells: [r.name + (r === worst && r.diff > 0 ? " · schwächste" : ""), mmss(r.t), { t: mmss(r.goal), c: "mu" }, { t: sg(r.diff) + " s", c: r.diff <= 0 ? "ok" : "bad" }] })), note: "Kompromiss Ø: wie viel langsamer du direkt nach einer Station läufst als im Plan. Die Referenz ist nur 1 km." }, esc);
@@ -21534,10 +21548,11 @@
       /* Coach-Block (eingeklappt): Urteil in Worten, danach Zahlen gegen Plan, letzte Einheit, Saison, mögliche Ursache und der Text des Coaches */
       function anCoach(i, p, c) {
         const dk = keyI(i), rec = S.analysis[dk], busy = !!anBusy[dk], stale = !!rec && rec.sig !== s7AnSig(i, p), R = rec && !busy ? rec.data : null;
+        anAutoRefresh(i, p, rec, stale, busy);
         const { d, model, ivs, kind, S0, secs } = c, h = model.headline, line = (n, t) => `<b>${esc2(n)}</b> ${esc2(t)}`;
         const pr = (arr) => (arr && arr.length ? arr.map((x) => (x.title ? line(x.title, x.detail) : line(x.n, x.t))).join("<br>") : "");
         let verdict = "", tone = "", teaser = "";
-        if (R) teaser = esc2(R.headline);
+        if (R) teaser = (stale ? "<i>Veraltet, wird neu erstellt:</i> " : "") + esc2(R.headline);
         else if (kind === "interval" || kind === "station") { const m = /^(\d+) von (\d+)$/.exec(h.big); if (m) { const hit = +m[1], n = +m[2]; verdict = hit === n ? "Sehr gut" : hit >= n - 1 ? "Solide" : "Unter Plan"; tone = hit === n ? "ok" : "warn"; teaser = `${h.big} ${esc2(h.label)}`; } }
         else if (h.status) { verdict = h.status.text; tone = h.status.tone; teaser = `${esc2(h.big)} ${esc2(h.label)}`; }
         else if (h.big && h.big !== "–") teaser = `${esc2(h.big)} ${esc2(h.label)}`;

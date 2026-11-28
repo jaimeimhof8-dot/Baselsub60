@@ -115,7 +115,7 @@ export function dashV3({ kind, act, ph, st, planText = "", facts = {}, prev = nu
     const partial = cover && cover[1] !== cover[2];
     out.tiles.push(work.hr ? { k: "Ø Puls Arbeit", v: String(work.hr), sub: partial ? `Puls in ${cover[1]} von ${cover[2]} Runden` : isS ? "Läufe und Stationen" : "nur die Arbeitsrunden", tone: "" } : { k: "Ø Puls Arbeit", v: "–", sub: "", na: true, why: "kein Puls in den Arbeitsrunden aufgezeichnet" });
     if (isS) {
-      out.tiles.unshift(comp ? { k: "Kompromiss-Delta", v: sg(comp.avg) + " s/km", sub: "Läufe nach Station, Ø", tone: "" } : { k: "Kompromiss-Delta", v: "–", sub: "", na: true, why: "kein Referenz-km oder Runden passen nicht zum Plan" });
+      out.tiles.unshift(comp ? { k: "Kompromiss-Delta", v: sg(comp.avg) + " s/km", sub: "Läufe nach Station, Ø", tone: "" } : { k: "Kompromiss-Delta", v: "–", sub: "", na: true, why: (st && st.compromiseWhy) || "kein Referenz-km oder Runden passen nicht zum Plan" });
     } else {
       if (work.pace) out.tiles.push({ k: "Pace Arbeit", v: mmss(work.pace), sub: "/km", tone: "" });
       out.tiles.push(st.drift ? { k: "Puls-Drift", v: sg(st.drift.bpm) + " bpm", sub: "erstes zu letztem Drittel", tone: st.drift.pct >= DRIFT_WARN ? "yellow" : "" } : { k: "Puls-Drift", v: "–", sub: "", na: true, why: "weniger als 3 Arbeitsläufe mit Puls" });
@@ -128,7 +128,7 @@ export function dashV3({ kind, act, ph, st, planText = "", facts = {}, prev = nu
 
   // Plan gegen Ist: Stationstag aus den Plan-Schritten, Intervall-Lauf aus Zieltempo × Distanz
   const plan = isS ? (st && st.plan ? { rows: st.plan.rows, hit: st.plan.hit, n: st.plan.n } : null) : intervalPlan(ph, planText);
-  out.plan = plan ? { rows: plan.rows.map((r) => ({ name: r.name, goal: r.goal, t: r.t, diff: r.diff })), hit: plan.hit, n: plan.n } : null;
+  out.plan = plan ? { rows: plan.rows.map((r) => ({ name: r.name, kind: r.kind, goal: r.goal, t: r.t, diff: r.diff })), hit: plan.hit, n: plan.n } : null;
 
   // Vergleich mit der letzten Einheit
   if (prev) {

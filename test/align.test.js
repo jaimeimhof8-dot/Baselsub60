@@ -401,3 +401,29 @@ test("Echte Simulation 28.11.: alle 8 Arbeitsschritte sicher, richtige Runden, E
   assert.equal(w.splits.got, 8);
   assert.equal(w.splits.total, 8);
 });
+test("Echte Simulation 28.11. durch die ganze Analyse: Phasen sicher, Plan gegen Ist mit 8 Schritten, Auswertung als Stationstag", async () => {
+  const { splitPhases, phaseStats } = await import("../src/session-dash.js");
+  const { dashV3 } = await import("../src/dash-v3.js");
+  const { sessionKind, anSessionModel } = await import("../src/an-session.js");
+  const plan = { t: "Brick-Simulation", k: "sim", i: SIM_LINES };
+  const steps = simSteps(SIM_LINES);
+  const ph = splitPhases(SIM_LAPS, { steps, planText: "Steigerungen 4×100 m @ 3:40/km (0:22)" });
+  assert.equal(ph.conf, "sure", ph.note);
+  assert.equal(ph.phase.filter((x) => x === "work").length, 8);
+  const st = phaseStats(ph, { steps, maxHr: 190 });
+  assert.ok(st.plan && st.plan.n === 8, JSON.stringify(st.plan));
+  const act = { src: "garmin", lapsV: 3, laps: SIM_LAPS, hr: 168, time: 1682, dist: 0, group: "strength" };
+  assert.equal(sessionKind(plan, act), "station");
+  const d = dashV3({ kind: "station", act, ph, st });
+  assert.ok(d.plan && d.plan.rows.length >= 4, "Plan gegen Ist vorhanden");
+  const model = anSessionModel({ kind: "station", act, d, conf: ph.conf });
+  // Kopfzeile und Kennzahlen zählen nur die 4 Stationen: Push 1:48, Pull 4:04, Lunges 2:58, Wall Balls 3:26 = 12:16
+  assert.equal(model.headline.big, "3 von 4", JSON.stringify(model.headline));
+  assert.equal(model.numbers[0].v, "12:16");
+  assert.equal(model.numbers[2].v, "+24"); // Sled Pull 4:04 gegen 3:40
+  // Kein Kompromiss-Delta, weil der Plan keinen frischen Referenz-km hat – nicht «Runden passen nicht»
+  assert.match(model.numbers[1].why, /kein frischer Referenz-km/);
+  assert.ok(!JSON.stringify(model).includes("passen nicht"), JSON.stringify(model.numbers));
+  // Simulationstag ohne «Run N → Station» bleibt wie bisher (keine Schritte, kein Stationstag)
+  assert.equal(sessionKind({ k: "sim", i: ["Doubles Transition Drilling"] }, act), "other");
+});

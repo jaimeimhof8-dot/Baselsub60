@@ -69,7 +69,7 @@ export function alignLaps(laps, steps) {
   const same = (k) => !!(r1.span[k] && r2.span[k] && r1.span[k][0] === r2.span[k][0] && r1.span[k][1] === r2.span[k][1]);
   const sure = r2.sure.map((x, k) => (x && (r1.sure[k] || same(k)) ? x : x === null ? null : false));
   const why = r2.why.map((w, k) => (r2.sure[k] && !sure[k] ? "erst nach Anpassung ans Tagesniveau passend" : w));
-  const work = steps.filter((st) => st.kind !== "rest").length - (r2.tail ? steps.slice(steps.length - r2.tail).filter((st) => st.kind !== "rest").length : 0);
+  const work = steps.filter((st, k) => st.kind !== "rest" && !(st.opt && !r2.span[k] && !r2.pair[k])).length - (r2.tail ? steps.slice(steps.length - r2.tail).filter((st, q) => st.kind !== "rest" && !(st.opt && !r2.span[steps.length - r2.tail + q])).length : 0);
   const quality = steps.filter((st, k) => st.kind !== "rest" && sure[k] && r2.laps[k] != null).length / Math.max(1, work);
   return { ...r2, sure, why, quality, level: Object.fromEntries(Object.entries(lv).map(([k, v]) => [k, Math.round(Math.exp(v) * 100) / 100])) };
 }
@@ -188,7 +188,8 @@ function alignCore(laps, steps) {
           relax(i + 2, j + 1, c + tc, h[i][j], "d", i, j, 1);
         }
         // Schritt nicht aufgezeichnet: am Ende (Absturz, Abbruch) billig, mittendrin teuer
-        relax(i + 1, j, c + (j === m ? 0.2 : isWork(i) ? 1.5 : 0.1), h[i][j], "s", i, j, 0);
+        // Optionale Schritte (Einlaufen/Auslaufen, oft eigene Aktivität) dürfen fehlen
+        relax(i + 1, j, c + (j === m || steps[i].opt ? 0.2 : isWork(i) ? 1.5 : 0.1), h[i][j], "s", i, j, 0);
       }
       // überzählige Runde; direkt nach dem Einlaufen ist eine Wartepause bzw. Stopp-Runde erlaubt (fast kostenlos)
       if (j < m) relax(i, j + 1, c + (harmless(T[j]) ? 0.15 : i > 0 && steps[i - 1].kind === "warm" && waitPlan(i - 1) && waitLike(j) ? 0.3 : T[j].t < 45 ? 0.6 : 1.0), h[i][j], "l", i, j, 0);
@@ -267,10 +268,10 @@ function alignCore(laps, steps) {
   // Mit Puls 0,2 als Untergrenze (Trink-Runden fängt dann die Pulspegel-Prüfung ab), ohne Puls 0,15
   const anomTh = (k) => Math.min(0.3, Math.max(hrOk ? 0.2 : 0.15, 3 * (spread[steps[k].kind] || 0)));
   const dev = (k) => (dbl[k] ? 1 : steps[k].goal > 0 ? Math.max(Math.abs(lr(k) - med(k)), Math.abs(lr(k)) > (steps[k].kind === "station" ? 0.7 : 0.5) ? 1 : 0) : 0);
-  const anomaly = steps.some((st, k) => k <= lastMatched && !asg[k] && (isWork(k) || !systematicRest)) ||
+  const anomaly = steps.some((st, k) => k <= lastMatched && !asg[k] && !st.opt && (isWork(k) || !systematicRest)) ||
     asg.some((x) => x && x[0] !== x[1]) || dbl.some(Boolean) ||
     T.some((l, q) => q <= lastLap && !covered.has(q) && !okExtra(q)) ||
-    matched.some((k) => dev(k) > (hrOk && steps[k].kind === "rest" ? 0.5 : anomTh(k))); // grosse Abweichung vom Tagesniveau: Zeichen für Verschiebung
+    matched.some((k) => dev(k) > (hrOk && (steps[k].kind === "rest" || steps[k].kind === "station") ? 0.5 : anomTh(k))); // grosse Abweichung vom Tagesniveau: Zeichen für Verschiebung
   // Mit Puls zählen die Typ-Kosten mit: Station und Pause gleicher Dauer unterscheiden sich dann über den Puls. Mit Puls genügt ein
   // kleinerer Abstand (0,15 statt 0,25): Die Pausen legen die Periode fest (Station mit Roxzone liegt zeitlich nahe am Laufband-Lauf ohne Strecke).
   // Tagesniveau je Schrittart über alle sauber zugeordneten Schritte (für den Nachbarvergleich, gleiche Grenzen wie med)
@@ -284,7 +285,8 @@ function alignCore(laps, steps) {
   const relCost = (k, a0, a1) => Math.abs(Math.log((pre[a1 + 1] - pre[a0]) / steps[k].goal) - (lvl[steps[k].kind] || 0)) +
     (typeOk(k, dpre[a1 + 1] - dpre[a0]) ? 0 : 2) + hrCost(k, a0, a1);
   const distinct = (k, a) => {
-    for (const j of [k - 1, k + 1]) if (j >= 0 && j < n && steps[j].goal > 0 && steps[k].goal > 0 && relCost(j, a[0], a[1]) < relCost(k, a[0], a[1]) + (hrOk ? 0.15 : 0.25)) return false;
+    // Optionale Nachbarn ohne Runde (Einlaufen in eigener Aktivität) sind kein Vergleich
+    for (const j of [k - 1, k + 1]) if (j >= 0 && j < n && !(steps[j].opt && !asg[j]) && steps[j].goal > 0 && steps[k].goal > 0 && relCost(j, a[0], a[1]) < relCost(k, a[0], a[1]) + (hrOk ? 0.15 : 0.25)) return false;
     return true;
   };
   // Sicher ist ein Schritt nur, wenn er vom Start ODER vom Ende her lückenlos verankert ist (Ende nur bei vollständiger Aufzeichnung).
@@ -317,9 +319,11 @@ function alignCore(laps, steps) {
     if (dbl[k]) return "zusammen mit dem Nachbarschritt in einer Runde";
     if (a[0] !== a[1]) return "mehrere Runden zusammengefasst";
     // Nachbarschritt unbelegt: die Runde könnte beide Schritte enthalten (vergessener Druck) oder dem Nachbarn gehören
-    if ([k - 1, k + 1].some((j) => j >= 0 && j <= lastMatched && !asg[j] && (isWork(j) || !systematicRest))) return "Nachbarschritt ohne Runde";
+    if ([k - 1, k + 1].some((j) => j >= 0 && j <= lastMatched && !asg[j] && !steps[j].opt && (isWork(j) || !systematicRest))) return "Nachbarschritt ohne Runde";
     // Pausen hält man nach Bedarf: mit Puls als Beleg erst ab Faktor 1,65 auffällig, sonst wie Arbeit ab 20 %
-    if (dev(k) > (hrOk && steps[k].kind === "rest" ? 0.5 : 0.2)) return "Zeit weicht stark vom Ziel ab";
+    // Stationen und Pausen: mit Puls als Beleg erst ab Faktor 1,65 auffällig (Stationsziele sind Teamziele, echte Zeiten streuen stark;
+    // eine falsche «Station» mit Pausenpuls fängt hrWrong ab). Läufe: ab 20 %.
+    if (dev(k) > (hrOk && (steps[k].kind === "rest" || steps[k].kind === "station") ? 0.5 : 0.2)) return "Zeit weicht stark vom Ziel ab";
     // Aufzeichnung endet früher und der Schritt gleicht einem Nachbarschritt: eine Lücke wäre nicht von einem Abbruch zu unterscheiden
     if (tail > 0 && [k - 1, k + 1].some((j) => j >= 0 && j < n && steps[j].kind === steps[k].kind && steps[j].goal === steps[k].goal)) return "Abbruch, gleicher Nachbarschritt";
     const hw = hrWrong(k, a);
@@ -344,7 +348,7 @@ function alignCore(laps, steps) {
   let rigid = true, next = 0; // next = erste noch nicht verbrauchte Runde
   for (let k = 0; k < n; k++) {
     const a = asg[k];
-    if (!a) { if (k <= lastMatched && (isWork(k) || !systematicRest)) rigid = false; why[k] = k > lastMatched ? "nicht aufgezeichnet" : "keine Runde"; continue; }
+    if (!a) { if (k <= lastMatched && !steps[k].opt && (isWork(k) || !systematicRest)) rigid = false; why[k] = steps[k].opt ? "nicht in dieser Aktivität" : k > lastMatched ? "nicht aufgezeichnet" : "keine Runde"; continue; }
     for (let q = next; q < a[0]; q++) if (!okExtra(q)) rigid = false;
     next = a[1] + 1;
     if (a[0] !== a[1] || dbl[k]) rigid = false;
@@ -357,7 +361,7 @@ function alignCore(laps, steps) {
     let ok = true, prevStart = m;
     for (let k = n - 1; k >= 0 && ok; k--) {
       const a = asg[k];
-      if (!a) { if (isWork(k) || !systematicRest) ok = false; continue; }
+      if (!a) { if (!steps[k].opt && (isWork(k) || !systematicRest)) ok = false; continue; }
       for (let q = a[1] + 1; q < prevStart; q++) if (!okExtra(q)) ok = false;
       if (a[0] !== a[1] || dbl[k]) ok = false;
       prevStart = a[0];
@@ -402,7 +406,8 @@ function alignCore(laps, steps) {
     times: idx.map((x) => (x == null ? null : Math.round(merged[x].t))),
     hr: idx.map((x) => (x == null ? null : merged[x].hr || null)),
     wait: [...waitSet], laps: idx, span: asg.map((x, k) => (x && k !== incomplete && !dbl[k] ? x.slice() : null)), pair: dbl.slice(), merged, sure, why, hrUsed: hrOk, incomplete, tail, skipped, merges,
-    quality: workSure / Math.max(1, steps.filter((s) => s.kind !== "rest").length - (tail ? steps.slice(n - tail).filter((s) => s.kind !== "rest").length : 0)),
+    // Quote ohne optionale Schritte, die in dieser Aktivität fehlen (Einlaufen/Auslaufen separat)
+    quality: workSure / Math.max(1, steps.filter((s, k) => s.kind !== "rest" && !(s.opt && !asg[k])).length - (tail ? steps.slice(n - tail).filter((s, q) => s.kind !== "rest" && !(s.opt && !asg[n - tail + q])).length : 0)),
     cost: Math.round(best.total * 100) / 100,
   };
 }

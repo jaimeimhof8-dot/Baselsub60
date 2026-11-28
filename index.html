@@ -14685,6 +14685,7 @@
       import { normTime } from "./src/timeinput.js";
       import { repSummary, watchCheck, alignFuzzy } from "./src/laps.js";
       import { alignLaps } from "./src/align.js";
+      import { simSteps } from "./src/simsteps.js";
       import { lauftagSteps, alignLauf } from "./src/lauftag.js";
       import { planSteps } from "./src/garmin-workout.js";
       import {
@@ -22858,6 +22859,8 @@
       };
       /* Plan eines Stationstags → Schritte: Einlaufen, Referenzlauf, je Runde Station · Lauf · Pause, Auslaufen. Sonst null (dann normaler Fokusmodus). */
       function s7Steps(p) {
+        // Simulationstag («Run N: 1 km … → Station … (Ziel m:ss)»): eigener Parser (src/simsteps.js)
+        if (p && p.k === "sim" && (p.i || []).length) return simSteps(p.i);
         if (!p || p.k !== "station" || !(p.i || []).length) return null;
         const all = p.i.join(" | "),
           f200 =

@@ -156,12 +156,14 @@ export function watchCheck(act, { steps = null, intervalText = "" } = {}) {
   const wait = !!act && act.src === "garmin" && act.lapsV !== 3;
   const out = { laps: { n: laps.length, state: laps.length ? "ok" : wait ? "wait" : "none" }, splits: null, intervals: null };
   if (steps && steps.length) {
-    const total = steps.filter((s) => s.kind !== "rest").length;
+    let total = steps.filter((s) => s.kind !== "rest").length;
     if (!laps.length) out.splits = { state: "none", got: 0, total, mode: null, count: 0 };
     else {
       const r = alignSplits(laps, steps);
       const dp = r.times ? null : alignLaps(laps, steps);
       // Erster Grund (Arbeitsschritt), warum etwas nicht sicher ist – für die Anzeige in Klartext
+      // Optionale Schritte (Einlaufen/Auslaufen in eigener Aktivität), die hier keine Runde haben, zählen nicht mit
+      if (dp) total -= steps.filter((s, k) => s.opt && s.kind !== "rest" && !dp.span[k]).length;
       const reason = dp ? (() => { const k = steps.findIndex((st, q) => st.kind !== "rest" && dp.sure[q] === false && dp.why[q]); return k < 0 ? "" : `${steps[k].name || steps[k].kind} (Schritt ${k + 1}): ${dp.why[k]}`; })() : "Runden passen insgesamt nicht zum Plan";
       if (r.times) out.splits = { state: "ok", got: r.times.filter((t, k) => t != null && steps[k].kind !== "rest").length, total, mode: r.mode, count: r.count };
       else if (dp && dp.sure.some((x, k) => x && steps[k].kind !== "rest")) {

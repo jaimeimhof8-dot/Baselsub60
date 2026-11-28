@@ -197,3 +197,12 @@ Tests: 519 grün, neu u. a. «Fall A sauber» (180 Einheiten, alle Arbeitsschrit
 Stand: 519 Tests grün. Fall A mit Puls: im Prüfer-Skript `fallA2.mjs` 0 Fehlzuordnungen (vorher 32), Gegenbeispiel mit Puls (`dumpA`) meldet nichts mehr als sicher. 36 000 Zufallseinheiten: 15 falsch «sicher» (alle «fehlt»), 1 still falsch eingetragen.
 
 **Offen, ohne Puls:** In Fall A ohne Puls bleiben im Prüfer-Skript 35 Arbeitsschritte und 7 eingetragene Zeiten falsch, fast alle «erste Station fehlt ganz, eine Warte-Runde gleicher Länge steht an ihrer Stelle». Ohne Puls ist das nicht erkennbar. Mit Pulsgurt tritt es nicht auf. Dieser letzte Stand ist vom Prüfer-Agenten nicht mehr nachgeprüft (auf Jaimes Wunsch abgeschlossen).
+
+## 9. Simulationstage («Brick-Simulation», 28.11.2026)
+
+- Neu `src/simsteps.js`: liest «Run N: 1 km @ 4:05/km (4:05) → Station … (Ziel m:ss, …)», auch in der ab Plantag 16 aufgeteilten Form (Lauf und Station in zwei Zeilen). Hinweis- und Taktikzeilen sowie Steigerungen ergeben keinen Schritt. Einlaufen/Auslaufen sind **optional** (`opt`): Sie stecken oft in einer eigenen Aktivität, fehlen dann ohne Störung und zählen nicht in «x von y».
+- `s7Steps` (index.html) nutzt den Parser für `k: "sim"`. Damit gelten Zuordnung, Prüfliste, Diagnose, Analyse und Split-Ansicht auch für Simulationstage.
+- Stationen mit Puls: Abweichung vom Ziel erst ab Faktor 1,65 auffällig (Stationsziele sind Teamziele, echte Zeiten streuen stark; z. B. Sled Push 1:48 statt 3:03).
+- Echter Test mit Jaimes Einheit vom 28.11. (Garmin «Hyrox», 8 Runden + 1-s-Stopp, Einlaufen separat): alle 8 Arbeitsschritte auf der richtigen Runde und sicher.
+- Messung: 36 000 Zufallseinheiten 23 falsch «sicher» (vorher 15). Die zusätzlichen sind «fehlt + Trink-Runde» (ausgelassener Schritt, an seiner Stelle eine Trinkpause gleicher Länge mit Arbeitspuls) und ein Lap-Druck zur falschen Zeit bei 8 gleichen Stationen. Beide Klassen sind aus Zeit, Strecke und Puls nicht erkennbar. Still falsch eingetragen: 2 (alt: 38 386). Dieser Stand ist nicht mehr vom Prüfer-Agenten geprüft.
+- Edge Function `garmin` Version 18 deployt (28.11.2026).

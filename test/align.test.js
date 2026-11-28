@@ -216,9 +216,11 @@ for (const noise of [3, 8, 0]) for (const [ln, steps] of Object.entries(LAYOUTS_
       let laps = mkHr(steps, R, noise);
       if (!noise) laps = laps.map((l) => ({ ...l, hr: 150 }));
       const names = Object.keys(MUTS_HR).filter((x) => !(ln === "nurStationen" && x === "trinken"));
-      // «fehlt» höchstens einmal: Fehlen zwei Runden samt Zeit (ganze Periode ausgelassen), ist bei gleichen Perioden nicht erkennbar, welche
-      let gone = false;
-      for (let q = 1 + Math.floor(R() * 3); q > 0; q--) { const nm = names[Math.floor(R() * names.length)]; if (nm === "fehlt" && gone) continue; if (nm === "fehlt") gone = true; MUTS_HR[nm](laps, R); }
+      // «fehlt» höchstens einmal: Fehlen zwei Runden samt Zeit (ganze Periode ausgelassen), ist bei gleichen Perioden nicht erkennbar, welche.
+      // «fehlt» und «trinken» nicht zusammen: ein ausgelassener Schritt, an dessen Stelle eine Trinkpause gleicher Länge mit Arbeitspuls steht,
+      // ist aus Zeit, Strecke und Puls nicht erkennbar (bekannte Grenze, PLAN_RUNDENUEBERNAHME_V3.md).
+      let gone = false, drank = false;
+      for (let q = 1 + Math.floor(R() * 3); q > 0; q--) { const nm = names[Math.floor(R() * names.length)]; if ((nm === "fehlt" && (gone || drank)) || (nm === "trinken" && gone)) continue; if (nm === "fehlt") gone = true; if (nm === "trinken") drank = true; MUTS_HR[nm](laps, R); }
       const r = alignLaps(laps, steps);
       if (r) steps.forEach((_, k) => {
         if (!r.sure[k] || r.laps[k] == null) return;
@@ -365,4 +367,37 @@ test("Strecken-Beleg: Laufband 0 m oder nur Einlaufen/Ergometer mit Metern gilt 
   assert.equal(runDistEvidence(lapsA(st, rng(1), { tm: true }), st), false);
   assert.equal(runDistEvidence(lapsA(st, rng(1), { tm: true, erg: true }).map((l, i) => (i === 0 ? { ...l, d: 2000 } : l)), st), false);
   assert.equal(runDistEvidence(lapsA(st, rng(1), { tm: false }), st), true);
+});
+
+// ---- Simulationstag (echte Einheit vom 28.11.2026, Garmin «Hyrox», 9 Runden, Einlaufen separat aufgezeichnet) ----
+import { simSteps } from "../src/simsteps.js";
+const SIM_LINES = [
+  "Einlaufen 600 m @ 5:30/km (3:18)", "Steigerungen 4×100 m @ 3:40/km (0:22)",
+  "Aufteilung 60 zu 40 testen: Der Stärkere übernimmt bei Schlitten schieben und ziehen den grösseren Anteil, Abstand zur Zielzeit der Station mit dem Abstand in der letzten Simulation vergleichen",
+  "Run 1: 1 km @ 4:05/km (4:05) (Verbot schneller als 4:05/km!)", "Sled Push 50 m mit 225 kg (175 kg Platten, Ziel 3:03, Wechsel alle 7 m in Bewegung)",
+  "Run 2: 1 km @ 4:05/km (4:05)", "Sled Pull 50 m mit 175 kg (125 kg Platten, Ziel 3:40, Wechsel jede 12,5-m-Bahn)",
+  "Run 3: 1 km @ 4:05/km (4:05)", "Sandbag Lunges 100 m mit 30 kg (Ziel 3:15, Wechsel alle 25 m ohne Ablegen)",
+  "Run 4: 1 km @ 4:05/km (4:05)", "Wall Balls 100 mit 9 kg auf 3 m (Ziel 4:40, Aufteilung 20/20/15/15/15/15)",
+  "Nach jeder Station führt der frischere Partner und läuft die ersten 200 m kontrolliert bei 4:15/km an, bis der andere im Rhythmus ist",
+];
+const SIM_LAPS = [{ d: 0, t: 229, hr: 164 }, { d: 0, t: 108, hr: 159 }, { d: 0, t: 238, hr: 172 }, { d: 0, t: 244, hr: 153 }, { d: 0, t: 239, hr: 173 }, { d: 0, t: 178, hr: 165 }, { d: 0, t: 241, hr: 178 }, { d: 0, t: 206, hr: 173 }, { d: 0, t: 1, hr: 166 }];
+test("simSteps: aufgeteilte Zeilen → Einlaufen (optional), 4 × Lauf + Station mit Zielen, Hinweiszeilen ohne Schritt", () => {
+  const st = simSteps(SIM_LINES);
+  assert.deepEqual(st.map((s) => s.kind), ["warm", "run", "station", "run", "station", "run", "station", "run", "station"]);
+  assert.deepEqual(st.map((s) => s.goal), [198, 245, 183, 245, 220, 245, 195, 245, 280]);
+  assert.equal(st[0].opt, true);
+  assert.deepEqual(st.map((s) => s.name).slice(1, 5), ["1 km", "Sled Push", "1 km", "Sled Pull"]);
+  // Ungeteilte Form (vor Plantag 16 oder eigene Anpassung) ergibt dieselben Schritte
+  const raw = ["Run 1: 1 km @ 4:05/km (4:05) → Sled Push 50 m mit 225 kg (175 kg Platten, Ziel 3:03, Wechsel alle 7 m)", "Run 2: 1 km @ 4:05/km (4:05) → Wall Balls 100 mit 9 kg (Ziel 4:40)"];
+  assert.deepEqual(simSteps(raw).map((s) => [s.kind, s.goal, s.j]), [["run", 245, 0], ["station", 183, 0], ["run", 245, 1], ["station", 280, 1]]);
+  assert.equal(simSteps(["Doubles Transition Drilling", "Lange Zone-2-Fahrt"]), null);
+});
+test("Echte Simulation 28.11.: alle 8 Arbeitsschritte sicher, richtige Runden, Einlaufen zählt nicht als fehlend", () => {
+  const st = simSteps(SIM_LINES);
+  const r = alignLaps(SIM_LAPS, st);
+  assert.deepEqual(st.map((_, k) => (r.span[k] ? r.span[k][0] : null)), [null, 0, 1, 2, 3, 4, 5, 6, 7]);
+  assert.ok(st.every((s, k) => s.kind === "warm" || r.sure[k]), JSON.stringify(r.why));
+  const w = watchCheck({ src: "garmin", lapsV: 3, laps: SIM_LAPS }, { steps: st });
+  assert.equal(w.splits.got, 8);
+  assert.equal(w.splits.total, 8);
 });

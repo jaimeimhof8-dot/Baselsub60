@@ -421,6 +421,8 @@ test("Echte Simulation 28.11. durch die ganze Analyse: Phasen sicher, Plan gegen
   assert.equal(model.headline.big, "3 von 4", JSON.stringify(model.headline));
   // Gesamtdauer 28:02 (Garmin), Stationen 12:16, Läufe 3:49 + 3:58 + 3:59 + 4:01 = 15:47
   assert.deepEqual(model.numbers.map((n) => [n.k, n.v]), [["Gesamtdauer", "28:02"], ["Stationszeit", "12:16"], ["Laufzeit", "15:47"], ["Kompromiss Ø", "–"], ["Schwächste", "+24"]]);
+  assert.deepEqual(model.tabs, ["Gesamt", "Stationen", "Läufe", "Vorher", "Mehr"]);
+  assert.deepEqual(d.plan.rows.filter((r) => r.kind === "run").map((r) => r.hr), [164, 172, 173, 178]);
   // Kein Kompromiss-Delta, weil der Plan keinen frischen Referenz-km hat – nicht «Runden passen nicht»
   assert.match(model.numbers[3].why, /kein frischer Referenz-km/);
   assert.ok(!JSON.stringify(model).includes("passen nicht"), JSON.stringify(model.numbers));

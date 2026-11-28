@@ -14563,7 +14563,7 @@
       </nav>
       <div id="acct"></div>
       <!-- App-Version (gleich wie der Cache-Name in sw.js): zeigt, ob das Gerät die neueste Version ausführt -->
-      <p id="appv" style="margin:12px 16px;font-size:12px;color:var(--muted)">App-Version 141</p>
+      <p id="appv" style="margin:12px 16px;font-size:12px;color:var(--muted)">App-Version 142</p>
     </div>
     <div id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -21109,7 +21109,7 @@
           acts = "",
           text = "";
         if (busy)
-          body = `<p class="s7-an-e">Coach liest deine Einheit und die letzten gleichartigen …</p>`;
+          body = `<p class="s7-an-e">Coach liest deine Einheit und die letzten gleichartigen … Das dauert bis zu einer Minute, bitte die App so lange offen lassen.</p>`;
         else if (!rec) {
           body = `<p class="s7-an-e">Für Stärken, Schwächen, Tempo, Pausen und Planänderungen wertet dein Coach die Einheit aus.</p>${btn("Coach-Analyse starten")}`;
         } else {
@@ -21559,6 +21559,7 @@
         else if (kind === "interval" || kind === "station") { const m = /^(\d+) von (\d+)$/.exec(h.big); if (m) { const hit = +m[1], n = +m[2]; verdict = hit === n ? "Sehr gut" : hit >= n - 1 ? "Solide" : "Unter Plan"; tone = hit === n ? "ok" : "warn"; teaser = `${h.big} ${esc2(h.label)}`; } }
         else if (h.status) { verdict = h.status.text; tone = h.status.tone; teaser = `${esc2(h.big)} ${esc2(h.label)}`; }
         else if (h.big && h.big !== "–") teaser = `${esc2(h.big)} ${esc2(h.label)}`;
+        if (busy) teaser = "<i>Coach erstellt die Einschätzung neu (bis zu 1 Minute, App offen lassen) …</i>";
         const secsOut = [];
         if (R && R.summary) secsOut.push({ cls: "mu", t: "Einordnung", html: esc2(R.summary) + (R.form && R.form.text ? "<br>" + line(R.form.rating || "Form", R.form.text) : "") });
         const good = R && R.strengths.length ? pr(R.strengths) : pr(d && d.an && d.an.good), bad = R && R.weaknesses.length ? pr(R.weaknesses) : pr(d && d.an && d.an.bad);
@@ -21587,7 +21588,7 @@
           else if (rec.state === "applied") prop = `<p class="an3-note">Planänderung übernommen.</p>`;
         }
         const at = rec ? new Date(rec.at) : null, when = at ? `Analysiert ${at.getDate()}.${at.getMonth() + 1}. ${String(at.getHours()).padStart(2, "0")}:${String(at.getMinutes()).padStart(2, "0")}` : "Noch keine Coach-Analyse";
-        const foot = anCoachFoot(esc2(when + (stale ? ". Seit der Analyse haben sich Werte oder Uhr-Daten geändert." : ".") + (anErr[dk] ? " " + anErr[dk] : "")), busy ? "Coach liest die Einheit …" : !rec ? "Coach-Analyse starten" : stale ? "Neu analysieren" : "Nochmals analysieren", i, busy);
+        const foot = anCoachFoot(esc2(when + (stale ? ". Seit der Analyse haben sich Werte oder Uhr-Daten geändert." : ".") + (anErr[dk] ? " " + anErr[dk] : "")), busy ? "Coach liest die Einheit … (bis 1 Min., App offen lassen)" : !rec ? "Coach-Analyse starten" : stale ? "Neu analysieren" : "Nochmals analysieren", i, busy);
         return anCoachHtml({ teaser, verdict, tone, sections: secsOut, prop, foot });
       }
       function anBody(i, p) {

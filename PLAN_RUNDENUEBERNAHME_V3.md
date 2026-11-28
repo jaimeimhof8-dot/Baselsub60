@@ -184,3 +184,16 @@ Grenze: Bei 90 s Roxzone, Laufband ohne Strecke **und** vergessenem Druck liegen
 **Sicherheit nach Fall A**: 36 000 Zufallseinheiten 15 falsch «sicher» (wie vor Fall A, alle mit «fehlt»), 1 still falsch eingetragen. In der App übernommen 34,7 % (vorher 33,3 %). Prüfer-Skripte `sim.mjs` / `sim2.mjs`: 0 / 1 falsch «sicher», 0 / 0 falsch eingetragen. Saubere Einheiten ohne Puls wurden besser (90-s-Pausen 40 → 67 %, 120 s 35 → 81 %), mit Puls weiterhin 100 %.
 
 Tests: 519 grün, neu u. a. «Fall A sauber» (180 Einheiten, alle Arbeitsschritte sicher), «Fall A gestört» (600 Einheiten, nie sicher auf fremder Runde), Strecken-Beleg, Diagnose-Felder.
+
+
+## 8. Nacharbeit nach Prüfer-Review 4 («nicht freigegeben»: zweiter Durchgang bestätigt falsche Zuordnung selbst)
+
+- Tagesniveau nur aus Schritten, die im ersten Durchgang sicher sind. Im zweiten Durchgang ist nur sicher, was im ersten sicher war oder in beiden dieselbe Runde bekommt.
+- Schon der erste Durchgang rechnet relativ zum Tagesniveau (Stationen bis Faktor 2), auch der Nachbarvergleich. So ist er bei Roxzone selbst sicher.
+- Ergometer-Meter als eigener Typ-Beleg, auch ohne Laufstrecke (Laufband).
+- Widerspricht der Puls irgendwo dem Schritttyp, gilt das Ende nicht als Anker (Absturz an einer Rundengrenze plus Wartepausen).
+- Zweite Wartepause wird mit dem Einlaufen verglichen. Stopp-Runde (< 30 s) als Wartepause nur mit Puls.
+
+Stand: 519 Tests grün. Fall A mit Puls: im Prüfer-Skript `fallA2.mjs` 0 Fehlzuordnungen (vorher 32), Gegenbeispiel mit Puls (`dumpA`) meldet nichts mehr als sicher. 36 000 Zufallseinheiten: 15 falsch «sicher» (alle «fehlt»), 1 still falsch eingetragen.
+
+**Offen, ohne Puls:** In Fall A ohne Puls bleiben im Prüfer-Skript 35 Arbeitsschritte und 7 eingetragene Zeiten falsch, fast alle «erste Station fehlt ganz, eine Warte-Runde gleicher Länge steht an ihrer Stelle». Ohne Puls ist das nicht erkennbar. Mit Pulsgurt tritt es nicht auf. Dieser letzte Stand ist vom Prüfer-Agenten nicht mehr nachgeprüft (auf Jaimes Wunsch abgeschlossen).

@@ -21552,7 +21552,8 @@
         const { d, model, ivs, kind, S0, secs } = c, h = model.headline, line = (n, t) => `<b>${esc2(n)}</b> ${esc2(t)}`;
         const pr = (arr) => (arr && arr.length ? arr.map((x) => (x.title ? line(x.title, x.detail) : line(x.n, x.t))).join("<br>") : "");
         let verdict = "", tone = "", teaser = "";
-        if (R) teaser = (stale ? "<i>Veraltet, wird neu erstellt:</i> " : "") + esc2(R.headline);
+        // «wird neu erstellt» nur, wenn das auch passiert (angemeldet, online, kein Fehler); sonst nur «Veraltet»
+        if (R) teaser = (stale ? (coachReady() && navigator.onLine !== false && !anErr[dk] ? "<i>Veraltet, wird neu erstellt:</i> " : "<i>Veraltet:</i> ") : "") + esc2(R.headline);
         else if (kind === "interval" || kind === "station") { const m = /^(\d+) von (\d+)$/.exec(h.big); if (m) { const hit = +m[1], n = +m[2]; verdict = hit === n ? "Sehr gut" : hit >= n - 1 ? "Solide" : "Unter Plan"; tone = hit === n ? "ok" : "warn"; teaser = `${h.big} ${esc2(h.label)}`; } }
         else if (h.status) { verdict = h.status.text; tone = h.status.tone; teaser = `${esc2(h.big)} ${esc2(h.label)}`; }
         else if (h.big && h.big !== "–") teaser = `${esc2(h.big)} ${esc2(h.label)}`;
@@ -23222,7 +23223,9 @@
           const id = dk + "|" + j;
           if (!arr.some((x) => x != null)) continue;
           if (onlyEmpty && String(S.val[id] || "").trim()) continue;
-          S.val[id] = arr.map((x) => (x != null ? mmss(x) : "–")).join(" · ");
+          // Hat die Uhr für einen Teil der Zeile keine sichere Zeit, bleibt der bisherige Wert dieses Teils (z. B. Handeintrag) stehen
+          const old = String(S.val[id] || "").split(" · ").map((x) => x.trim());
+          S.val[id] = arr.map((x, q) => (x != null ? mmss(x) : old[q] && old[q] !== "–" && arr.length === old.length ? old[q] : "–")).join(" · ");
           n++;
         }
         return n;

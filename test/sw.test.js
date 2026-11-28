@@ -16,3 +16,10 @@ test("Push Press belastet Schultern und Beine", () => {
   assert.ok(z.includes("shoulders") && z.includes("quads"));
   assert.ok(!z.includes("chest"));
 });
+
+test("Angezeigte App-Version im Menü entspricht dem Cache-Namen des Service Workers", () => {
+  const sw = readFileSync(new URL("../sw.js", import.meta.url), "utf8");
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const v = /const C = "hyrox-v(\d+)"/.exec(sw)[1];
+  assert.match(html, new RegExp(`App-Version ${v}<`));
+});

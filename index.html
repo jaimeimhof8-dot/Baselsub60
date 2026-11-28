@@ -13186,7 +13186,9 @@
       .an3-rc small { display: block; font-size: 12px; color: var(--muted); }
       .an3-rc b { font-family: var(--f-head); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; white-space: nowrap; }
       .an3-rc b em { font-style: normal; font-family: var(--f-body); font-size: 12px; font-weight: 500; color: var(--muted); margin-left: 3px; }
-      .an3-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-top: 28px; }
+      .an3-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-top: 28px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+      .an3-tabs::-webkit-scrollbar { display: none; }
+      .an3-tabs button { flex: 0 0 auto; white-space: nowrap; }
       .an3-tabs button { background: none; border: 0; min-height: 48px; padding: 0 12px; color: var(--muted); font-weight: 600; position: relative; }
       .an3-tabs button[aria-selected="true"] { color: var(--text); }
       .an3-tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: -1px; height: 2px; background: var(--accent); border-radius: 2px; }
@@ -14563,7 +14565,7 @@
       </nav>
       <div id="acct"></div>
       <!-- App-Version (gleich wie der Cache-Name in sw.js): zeigt, ob das Gerät die neueste Version ausführt -->
-      <p id="appv" style="margin:12px 16px;font-size:12px;color:var(--muted)">App-Version 143</p>
+      <p id="appv" style="margin:12px 16px;font-size:12px;color:var(--muted)">App-Version 144</p>
     </div>
     <div id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -21539,6 +21541,27 @@
           if (!bl.length) return anEmpty("Keine Zeitreihe von der Uhr.");
           const rows = bl.map((q) => ({ cells: [Math.round((q.t0 - S0.t[0]) / 60) + " bis " + Math.round((q.t1 - S0.t[0]) / 60) + " min", mmss(q.t1 - q.t0), q.pw ? Math.round(q.pw) : "", q.hr ? Math.round(q.hr) : "", q.cad ? Math.round(q.cad) : ""], sel: sel(q.t0, q.t1, "Block " + q.k) }));
           return anTableHtml({ cols: "minmax(0,1fr) 52px 44px 44px 44px", head: ["Abschnitt", "Zeit", "Watt", "Puls", "U/min"], rows, note: "Blöcke zu 10 Minuten. Zeile antippen zoomt alle Diagramme auf den Block." }, esc);
+        }
+        if (tab === "Gesamt" || tab === "Läufe") {
+          // Gesamt: alle Läufe und Stationen in Plan-Reihenfolge; Läufe: nur die Läufe mit Pace und Puls
+          const p0 = d && d.plan;
+          if (!p0 || !p0.rows.length) return anEmpty("Die Runden passen nicht zu den Plan-Schritten.");
+          let nr = 0;
+          const all = p0.rows.map((r) => ({ ...r, label: r.kind === "run" ? "Lauf " + ++nr + (r.name ? " · " + r.name : "") : r.name }));
+          const km = (r) => { const m = /(\d+(?:[.,]\d+)?)\s?km/.exec(r.name || ""), mm = /(\d+)\s?m\b/.exec(r.name || ""); return m ? parseFloat(m[1].replace(",", ".")) : mm ? +mm[1] / 1000 : 0; };
+          const dcell = (r) => ({ t: sg(r.diff) + " s", c: r.diff <= 0 ? "ok" : "bad" });
+          if (tab === "Läufe") {
+            const rr = all.filter((r) => r.kind === "run");
+            if (!rr.length) return anEmpty("Keine Läufe sicher zugeordnet.");
+            const tot = rr.reduce((s, r) => s + r.t, 0), dist = rr.reduce((s, r) => s + km(r), 0);
+            return anTableHtml({ cols: "minmax(0,1fr) 52px 52px 40px 56px", head: ["Lauf", "Zeit", "Pace", "Puls", "Δ"],
+              rows: rr.map((r) => ({ cells: [r.label, mmss(r.t), km(r) ? mmss(r.t / km(r)) : "–", r.hr || "", dcell(r)] })),
+              note: `Läufe zusammen ${mmss(tot)}${dist ? `, Ø ${mmss(tot / dist)}/km` : ""}. Δ = Zeit gegen Zielzeit aus dem Plan.` }, esc);
+          }
+          const st = all.filter((r) => r.kind !== "run").reduce((s, r) => s + r.t, 0), ru = all.filter((r) => r.kind === "run").reduce((s, r) => s + r.t, 0);
+          return anTableHtml({ cols: "minmax(0,1fr) 52px 52px 40px 56px", head: ["Abschnitt", "Zeit", "Ziel", "Puls", "Δ"],
+            rows: all.map((r) => ({ cells: [r.label, mmss(r.t), { t: mmss(r.goal), c: "mu" }, r.hr || "", dcell(r)] })),
+            note: `Gesamtdauer ${act && act.time ? mmss(act.time) : "–"} (wie Garmin) · Stationen ${mmss(st)} · Läufe ${mmss(ru)}. Stationszeit inklusive Roxzone.` }, esc);
         }
         if (tab === "Stationen") {
           // Nur Stationen (Plan gegen Ist enthält auch die Läufe)

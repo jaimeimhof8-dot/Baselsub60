@@ -146,7 +146,8 @@ export function anSessionModel({ kind, act, d = null, ivs = [], maxHr = null, zo
     const comp = tile("Kompromiss-Delta");
     out.numbers.push(comp && !comp.na ? num("Kompromiss Ø", comp.v.replace(/ s\/km$/, ""), "s/km", /^\+(\d+)/.test(comp.v) && +/^\+(\d+)/.exec(comp.v)[1] >= 10 ? "warn" : "") : na("Kompromiss Ø", comp && comp.why ? comp.why : "kein Referenz-km"));
     if (plan && plan.rows.length) { const w = plan.rows.reduce((a, r) => (r.diff > a.diff ? r : a), plan.rows[0]); out.numbers.push(num("Schwächste", sg(w.diff), "s")); out.worst = w.name; } else out.numbers.push(na("Schwächste", "kein Plan-Vergleich"));
-    out.tabs = ["Stationen", "Vorher", "Mehr"];
+    // Mit Läufen im Plan-Vergleich (Simulation, «Runde N: Station → 1 km»): Gesamt, Stationen, Läufe getrennt
+    out.tabs = plan0 && plan0.rows.some((r) => r.kind === "run") ? ["Gesamt", "Stationen", "Läufe", "Vorher", "Mehr"] : ["Stationen", "Vorher", "Mehr"];
     return out;
   }
 

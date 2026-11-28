@@ -14563,7 +14563,7 @@
       </nav>
       <div id="acct"></div>
       <!-- App-Version (gleich wie der Cache-Name in sw.js): zeigt, ob das Gerät die neueste Version ausführt -->
-      <p id="appv" style="margin:12px 16px;font-size:12px;color:var(--muted)">App-Version 142</p>
+      <p id="appv" style="margin:12px 16px;font-size:12px;color:var(--muted)">App-Version 143</p>
     </div>
     <div id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -20920,12 +20920,34 @@
         anAuto = {}; // je Tag: Fingerabdruck, für den die veraltete Analyse schon automatisch neu angestossen wurde (höchstens einmal je Stand)
       /* Gespeicherte Coach-Analyse veraltet (Werte oder Uhr-Daten haben sich seither geändert, z. B. Runden neu zugeordnet):
          einmal automatisch neu erstellen, statt den alten Text («Runden nicht zugeordnet») stehen zu lassen */
+      /* Erst nachsehen, ob der Server die Analyse schon fertig gespeichert hat (App war während der Analyse geschlossen),
+         sonst neu anstossen. Neu anstossen höchstens einmal je Stand und alle 5 Minuten; nachsehen bei jedem Öffnen der Ansicht. */
+      async function anFromServer(i, p) {
+        const dk = keyI(i), sig = s7AnSig(i, p);
+        try {
+          const { data: row } = await sb.from("coach_results").select("sig,data,created_at").eq("day", dk).maybeSingle();
+          if (!row || row.sig !== sig) return false;
+          const r = coach.parseAnalysis(row.data);
+          S.analysis[dk] = { at: Date.parse(row.created_at) || Date.now(), sig, data: r, state: r.actions.length ? "open" : "none" };
+          delete anErr[dk];
+          save();
+          if (view === "today" || view === "analysis") render();
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
       function anAutoRefresh(i, p, rec, stale, busy) {
         if (!rec || !stale || busy || !coachReady() || navigator.onLine === false) return;
-        const dk = keyI(i), sig = s7AnSig(i, p);
-        if (anAuto[dk] === sig) return;
-        anAuto[dk] = sig;
-        setTimeout(() => runAnalysis(i), 0);
+        const dk = keyI(i), sig = s7AnSig(i, p), a = anAuto[dk];
+        if (a && a.sig === sig && (a.checking || Date.now() - a.at < 20000)) return;
+        const rerun = !a || a.sig !== sig || Date.now() - a.run > 300000;
+        anAuto[dk] = { sig, at: Date.now(), run: rerun ? Date.now() : a.run, checking: true };
+        setTimeout(async () => {
+          const got = await anFromServer(i, p);
+          anAuto[dk].checking = false;
+          if (!got && rerun && !anBusy[dk]) runAnalysis(i);
+        }, 0);
       }
       function anFnError(error) {
         const res =
@@ -20958,11 +20980,13 @@
         render();
         try {
           if (gmOn() && !gmBusy && !actsOf(i).some((a) => a.laps && a.laps.length)) await garminSync(true);
+          const sigNow = s7AnSig(i, p);
           const req = coach.buildCoachRequest({
             context: coach.analysisContext(coachCtx(), s7AnData(i, p)),
             chat: [],
             message: coach.analyseMessage(i, p),
             mode: "analyse",
+            job: { day: dk, sig: sigNow },
           });
           const { data, error } = await sb.functions.invoke("coach", {
             body: req,
@@ -20971,7 +20995,7 @@
           const r = coach.parseAnalysis(data);
           S.analysis[dk] = {
             at: Date.now(),
-            sig: s7AnSig(i, p),
+            sig: sigNow,
             data: r,
             state: r.actions.length ? "open" : "none",
           };

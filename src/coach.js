@@ -92,11 +92,12 @@ export function coachErrorText(status, code) {
 }
 
 /** Request-Body für die Edge Function. Wirft bei leerer oder zu langer Nachricht. */
-export function buildCoachRequest({ context, chat, message, mode }) {
+export function buildCoachRequest({ context, chat, message, mode, job }) {
   const text = String(message || "").trim();
   if (!text) throw Object.assign(new Error("Bitte beschreibe kurz, was nicht passt."), { code: "empty" });
   if (text.length > MAX_MSG) throw Object.assign(new Error(`Bitte höchstens ${MAX_MSG} Zeichen.`), { code: "too_long" });
-  return { context, history: toApiHistory(chat || []), message: text, ...(mode === "explain" || mode === "analyse" ? { mode } : {}) };
+  // job (nur Analyse): {day, sig} – der Server speichert das Ergebnis darunter (public.coach_results), falls die App vorher geschlossen wird
+  return { context, history: toApiHistory(chat || []), message: text, ...(mode === "explain" || mode === "analyse" ? { mode } : {}), ...(mode === "analyse" && job && job.day && job.sig ? { job: { day: String(job.day), sig: String(job.sig) } } : {}) };
 }
 
 /** Frage „Erkläre mir diese Einheit“: enthält die Einheit selbst, damit sie auch ausserhalb der Plan-Vorschau verständlich ist. */

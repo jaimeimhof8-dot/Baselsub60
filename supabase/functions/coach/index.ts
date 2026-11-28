@@ -129,9 +129,13 @@ const ANALYSE_SCHEMA = {
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-function readBody(b: unknown): { context: unknown; history: Msg[]; message: string; explain: boolean; analyse: boolean } | null {
+type Job = { day: string; sig: string } | null;
+function readBody(b: unknown): { context: unknown; history: Msg[]; message: string; explain: boolean; analyse: boolean; job: Job } | null {
   if (!b || typeof b !== "object") return null;
-  const { context, history, message, mode } = b as Record<string, unknown>;
+  const { context, history, message, mode, job } = b as Record<string, unknown>;
+  // Analyse-Auftrag: Tag und Fingerabdruck, unter denen das Ergebnis gespeichert wird (public.coach_results)
+  const j = job as Record<string, unknown> | undefined;
+  const okJob = mode === "analyse" && j && typeof j.day === "string" && /^\d{4}-\d{1,2}-\d{1,2}$/.test(j.day) && typeof j.sig === "string" && j.sig.length <= 20000;
   if (typeof message !== "string" || !message.trim() || message.length > 2000) return null;
   if (!context || typeof context !== "object" || JSON.stringify(context).length > 60_000) return null;
   const h = Array.isArray(history) ? history : [];
@@ -144,7 +148,7 @@ function readBody(b: unknown): { context: unknown; history: Msg[]; message: stri
   }
   while (clean.length && clean[0].role !== "user") clean.shift();
   while (clean.length && clean[clean.length - 1].role !== "assistant") clean.pop();
-  return { context, history: clean, message: message.trim(), explain: mode === "explain", analyse: mode === "analyse" };
+  return { context, history: clean, message: message.trim(), explain: mode === "explain", analyse: mode === "analyse", job: okJob ? { day: j!.day as string, sig: j!.sig as string } : null };
 }
 
 Deno.serve(async (req) => {
@@ -171,6 +175,14 @@ Deno.serve(async (req) => {
     { role: "user" as const, content: `<plan>\n${JSON.stringify(body.context)}\n</plan>\n\n${body.message}` },
   ];
 
+  // Analyse: weiterrechnen und speichern, auch wenn die App die Verbindung abbricht (Handy gesperrt, App gewechselt)
+  const work = handle(body, messages, sb);
+  const er = (globalThis as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime;
+  if (body.job && er) er.waitUntil(work.catch(() => {}));
+  return await work;
+});
+
+async function handle(body: NonNullable<ReturnType<typeof readBody>>, messages: Msg[], sb: ReturnType<typeof createClient>): Promise<Response> {
   try {
     const response = await client.beta.messages.create({
       model: "claude-sonnet-5-5",
@@ -198,6 +210,11 @@ Deno.serve(async (req) => {
     if (!text || text.type !== "text") return json({ error: "empty" }, 502);
     const out = JSON.parse(text.text);
     if (body.explain) out.actions = []; // Erklär-Modus ändert nie den Plan
+    if (body.job) {
+      // Mit dem Login des Nutzers speichern (RLS: nur eigene Zeile); ein Fehler hier verhindert die Antwort nicht
+      const { error } = await sb.from("coach_results").upsert({ day: body.job.day, sig: body.job.sig, data: out, created_at: new Date().toISOString() }, { onConflict: "user_id,day" });
+      if (error) console.error("coach_results speichern", error.message);
+    }
     return json(out);
   } catch (e) {
     if (e instanceof Anthropic.RateLimitError) return json({ error: "rate_limit" }, 429);
@@ -205,4 +222,4 @@ Deno.serve(async (req) => {
     if (e instanceof SyntaxError) return json({ error: "bad_json" }, 502);
     throw e;
   }
-});
+}

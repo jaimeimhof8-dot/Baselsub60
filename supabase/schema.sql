@@ -69,6 +69,26 @@ create policy "eigener Plan lesen"   on public.plan_state for select to authenti
 create policy "eigener Plan anlegen" on public.plan_state for insert to authenticated with check (user_id = auth.uid() and public.is_member());
 create policy "eigener Plan ändern"  on public.plan_state for update to authenticated using (user_id = auth.uid() and public.is_member()) with check (user_id = auth.uid() and public.is_member());
 
+-- Fertige Coach-Analysen, vom Server gespeichert: gehen nicht verloren, wenn die App während der Analyse (≈ 45 s) geschlossen wird.
+-- Je Nutzer und Tag die letzte Analyse; die App holt sie beim nächsten Öffnen ab (nur wenn der Fingerabdruck sig passt).
+create table if not exists public.coach_results (
+  user_id    uuid not null default auth.uid() references auth.users on delete cascade,
+  day        text not null check (day ~ '^\d{4}-\d{1,2}-\d{1,2}$'),
+  sig        text not null check (length(sig) <= 20000),
+  data       jsonb not null,
+  created_at timestamptz not null default now(),
+  primary key (user_id, day)
+);
+alter table public.coach_results enable row level security;
+revoke all on public.coach_results from anon;
+grant select, insert, update on public.coach_results to authenticated;
+drop policy if exists "eigene Analysen lesen"   on public.coach_results;
+drop policy if exists "eigene Analysen anlegen" on public.coach_results;
+drop policy if exists "eigene Analysen ändern"  on public.coach_results;
+create policy "eigene Analysen lesen"   on public.coach_results for select to authenticated using (user_id = auth.uid() and public.is_member());
+create policy "eigene Analysen anlegen" on public.coach_results for insert to authenticated with check (user_id = auth.uid() and public.is_member());
+create policy "eigene Analysen ändern"  on public.coach_results for update to authenticated using (user_id = auth.uid() and public.is_member()) with check (user_id = auth.uid() and public.is_member());
+
 -- Vorlage für weitere Tabellen mit Nutzerdaten – immer user_id + RLS, sonst sind die Daten für alle Nutzer lesbar:
 --   create table public.xyz (id bigint generated always as identity primary key,
 --     user_id uuid not null default auth.uid() references auth.users on delete cascade, ...);

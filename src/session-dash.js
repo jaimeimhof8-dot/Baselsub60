@@ -317,7 +317,7 @@ export function phaseStats(ph, { steps = null, maxHr = null } = {}) {
     }
     // Plan gegen Ist je Schritt (nur Schritte mit Zielzeit und Runde)
     const rows = [];
-    steps.forEach((s, k) => { const l = lapOf(k); if (l && s.goal > 0 && (s.kind === "run" || s.kind === "station")) rows.push({ name: s.name, kind: s.kind, goal: s.goal, t: Math.round(l.t), diff: Math.round(l.t - s.goal) }); });
+    steps.forEach((s, k) => { const l = lapOf(k); if (l && s.goal > 0 && (s.kind === "run" || s.kind === "station")) rows.push({ name: s.name, kind: s.kind, goal: s.goal, t: Math.round(l.t), hr: l.hr ? Math.round(l.hr) : null, diff: Math.round(l.t - s.goal) }); });
     if (rows.length) st.plan = { rows, hit: rows.filter((r) => r.diff <= 0).length, n: rows.length, sum: rows.reduce((s, r) => s + r.diff, 0) };
   }
   return st;

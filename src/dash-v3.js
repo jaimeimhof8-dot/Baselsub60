@@ -128,7 +128,7 @@ export function dashV3({ kind, act, ph, st, planText = "", facts = {}, prev = nu
 
   // Plan gegen Ist: Stationstag aus den Plan-Schritten, Intervall-Lauf aus Zieltempo × Distanz
   const plan = isS ? (st && st.plan ? { rows: st.plan.rows, hit: st.plan.hit, n: st.plan.n } : null) : intervalPlan(ph, planText);
-  out.plan = plan ? { rows: plan.rows.map((r) => ({ name: r.name, kind: r.kind, goal: r.goal, t: r.t, diff: r.diff })), hit: plan.hit, n: plan.n } : null;
+  out.plan = plan ? { rows: plan.rows.map((r) => ({ name: r.name, kind: r.kind, goal: r.goal, t: r.t, hr: r.hr ?? null, diff: r.diff })), hit: plan.hit, n: plan.n } : null;
 
   // Vergleich mit der letzten Einheit
   if (prev) {

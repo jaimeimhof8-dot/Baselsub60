@@ -13169,7 +13169,7 @@
       .an3-pill.an3-mu { background: var(--well); color: var(--muted); }
       .an3-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; border-top: 1px solid var(--line); padding-top: 16px; }
       .an3-cols .an3-k { font-size: 12px; color: var(--muted); line-height: 1.25; }
-      .an3-cols .an3-v { font-family: var(--f-head); font-size: 30px; font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; }
+      .an3-cols .an3-v { font-family: var(--f-head); font-size: clamp(22px, 6.6vw, 30px); font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; }
       .an3-cols .an3-v small { font-size: 13px; color: var(--muted); margin-left: 3px; font-family: var(--f-body); font-weight: 500; }
       .an3-cols .an3-warn .an3-v { color: var(--warn); }
       .an3-dl { display: flex; align-items: center; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
@@ -13215,7 +13215,9 @@
       .an3-rc small { display: block; font-size: 12px; color: var(--muted); }
       .an3-rc b { font-family: var(--f-head); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; white-space: nowrap; }
       .an3-rc b em { font-style: normal; font-family: var(--f-body); font-size: 12px; font-weight: 500; color: var(--muted); margin-left: 3px; }
-      .an3-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-top: 28px; }
+      .an3-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-top: 28px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+      .an3-tabs::-webkit-scrollbar { display: none; }
+      .an3-tabs button { flex: 0 0 auto; white-space: nowrap; }
       .an3-tabs button { background: none; border: 0; min-height: 48px; padding: 0 12px; color: var(--muted); font-weight: 600; position: relative; }
       .an3-tabs button[aria-selected="true"] { color: var(--text); }
       .an3-tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: -1px; height: 2px; background: var(--accent); border-radius: 2px; }
@@ -14591,6 +14593,8 @@
         </button>
       </nav>
       <div id="acct"></div>
+      <!-- App-Version (gleich wie der Cache-Name in sw.js): zeigt, ob das Gerät die neueste Version ausführt -->
+      <p id="appv" style="margin:12px 16px;font-size:12px;color:var(--muted)">App-Version 145</p>
     </div>
     <div id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -20952,12 +20956,34 @@
         anAuto = {}; // je Tag: Fingerabdruck, für den die veraltete Analyse schon automatisch neu angestossen wurde (höchstens einmal je Stand)
       /* Gespeicherte Coach-Analyse veraltet (Werte oder Uhr-Daten haben sich seither geändert, z. B. Runden neu zugeordnet):
          einmal automatisch neu erstellen, statt den alten Text («Runden nicht zugeordnet») stehen zu lassen */
+      /* Erst nachsehen, ob der Server die Analyse schon fertig gespeichert hat (App war während der Analyse geschlossen),
+         sonst neu anstossen. Neu anstossen höchstens einmal je Stand und alle 5 Minuten; nachsehen bei jedem Öffnen der Ansicht. */
+      async function anFromServer(i, p) {
+        const dk = keyI(i), sig = s7AnSig(i, p);
+        try {
+          const { data: row } = await sb.from("coach_results").select("sig,data,created_at").eq("day", dk).maybeSingle();
+          if (!row || row.sig !== sig) return false;
+          const r = coach.parseAnalysis(row.data);
+          S.analysis[dk] = { at: Date.parse(row.created_at) || Date.now(), sig, data: r, state: r.actions.length ? "open" : "none" };
+          delete anErr[dk];
+          save();
+          if (view === "today" || view === "analysis") render();
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
       function anAutoRefresh(i, p, rec, stale, busy) {
         if (!rec || !stale || busy || !coachReady() || navigator.onLine === false) return;
-        const dk = keyI(i), sig = s7AnSig(i, p);
-        if (anAuto[dk] === sig) return;
-        anAuto[dk] = sig;
-        setTimeout(() => runAnalysis(i), 0);
+        const dk = keyI(i), sig = s7AnSig(i, p), a = anAuto[dk];
+        if (a && a.sig === sig && (a.checking || Date.now() - a.at < 20000)) return;
+        const rerun = !a || a.sig !== sig || Date.now() - a.run > 300000;
+        anAuto[dk] = { sig, at: Date.now(), run: rerun ? Date.now() : a.run, checking: true };
+        setTimeout(async () => {
+          const got = await anFromServer(i, p);
+          anAuto[dk].checking = false;
+          if (!got && rerun && !anBusy[dk]) runAnalysis(i);
+        }, 0);
       }
       function anFnError(error) {
         const res =
@@ -20990,11 +21016,13 @@
         render();
         try {
           if (gmOn() && !gmBusy && !actsOf(i).some((a) => a.laps && a.laps.length)) await garminSync(true);
+          const sigNow = s7AnSig(i, p);
           const req = coach.buildCoachRequest({
             context: coach.analysisContext(coachCtx(), s7AnData(i, p)),
             chat: [],
             message: coach.analyseMessage(i, p),
             mode: "analyse",
+            job: { day: dk, sig: sigNow },
           });
           const { data, error } = await sb.functions.invoke("coach", {
             body: req,
@@ -21003,7 +21031,7 @@
           const r = coach.parseAnalysis(data);
           S.analysis[dk] = {
             at: Date.now(),
-            sig: s7AnSig(i, p),
+            sig: sigNow,
             data: r,
             state: r.actions.length ? "open" : "none",
           };
@@ -21141,7 +21169,7 @@
           acts = "",
           text = "";
         if (busy)
-          body = `<p class="s7-an-e">Coach liest deine Einheit und die letzten gleichartigen …</p>`;
+          body = `<p class="s7-an-e">Coach liest deine Einheit und die letzten gleichartigen … Das dauert bis zu einer Minute, bitte die App so lange offen lassen.</p>`;
         else if (!rec) {
           body = `<p class="s7-an-e">Für Stärken, Schwächen, Tempo, Pausen und Planänderungen wertet dein Coach die Einheit aus.</p>${btn("Coach-Analyse starten")}`;
         } else {
@@ -21548,6 +21576,27 @@
           const rows = bl.map((q) => ({ cells: [Math.round((q.t0 - S0.t[0]) / 60) + " bis " + Math.round((q.t1 - S0.t[0]) / 60) + " min", mmss(q.t1 - q.t0), q.pw ? Math.round(q.pw) : "", q.hr ? Math.round(q.hr) : "", q.cad ? Math.round(q.cad) : ""], sel: sel(q.t0, q.t1, "Block " + q.k) }));
           return anTableHtml({ cols: "minmax(0,1fr) 52px 44px 44px 44px", head: ["Abschnitt", "Zeit", "Watt", "Puls", "U/min"], rows, note: "Blöcke zu 10 Minuten. Zeile antippen zoomt alle Diagramme auf den Block." }, esc);
         }
+        if (tab === "Gesamt" || tab === "Läufe") {
+          // Gesamt: alle Läufe und Stationen in Plan-Reihenfolge; Läufe: nur die Läufe mit Pace und Puls
+          const p0 = d && d.plan;
+          if (!p0 || !p0.rows.length) return anEmpty("Die Runden passen nicht zu den Plan-Schritten.");
+          let nr = 0;
+          const all = p0.rows.map((r) => ({ ...r, label: r.kind === "run" ? "Lauf " + ++nr + (r.name ? " · " + r.name : "") : r.name }));
+          const km = (r) => { const m = /(\d+(?:[.,]\d+)?)\s?km/.exec(r.name || ""), mm = /(\d+)\s?m\b/.exec(r.name || ""); return m ? parseFloat(m[1].replace(",", ".")) : mm ? +mm[1] / 1000 : 0; };
+          const dcell = (r) => ({ t: sg(r.diff) + " s", c: r.diff <= 0 ? "ok" : "bad" });
+          if (tab === "Läufe") {
+            const rr = all.filter((r) => r.kind === "run");
+            if (!rr.length) return anEmpty("Keine Läufe sicher zugeordnet.");
+            const tot = rr.reduce((s, r) => s + r.t, 0), dist = rr.reduce((s, r) => s + km(r), 0);
+            return anTableHtml({ cols: "minmax(0,1fr) 52px 52px 40px 56px", head: ["Lauf", "Zeit", "Pace", "Puls", "Δ"],
+              rows: rr.map((r) => ({ cells: [r.label, mmss(r.t), km(r) ? mmss(r.t / km(r)) : "–", r.hr || "", dcell(r)] })),
+              note: `Läufe zusammen ${mmss(tot)}${dist ? `, Ø ${mmss(tot / dist)}/km` : ""}. Δ = Zeit gegen Zielzeit aus dem Plan.` }, esc);
+          }
+          const st = all.filter((r) => r.kind !== "run").reduce((s, r) => s + r.t, 0), ru = all.filter((r) => r.kind === "run").reduce((s, r) => s + r.t, 0);
+          return anTableHtml({ cols: "minmax(0,1fr) 52px 52px 40px 56px", head: ["Abschnitt", "Zeit", "Ziel", "Puls", "Δ"],
+            rows: all.map((r) => ({ cells: [r.label, mmss(r.t), { t: mmss(r.goal), c: "mu" }, r.hr || "", dcell(r)] })),
+            note: `Gesamtdauer ${act && act.time ? mmss(act.time) : "–"} (wie Garmin) · Stationen ${mmss(st)} · Läufe ${mmss(ru)}. Stationszeit inklusive Roxzone.` }, esc);
+        }
         if (tab === "Stationen") {
           // Nur Stationen (Plan gegen Ist enthält auch die Läufe)
           const p0 = d && d.plan, sr = p0 ? p0.rows.filter((r) => !r.kind || r.kind === "station") : [];
@@ -21591,6 +21640,7 @@
         else if (kind === "interval" || kind === "station") { const m = /^(\d+) von (\d+)$/.exec(h.big); if (m) { const hit = +m[1], n = +m[2]; verdict = hit === n ? "Sehr gut" : hit >= n - 1 ? "Solide" : "Unter Plan"; tone = hit === n ? "ok" : "warn"; teaser = `${h.big} ${esc2(h.label)}`; } }
         else if (h.status) { verdict = h.status.text; tone = h.status.tone; teaser = `${esc2(h.big)} ${esc2(h.label)}`; }
         else if (h.big && h.big !== "–") teaser = `${esc2(h.big)} ${esc2(h.label)}`;
+        if (busy) teaser = "<i>Coach erstellt die Einschätzung neu (bis zu 1 Minute, App offen lassen) …</i>";
         const secsOut = [];
         if (R && R.summary) secsOut.push({ cls: "mu", t: "Einordnung", html: esc2(R.summary) + (R.form && R.form.text ? "<br>" + line(R.form.rating || "Form", R.form.text) : "") });
         const good = R && R.strengths.length ? pr(R.strengths) : pr(d && d.an && d.an.good), bad = R && R.weaknesses.length ? pr(R.weaknesses) : pr(d && d.an && d.an.bad);
@@ -21619,7 +21669,7 @@
           else if (rec.state === "applied") prop = `<p class="an3-note">Planänderung übernommen.</p>`;
         }
         const at = rec ? new Date(rec.at) : null, when = at ? `Analysiert ${at.getDate()}.${at.getMonth() + 1}. ${String(at.getHours()).padStart(2, "0")}:${String(at.getMinutes()).padStart(2, "0")}` : "Noch keine Coach-Analyse";
-        const foot = anCoachFoot(esc2(when + (stale ? ". Seit der Analyse haben sich Werte oder Uhr-Daten geändert." : ".") + (anErr[dk] ? " " + anErr[dk] : "")), busy ? "Coach liest die Einheit …" : !rec ? "Coach-Analyse starten" : stale ? "Neu analysieren" : "Nochmals analysieren", i, busy);
+        const foot = anCoachFoot(esc2(when + (stale ? ". Seit der Analyse haben sich Werte oder Uhr-Daten geändert." : ".") + (anErr[dk] ? " " + anErr[dk] : "")), busy ? "Coach liest die Einheit … (bis 1 Min., App offen lassen)" : !rec ? "Coach-Analyse starten" : stale ? "Neu analysieren" : "Nochmals analysieren", i, busy);
         return anCoachHtml({ teaser, verdict, tone, sections: secsOut, prop, foot });
       }
       /* Simulationstag → Rennprognose: Vorschlag aus Handeingaben und Uhr-Runden, übernommen erst nach Bestätigung (src/sim-intake.js) */
@@ -23286,6 +23336,9 @@
           const id = dk + "|" + j;
           if (!arr.some((x) => x != null)) continue;
           if (onlyEmpty && String(S.val[id] || "").trim()) continue;
+          // Steht in der Zeile etwas anderes als Zeiten (z. B. «202 kg» von Hand), nie überschreiben: das ist ein Eintrag, keine Uhr-Zeit
+          const cur = String(S.val[id] || "").trim();
+          if (cur && !cur.split(" · ").every((x) => /^(\d{1,2}:\d\d|–)$/.test(x.trim()))) continue;
           // Hat die Uhr für einen Teil der Zeile keine sichere Zeit, bleibt der bisherige Wert dieses Teils (z. B. Handeintrag) stehen
           const old = String(S.val[id] || "").split(" · ").map((x) => x.trim());
           S.val[id] = arr.map((x, q) => (x != null ? mmss(x) : old[q] && old[q] !== "–" && arr.length === old.length ? old[q] : "–")).join(" · ");

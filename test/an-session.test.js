@@ -119,9 +119,12 @@ test("anSessionModel station: Stationen im Ziel, schwächste Station", () => {
   const rows = [{ name: "SkiErg", goal: 240, t: 238, diff: -2 }, { name: "Wall Balls", goal: 200, t: 236, diff: 36 }];
   const m = anSessionModel({ kind: "station", act: { src: "garmin" }, d: { plan: { hit: 1, n: 2, rows }, tiles: [{ k: "Kompromiss-Delta", v: "+12 s/km" }] } });
   assert.equal(m.headline.big, "1 von 2");
-  assert.equal(m.numbers[0].v, "7:54");
-  assert.equal(m.numbers[1].tone, "warn");
-  assert.equal(m.numbers[2].v, "+36");
+  assert.deepEqual(m.numbers.map((n) => n.k), ["Gesamtdauer", "Stationszeit", "Laufzeit", "Kompromiss Ø", "Schwächste"]);
+  assert.equal(m.numbers[0].na, true, "ohne Dauer von der Uhr kein erfundener Wert");
+  assert.equal(m.numbers[1].v, "7:54");
+  assert.equal(m.numbers[2].na, true, "ohne Laufzeilen keine Laufzeit");
+  assert.equal(m.numbers[3].tone, "warn");
+  assert.equal(m.numbers[4].v, "+36");
   assert.equal(m.worst, "Wall Balls");
   assert.equal(m.chart, null, "ohne Zeitreihe kein Diagramm");
 });
